@@ -1,0 +1,109 @@
+<?php
+
+use Core\Config;
+use Ouzo\Utilities\Clock;
+use Ouzo\Utilities\Arrays;
+use Database\Repository\BikeEvent;
+use Database\Repository\BikeProfile;
+use O365\Objects\User;
+use Ouzo\Utilities\Json;
+use Ouzo\Utilities\Strings;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Security\Request;
+
+require_once __DIR__ . "/../../../app/autoload.php";
+
+$return = [];
+$start = Clock::at($_POST['perSchoolStart']);
+$end = Clock::at($_POST['perSchoolEnd']);
+
+$schools = Config::get("schools");
+$prices = Config::get("tool/bike/price");
+
+if (!file_exists(LOCATION_PUBLIC_DOWNLOADS)) mkdir(LOCATION_PUBLIC_DOWNLOADS, 0777);
+if (!file_exists(LOCATION_PUBLIC_DOWNLOADS . "bike")) mkdir(LOCATION_PUBLIC_DOWNLOADS . "bike", 0777);
+
+$bikeEvents = (new BikeEvent)->get();
+$bikeEvents = Arrays::filter($bikeEvents, fn ($be) => Clock::at($be->date)->isAfterOrEqualTo($start) && Clock::at($be->date)->isBeforeOrEqualTo($end));
+$teachersUpn = array_values(array_unique(Arrays::map($bikeEvents, fn ($be) => $be->upn)));
+
+$spreadsheet = new Spreadsheet();
+$mainSheet = $spreadsheet->getActiveSheet()->setTitle("Overzicht");
+
+$mainSheet->mergeCells("A1:F1")
+    ->setCellValue("A1", "Fietsvergoeding - Overzicht per school: " . $start->format("d-m-Y") . " - " . $end->format("d-m-Y"))
+    ->getStyle("A1")
+    ->getFont()->setBold(true);
+
+$mainSheet->setCellValue("A3", "School");
+$mainSheet->setCellValue("B3", "Kilometers");
+$mainSheet->setCellValue("C3", "Kosten");
+
+$mainRow = 4;
+
+foreach ($schools as $id => $school) {
+    $mainSheet->setCellValue("A{$mainRow}", $school)->getCell("A{$mainRow}")->getHyperlink()->setUrl("sheet://'{$school}'!A1");
+
+    $sheet = $spreadsheet->createSheet();
+    $sheet->setTitle($school);
+
+    $sheet->mergeCells("A1:F1")
+        ->setCellValue("A1", "Fietsvergoeding - {$school}: " . $start->format("d-m-Y") . " - " . $end->format("d-m-Y"))
+        ->getStyle("A1")
+        ->getFont()->setBold(true);
+
+    $sheet->setCellValue("A3", 'Leerkracht');
+    $sheet->setCellValue("B3", 'Kilometers');
+    $sheet->setCellValue("C3", 'Kosten');
+
+    $row = 4;
+    $totalKm = $totalCosts = 0;
+
+    foreach ($teachersUpn as $upn) {
+        if (!Strings::contains($upn, '@')) continue;
+
+        $teacher = (new User)->get($upn);
+        $bikeProfile = (new BikeProfile)->getByUpn($upn);
+        if (!Strings::equal($bikeProfile->mainSchool, $id)) continue;
+
+        $teacherBikeEvents = Arrays::filter($bikeEvents, fn ($be) => Strings::equalsIgnoreCase($be->upn, $upn) && $be->distance > 0);
+
+        $sheet->setCellValue("A{$row}", $teacher->getDisplayName());
+
+        $km = $costs = 0;
+        foreach ($teacherBikeEvents as $bikeEvent) {
+            $km += ($bikeEvent->distanceInKm * 2);
+            $costs += ($bikeEvent->distanceInKm * 2) * Arrays::first(Arrays::filter($prices, fn ($p) => Clock::at($bikeEvent->date)->isAfterOrEqualTo(Clock::at($p['start'])) && Clock::at($bikeEvent->date)->isBeforeOrEqualTo(Clock::at($p['end']))))['amount'];
+        }
+
+        $sheet->setCellValue("B{$row}", $km);
+        $sheet->setCellValue("C{$row}", $costs);
+
+        $totalKm += $km;
+        $totalCosts += $costs;
+
+        $row++;
+    }
+
+    $row++;
+    $sheet->setCellValue("A{$row}", "Totaal");
+    $sheet->setCellValue("B{$row}", $totalKm);
+    $sheet->setCellValue("C{$row}", $totalCosts);
+
+    foreach ($sheet->getColumnIterator() as $c) $sheet->getColumnDimension($c->getColumnIndex())->setAutoSize(true);
+
+    $mainSheet->setCellValue("B{$mainRow}", $totalKm);
+    $mainSheet->setCellValue("C{$mainRow}", $totalCosts);
+
+    $mainRow++;
+}
+
+foreach ($mainSheet->getColumnIterator() as $c) $mainSheet->getColumnDimension($c->getColumnIndex())->setAutoSize(true);
+
+$writer = new Xlsx($spreadsheet);
+$writer->save(LOCATION_PUBLIC_DOWNLOADS . "bike/exportPerSchool.xlsx");
+
+$return['download'] = Request::host(protocol: 'https') . "/public/downloads/bike/exportPerSchool.xlsx";
+
+echo Json::safeEncode($return);
