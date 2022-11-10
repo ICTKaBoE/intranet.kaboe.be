@@ -2,20 +2,28 @@
 
 namespace Database\Interface;
 
+use Ouzo\Utilities\Arrays;
+
 class CustomObject
 {
     protected $objectAttributes = [];
+    protected $linkObjects = true;
+
     public function __construct($attributes = [])
     {
         foreach ($this->objectAttributes as $objAtt) {
-            if (key_exists($objAtt, $attributes)) $this->$objAtt = $attributes[$objAtt];
-            else $this->$objAtt = null;
+            $this->$objAtt = Arrays::getValue($attributes, $objAtt, null);
         }
 
+        if ($this->linkObjects) $this->link();
         $this->init();
     }
 
     public function init()
+    {
+    }
+
+    public function link()
     {
     }
 

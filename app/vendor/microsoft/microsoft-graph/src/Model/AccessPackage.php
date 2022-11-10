@@ -179,8 +179,37 @@ class AccessPackage extends Entity
 
 
      /**
+     * Gets the accessPackagesIncompatibleWith
+    * The access packages that are incompatible with this package. Read-only.
+     *
+     * @return array|null The accessPackagesIncompatibleWith
+     */
+    public function getAccessPackagesIncompatibleWith()
+    {
+        if (array_key_exists("accessPackagesIncompatibleWith", $this->_propDict)) {
+           return $this->_propDict["accessPackagesIncompatibleWith"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the accessPackagesIncompatibleWith
+    * The access packages that are incompatible with this package. Read-only.
+    *
+    * @param AccessPackage[] $val The accessPackagesIncompatibleWith
+    *
+    * @return AccessPackage
+    */
+    public function setAccessPackagesIncompatibleWith($val)
+    {
+        $this->_propDict["accessPackagesIncompatibleWith"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the assignmentPolicies
-    * Read-only. Nullable.
      *
      * @return array|null The assignmentPolicies
      */
@@ -195,7 +224,6 @@ class AccessPackage extends Entity
 
     /**
     * Sets the assignmentPolicies
-    * Read-only. Nullable.
     *
     * @param AccessPackageAssignmentPolicy[] $val The assignmentPolicies
     *
@@ -209,7 +237,6 @@ class AccessPackage extends Entity
 
     /**
     * Gets the catalog
-    * Read-only. Nullable.
     *
     * @return AccessPackageCatalog|null The catalog
     */
@@ -228,7 +255,6 @@ class AccessPackage extends Entity
 
     /**
     * Sets the catalog
-    * Read-only. Nullable.
     *
     * @param AccessPackageCatalog $val The catalog
     *
@@ -237,6 +263,66 @@ class AccessPackage extends Entity
     public function setCatalog($val)
     {
         $this->_propDict["catalog"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the incompatibleAccessPackages
+    * The access packages whose assigned users are ineligible to be assigned this access package.
+     *
+     * @return array|null The incompatibleAccessPackages
+     */
+    public function getIncompatibleAccessPackages()
+    {
+        if (array_key_exists("incompatibleAccessPackages", $this->_propDict)) {
+           return $this->_propDict["incompatibleAccessPackages"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the incompatibleAccessPackages
+    * The access packages whose assigned users are ineligible to be assigned this access package.
+    *
+    * @param AccessPackage[] $val The incompatibleAccessPackages
+    *
+    * @return AccessPackage
+    */
+    public function setIncompatibleAccessPackages($val)
+    {
+        $this->_propDict["incompatibleAccessPackages"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the incompatibleGroups
+    * The groups whose members are ineligible to be assigned this access package.
+     *
+     * @return array|null The incompatibleGroups
+     */
+    public function getIncompatibleGroups()
+    {
+        if (array_key_exists("incompatibleGroups", $this->_propDict)) {
+           return $this->_propDict["incompatibleGroups"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the incompatibleGroups
+    * The groups whose members are ineligible to be assigned this access package.
+    *
+    * @param Group[] $val The incompatibleGroups
+    *
+    * @return AccessPackage
+    */
+    public function setIncompatibleGroups($val)
+    {
+        $this->_propDict["incompatibleGroups"] = $val;
         return $this;
     }
 

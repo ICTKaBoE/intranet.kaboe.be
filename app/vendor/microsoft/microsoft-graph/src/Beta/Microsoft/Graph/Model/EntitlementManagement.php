@@ -27,7 +27,6 @@ class EntitlementManagement extends Entity
 
      /**
      * Gets the accessPackageAssignmentApprovals
-    * Approval stages for assignment requests.
      *
      * @return array|null The accessPackageAssignmentApprovals
      */
@@ -42,7 +41,6 @@ class EntitlementManagement extends Entity
 
     /**
     * Sets the accessPackageAssignmentApprovals
-    * Approval stages for assignment requests.
     *
     * @param Approval[] $val The accessPackageAssignmentApprovals
     *
@@ -147,7 +145,7 @@ class EntitlementManagement extends Entity
 
      /**
      * Gets the accessPackageAssignments
-    * Represents the grant of an access package to a subject (user or group).
+    * The assignment of an access package to a subject for a period of time.
      *
      * @return array|null The accessPackageAssignments
      */
@@ -162,7 +160,7 @@ class EntitlementManagement extends Entity
 
     /**
     * Sets the accessPackageAssignments
-    * Represents the grant of an access package to a subject (user or group).
+    * The assignment of an access package to a subject for a period of time.
     *
     * @param AccessPackageAssignment[] $val The accessPackageAssignments
     *
@@ -177,7 +175,7 @@ class EntitlementManagement extends Entity
 
      /**
      * Gets the accessPackageCatalogs
-    * Represents a group of access packages.
+    * A container of access packages.
      *
      * @return array|null The accessPackageCatalogs
      */
@@ -192,7 +190,7 @@ class EntitlementManagement extends Entity
 
     /**
     * Sets the accessPackageCatalogs
-    * Represents a group of access packages.
+    * A container of access packages.
     *
     * @param AccessPackageCatalog[] $val The accessPackageCatalogs
     *
@@ -414,6 +412,34 @@ class EntitlementManagement extends Entity
     public function setSettings($val)
     {
         $this->_propDict["settings"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the subjects
+     *
+     * @return array|null The subjects
+     */
+    public function getSubjects()
+    {
+        if (array_key_exists("subjects", $this->_propDict)) {
+           return $this->_propDict["subjects"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the subjects
+    *
+    * @param AccessPackageSubject[] $val The subjects
+    *
+    * @return EntitlementManagement
+    */
+    public function setSubjects($val)
+    {
+        $this->_propDict["subjects"] = $val;
         return $this;
     }
 

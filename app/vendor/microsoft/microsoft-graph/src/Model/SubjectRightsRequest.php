@@ -446,7 +446,7 @@ class SubjectRightsRequest extends Entity
     * Gets the regulations
     * List of regulations that this request will fulfill.
     *
-    * @return string|null The regulations
+    * @return array|null The regulations
     */
     public function getRegulations()
     {
@@ -461,7 +461,7 @@ class SubjectRightsRequest extends Entity
     * Sets the regulations
     * List of regulations that this request will fulfill.
     *
-    * @param string $val The regulations
+    * @param string[] $val The regulations
     *
     * @return SubjectRightsRequest
     */
@@ -536,7 +536,7 @@ class SubjectRightsRequest extends Entity
 
     /**
     * Gets the type
-    * The type of the request. Possible values are: export, delete, access, tagForAction, unknownFutureValue.
+    * The type of the request. Possible values are: export, delete,  access, tagForAction, unknownFutureValue.
     *
     * @return SubjectRightsRequestType|null The type
     */
@@ -555,7 +555,7 @@ class SubjectRightsRequest extends Entity
 
     /**
     * Sets the type
-    * The type of the request. Possible values are: export, delete, access, tagForAction, unknownFutureValue.
+    * The type of the request. Possible values are: export, delete,  access, tagForAction, unknownFutureValue.
     *
     * @param SubjectRightsRequestType $val The type
     *

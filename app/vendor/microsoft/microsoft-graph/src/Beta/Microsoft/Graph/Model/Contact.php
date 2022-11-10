@@ -90,7 +90,7 @@ class Contact extends OutlookItem
     * Gets the children
     * The names of the contact's children.
     *
-    * @return string|null The children
+    * @return array|null The children
     */
     public function getChildren()
     {
@@ -105,7 +105,7 @@ class Contact extends OutlookItem
     * Sets the children
     * The names of the contact's children.
     *
-    * @param string $val The children
+    * @param string[] $val The children
     *
     * @return Contact
     */
@@ -384,7 +384,7 @@ class Contact extends OutlookItem
     /**
     * Gets the imAddresses
     *
-    * @return string|null The imAddresses
+    * @return array|null The imAddresses
     */
     public function getImAddresses()
     {
@@ -398,7 +398,7 @@ class Contact extends OutlookItem
     /**
     * Sets the imAddresses
     *
-    * @param string $val The imAddresses
+    * @param string[] $val The imAddresses
     *
     * @return Contact
     */
@@ -958,7 +958,7 @@ class Contact extends OutlookItem
 
      /**
      * Gets the extensions
-    * The collection of open extensions defined for the contact. Read-only. Nullable.
+    * The collection of open extensions defined for the contact. Nullable.
      *
      * @return array|null The extensions
      */
@@ -973,7 +973,7 @@ class Contact extends OutlookItem
 
     /**
     * Sets the extensions
-    * The collection of open extensions defined for the contact. Read-only. Nullable.
+    * The collection of open extensions defined for the contact. Nullable.
     *
     * @param Extension[] $val The extensions
     *

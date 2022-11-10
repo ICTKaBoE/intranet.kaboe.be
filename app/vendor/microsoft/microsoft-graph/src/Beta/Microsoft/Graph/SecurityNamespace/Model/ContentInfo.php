@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * ContentInfo class
 *
@@ -25,6 +25,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 {
     /**
     * Gets the contentFormat
+    * The format of the content to be labeled. Possible values are: file, email.
     *
     * @return string|null The contentFormat
     */
@@ -39,6 +40,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the contentFormat
+    * The format of the content to be labeled. Possible values are: file, email.
     *
     * @param string $val The value of the contentFormat
     *
@@ -51,6 +53,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
     }
     /**
     * Gets the identifier
+    * Identifier used for Azure Information Protection Analytics.
     *
     * @return string|null The identifier
     */
@@ -65,6 +68,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the identifier
+    * Identifier used for Azure Information Protection Analytics.
     *
     * @param string $val The value of the identifier
     *
@@ -78,13 +82,14 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the metadata
+    * Existing Microsoft Purview Information Protection metadata is passed as key-value pairs, where the key is the MSIP_Label_GUID_PropName.
     *
     * @return KeyValuePair|null The metadata
     */
     public function getMetadata()
     {
         if (array_key_exists("metadata", $this->_propDict)) {
-            if (is_a($this->_propDict["metadata"], "\Beta\Microsoft\Graph\Security\Model\KeyValuePair") || is_null($this->_propDict["metadata"])) {
+            if (is_a($this->_propDict["metadata"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\KeyValuePair") || is_null($this->_propDict["metadata"])) {
                 return $this->_propDict["metadata"];
             } else {
                 $this->_propDict["metadata"] = new KeyValuePair($this->_propDict["metadata"]);
@@ -96,6 +101,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the metadata
+    * Existing Microsoft Purview Information Protection metadata is passed as key-value pairs, where the key is the MSIP_Label_GUID_PropName.
     *
     * @param KeyValuePair $val The value to assign to the metadata
     *
@@ -109,13 +115,14 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the state
+    * The usage state of the content. The possible values are: rest, motion, or use.
     *
     * @return ContentState|null The state
     */
     public function getState()
     {
         if (array_key_exists("state", $this->_propDict)) {
-            if (is_a($this->_propDict["state"], "\Beta\Microsoft\Graph\Security\Model\ContentState") || is_null($this->_propDict["state"])) {
+            if (is_a($this->_propDict["state"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\ContentState") || is_null($this->_propDict["state"])) {
                 return $this->_propDict["state"];
             } else {
                 $this->_propDict["state"] = new ContentState($this->_propDict["state"]);
@@ -127,6 +134,7 @@ class ContentInfo extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the state
+    * The usage state of the content. The possible values are: rest, motion, or use.
     *
     * @param ContentState $val The value to assign to the state
     *

@@ -114,7 +114,6 @@ class SecureScoreControlProfile extends Entity
 
      /**
      * Gets the complianceInformation
-    * The collection of compliance information associated with secure score control
      *
      * @return array|null The complianceInformation
      */
@@ -129,7 +128,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Sets the complianceInformation
-    * The collection of compliance information associated with secure score control
     *
     * @param ComplianceInformation[] $val The complianceInformation
     *
@@ -173,7 +171,6 @@ class SecureScoreControlProfile extends Entity
 
      /**
      * Gets the controlStateUpdates
-    * Flag to indicate where the tenant has marked a control (ignore, thirdParty, reviewed) (supports update).
      *
      * @return array|null The controlStateUpdates
      */
@@ -188,7 +185,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Sets the controlStateUpdates
-    * Flag to indicate where the tenant has marked a control (ignore, thirdParty, reviewed) (supports update).
     *
     * @param SecureScoreControlStateUpdate[] $val The controlStateUpdates
     *
@@ -440,7 +436,7 @@ class SecureScoreControlProfile extends Entity
     * Gets the threats
     * List of threats the control mitigates (accountBreach,dataDeletion,dataExfiltration,dataSpillage,
     *
-    * @return string|null The threats
+    * @return array|null The threats
     */
     public function getThreats()
     {
@@ -455,7 +451,7 @@ class SecureScoreControlProfile extends Entity
     * Sets the threats
     * List of threats the control mitigates (accountBreach,dataDeletion,dataExfiltration,dataSpillage,
     *
-    * @param string $val The threats
+    * @param string[] $val The threats
     *
     * @return SecureScoreControlProfile
     */
@@ -467,7 +463,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Gets the tier
-    * Control tier (Core, Defense in Depth, Advanced.)
     *
     * @return string|null The tier
     */
@@ -482,7 +477,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Sets the tier
-    * Control tier (Core, Defense in Depth, Advanced.)
     *
     * @param string $val The tier
     *
@@ -525,7 +519,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Gets the userImpact
-    * User impact of implementing control (low, moderate, high).
     *
     * @return string|null The userImpact
     */
@@ -540,7 +533,6 @@ class SecureScoreControlProfile extends Entity
 
     /**
     * Sets the userImpact
-    * User impact of implementing control (low, moderate, high).
     *
     * @param string $val The userImpact
     *

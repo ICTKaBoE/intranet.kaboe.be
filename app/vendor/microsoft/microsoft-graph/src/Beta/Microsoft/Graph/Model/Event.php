@@ -26,7 +26,7 @@ class Event extends OutlookItem
 {
     /**
     * Gets the allowNewTimeProposals
-    * true if the meeting organizer allows invitees to propose a new time when responding; otherwise, false. Optional. Default is true.
+    * true if the meeting organizer allows invitees to propose a new time when responding; otherwise false. Optional. Default is true.
     *
     * @return bool|null The allowNewTimeProposals
     */
@@ -41,7 +41,7 @@ class Event extends OutlookItem
 
     /**
     * Sets the allowNewTimeProposals
-    * true if the meeting organizer allows invitees to propose a new time when responding; otherwise, false. Optional. Default is true.
+    * true if the meeting organizer allows invitees to propose a new time when responding; otherwise false. Optional. Default is true.
     *
     * @param bool $val The allowNewTimeProposals
     *
@@ -149,7 +149,7 @@ class Event extends OutlookItem
     * Gets the cancelledOccurrences
     * Contains occurrenceId property values of cancelled instances in a recurring series, if the event is the series master. Instances in a recurring series that are cancelled are called cancelledOccurences.Returned only on $select in a Get operation which specifies the id of a series master event (that is, the seriesMasterId property value).
     *
-    * @return string|null The cancelledOccurrences
+    * @return array|null The cancelledOccurrences
     */
     public function getCancelledOccurrences()
     {
@@ -164,7 +164,7 @@ class Event extends OutlookItem
     * Sets the cancelledOccurrences
     * Contains occurrenceId property values of cancelled instances in a recurring series, if the event is the series master. Instances in a recurring series that are cancelled are called cancelledOccurences.Returned only on $select in a Get operation which specifies the id of a series master event (that is, the seriesMasterId property value).
     *
-    * @param string $val The cancelledOccurrences
+    * @param string[] $val The cancelledOccurrences
     *
     * @return Event
     */

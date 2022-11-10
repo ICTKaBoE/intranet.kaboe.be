@@ -27,7 +27,6 @@ class AuditLogRoot extends Entity
 
      /**
      * Gets the directoryAudits
-    * Read-only. Nullable.
      *
      * @return array|null The directoryAudits
      */
@@ -42,7 +41,6 @@ class AuditLogRoot extends Entity
 
     /**
     * Sets the directoryAudits
-    * Read-only. Nullable.
     *
     * @param DirectoryAudit[] $val The directoryAudits
     *
@@ -84,36 +82,7 @@ class AuditLogRoot extends Entity
 
 
      /**
-     * Gets the restrictedSignIns
-     *
-     * @return array|null The restrictedSignIns
-     */
-    public function getRestrictedSignIns()
-    {
-        if (array_key_exists("restrictedSignIns", $this->_propDict)) {
-           return $this->_propDict["restrictedSignIns"];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-    * Sets the restrictedSignIns
-    *
-    * @param RestrictedSignIn[] $val The restrictedSignIns
-    *
-    * @return AuditLogRoot
-    */
-    public function setRestrictedSignIns($val)
-    {
-        $this->_propDict["restrictedSignIns"] = $val;
-        return $this;
-    }
-
-
-     /**
      * Gets the signIns
-    * Read-only. Nullable.
      *
      * @return array|null The signIns
      */
@@ -128,7 +97,6 @@ class AuditLogRoot extends Entity
 
     /**
     * Sets the signIns
-    * Read-only. Nullable.
     *
     * @param SignIn[] $val The signIns
     *

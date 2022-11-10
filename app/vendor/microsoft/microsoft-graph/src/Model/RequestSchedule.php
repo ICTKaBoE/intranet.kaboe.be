@@ -26,7 +26,7 @@ class RequestSchedule extends Entity
 
     /**
     * Gets the expiration
-    * When the access should expire.
+    * When the eligible or active assignment expires.
     *
     * @return ExpirationPattern|null The expiration
     */
@@ -45,7 +45,7 @@ class RequestSchedule extends Entity
 
     /**
     * Sets the expiration
-    * When the access should expire.
+    * When the eligible or active assignment expires.
     *
     * @param ExpirationPattern $val The value to assign to the expiration
     *
@@ -59,7 +59,7 @@ class RequestSchedule extends Entity
 
     /**
     * Gets the recurrence
-    * For recurring access. Not used at present.
+    * The frequency of the  eligible or active assignment. This property is currently unsupported in PIM.
     *
     * @return PatternedRecurrence|null The recurrence
     */
@@ -78,7 +78,7 @@ class RequestSchedule extends Entity
 
     /**
     * Sets the recurrence
-    * For recurring access. Not used at present.
+    * The frequency of the  eligible or active assignment. This property is currently unsupported in PIM.
     *
     * @param PatternedRecurrence $val The value to assign to the recurrence
     *
@@ -92,7 +92,7 @@ class RequestSchedule extends Entity
 
     /**
     * Gets the startDateTime
-    * The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+    * When the  eligible or active assignment becomes active.
     *
     * @return \DateTime|null The startDateTime
     */
@@ -111,7 +111,7 @@ class RequestSchedule extends Entity
 
     /**
     * Sets the startDateTime
-    * The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+    * When the  eligible or active assignment becomes active.
     *
     * @param \DateTime $val The value to assign to the startDateTime
     *

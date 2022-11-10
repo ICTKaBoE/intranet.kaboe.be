@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 
 /**
 * InformationProtection class
@@ -26,13 +26,14 @@ class InformationProtection extends \Beta\Microsoft\Graph\Model\Entity
 {
     /**
     * Gets the labelPolicySettings
+    * Read the Microsoft Purview Information Protection policy settings for the user or organization.
     *
     * @return InformationProtectionPolicySetting|null The labelPolicySettings
     */
     public function getLabelPolicySettings()
     {
         if (array_key_exists("labelPolicySettings", $this->_propDict)) {
-            if (is_a($this->_propDict["labelPolicySettings"], "\Beta\Microsoft\Graph\Security\Model\InformationProtectionPolicySetting") || is_null($this->_propDict["labelPolicySettings"])) {
+            if (is_a($this->_propDict["labelPolicySettings"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtectionPolicySetting") || is_null($this->_propDict["labelPolicySettings"])) {
                 return $this->_propDict["labelPolicySettings"];
             } else {
                 $this->_propDict["labelPolicySettings"] = new InformationProtectionPolicySetting($this->_propDict["labelPolicySettings"]);
@@ -44,6 +45,7 @@ class InformationProtection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the labelPolicySettings
+    * Read the Microsoft Purview Information Protection policy settings for the user or organization.
     *
     * @param InformationProtectionPolicySetting $val The labelPolicySettings
     *
@@ -58,6 +60,7 @@ class InformationProtection extends \Beta\Microsoft\Graph\Model\Entity
 
      /**
      * Gets the sensitivityLabels
+    * Read the Microsoft Purview Information Protection labels for the user or organization.
      *
      * @return array|null The sensitivityLabels
      */
@@ -72,6 +75,7 @@ class InformationProtection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the sensitivityLabels
+    * Read the Microsoft Purview Information Protection labels for the user or organization.
     *
     * @param SensitivityLabel[] $val The sensitivityLabels
     *

@@ -33,11 +33,11 @@ class Repository
         return new $this->object($row);
     }
 
-    public function get($id = null, $order = true)
+    public function get($id = null, $order = true, $deleted = false)
     {
         $statement = $this->repoTable->select();
         if (!is_null($id)) $statement->where($this->idField, $id);
-        if ($this->deletedField) $statement->where($this->deletedField, "0");
+        if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
         if ($order && $this->orderField) $statement->orderBy($this->orderField, $this->orderDirection);
 
         $rows = $statement->get();

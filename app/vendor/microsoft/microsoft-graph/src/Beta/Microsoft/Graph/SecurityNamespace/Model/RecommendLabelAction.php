@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * RecommendLabelAction class
 *
@@ -26,13 +26,14 @@ class RecommendLabelAction extends InformationProtectionAction
 
     /**
     * Gets the actions
+    * Actions to take if the label is accepted by the user.
     *
     * @return InformationProtectionAction|null The actions
     */
     public function getActions()
     {
         if (array_key_exists("actions", $this->_propDict)) {
-            if (is_a($this->_propDict["actions"], "\Beta\Microsoft\Graph\Security\Model\InformationProtectionAction") || is_null($this->_propDict["actions"])) {
+            if (is_a($this->_propDict["actions"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtectionAction") || is_null($this->_propDict["actions"])) {
                 return $this->_propDict["actions"];
             } else {
                 $this->_propDict["actions"] = new InformationProtectionAction($this->_propDict["actions"]);
@@ -44,6 +45,7 @@ class RecommendLabelAction extends InformationProtectionAction
 
     /**
     * Sets the actions
+    * Actions to take if the label is accepted by the user.
     *
     * @param InformationProtectionAction $val The value to assign to the actions
     *
@@ -57,13 +59,14 @@ class RecommendLabelAction extends InformationProtectionAction
 
     /**
     * Gets the actionSource
+    * Specifies why the label was selected. Possible values are: manual, automatic, recommended, default.
     *
     * @return ActionSource|null The actionSource
     */
     public function getActionSource()
     {
         if (array_key_exists("actionSource", $this->_propDict)) {
-            if (is_a($this->_propDict["actionSource"], "\Beta\Microsoft\Graph\Security\Model\ActionSource") || is_null($this->_propDict["actionSource"])) {
+            if (is_a($this->_propDict["actionSource"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\ActionSource") || is_null($this->_propDict["actionSource"])) {
                 return $this->_propDict["actionSource"];
             } else {
                 $this->_propDict["actionSource"] = new ActionSource($this->_propDict["actionSource"]);
@@ -75,6 +78,7 @@ class RecommendLabelAction extends InformationProtectionAction
 
     /**
     * Sets the actionSource
+    * Specifies why the label was selected. Possible values are: manual, automatic, recommended, default.
     *
     * @param ActionSource $val The value to assign to the actionSource
     *
@@ -87,6 +91,7 @@ class RecommendLabelAction extends InformationProtectionAction
     }
     /**
     * Gets the responsibleSensitiveTypeIds
+    * The sensitive information type GUIDs that caused the recommendation to be given.
     *
     * @return string|null The responsibleSensitiveTypeIds
     */
@@ -101,6 +106,7 @@ class RecommendLabelAction extends InformationProtectionAction
 
     /**
     * Sets the responsibleSensitiveTypeIds
+    * The sensitive information type GUIDs that caused the recommendation to be given.
     *
     * @param string $val The value of the responsibleSensitiveTypeIds
     *

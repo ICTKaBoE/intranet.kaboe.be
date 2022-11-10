@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * CustomAction class
 *
@@ -25,6 +25,7 @@ class CustomAction extends InformationProtectionAction
 {
     /**
     * Gets the name
+    * Name of the custom action.
     *
     * @return string|null The name
     */
@@ -39,6 +40,7 @@ class CustomAction extends InformationProtectionAction
 
     /**
     * Sets the name
+    * Name of the custom action.
     *
     * @param string $val The value of the name
     *
@@ -52,13 +54,14 @@ class CustomAction extends InformationProtectionAction
 
     /**
     * Gets the customActionProperties
+    * Properties, in key-value pair format, of the action.
     *
     * @return KeyValuePair|null The customActionProperties
     */
     public function getCustomActionProperties()
     {
         if (array_key_exists("properties", $this->_propDict)) {
-            if (is_a($this->_propDict["properties"], "\Beta\Microsoft\Graph\Security\Model\KeyValuePair") || is_null($this->_propDict["properties"])) {
+            if (is_a($this->_propDict["properties"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\KeyValuePair") || is_null($this->_propDict["properties"])) {
                 return $this->_propDict["properties"];
             } else {
                 $this->_propDict["properties"] = new KeyValuePair($this->_propDict["properties"]);
@@ -70,6 +73,7 @@ class CustomAction extends InformationProtectionAction
 
     /**
     * Sets the customActionProperties
+    * Properties, in key-value pair format, of the action.
     *
     * @param KeyValuePair $val The value to assign to the properties
     *

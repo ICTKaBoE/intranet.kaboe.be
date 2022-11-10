@@ -1,0 +1,21 @@
+{
+	"get": [
+		"/",
+		"/error/404",
+		"/user/login",
+		"/user/logout",
+		"/user/profile",
+		"/user/address",
+		"/settings",
+		"/bike/home-work",
+		"/bike/profile",
+		{
+			"path": "/selectModule",
+			"controller": "SelectModuleController"
+		},
+		{
+			"path": "/o365/callback",
+			"controller": "O365CallbackController"
+		}
+	]
+}

@@ -610,7 +610,7 @@ class IntuneBrand extends Entity
     }
     /**
     * Gets the sendDeviceOwnershipChangePushNotification
-    * SendDeviceOwnershipChangePushNotification will be deprecated in 06/2022 and will stop returning a value in 07/2022. A boolean that indicates if a push notification is sent to users when their device ownership type changes from personal to corporate
+    * Boolean that indicates if a push notification is sent to users when their device ownership type changes from personal to corporate
     *
     * @return bool|null The sendDeviceOwnershipChangePushNotification
     */
@@ -625,7 +625,7 @@ class IntuneBrand extends Entity
 
     /**
     * Sets the sendDeviceOwnershipChangePushNotification
-    * SendDeviceOwnershipChangePushNotification will be deprecated in 06/2022 and will stop returning a value in 07/2022. A boolean that indicates if a push notification is sent to users when their device ownership type changes from personal to corporate
+    * Boolean that indicates if a push notification is sent to users when their device ownership type changes from personal to corporate
     *
     * @param bool $val The value of the sendDeviceOwnershipChangePushNotification
     *
@@ -662,6 +662,34 @@ class IntuneBrand extends Entity
     public function setShowAzureADEnterpriseApps($val)
     {
         $this->_propDict["showAzureADEnterpriseApps"] = $val;
+        return $this;
+    }
+    /**
+    * Gets the showConfigurationManagerApps
+    * Boolean that indicates if ConfigurationManagerApps will be shown in Company Portal
+    *
+    * @return bool|null The showConfigurationManagerApps
+    */
+    public function getShowConfigurationManagerApps()
+    {
+        if (array_key_exists("showConfigurationManagerApps", $this->_propDict)) {
+            return $this->_propDict["showConfigurationManagerApps"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the showConfigurationManagerApps
+    * Boolean that indicates if ConfigurationManagerApps will be shown in Company Portal
+    *
+    * @param bool $val The value of the showConfigurationManagerApps
+    *
+    * @return IntuneBrand
+    */
+    public function setShowConfigurationManagerApps($val)
+    {
+        $this->_propDict["showConfigurationManagerApps"] = $val;
         return $this;
     }
     /**

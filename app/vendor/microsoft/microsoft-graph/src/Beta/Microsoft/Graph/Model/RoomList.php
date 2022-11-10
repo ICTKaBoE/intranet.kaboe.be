@@ -56,7 +56,6 @@ class RoomList extends Place
 
      /**
      * Gets the rooms
-    * Read-only. Nullable.
      *
      * @return array|null The rooms
      */
@@ -71,7 +70,6 @@ class RoomList extends Place
 
     /**
     * Sets the rooms
-    * Read-only. Nullable.
     *
     * @param Room[] $val The rooms
     *
@@ -80,6 +78,34 @@ class RoomList extends Place
     public function setRooms($val)
     {
         $this->_propDict["rooms"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the workspaces
+     *
+     * @return array|null The workspaces
+     */
+    public function getWorkspaces()
+    {
+        if (array_key_exists("workspaces", $this->_propDict)) {
+           return $this->_propDict["workspaces"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the workspaces
+    *
+    * @param Workspace[] $val The workspaces
+    *
+    * @return RoomList
+    */
+    public function setWorkspaces($val)
+    {
+        $this->_propDict["workspaces"] = $val;
         return $this;
     }
 

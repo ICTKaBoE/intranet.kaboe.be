@@ -177,7 +177,7 @@ class Group extends DirectoryObject
 
     /**
     * Gets the displayName
-    * The display name for the group. This property is required when a group is created and cannot be cleared during updates. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderBy.
+    * The display name for the group. This property is required when a group is created and cannot be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderBy.
     *
     * @return string|null The displayName
     */
@@ -192,7 +192,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the displayName
-    * The display name for the group. This property is required when a group is created and cannot be cleared during updates. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderBy.
+    * The display name for the group. This property is required when a group is created and cannot be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderBy.
     *
     * @param string $val The displayName
     *
@@ -241,7 +241,7 @@ class Group extends DirectoryObject
     * Gets the groupTypes
     * Specifies the group type and its membership. If the collection contains Unified, the group is a Microsoft 365 group; otherwise, it's either a security group or distribution group. For details, see groups overview.If the collection includes DynamicMembership, the group has dynamic membership; otherwise, membership is static. Returned by default. Supports $filter (eq, not).
     *
-    * @return string|null The groupTypes
+    * @return array|null The groupTypes
     */
     public function getGroupTypes()
     {
@@ -256,7 +256,7 @@ class Group extends DirectoryObject
     * Sets the groupTypes
     * Specifies the group type and its membership. If the collection contains Unified, the group is a Microsoft 365 group; otherwise, it's either a security group or distribution group. For details, see groups overview.If the collection includes DynamicMembership, the group has dynamic membership; otherwise, membership is static. Returned by default. Supports $filter (eq, not).
     *
-    * @param string $val The groupTypes
+    * @param string[] $val The groupTypes
     *
     * @return Group
     */
@@ -297,7 +297,7 @@ class Group extends DirectoryObject
 
     /**
     * Gets the isAssignableToRole
-    * Indicates whether this group can be assigned to an Azure Active Directory role or not. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers in Global administrator and Privileged role administrator roles can set this property. The caller must be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Azure AD role assignmentsReturned by default. Supports $filter (eq, ne, not).
+    * Indicates whether this group can be assigned to an Azure Active Directory role or not. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers in Global Administrator and Privileged Role Administrator roles can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Azure AD role assignmentsReturned by default. Supports $filter (eq, ne, not).
     *
     * @return bool|null The isAssignableToRole
     */
@@ -312,7 +312,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the isAssignableToRole
-    * Indicates whether this group can be assigned to an Azure Active Directory role or not. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers in Global administrator and Privileged role administrator roles can set this property. The caller must be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Azure AD role assignmentsReturned by default. Supports $filter (eq, ne, not).
+    * Indicates whether this group can be assigned to an Azure Active Directory role or not. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers in Global Administrator and Privileged Role Administrator roles can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Azure AD role assignmentsReturned by default. Supports $filter (eq, ne, not).
     *
     * @param bool $val The isAssignableToRole
     *
@@ -504,7 +504,6 @@ class Group extends DirectoryObject
 
     /**
     * Gets the onPremisesDomainName
-    * Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.Returned by default. Read-only.
     *
     * @return string|null The onPremisesDomainName
     */
@@ -519,7 +518,6 @@ class Group extends DirectoryObject
 
     /**
     * Sets the onPremisesDomainName
-    * Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.Returned by default. Read-only.
     *
     * @param string $val The onPremisesDomainName
     *
@@ -566,7 +564,6 @@ class Group extends DirectoryObject
 
     /**
     * Gets the onPremisesNetBiosName
-    * Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.Returned by default. Read-only.
     *
     * @return string|null The onPremisesNetBiosName
     */
@@ -581,7 +578,6 @@ class Group extends DirectoryObject
 
     /**
     * Sets the onPremisesNetBiosName
-    * Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.Returned by default. Read-only.
     *
     * @param string $val The onPremisesNetBiosName
     *
@@ -770,9 +766,9 @@ class Group extends DirectoryObject
 
     /**
     * Gets the proxyAddresses
-    * Email addresses for the group that direct to the same group mailbox. For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. The any operator is required to filter expressions on multi-valued properties. Returned by default. Read-only. Not nullable. Supports $filter (eq, not, ge, le, startsWith).
+    * Email addresses for the group that direct to the same group mailbox. For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. The any operator is required to filter expressions on multi-valued properties. Returned by default. Read-only. Not nullable. Supports $filter (eq, not, ge, le, startsWith, endsWith, and counting empty collections).
     *
-    * @return string|null The proxyAddresses
+    * @return array|null The proxyAddresses
     */
     public function getProxyAddresses()
     {
@@ -785,9 +781,9 @@ class Group extends DirectoryObject
 
     /**
     * Sets the proxyAddresses
-    * Email addresses for the group that direct to the same group mailbox. For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. The any operator is required to filter expressions on multi-valued properties. Returned by default. Read-only. Not nullable. Supports $filter (eq, not, ge, le, startsWith).
+    * Email addresses for the group that direct to the same group mailbox. For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. The any operator is required to filter expressions on multi-valued properties. Returned by default. Read-only. Not nullable. Supports $filter (eq, not, ge, le, startsWith, endsWith, and counting empty collections).
     *
-    * @param string $val The proxyAddresses
+    * @param string[] $val The proxyAddresses
     *
     * @return Group
     */
@@ -919,7 +915,7 @@ class Group extends DirectoryObject
 
     /**
     * Gets the visibility
-    * Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or Hiddenmembership. Hiddenmembership can be set only for Microsoft 365 groups, when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default and Microsoft 365 group is Public. Groups assignable to roles are always Private. See group visibility options to learn more. Returned by default. Nullable.
+    * Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups, when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default and Microsoft 365 group is Public. Groups assignable to roles are always Private. See group visibility options to learn more. Returned by default. Nullable.
     *
     * @return string|null The visibility
     */
@@ -934,7 +930,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the visibility
-    * Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or Hiddenmembership. Hiddenmembership can be set only for Microsoft 365 groups, when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default and Microsoft 365 group is Public. Groups assignable to roles are always Private. See group visibility options to learn more. Returned by default. Nullable.
+    * Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups, when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default and Microsoft 365 group is Public. Groups assignable to roles are always Private. See group visibility options to learn more. Returned by default. Nullable.
     *
     * @param string $val The visibility
     *
@@ -1122,7 +1118,7 @@ class Group extends DirectoryObject
 
     /**
     * Gets the isArchived
-    * When a group is associated with a team this property deternunes whether the team is in read-only mode.
+    * When a group is associated with a team this property determines whether the team is in read-only mode.To read this property, use the /group/{groupId}/team endpoint or the Get team API. To update this property, use the archiveTeam and unarchiveTeam APIs.
     *
     * @return bool|null The isArchived
     */
@@ -1137,7 +1133,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the isArchived
-    * When a group is associated with a team this property deternunes whether the team is in read-only mode.
+    * When a group is associated with a team this property determines whether the team is in read-only mode.To read this property, use the /group/{groupId}/team endpoint or the Get team API. To update this property, use the archiveTeam and unarchiveTeam APIs.
     *
     * @param bool $val The isArchived
     *
@@ -1395,6 +1391,7 @@ class Group extends DirectoryObject
 
      /**
      * Gets the transitiveMemberOf
+    * The groups that a group is a member of, either directly and through nested membership. Nullable.
      *
      * @return array|null The transitiveMemberOf
      */
@@ -1409,6 +1406,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the transitiveMemberOf
+    * The groups that a group is a member of, either directly and through nested membership. Nullable.
     *
     * @param DirectoryObject[] $val The transitiveMemberOf
     *
@@ -1423,6 +1421,7 @@ class Group extends DirectoryObject
 
      /**
      * Gets the transitiveMembers
+    * The direct and transitive members of a group. Nullable.
      *
      * @return array|null The transitiveMembers
      */
@@ -1437,6 +1436,7 @@ class Group extends DirectoryObject
 
     /**
     * Sets the transitiveMembers
+    * The direct and transitive members of a group. Nullable.
     *
     * @param DirectoryObject[] $val The transitiveMembers
     *
@@ -1598,69 +1598,6 @@ class Group extends DirectoryObject
     public function setEvents($val)
     {
         $this->_propDict["events"] = $val;
-        return $this;
-    }
-
-    /**
-    * Gets the photo
-    * The group's profile photo
-    *
-    * @return ProfilePhoto|null The photo
-    */
-    public function getPhoto()
-    {
-        if (array_key_exists("photo", $this->_propDict)) {
-            if (is_a($this->_propDict["photo"], "\Microsoft\Graph\Model\ProfilePhoto") || is_null($this->_propDict["photo"])) {
-                return $this->_propDict["photo"];
-            } else {
-                $this->_propDict["photo"] = new ProfilePhoto($this->_propDict["photo"]);
-                return $this->_propDict["photo"];
-            }
-        }
-        return null;
-    }
-
-    /**
-    * Sets the photo
-    * The group's profile photo
-    *
-    * @param ProfilePhoto $val The photo
-    *
-    * @return Group
-    */
-    public function setPhoto($val)
-    {
-        $this->_propDict["photo"] = $val;
-        return $this;
-    }
-
-
-     /**
-     * Gets the photos
-    * The profile photos owned by the group. Read-only. Nullable.
-     *
-     * @return array|null The photos
-     */
-    public function getPhotos()
-    {
-        if (array_key_exists("photos", $this->_propDict)) {
-           return $this->_propDict["photos"];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-    * Sets the photos
-    * The profile photos owned by the group. Read-only. Nullable.
-    *
-    * @param ProfilePhoto[] $val The photos
-    *
-    * @return Group
-    */
-    public function setPhotos($val)
-    {
-        $this->_propDict["photos"] = $val;
         return $this;
     }
 
@@ -1912,7 +1849,6 @@ class Group extends DirectoryObject
 
     /**
     * Gets the onenote
-    * Read-only.
     *
     * @return Onenote|null The onenote
     */
@@ -1931,7 +1867,6 @@ class Group extends DirectoryObject
 
     /**
     * Sets the onenote
-    * Read-only.
     *
     * @param Onenote $val The onenote
     *
@@ -1940,6 +1875,69 @@ class Group extends DirectoryObject
     public function setOnenote($val)
     {
         $this->_propDict["onenote"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the photo
+    * The group's profile photo
+    *
+    * @return ProfilePhoto|null The photo
+    */
+    public function getPhoto()
+    {
+        if (array_key_exists("photo", $this->_propDict)) {
+            if (is_a($this->_propDict["photo"], "\Microsoft\Graph\Model\ProfilePhoto") || is_null($this->_propDict["photo"])) {
+                return $this->_propDict["photo"];
+            } else {
+                $this->_propDict["photo"] = new ProfilePhoto($this->_propDict["photo"]);
+                return $this->_propDict["photo"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the photo
+    * The group's profile photo
+    *
+    * @param ProfilePhoto $val The photo
+    *
+    * @return Group
+    */
+    public function setPhoto($val)
+    {
+        $this->_propDict["photo"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the photos
+    * The profile photos owned by the group. Read-only. Nullable.
+     *
+     * @return array|null The photos
+     */
+    public function getPhotos()
+    {
+        if (array_key_exists("photos", $this->_propDict)) {
+           return $this->_propDict["photos"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the photos
+    * The profile photos owned by the group. Read-only. Nullable.
+    *
+    * @param ProfilePhoto[] $val The photos
+    *
+    * @return Group
+    */
+    public function setPhotos($val)
+    {
+        $this->_propDict["photos"] = $val;
         return $this;
     }
 

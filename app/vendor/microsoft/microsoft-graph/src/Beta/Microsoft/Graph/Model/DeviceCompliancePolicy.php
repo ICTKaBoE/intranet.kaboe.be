@@ -152,7 +152,7 @@ class DeviceCompliancePolicy extends Entity
     * Gets the roleScopeTagIds
     * List of Scope Tags for this Entity instance.
     *
-    * @return string|null The roleScopeTagIds
+    * @return array|null The roleScopeTagIds
     */
     public function getRoleScopeTagIds()
     {
@@ -167,7 +167,7 @@ class DeviceCompliancePolicy extends Entity
     * Sets the roleScopeTagIds
     * List of Scope Tags for this Entity instance.
     *
-    * @param string $val The roleScopeTagIds
+    * @param string[] $val The roleScopeTagIds
     *
     * @return DeviceCompliancePolicy
     */
@@ -332,7 +332,7 @@ class DeviceCompliancePolicy extends Entity
 
      /**
      * Gets the scheduledActionsForRule
-    * The list of scheduled action per rule for this compliance policy. This is a required property when creating any individual per-platform compliance policies.
+    * The list of scheduled action for this rule
      *
      * @return array|null The scheduledActionsForRule
      */
@@ -347,7 +347,7 @@ class DeviceCompliancePolicy extends Entity
 
     /**
     * Sets the scheduledActionsForRule
-    * The list of scheduled action per rule for this compliance policy. This is a required property when creating any individual per-platform compliance policies.
+    * The list of scheduled action for this rule
     *
     * @param DeviceComplianceScheduledActionForRule[] $val The scheduledActionsForRule
     *

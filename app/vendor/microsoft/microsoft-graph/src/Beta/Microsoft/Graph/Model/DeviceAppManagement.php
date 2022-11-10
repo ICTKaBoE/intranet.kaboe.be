@@ -879,6 +879,36 @@ class DeviceAppManagement extends Entity
 
 
      /**
+     * Gets the windowsManagedAppProtections
+    * Windows managed app policies.
+     *
+     * @return array|null The windowsManagedAppProtections
+     */
+    public function getWindowsManagedAppProtections()
+    {
+        if (array_key_exists("windowsManagedAppProtections", $this->_propDict)) {
+           return $this->_propDict["windowsManagedAppProtections"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the windowsManagedAppProtections
+    * Windows managed app policies.
+    *
+    * @param WindowsManagedAppProtection[] $val The windowsManagedAppProtections
+    *
+    * @return DeviceAppManagement
+    */
+    public function setWindowsManagedAppProtections($val)
+    {
+        $this->_propDict["windowsManagedAppProtections"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the deviceAppManagementTasks
     * Device app management tasks.
      *

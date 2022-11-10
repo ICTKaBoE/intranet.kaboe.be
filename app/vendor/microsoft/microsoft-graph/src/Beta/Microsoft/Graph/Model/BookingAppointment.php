@@ -54,6 +54,35 @@ class BookingAppointment extends Entity
     }
 
     /**
+    * Gets the anonymousJoinWebUrl
+    * Url of meeting to join anonymously.
+    *
+    * @return string|null The anonymousJoinWebUrl
+    */
+    public function getAnonymousJoinWebUrl()
+    {
+        if (array_key_exists("anonymousJoinWebUrl", $this->_propDict)) {
+            return $this->_propDict["anonymousJoinWebUrl"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the anonymousJoinWebUrl
+    * Url of meeting to join anonymously.
+    *
+    * @param string $val The anonymousJoinWebUrl
+    *
+    * @return BookingAppointment
+    */
+    public function setAnonymousJoinWebUrl($val)
+    {
+        $this->_propDict["anonymousJoinWebUrl"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the customerEmailAddress
     * The SMTP address of the bookingCustomer who is booking the appointment.
     *
@@ -358,7 +387,7 @@ class BookingAppointment extends Entity
 
     /**
     * Gets the filledAttendeesCount
-    * The current number of customers in the appointment
+    * The current number of customers in the appointment.
     *
     * @return int|null The filledAttendeesCount
     */
@@ -373,7 +402,7 @@ class BookingAppointment extends Entity
 
     /**
     * Sets the filledAttendeesCount
-    * The current number of customers in the appointment
+    * The current number of customers in the appointment.
     *
     * @param int $val The filledAttendeesCount
     *
@@ -540,7 +569,7 @@ class BookingAppointment extends Entity
 
     /**
     * Gets the isLocationOnline
-    * If true, indicates that the appointment will be held online. Default value is false.
+    * True indicates that the appointment will be held online. Default value is false.
     *
     * @return bool|null The isLocationOnline
     */
@@ -555,7 +584,7 @@ class BookingAppointment extends Entity
 
     /**
     * Sets the isLocationOnline
-    * If true, indicates that the appointment will be held online. Default value is false.
+    * True indicates that the appointment will be held online. Default value is false.
     *
     * @param bool $val The isLocationOnline
     *
@@ -654,7 +683,7 @@ class BookingAppointment extends Entity
 
     /**
     * Gets the optOutOfCustomerEmail
-    * If true indicates that the bookingCustomer for this appointment does not wish to receive a confirmation for this appointment.
+    * True indicates that the bookingCustomer for this appointment does not wish to receive a confirmation for this appointment.
     *
     * @return bool|null The optOutOfCustomerEmail
     */
@@ -669,7 +698,7 @@ class BookingAppointment extends Entity
 
     /**
     * Sets the optOutOfCustomerEmail
-    * If true indicates that the bookingCustomer for this appointment does not wish to receive a confirmation for this appointment.
+    * True indicates that the bookingCustomer for this appointment does not wish to receive a confirmation for this appointment.
     *
     * @param bool $val The optOutOfCustomerEmail
     *
@@ -841,7 +870,7 @@ class BookingAppointment extends Entity
 
     /**
     * Gets the selfServiceAppointmentId
-    * An additional tracking ID for the appointment, if the appointment has been created directly by the customer on the scheduling page, as opposed to by a staff member on the behalf of the customer. Only supported for appointment if maxAttendeeCount is 1.
+    * An additional tracking ID for the appointment, if the appointment has been created directly by the customer on the scheduling page, as opposed to by a staff member on the behalf of the customer.
     *
     * @return string|null The selfServiceAppointmentId
     */
@@ -856,7 +885,7 @@ class BookingAppointment extends Entity
 
     /**
     * Sets the selfServiceAppointmentId
-    * An additional tracking ID for the appointment, if the appointment has been created directly by the customer on the scheduling page, as opposed to by a staff member on the behalf of the customer. Only supported for appointment if maxAttendeeCount is 1.
+    * An additional tracking ID for the appointment, if the appointment has been created directly by the customer on the scheduling page, as opposed to by a staff member on the behalf of the customer.
     *
     * @param string $val The selfServiceAppointmentId
     *
@@ -990,7 +1019,7 @@ class BookingAppointment extends Entity
 
     /**
     * Gets the smsNotificationsEnabled
-    * If true, indicates SMS notifications will be sent to the customers for the appointment. Default value is false.
+    * True indicates SMS notifications will be sent to the customers for the appointment. Default value is false.
     *
     * @return bool|null The smsNotificationsEnabled
     */
@@ -1005,7 +1034,7 @@ class BookingAppointment extends Entity
 
     /**
     * Sets the smsNotificationsEnabled
-    * If true, indicates SMS notifications will be sent to the customers for the appointment. Default value is false.
+    * True indicates SMS notifications will be sent to the customers for the appointment. Default value is false.
     *
     * @param bool $val The smsNotificationsEnabled
     *
@@ -1021,7 +1050,7 @@ class BookingAppointment extends Entity
     * Gets the staffMemberIds
     * The ID of each bookingStaffMember who is scheduled in this appointment.
     *
-    * @return string|null The staffMemberIds
+    * @return array|null The staffMemberIds
     */
     public function getStaffMemberIds()
     {
@@ -1036,7 +1065,7 @@ class BookingAppointment extends Entity
     * Sets the staffMemberIds
     * The ID of each bookingStaffMember who is scheduled in this appointment.
     *
-    * @param string $val The staffMemberIds
+    * @param string[] $val The staffMemberIds
     *
     * @return BookingAppointment
     */

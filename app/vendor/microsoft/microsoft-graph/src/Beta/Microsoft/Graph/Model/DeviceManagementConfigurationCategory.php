@@ -57,7 +57,7 @@ class DeviceManagementConfigurationCategory extends Entity
     * Gets the childCategoryIds
     * List of child ids of the category.
     *
-    * @return string|null The childCategoryIds
+    * @return array|null The childCategoryIds
     */
     public function getChildCategoryIds()
     {
@@ -72,7 +72,7 @@ class DeviceManagementConfigurationCategory extends Entity
     * Sets the childCategoryIds
     * List of child ids of the category.
     *
-    * @param string $val The childCategoryIds
+    * @param string[] $val The childCategoryIds
     *
     * @return DeviceManagementConfigurationCategory
     */
@@ -324,7 +324,7 @@ class DeviceManagementConfigurationCategory extends Entity
 
     /**
     * Gets the technologies
-    * Technologies types, which settings in the category have. Possible values are: none, mdm, windows10XManagement, configManager, microsoftSense, exchangeOnline, linuxMdm, unknownFutureValue.
+    * Technologies types, which settings in the category have. Possible values are: none, mdm, windows10XManagement, configManager, appleRemoteManagement, microsoftSense, exchangeOnline, linuxMdm, enrollment, unknownFutureValue.
     *
     * @return DeviceManagementConfigurationTechnologies|null The technologies
     */
@@ -343,7 +343,7 @@ class DeviceManagementConfigurationCategory extends Entity
 
     /**
     * Sets the technologies
-    * Technologies types, which settings in the category have. Possible values are: none, mdm, windows10XManagement, configManager, microsoftSense, exchangeOnline, linuxMdm, unknownFutureValue.
+    * Technologies types, which settings in the category have. Possible values are: none, mdm, windows10XManagement, configManager, appleRemoteManagement, microsoftSense, exchangeOnline, linuxMdm, enrollment, unknownFutureValue.
     *
     * @param DeviceManagementConfigurationTechnologies $val The technologies
     *

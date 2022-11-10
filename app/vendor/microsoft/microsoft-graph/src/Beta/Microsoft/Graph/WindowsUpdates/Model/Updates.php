@@ -89,6 +89,36 @@ class Updates extends \Beta\Microsoft\Graph\Model\Entity
 
 
      /**
+     * Gets the resourceConnections
+    * Service connections to external resources such as analytics workspaces.
+     *
+     * @return array|null The resourceConnections
+     */
+    public function getResourceConnections()
+    {
+        if (array_key_exists("resourceConnections", $this->_propDict)) {
+           return $this->_propDict["resourceConnections"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the resourceConnections
+    * Service connections to external resources such as analytics workspaces.
+    *
+    * @param ResourceConnection[] $val The resourceConnections
+    *
+    * @return Updates
+    */
+    public function setResourceConnections($val)
+    {
+        $this->_propDict["resourceConnections"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the updatableAssets
     * Assets registered with the deployment service that can receive updates. Read-only.
      *

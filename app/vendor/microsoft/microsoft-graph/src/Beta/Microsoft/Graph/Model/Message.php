@@ -89,7 +89,7 @@ class Message extends OutlookItem
 
     /**
     * Gets the bodyPreview
-    * The first 255 characters of the message body. It is in text format.
+    * The first 255 characters of the message body. It is in text format. If the message contains instances of mention, this property would contain a concatenation of these mentions as well.
     *
     * @return string|null The bodyPreview
     */
@@ -104,7 +104,7 @@ class Message extends OutlookItem
 
     /**
     * Sets the bodyPreview
-    * The first 255 characters of the message body. It is in text format.
+    * The first 255 characters of the message body. It is in text format. If the message contains instances of mention, this property would contain a concatenation of these mentions as well.
     *
     * @param string $val The bodyPreview
     *
@@ -796,7 +796,7 @@ class Message extends OutlookItem
     /**
     * Gets the unsubscribeData
     *
-    * @return string|null The unsubscribeData
+    * @return array|null The unsubscribeData
     */
     public function getUnsubscribeData()
     {
@@ -810,7 +810,7 @@ class Message extends OutlookItem
     /**
     * Sets the unsubscribeData
     *
-    * @param string $val The unsubscribeData
+    * @param string[] $val The unsubscribeData
     *
     * @return Message
     */

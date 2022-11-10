@@ -237,7 +237,6 @@ class MailboxSettings extends Entity
 
     /**
     * Gets the userPurpose
-    * The purpose of the mailbox. Used to differentiate a mailbox for a single user from a shared mailbox and equipment mailbox in Exchange Online. Read only.
     *
     * @return UserPurpose|null The userPurpose
     */
@@ -256,7 +255,6 @@ class MailboxSettings extends Entity
 
     /**
     * Sets the userPurpose
-    * The purpose of the mailbox. Used to differentiate a mailbox for a single user from a shared mailbox and equipment mailbox in Exchange Online. Read only.
     *
     * @param UserPurpose $val The value to assign to the userPurpose
     *

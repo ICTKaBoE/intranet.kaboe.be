@@ -220,7 +220,7 @@ class EducationSubmission extends Entity
 
     /**
     * Gets the status
-    * Read-only. Possible values are: working, submitted, released, returned, and reassigned. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: reassigned.
+    * Read-only. Possible values are: working, submitted, released, returned, unknownFutureValue and reassigned. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: reassigned.
     *
     * @return EducationSubmissionStatus|null The status
     */
@@ -239,7 +239,7 @@ class EducationSubmission extends Entity
 
     /**
     * Sets the status
-    * Read-only. Possible values are: working, submitted, released, returned, and reassigned. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: reassigned.
+    * Read-only. Possible values are: working, submitted, released, returned, unknownFutureValue and reassigned. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: reassigned.
     *
     * @param EducationSubmissionStatus $val The status
     *
@@ -386,7 +386,6 @@ class EducationSubmission extends Entity
 
      /**
      * Gets the outcomes
-    * Read-Write. Nullable.
      *
      * @return array|null The outcomes
      */
@@ -401,7 +400,6 @@ class EducationSubmission extends Entity
 
     /**
     * Sets the outcomes
-    * Read-Write. Nullable.
     *
     * @param EducationOutcome[] $val The outcomes
     *
@@ -416,7 +414,6 @@ class EducationSubmission extends Entity
 
      /**
      * Gets the resources
-    * Nullable.
      *
      * @return array|null The resources
      */
@@ -431,7 +428,6 @@ class EducationSubmission extends Entity
 
     /**
     * Sets the resources
-    * Nullable.
     *
     * @param EducationSubmissionResource[] $val The resources
     *
@@ -446,7 +442,6 @@ class EducationSubmission extends Entity
 
      /**
      * Gets the submittedResources
-    * Read-only. Nullable.
      *
      * @return array|null The submittedResources
      */
@@ -461,7 +456,6 @@ class EducationSubmission extends Entity
 
     /**
     * Sets the submittedResources
-    * Read-only. Nullable.
     *
     * @param EducationSubmissionResource[] $val The submittedResources
     *

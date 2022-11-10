@@ -22,12 +22,42 @@ namespace Beta\Microsoft\Graph\Model;
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-class AuditLogRoot extends Entity
+class AuditLogRoot implements \JsonSerializable
 {
+    /**
+    * The array of properties available
+    * to the model
+    *
+    * @var array $_propDict
+    */
+    protected $_propDict;
+
+    /**
+    * Construct a new AuditLogRoot
+    *
+    * @param array $propDict A list of properties to set
+    */
+    function __construct($propDict = array())
+    {
+        if (!is_array($propDict)) {
+           $propDict = array();
+        }
+        $this->_propDict = $propDict;
+    }
+
+    /**
+    * Gets the property dictionary of the AuditLogRoot
+    *
+    * @return array The list of properties
+    */
+    public function getProperties()
+    {
+        return $this->_propDict;
+    }
+
 
      /**
      * Gets the directoryAudits
-    * Read-only. Nullable.
      *
      * @return array|null The directoryAudits
      */
@@ -42,7 +72,6 @@ class AuditLogRoot extends Entity
 
     /**
     * Sets the directoryAudits
-    * Read-only. Nullable.
     *
     * @param DirectoryAudit[] $val The directoryAudits
     *
@@ -112,36 +141,7 @@ class AuditLogRoot extends Entity
 
 
      /**
-     * Gets the restrictedSignIns
-     *
-     * @return array|null The restrictedSignIns
-     */
-    public function getRestrictedSignIns()
-    {
-        if (array_key_exists("restrictedSignIns", $this->_propDict)) {
-           return $this->_propDict["restrictedSignIns"];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-    * Sets the restrictedSignIns
-    *
-    * @param RestrictedSignIn[] $val The restrictedSignIns
-    *
-    * @return AuditLogRoot
-    */
-    public function setRestrictedSignIns($val)
-    {
-        $this->_propDict["restrictedSignIns"] = $val;
-        return $this;
-    }
-
-
-     /**
      * Gets the signIns
-    * Read-only. Nullable.
      *
      * @return array|null The signIns
      */
@@ -156,7 +156,6 @@ class AuditLogRoot extends Entity
 
     /**
     * Sets the signIns
-    * Read-only. Nullable.
     *
     * @param SignIn[] $val The signIns
     *
@@ -168,4 +167,51 @@ class AuditLogRoot extends Entity
         return $this;
     }
 
+    /**
+    * Gets the ODataType
+    *
+    * @return string|null The ODataType
+    */
+    public function getODataType()
+    {
+        if (array_key_exists('@odata.type', $this->_propDict)) {
+            return $this->_propDict["@odata.type"];
+        }
+        return null;
+    }
+
+    /**
+    * Sets the ODataType
+    *
+    * @param string $val The ODataType
+    *
+    * @return AuditLogRoot
+    */
+    public function setODataType($val)
+    {
+        $this->_propDict["@odata.type"] = $val;
+        return $this;
+    }
+
+    /**
+    * Serializes the object by property array
+    * Manually serialize DateTime into RFC3339 format
+    *
+    * @return array The list of properties
+    */
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        $serializableProperties = $this->getProperties();
+        foreach ($serializableProperties as $property => $val) {
+            if (is_a($val, "\DateTime")) {
+                $serializableProperties[$property] = $val->format(\DateTime::RFC3339);
+            } else if (is_a($val, "\Microsoft\Graph\Core\Enum")) {
+                $serializableProperties[$property] = $val->value();
+            } else if (is_a($val, "\Entity")) {
+                $serializableProperties[$property] = $val->jsonSerialize();
+            }
+        }
+        return $serializableProperties;
+    }
 }

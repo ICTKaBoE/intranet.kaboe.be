@@ -85,7 +85,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the assignedLicenses
-    * The licenses that are assigned to the user, including inherited (group-based) licenses.  Not nullable. Returned only on $select. Supports $filter (eq and not).
+    * The licenses that are assigned to the user, including inherited (group-based) licenses.  Not nullable. Returned only on $select. Supports $filter (eq, not, and counting empty collections).
      *
      * @return array|null The assignedLicenses
      */
@@ -100,7 +100,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the assignedLicenses
-    * The licenses that are assigned to the user, including inherited (group-based) licenses.  Not nullable. Returned only on $select. Supports $filter (eq and not).
+    * The licenses that are assigned to the user, including inherited (group-based) licenses.  Not nullable. Returned only on $select. Supports $filter (eq, not, and counting empty collections).
     *
     * @param AssignedLicense[] $val The assignedLicenses
     *
@@ -143,10 +143,41 @@ class User extends DirectoryObject
     }
 
     /**
+    * Gets the authorizationInfo
+    *
+    * @return AuthorizationInfo|null The authorizationInfo
+    */
+    public function getAuthorizationInfo()
+    {
+        if (array_key_exists("authorizationInfo", $this->_propDict)) {
+            if (is_a($this->_propDict["authorizationInfo"], "\Microsoft\Graph\Model\AuthorizationInfo") || is_null($this->_propDict["authorizationInfo"])) {
+                return $this->_propDict["authorizationInfo"];
+            } else {
+                $this->_propDict["authorizationInfo"] = new AuthorizationInfo($this->_propDict["authorizationInfo"]);
+                return $this->_propDict["authorizationInfo"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the authorizationInfo
+    *
+    * @param AuthorizationInfo $val The authorizationInfo
+    *
+    * @return User
+    */
+    public function setAuthorizationInfo($val)
+    {
+        $this->_propDict["authorizationInfo"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the businessPhones
     * The telephone numbers for the user. NOTE: Although this is a string collection, only one number can be set for this property. Read-only for users synced from on-premises directory. Returned by default. Supports $filter (eq, not, ge, le, startsWith).
     *
-    * @return string|null The businessPhones
+    * @return array|null The businessPhones
     */
     public function getBusinessPhones()
     {
@@ -161,7 +192,7 @@ class User extends DirectoryObject
     * Sets the businessPhones
     * The telephone numbers for the user. NOTE: Although this is a string collection, only one number can be set for this property. Read-only for users synced from on-premises directory. Returned by default. Supports $filter (eq, not, ge, le, startsWith).
     *
-    * @param string $val The businessPhones
+    * @param string[] $val The businessPhones
     *
     * @return User
     */
@@ -685,7 +716,7 @@ class User extends DirectoryObject
     * Gets the imAddresses
     * The instant message voice over IP (VOIP) session initiation protocol (SIP) addresses for the user. Read-only. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith).
     *
-    * @return string|null The imAddresses
+    * @return array|null The imAddresses
     */
     public function getImAddresses()
     {
@@ -700,7 +731,7 @@ class User extends DirectoryObject
     * Sets the imAddresses
     * The instant message voice over IP (VOIP) session initiation protocol (SIP) addresses for the user. Read-only. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith).
     *
-    * @param string $val The imAddresses
+    * @param string[] $val The imAddresses
     *
     * @return User
     */
@@ -862,7 +893,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the mail
-    * The SMTP address for the user, for example, jeff@contoso.onmicrosoft.com.Changes to this property will also update the user's proxyAddresses collection to include the value as an SMTP address. For Azure AD B2C accounts, this property can be updated up to only ten times with unique SMTP addresses. This property cannot contain accent characters.Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, endsWith, and eq on null values).
+    * The SMTP address for the user, for example, jeff@contoso.onmicrosoft.com. Changes to this property will also update the user's proxyAddresses collection to include the value as an SMTP address. This property cannot contain accent characters.  NOTE: We do not recommend updating this property for Azure AD B2C user profiles. Use the otherMails property instead. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, endsWith, and eq on null values).
     *
     * @return string|null The mail
     */
@@ -877,7 +908,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the mail
-    * The SMTP address for the user, for example, jeff@contoso.onmicrosoft.com.Changes to this property will also update the user's proxyAddresses collection to include the value as an SMTP address. For Azure AD B2C accounts, this property can be updated up to only ten times with unique SMTP addresses. This property cannot contain accent characters.Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, endsWith, and eq on null values).
+    * The SMTP address for the user, for example, jeff@contoso.onmicrosoft.com. Changes to this property will also update the user's proxyAddresses collection to include the value as an SMTP address. This property cannot contain accent characters.  NOTE: We do not recommend updating this property for Azure AD B2C user profiles. Use the otherMails property instead. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, endsWith, and eq on null values).
     *
     * @param string $val The mail
     *
@@ -1036,7 +1067,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the onPremisesExtensionAttributes
-    * Contains extensionAttributes1-15 for the user. The individual extension attributes are neither selectable nor filterable. For an onPremisesSyncEnabled user, the source of authority for this set of properties is the on-premises and is read-only. For a cloud-only user (where onPremisesSyncEnabled is false), these properties can be set during creation or update of a user object.  For a cloud-only user previously synced from on-premises Active Directory, these properties are read-only in Microsoft Graph but can be fully managed through the Exchange Admin Center or the Exchange Online V2 module in PowerShell. These extension attributes are also known as Exchange custom attributes 1-15.
+    * Contains extensionAttributes1-15 for the user. These extension attributes are also known as Exchange custom attributes 1-15. For an onPremisesSyncEnabled user, the source of authority for this set of properties is the on-premises and is read-only. For a cloud-only user (where onPremisesSyncEnabled is false), these properties can be set during creation or update of a user object.  For a cloud-only user previously synced from on-premises Active Directory, these properties are read-only in Microsoft Graph but can be fully managed through the Exchange Admin Center or the Exchange Online V2 module in PowerShell. Returned only on $select. Supports $filter (eq, ne, not, in).
     *
     * @return OnPremisesExtensionAttributes|null The onPremisesExtensionAttributes
     */
@@ -1055,7 +1086,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the onPremisesExtensionAttributes
-    * Contains extensionAttributes1-15 for the user. The individual extension attributes are neither selectable nor filterable. For an onPremisesSyncEnabled user, the source of authority for this set of properties is the on-premises and is read-only. For a cloud-only user (where onPremisesSyncEnabled is false), these properties can be set during creation or update of a user object.  For a cloud-only user previously synced from on-premises Active Directory, these properties are read-only in Microsoft Graph but can be fully managed through the Exchange Admin Center or the Exchange Online V2 module in PowerShell. These extension attributes are also known as Exchange custom attributes 1-15.
+    * Contains extensionAttributes1-15 for the user. These extension attributes are also known as Exchange custom attributes 1-15. For an onPremisesSyncEnabled user, the source of authority for this set of properties is the on-premises and is read-only. For a cloud-only user (where onPremisesSyncEnabled is false), these properties can be set during creation or update of a user object.  For a cloud-only user previously synced from on-premises Active Directory, these properties are read-only in Microsoft Graph but can be fully managed through the Exchange Admin Center or the Exchange Online V2 module in PowerShell. Returned only on $select. Supports $filter (eq, ne, not, in).
     *
     * @param OnPremisesExtensionAttributes $val The onPremisesExtensionAttributes
     *
@@ -1219,7 +1250,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the onPremisesSyncEnabled
-    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced; null if this object has never been synced from an on-premises directory (default). Read-only. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
+    * true if this user object is currently being synced from an on-premises Active Directory (AD); otherwise the user isn't being synced and can be managed in Azure Active Directory (Azure AD). Read-only. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
     *
     * @return bool|null The onPremisesSyncEnabled
     */
@@ -1234,7 +1265,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the onPremisesSyncEnabled
-    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced; null if this object has never been synced from an on-premises directory (default). Read-only. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
+    * true if this user object is currently being synced from an on-premises Active Directory (AD); otherwise the user isn't being synced and can be managed in Azure Active Directory (Azure AD). Read-only. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
     *
     * @param bool $val The onPremisesSyncEnabled
     *
@@ -1277,9 +1308,9 @@ class User extends DirectoryObject
 
     /**
     * Gets the otherMails
-    * A list of additional email addresses for the user; for example: ['bob@contoso.com', 'Robert@fabrikam.com']. NOTE: This property cannot contain accent characters. Returned only on $select. Supports $filter (eq, not, ge, le, in, startsWith).
+    * A list of additional email addresses for the user; for example: ['bob@contoso.com', 'Robert@fabrikam.com']. NOTE: This property cannot contain accent characters. Returned only on $select. Supports $filter (eq, not, ge, le, in, startsWith, endsWith, and counting empty collections).
     *
-    * @return string|null The otherMails
+    * @return array|null The otherMails
     */
     public function getOtherMails()
     {
@@ -1292,9 +1323,9 @@ class User extends DirectoryObject
 
     /**
     * Sets the otherMails
-    * A list of additional email addresses for the user; for example: ['bob@contoso.com', 'Robert@fabrikam.com']. NOTE: This property cannot contain accent characters. Returned only on $select. Supports $filter (eq, not, ge, le, in, startsWith).
+    * A list of additional email addresses for the user; for example: ['bob@contoso.com', 'Robert@fabrikam.com']. NOTE: This property cannot contain accent characters. Returned only on $select. Supports $filter (eq, not, ge, le, in, startsWith, endsWith, and counting empty collections).
     *
-    * @param string $val The otherMails
+    * @param string[] $val The otherMails
     *
     * @return User
     */
@@ -1485,9 +1516,9 @@ class User extends DirectoryObject
 
     /**
     * Gets the proxyAddresses
-    * For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. Changes to the mail property will also update this collection to include the value as an SMTP address. For more information, see mail and proxyAddresses properties. The proxy address prefixed with SMTP (capitalized) is the primary proxy address while those prefixed with smtp are the secondary proxy addresses. For Azure AD B2C accounts, this property has a limit of ten unique addresses. Read-only in Microsoft Graph; you can update this property only through the Microsoft 365 admin center. Not nullable. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith).
+    * For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. Changes to the mail property will also update this collection to include the value as an SMTP address. For more information, see mail and proxyAddresses properties. The proxy address prefixed with SMTP (capitalized) is the primary proxy address while those prefixed with smtp are the secondary proxy addresses. For Azure AD B2C accounts, this property has a limit of ten unique addresses. Read-only in Microsoft Graph; you can update this property only through the Microsoft 365 admin center. Not nullable. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith, endsWith, and counting empty collections).
     *
-    * @return string|null The proxyAddresses
+    * @return array|null The proxyAddresses
     */
     public function getProxyAddresses()
     {
@@ -1500,9 +1531,9 @@ class User extends DirectoryObject
 
     /**
     * Sets the proxyAddresses
-    * For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. Changes to the mail property will also update this collection to include the value as an SMTP address. For more information, see mail and proxyAddresses properties. The proxy address prefixed with SMTP (capitalized) is the primary proxy address while those prefixed with smtp are the secondary proxy addresses. For Azure AD B2C accounts, this property has a limit of ten unique addresses. Read-only in Microsoft Graph; you can update this property only through the Microsoft 365 admin center. Not nullable. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith).
+    * For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com']. Changes to the mail property will also update this collection to include the value as an SMTP address. For more information, see mail and proxyAddresses properties. The proxy address prefixed with SMTP (capitalized) is the primary proxy address while those prefixed with smtp are the secondary proxy addresses. For Azure AD B2C accounts, this property has a limit of ten unique addresses. Read-only in Microsoft Graph; you can update this property only through the Microsoft 365 admin center. Not nullable. Returned only on $select. Supports $filter (eq, not, ge, le, startsWith, endsWith, and counting empty collections).
     *
-    * @param string $val The proxyAddresses
+    * @param string[] $val The proxyAddresses
     *
     * @return User
     */
@@ -1513,8 +1544,37 @@ class User extends DirectoryObject
     }
 
     /**
+    * Gets the securityIdentifier
+    * Security identifier (SID) of the user, used in Windows scenarios. Read-only. Returned by default. Supports $select and $filter (eq, not, ge, le, startsWith).
+    *
+    * @return string|null The securityIdentifier
+    */
+    public function getSecurityIdentifier()
+    {
+        if (array_key_exists("securityIdentifier", $this->_propDict)) {
+            return $this->_propDict["securityIdentifier"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the securityIdentifier
+    * Security identifier (SID) of the user, used in Windows scenarios. Read-only. Returned by default. Supports $select and $filter (eq, not, ge, le, startsWith).
+    *
+    * @param string $val The securityIdentifier
+    *
+    * @return User
+    */
+    public function setSecurityIdentifier($val)
+    {
+        $this->_propDict["securityIdentifier"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the showInAddressList
-    * true if the Outlook global address list should contain this user, otherwise false. If not set, this will be treated as true. For users invited through the invitation manager, this property will be set to false. Returned only on $select. Supports $filter (eq, ne, not, in).
+    * Do not use in Microsoft Graph. Manage this property through the Microsoft 365 admin center instead. Represents whether the user should be included in the Outlook global address list. See Known issue.
     *
     * @return bool|null The showInAddressList
     */
@@ -1529,7 +1589,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the showInAddressList
-    * true if the Outlook global address list should contain this user, otherwise false. If not set, this will be treated as true. For users invited through the invitation manager, this property will be set to false. Returned only on $select. Supports $filter (eq, ne, not, in).
+    * Do not use in Microsoft Graph. Manage this property through the Microsoft 365 admin center instead. Represents whether the user should be included in the Outlook global address list. See Known issue.
     *
     * @param bool $val The showInAddressList
     *
@@ -1909,7 +1969,7 @@ class User extends DirectoryObject
     * Gets the interests
     * A list for the user to describe their interests. Returned only on $select.
     *
-    * @return string|null The interests
+    * @return array|null The interests
     */
     public function getInterests()
     {
@@ -1924,7 +1984,7 @@ class User extends DirectoryObject
     * Sets the interests
     * A list for the user to describe their interests. Returned only on $select.
     *
-    * @param string $val The interests
+    * @param string[] $val The interests
     *
     * @return User
     */
@@ -1967,7 +2027,7 @@ class User extends DirectoryObject
     * Gets the pastProjects
     * A list for the user to enumerate their past projects. Returned only on $select.
     *
-    * @return string|null The pastProjects
+    * @return array|null The pastProjects
     */
     public function getPastProjects()
     {
@@ -1982,7 +2042,7 @@ class User extends DirectoryObject
     * Sets the pastProjects
     * A list for the user to enumerate their past projects. Returned only on $select.
     *
-    * @param string $val The pastProjects
+    * @param string[] $val The pastProjects
     *
     * @return User
     */
@@ -1994,7 +2054,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the preferredName
-    * The preferred name for the user. Returned only on $select.
+    * The preferred name for the user. Not Supported. This attribute returns an empty string.Returned only on $select.
     *
     * @return string|null The preferredName
     */
@@ -2009,7 +2069,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the preferredName
-    * The preferred name for the user. Returned only on $select.
+    * The preferred name for the user. Not Supported. This attribute returns an empty string.Returned only on $select.
     *
     * @param string $val The preferredName
     *
@@ -2025,7 +2085,7 @@ class User extends DirectoryObject
     * Gets the responsibilities
     * A list for the user to enumerate their responsibilities. Returned only on $select.
     *
-    * @return string|null The responsibilities
+    * @return array|null The responsibilities
     */
     public function getResponsibilities()
     {
@@ -2040,7 +2100,7 @@ class User extends DirectoryObject
     * Sets the responsibilities
     * A list for the user to enumerate their responsibilities. Returned only on $select.
     *
-    * @param string $val The responsibilities
+    * @param string[] $val The responsibilities
     *
     * @return User
     */
@@ -2054,7 +2114,7 @@ class User extends DirectoryObject
     * Gets the schools
     * A list for the user to enumerate the schools they have attended. Returned only on $select.
     *
-    * @return string|null The schools
+    * @return array|null The schools
     */
     public function getSchools()
     {
@@ -2069,7 +2129,7 @@ class User extends DirectoryObject
     * Sets the schools
     * A list for the user to enumerate the schools they have attended. Returned only on $select.
     *
-    * @param string $val The schools
+    * @param string[] $val The schools
     *
     * @return User
     */
@@ -2083,7 +2143,7 @@ class User extends DirectoryObject
     * Gets the skills
     * A list for the user to enumerate their skills. Returned only on $select.
     *
-    * @return string|null The skills
+    * @return array|null The skills
     */
     public function getSkills()
     {
@@ -2098,7 +2158,7 @@ class User extends DirectoryObject
     * Sets the skills
     * A list for the user to enumerate their skills. Returned only on $select.
     *
-    * @param string $val The skills
+    * @param string[] $val The skills
     *
     * @return User
     */
@@ -2412,7 +2472,6 @@ class User extends DirectoryObject
 
      /**
      * Gets the scopedRoleMemberOf
-    * The scoped-role administrative unit memberships for this user. Read-only. Nullable.
      *
      * @return array|null The scopedRoleMemberOf
      */
@@ -2427,7 +2486,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the scopedRoleMemberOf
-    * The scoped-role administrative unit memberships for this user. Read-only. Nullable.
     *
     * @param ScopedRoleMembership[] $val The scopedRoleMemberOf
     *
@@ -2442,6 +2500,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the transitiveMemberOf
+    * The groups, including nested groups, and directory roles that a user is a member of. Nullable.
      *
      * @return array|null The transitiveMemberOf
      */
@@ -2456,6 +2515,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the transitiveMemberOf
+    * The groups, including nested groups, and directory roles that a user is a member of. Nullable.
     *
     * @param DirectoryObject[] $val The transitiveMemberOf
     *
@@ -2775,7 +2835,6 @@ class User extends DirectoryObject
 
     /**
     * Gets the outlook
-    * Read-only.
     *
     * @return OutlookUser|null The outlook
     */
@@ -2794,7 +2853,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the outlook
-    * Read-only.
     *
     * @param OutlookUser $val The outlook
     *
@@ -2930,7 +2988,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the extensions
-    * The collection of open extensions defined for the user. Read-only. Nullable.
+    * The collection of open extensions defined for the user. Read-only. Supports $expand. Nullable.
      *
      * @return array|null The extensions
      */
@@ -2945,7 +3003,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the extensions
-    * The collection of open extensions defined for the user. Read-only. Nullable.
+    * The collection of open extensions defined for the user. Read-only. Supports $expand. Nullable.
     *
     * @param Extension[] $val The extensions
     *
@@ -3112,7 +3170,6 @@ class User extends DirectoryObject
 
     /**
     * Gets the insights
-    * Read-only. Nullable.
     *
     * @return OfficeGraphInsights|null The insights
     */
@@ -3131,7 +3188,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the insights
-    * Read-only. Nullable.
     *
     * @param OfficeGraphInsights $val The insights
     *
@@ -3145,7 +3201,6 @@ class User extends DirectoryObject
 
     /**
     * Gets the settings
-    * Read-only. Nullable.
     *
     * @return UserSettings|null The settings
     */
@@ -3164,7 +3219,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the settings
-    * Read-only. Nullable.
     *
     * @param UserSettings $val The settings
     *
@@ -3178,7 +3232,6 @@ class User extends DirectoryObject
 
     /**
     * Gets the onenote
-    * Read-only.
     *
     * @return Onenote|null The onenote
     */
@@ -3197,7 +3250,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the onenote
-    * Read-only.
     *
     * @param Onenote $val The onenote
     *
@@ -3245,7 +3297,6 @@ class User extends DirectoryObject
 
      /**
      * Gets the photos
-    * Read-only. Nullable.
      *
      * @return array|null The photos
      */
@@ -3260,7 +3311,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the photos
-    * Read-only. Nullable.
     *
     * @param ProfilePhoto[] $val The photos
     *
@@ -3425,7 +3475,6 @@ class User extends DirectoryObject
 
      /**
      * Gets the joinedTeams
-    * The Microsoft Teams teams that the user is a member of. Read-only. Nullable.
      *
      * @return array|null The joinedTeams
      */
@@ -3440,7 +3489,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the joinedTeams
-    * The Microsoft Teams teams that the user is a member of. Read-only. Nullable.
     *
     * @param Team[] $val The joinedTeams
     *
@@ -3454,7 +3502,6 @@ class User extends DirectoryObject
 
     /**
     * Gets the teamwork
-    * A container for Microsoft Teams features available for the user. Read-only. Nullable.
     *
     * @return UserTeamwork|null The teamwork
     */
@@ -3473,7 +3520,6 @@ class User extends DirectoryObject
 
     /**
     * Sets the teamwork
-    * A container for Microsoft Teams features available for the user. Read-only. Nullable.
     *
     * @param UserTeamwork $val The teamwork
     *

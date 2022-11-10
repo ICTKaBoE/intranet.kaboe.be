@@ -58,7 +58,7 @@ class Organization extends DirectoryObject
     * Gets the businessPhones
     * Telephone number for the organization. Although this is a string collection, only one number can be set for this property.
     *
-    * @return string|null The businessPhones
+    * @return array|null The businessPhones
     */
     public function getBusinessPhones()
     {
@@ -73,7 +73,7 @@ class Organization extends DirectoryObject
     * Sets the businessPhones
     * Telephone number for the organization. Although this is a string collection, only one number can be set for this property.
     *
-    * @param string $val The businessPhones
+    * @param string[] $val The businessPhones
     *
     * @return Organization
     */
@@ -298,7 +298,7 @@ class Organization extends DirectoryObject
     * Gets the marketingNotificationEmails
     * Not nullable.
     *
-    * @return string|null The marketingNotificationEmails
+    * @return array|null The marketingNotificationEmails
     */
     public function getMarketingNotificationEmails()
     {
@@ -313,7 +313,7 @@ class Organization extends DirectoryObject
     * Sets the marketingNotificationEmails
     * Not nullable.
     *
-    * @param string $val The marketingNotificationEmails
+    * @param string[] $val The marketingNotificationEmails
     *
     * @return Organization
     */
@@ -325,7 +325,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the onPremisesLastSyncDateTime
-    * The time and date at which the tenant was last synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
+    * The time and date at which the tenant was last synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @return \DateTime|null The onPremisesLastSyncDateTime
     */
@@ -344,7 +344,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the onPremisesLastSyncDateTime
-    * The time and date at which the tenant was last synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
+    * The time and date at which the tenant was last synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @param \DateTime $val The onPremisesLastSyncDateTime
     *
@@ -358,7 +358,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the onPremisesSyncEnabled
-    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced. Nullable. null if this object has never been synced from an on-premises directory (default).
+    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced; Nullable. null if this object has never been synced from an on-premises directory (default).
     *
     * @return bool|null The onPremisesSyncEnabled
     */
@@ -373,7 +373,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the onPremisesSyncEnabled
-    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced. Nullable. null if this object has never been synced from an on-premises directory (default).
+    * true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced; Nullable. null if this object has never been synced from an on-premises directory (default).
     *
     * @param bool $val The onPremisesSyncEnabled
     *
@@ -416,7 +416,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the preferredLanguage
-    * The preferred language for the organization. Should follow ISO 639-1 Code; for example, en.
+    * The preferred language for the organization. Should follow ISO 639-1 Code; for example en.
     *
     * @return string|null The preferredLanguage
     */
@@ -431,7 +431,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the preferredLanguage
-    * The preferred language for the organization. Should follow ISO 639-1 Code; for example, en.
+    * The preferred language for the organization. Should follow ISO 639-1 Code; for example en.
     *
     * @param string $val The preferredLanguage
     *
@@ -509,7 +509,7 @@ class Organization extends DirectoryObject
     /**
     * Gets the securityComplianceNotificationMails
     *
-    * @return string|null The securityComplianceNotificationMails
+    * @return array|null The securityComplianceNotificationMails
     */
     public function getSecurityComplianceNotificationMails()
     {
@@ -523,7 +523,7 @@ class Organization extends DirectoryObject
     /**
     * Sets the securityComplianceNotificationMails
     *
-    * @param string $val The securityComplianceNotificationMails
+    * @param string[] $val The securityComplianceNotificationMails
     *
     * @return Organization
     */
@@ -536,7 +536,7 @@ class Organization extends DirectoryObject
     /**
     * Gets the securityComplianceNotificationPhones
     *
-    * @return string|null The securityComplianceNotificationPhones
+    * @return array|null The securityComplianceNotificationPhones
     */
     public function getSecurityComplianceNotificationPhones()
     {
@@ -550,7 +550,7 @@ class Organization extends DirectoryObject
     /**
     * Sets the securityComplianceNotificationPhones
     *
-    * @param string $val The securityComplianceNotificationPhones
+    * @param string[] $val The securityComplianceNotificationPhones
     *
     * @return Organization
     */
@@ -622,7 +622,7 @@ class Organization extends DirectoryObject
     * Gets the technicalNotificationMails
     * Not nullable.
     *
-    * @return string|null The technicalNotificationMails
+    * @return array|null The technicalNotificationMails
     */
     public function getTechnicalNotificationMails()
     {
@@ -637,7 +637,7 @@ class Organization extends DirectoryObject
     * Sets the technicalNotificationMails
     * Not nullable.
     *
-    * @param string $val The technicalNotificationMails
+    * @param string[] $val The technicalNotificationMails
     *
     * @return Organization
     */
@@ -745,6 +745,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the branding
+    * Resource to manage the default branding for the organization. Nullable.
     *
     * @return OrganizationalBranding|null The branding
     */
@@ -763,6 +764,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the branding
+    * Resource to manage the default branding for the organization. Nullable.
     *
     * @param OrganizationalBranding $val The branding
     *
@@ -807,7 +809,7 @@ class Organization extends DirectoryObject
 
      /**
      * Gets the extensions
-    * The collection of open extensions defined for the organization. Read-only. Nullable.
+    * The collection of open extensions defined for the organization resource. Nullable.
      *
      * @return array|null The extensions
      */
@@ -822,7 +824,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the extensions
-    * The collection of open extensions defined for the organization. Read-only. Nullable.
+    * The collection of open extensions defined for the organization resource. Nullable.
     *
     * @param Extension[] $val The extensions
     *

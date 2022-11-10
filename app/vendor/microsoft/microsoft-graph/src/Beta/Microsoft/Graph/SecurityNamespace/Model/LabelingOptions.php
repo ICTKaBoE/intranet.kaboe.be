@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * LabelingOptions class
 *
@@ -26,13 +26,14 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the assignmentMethod
+    * Describes whether the label was applied by an automated (standard) process or a person (privileged).
     *
     * @return AssignmentMethod|null The assignmentMethod
     */
     public function getAssignmentMethod()
     {
         if (array_key_exists("assignmentMethod", $this->_propDict)) {
-            if (is_a($this->_propDict["assignmentMethod"], "\Beta\Microsoft\Graph\Security\Model\AssignmentMethod") || is_null($this->_propDict["assignmentMethod"])) {
+            if (is_a($this->_propDict["assignmentMethod"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\AssignmentMethod") || is_null($this->_propDict["assignmentMethod"])) {
                 return $this->_propDict["assignmentMethod"];
             } else {
                 $this->_propDict["assignmentMethod"] = new AssignmentMethod($this->_propDict["assignmentMethod"]);
@@ -44,6 +45,7 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the assignmentMethod
+    * Describes whether the label was applied by an automated (standard) process or a person (privileged).
     *
     * @param AssignmentMethod $val The value to assign to the assignmentMethod
     *
@@ -57,13 +59,14 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the downgradeJustification
+    * The downgrade justification object that indicates if downgrade was justified and, if so, the reason.
     *
     * @return DowngradeJustification|null The downgradeJustification
     */
     public function getDowngradeJustification()
     {
         if (array_key_exists("downgradeJustification", $this->_propDict)) {
-            if (is_a($this->_propDict["downgradeJustification"], "\Beta\Microsoft\Graph\Security\Model\DowngradeJustification") || is_null($this->_propDict["downgradeJustification"])) {
+            if (is_a($this->_propDict["downgradeJustification"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\DowngradeJustification") || is_null($this->_propDict["downgradeJustification"])) {
                 return $this->_propDict["downgradeJustification"];
             } else {
                 $this->_propDict["downgradeJustification"] = new DowngradeJustification($this->_propDict["downgradeJustification"]);
@@ -75,6 +78,7 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the downgradeJustification
+    * The downgrade justification object that indicates if downgrade was justified and, if so, the reason.
     *
     * @param DowngradeJustification $val The value to assign to the downgradeJustification
     *
@@ -88,13 +92,14 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the extendedProperties
+    * Extended properties will be parsed and returned in the standard Microsoft Purview Information Protection labeled metadata format as part of the label information.
     *
     * @return KeyValuePair|null The extendedProperties
     */
     public function getExtendedProperties()
     {
         if (array_key_exists("extendedProperties", $this->_propDict)) {
-            if (is_a($this->_propDict["extendedProperties"], "\Beta\Microsoft\Graph\Security\Model\KeyValuePair") || is_null($this->_propDict["extendedProperties"])) {
+            if (is_a($this->_propDict["extendedProperties"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\KeyValuePair") || is_null($this->_propDict["extendedProperties"])) {
                 return $this->_propDict["extendedProperties"];
             } else {
                 $this->_propDict["extendedProperties"] = new KeyValuePair($this->_propDict["extendedProperties"]);
@@ -106,6 +111,7 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the extendedProperties
+    * Extended properties will be parsed and returned in the standard Microsoft Purview Information Protection labeled metadata format as part of the label information.
     *
     * @param KeyValuePair $val The value to assign to the extendedProperties
     *
@@ -118,6 +124,7 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
     }
     /**
     * Gets the labelId
+    * The GUID of the label that should be applied to the information.
     *
     * @return string|null The labelId
     */
@@ -132,6 +139,7 @@ class LabelingOptions extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the labelId
+    * The GUID of the label that should be applied to the information.
     *
     * @param string $val The value of the labelId
     *

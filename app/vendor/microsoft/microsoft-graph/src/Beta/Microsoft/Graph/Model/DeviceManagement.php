@@ -59,7 +59,7 @@ class DeviceManagement extends Entity
 
     /**
     * Gets the intuneAccountId
-    * Intune Account Id for given tenant
+    * Intune Account ID for given tenant
     *
     * @return string|null The intuneAccountId
     */
@@ -74,7 +74,7 @@ class DeviceManagement extends Entity
 
     /**
     * Sets the intuneAccountId
-    * Intune Account Id for given tenant
+    * Intune Account ID for given tenant
     *
     * @param string $val The intuneAccountId
     *
@@ -339,6 +339,39 @@ class DeviceManagement extends Entity
     }
 
     /**
+    * Gets the dataProcessorServiceForWindowsFeaturesOnboarding
+    * A configuration entity for MEM features that utilize Data Processor Service for Windows (DPSW) data.
+    *
+    * @return DataProcessorServiceForWindowsFeaturesOnboarding|null The dataProcessorServiceForWindowsFeaturesOnboarding
+    */
+    public function getDataProcessorServiceForWindowsFeaturesOnboarding()
+    {
+        if (array_key_exists("dataProcessorServiceForWindowsFeaturesOnboarding", $this->_propDict)) {
+            if (is_a($this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"], "\Beta\Microsoft\Graph\Model\DataProcessorServiceForWindowsFeaturesOnboarding") || is_null($this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"])) {
+                return $this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"];
+            } else {
+                $this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"] = new DataProcessorServiceForWindowsFeaturesOnboarding($this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"]);
+                return $this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the dataProcessorServiceForWindowsFeaturesOnboarding
+    * A configuration entity for MEM features that utilize Data Processor Service for Windows (DPSW) data.
+    *
+    * @param DataProcessorServiceForWindowsFeaturesOnboarding $val The dataProcessorServiceForWindowsFeaturesOnboarding
+    *
+    * @return DeviceManagement
+    */
+    public function setDataProcessorServiceForWindowsFeaturesOnboarding($val)
+    {
+        $this->_propDict["dataProcessorServiceForWindowsFeaturesOnboarding"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the deviceProtectionOverview
     * Device protection overview.
     *
@@ -471,6 +504,39 @@ class DeviceManagement extends Entity
     }
 
     /**
+    * Gets the userExperienceAnalyticsAnomalySeverityOverview
+    * The user experience analytics anomaly severity overview entity contains the count information for each severity of anomaly.
+    *
+    * @return UserExperienceAnalyticsAnomalySeverityOverview|null The userExperienceAnalyticsAnomalySeverityOverview
+    */
+    public function getUserExperienceAnalyticsAnomalySeverityOverview()
+    {
+        if (array_key_exists("userExperienceAnalyticsAnomalySeverityOverview", $this->_propDict)) {
+            if (is_a($this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"], "\Beta\Microsoft\Graph\Model\UserExperienceAnalyticsAnomalySeverityOverview") || is_null($this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"])) {
+                return $this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"];
+            } else {
+                $this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"] = new UserExperienceAnalyticsAnomalySeverityOverview($this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"]);
+                return $this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsAnomalySeverityOverview
+    * The user experience analytics anomaly severity overview entity contains the count information for each severity of anomaly.
+    *
+    * @param UserExperienceAnalyticsAnomalySeverityOverview $val The userExperienceAnalyticsAnomalySeverityOverview
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsAnomalySeverityOverview($val)
+    {
+        $this->_propDict["userExperienceAnalyticsAnomalySeverityOverview"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the userExperienceAnalyticsSettings
     * User experience analytics device settings
     *
@@ -536,33 +602,34 @@ class DeviceManagement extends Entity
         return $this;
     }
 
-
-     /**
-     * Gets the androidDeviceOwnerEnrollmentProfiles
-    * Android device owner enrollment profile entities.
-     *
-     * @return array|null The androidDeviceOwnerEnrollmentProfiles
-     */
-    public function getAndroidDeviceOwnerEnrollmentProfiles()
+    /**
+    * Gets the monitoring
+    *
+    * @return \Beta\Microsoft\Graph\DeviceManagementNamespace\Model\Monitoring|null The monitoring
+    */
+    public function getMonitoring()
     {
-        if (array_key_exists("androidDeviceOwnerEnrollmentProfiles", $this->_propDict)) {
-           return $this->_propDict["androidDeviceOwnerEnrollmentProfiles"];
-        } else {
-            return null;
+        if (array_key_exists("monitoring", $this->_propDict)) {
+            if (is_a($this->_propDict["monitoring"], "\Beta\Microsoft\Graph\DeviceManagementNamespace\Model\Monitoring") || is_null($this->_propDict["monitoring"])) {
+                return $this->_propDict["monitoring"];
+            } else {
+                $this->_propDict["monitoring"] = new \Beta\Microsoft\Graph\DeviceManagementNamespace\Model\Monitoring($this->_propDict["monitoring"]);
+                return $this->_propDict["monitoring"];
+            }
         }
+        return null;
     }
 
     /**
-    * Sets the androidDeviceOwnerEnrollmentProfiles
-    * Android device owner enrollment profile entities.
+    * Sets the monitoring
     *
-    * @param AndroidDeviceOwnerEnrollmentProfile[] $val The androidDeviceOwnerEnrollmentProfiles
+    * @param \Beta\Microsoft\Graph\DeviceManagementNamespace\Model\Monitoring $val The monitoring
     *
     * @return DeviceManagement
     */
-    public function setAndroidDeviceOwnerEnrollmentProfiles($val)
+    public function setMonitoring($val)
     {
-        $this->_propDict["androidDeviceOwnerEnrollmentProfiles"] = $val;
+        $this->_propDict["monitoring"] = $val;
         return $this;
     }
 
@@ -594,6 +661,36 @@ class DeviceManagement extends Entity
     public function setVirtualEndpoint($val)
     {
         $this->_propDict["virtualEndpoint"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the androidDeviceOwnerEnrollmentProfiles
+    * Android device owner enrollment profile entities.
+     *
+     * @return array|null The androidDeviceOwnerEnrollmentProfiles
+     */
+    public function getAndroidDeviceOwnerEnrollmentProfiles()
+    {
+        if (array_key_exists("androidDeviceOwnerEnrollmentProfiles", $this->_propDict)) {
+           return $this->_propDict["androidDeviceOwnerEnrollmentProfiles"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the androidDeviceOwnerEnrollmentProfiles
+    * Android device owner enrollment profile entities.
+    *
+    * @param AndroidDeviceOwnerEnrollmentProfile[] $val The androidDeviceOwnerEnrollmentProfiles
+    *
+    * @return DeviceManagement
+    */
+    public function setAndroidDeviceOwnerEnrollmentProfiles($val)
+    {
+        $this->_propDict["androidDeviceOwnerEnrollmentProfiles"] = $val;
         return $this;
     }
 
@@ -2585,6 +2682,66 @@ class DeviceManagement extends Entity
 
 
      /**
+     * Gets the userExperienceAnalyticsAnomaly
+    * The user experience analytics anomaly entity contains anomaly details.
+     *
+     * @return array|null The userExperienceAnalyticsAnomaly
+     */
+    public function getUserExperienceAnalyticsAnomaly()
+    {
+        if (array_key_exists("userExperienceAnalyticsAnomaly", $this->_propDict)) {
+           return $this->_propDict["userExperienceAnalyticsAnomaly"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsAnomaly
+    * The user experience analytics anomaly entity contains anomaly details.
+    *
+    * @param UserExperienceAnalyticsAnomaly[] $val The userExperienceAnalyticsAnomaly
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsAnomaly($val)
+    {
+        $this->_propDict["userExperienceAnalyticsAnomaly"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the userExperienceAnalyticsAnomalyDevice
+    * The user experience analytics anomaly entity contains device details.
+     *
+     * @return array|null The userExperienceAnalyticsAnomalyDevice
+     */
+    public function getUserExperienceAnalyticsAnomalyDevice()
+    {
+        if (array_key_exists("userExperienceAnalyticsAnomalyDevice", $this->_propDict)) {
+           return $this->_propDict["userExperienceAnalyticsAnomalyDevice"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsAnomalyDevice
+    * The user experience analytics anomaly entity contains device details.
+    *
+    * @param UserExperienceAnalyticsAnomalyDevice[] $val The userExperienceAnalyticsAnomalyDevice
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsAnomalyDevice($val)
+    {
+        $this->_propDict["userExperienceAnalyticsAnomalyDevice"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the userExperienceAnalyticsAppHealthApplicationPerformance
     * User experience analytics appHealth Application Performance
      *
@@ -3249,6 +3406,69 @@ class DeviceManagement extends Entity
     public function setUserExperienceAnalyticsDevicePerformance($val)
     {
         $this->_propDict["userExperienceAnalyticsDevicePerformance"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the userExperienceAnalyticsDeviceScope
+    * The user experience analytics device scope entity endpoint to trigger on the service to either START or STOP computing metrics data based on a device scope configuration.
+    *
+    * @return UserExperienceAnalyticsDeviceScope|null The userExperienceAnalyticsDeviceScope
+    */
+    public function getUserExperienceAnalyticsDeviceScope()
+    {
+        if (array_key_exists("userExperienceAnalyticsDeviceScope", $this->_propDict)) {
+            if (is_a($this->_propDict["userExperienceAnalyticsDeviceScope"], "\Beta\Microsoft\Graph\Model\UserExperienceAnalyticsDeviceScope") || is_null($this->_propDict["userExperienceAnalyticsDeviceScope"])) {
+                return $this->_propDict["userExperienceAnalyticsDeviceScope"];
+            } else {
+                $this->_propDict["userExperienceAnalyticsDeviceScope"] = new UserExperienceAnalyticsDeviceScope($this->_propDict["userExperienceAnalyticsDeviceScope"]);
+                return $this->_propDict["userExperienceAnalyticsDeviceScope"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsDeviceScope
+    * The user experience analytics device scope entity endpoint to trigger on the service to either START or STOP computing metrics data based on a device scope configuration.
+    *
+    * @param UserExperienceAnalyticsDeviceScope $val The userExperienceAnalyticsDeviceScope
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsDeviceScope($val)
+    {
+        $this->_propDict["userExperienceAnalyticsDeviceScope"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the userExperienceAnalyticsDeviceScopes
+    * The user experience analytics device scope entity contains device scope configuration use to apply filtering on the endpoint analytics reports.
+     *
+     * @return array|null The userExperienceAnalyticsDeviceScopes
+     */
+    public function getUserExperienceAnalyticsDeviceScopes()
+    {
+        if (array_key_exists("userExperienceAnalyticsDeviceScopes", $this->_propDict)) {
+           return $this->_propDict["userExperienceAnalyticsDeviceScopes"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsDeviceScopes
+    * The user experience analytics device scope entity contains device scope configuration use to apply filtering on the endpoint analytics reports.
+    *
+    * @param UserExperienceAnalyticsDeviceScope[] $val The userExperienceAnalyticsDeviceScopes
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsDeviceScopes($val)
+    {
+        $this->_propDict["userExperienceAnalyticsDeviceScopes"] = $val;
         return $this;
     }
 
@@ -4076,61 +4296,94 @@ class DeviceManagement extends Entity
 
 
      /**
-     * Gets the managementConditions
-    * The management conditions associated with device management of the company.
+     * Gets the zebraFotaArtifacts
+    * The Collection of ZebraFotaArtifacts.
      *
-     * @return array|null The managementConditions
+     * @return array|null The zebraFotaArtifacts
      */
-    public function getManagementConditions()
+    public function getZebraFotaArtifacts()
     {
-        if (array_key_exists("managementConditions", $this->_propDict)) {
-           return $this->_propDict["managementConditions"];
+        if (array_key_exists("zebraFotaArtifacts", $this->_propDict)) {
+           return $this->_propDict["zebraFotaArtifacts"];
         } else {
             return null;
         }
     }
 
     /**
-    * Sets the managementConditions
-    * The management conditions associated with device management of the company.
+    * Sets the zebraFotaArtifacts
+    * The Collection of ZebraFotaArtifacts.
     *
-    * @param ManagementCondition[] $val The managementConditions
+    * @param ZebraFotaArtifact[] $val The zebraFotaArtifacts
     *
     * @return DeviceManagement
     */
-    public function setManagementConditions($val)
+    public function setZebraFotaArtifacts($val)
     {
-        $this->_propDict["managementConditions"] = $val;
+        $this->_propDict["zebraFotaArtifacts"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the zebraFotaConnector
+    * The singleton ZebraFotaConnector associated with account.
+    *
+    * @return ZebraFotaConnector|null The zebraFotaConnector
+    */
+    public function getZebraFotaConnector()
+    {
+        if (array_key_exists("zebraFotaConnector", $this->_propDict)) {
+            if (is_a($this->_propDict["zebraFotaConnector"], "\Beta\Microsoft\Graph\Model\ZebraFotaConnector") || is_null($this->_propDict["zebraFotaConnector"])) {
+                return $this->_propDict["zebraFotaConnector"];
+            } else {
+                $this->_propDict["zebraFotaConnector"] = new ZebraFotaConnector($this->_propDict["zebraFotaConnector"]);
+                return $this->_propDict["zebraFotaConnector"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the zebraFotaConnector
+    * The singleton ZebraFotaConnector associated with account.
+    *
+    * @param ZebraFotaConnector $val The zebraFotaConnector
+    *
+    * @return DeviceManagement
+    */
+    public function setZebraFotaConnector($val)
+    {
+        $this->_propDict["zebraFotaConnector"] = $val;
         return $this;
     }
 
 
      /**
-     * Gets the managementConditionStatements
-    * The management condition statements associated with device management of the company.
+     * Gets the zebraFotaDeployments
+    * Collection of ZebraFotaDeployments associated with account.
      *
-     * @return array|null The managementConditionStatements
+     * @return array|null The zebraFotaDeployments
      */
-    public function getManagementConditionStatements()
+    public function getZebraFotaDeployments()
     {
-        if (array_key_exists("managementConditionStatements", $this->_propDict)) {
-           return $this->_propDict["managementConditionStatements"];
+        if (array_key_exists("zebraFotaDeployments", $this->_propDict)) {
+           return $this->_propDict["zebraFotaDeployments"];
         } else {
             return null;
         }
     }
 
     /**
-    * Sets the managementConditionStatements
-    * The management condition statements associated with device management of the company.
+    * Sets the zebraFotaDeployments
+    * Collection of ZebraFotaDeployments associated with account.
     *
-    * @param ManagementConditionStatement[] $val The managementConditionStatements
+    * @param ZebraFotaDeployment[] $val The zebraFotaDeployments
     *
     * @return DeviceManagement
     */
-    public function setManagementConditionStatements($val)
+    public function setZebraFotaDeployments($val)
     {
-        $this->_propDict["managementConditionStatements"] = $val;
+        $this->_propDict["zebraFotaDeployments"] = $val;
         return $this;
     }
 
@@ -4551,6 +4804,66 @@ class DeviceManagement extends Entity
     public function setConfigManagerCollections($val)
     {
         $this->_propDict["configManagerCollections"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the organizationalMessageDetails
+    * A list of OrganizationalMessageDetails
+     *
+     * @return array|null The organizationalMessageDetails
+     */
+    public function getOrganizationalMessageDetails()
+    {
+        if (array_key_exists("organizationalMessageDetails", $this->_propDict)) {
+           return $this->_propDict["organizationalMessageDetails"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the organizationalMessageDetails
+    * A list of OrganizationalMessageDetails
+    *
+    * @param OrganizationalMessageDetail[] $val The organizationalMessageDetails
+    *
+    * @return DeviceManagement
+    */
+    public function setOrganizationalMessageDetails($val)
+    {
+        $this->_propDict["organizationalMessageDetails"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the organizationalMessageGuidedContents
+    * A list of OrganizationalMessageGuidedContents
+     *
+     * @return array|null The organizationalMessageGuidedContents
+     */
+    public function getOrganizationalMessageGuidedContents()
+    {
+        if (array_key_exists("organizationalMessageGuidedContents", $this->_propDict)) {
+           return $this->_propDict["organizationalMessageGuidedContents"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the organizationalMessageGuidedContents
+    * A list of OrganizationalMessageGuidedContents
+    *
+    * @param OrganizationalMessageGuidedContent[] $val The organizationalMessageGuidedContents
+    *
+    * @return DeviceManagement
+    */
+    public function setOrganizationalMessageGuidedContents($val)
+    {
+        $this->_propDict["organizationalMessageGuidedContents"] = $val;
         return $this;
     }
 

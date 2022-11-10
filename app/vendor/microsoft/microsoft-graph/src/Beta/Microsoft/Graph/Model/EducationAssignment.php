@@ -92,7 +92,7 @@ class EducationAssignment extends Entity
 
     /**
     * Gets the allowLateSubmissions
-    * Identifies whether students can submit after the due date. If this property isn't specified during create, it defaults to true.
+    * Identifies whether students can submit after the due date. If this property is not specified during create, it defaults to true.
     *
     * @return bool|null The allowLateSubmissions
     */
@@ -107,7 +107,7 @@ class EducationAssignment extends Entity
 
     /**
     * Sets the allowLateSubmissions
-    * Identifies whether students can submit after the due date. If this property isn't specified during create, it defaults to true.
+    * Identifies whether students can submit after the due date. If this property is not specified during create, it defaults to true.
     *
     * @param bool $val The allowLateSubmissions
     *
@@ -150,7 +150,7 @@ class EducationAssignment extends Entity
 
     /**
     * Gets the assignDateTime
-    * The date when the assignment should become active.  If in the future, the assignment isn't shown to the student until this date.  The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+    * The date when the assignment should become active.  If in the future, the assignment is not shown to the student until this date.  The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
     *
     * @return \DateTime|null The assignDateTime
     */
@@ -169,7 +169,7 @@ class EducationAssignment extends Entity
 
     /**
     * Sets the assignDateTime
-    * The date when the assignment should become active.  If in the future, the assignment isn't shown to the student until this date.  The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+    * The date when the assignment should become active.  If in the future, the assignment is not shown to the student until this date.  The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
     *
     * @param \DateTime $val The assignDateTime
     *
@@ -438,6 +438,35 @@ class EducationAssignment extends Entity
     }
 
     /**
+    * Gets the feedbackResourcesFolderUrl
+    * Folder URL where all the feedback file resources for this assignment are stored.
+    *
+    * @return string|null The feedbackResourcesFolderUrl
+    */
+    public function getFeedbackResourcesFolderUrl()
+    {
+        if (array_key_exists("feedbackResourcesFolderUrl", $this->_propDict)) {
+            return $this->_propDict["feedbackResourcesFolderUrl"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the feedbackResourcesFolderUrl
+    * Folder URL where all the feedback file resources for this assignment are stored.
+    *
+    * @param string $val The feedbackResourcesFolderUrl
+    *
+    * @return EducationAssignment
+    */
+    public function setFeedbackResourcesFolderUrl($val)
+    {
+        $this->_propDict["feedbackResourcesFolderUrl"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the grading
     * How the assignment will be graded.
     *
@@ -571,7 +600,7 @@ class EducationAssignment extends Entity
 
     /**
     * Gets the notificationChannelUrl
-    * Optional field to specify the URL of the channel to post the assignment publish notification. If not specified or null, defaults to the General channel. This field only applies to assignments where the assignTo value is educationAssignmentClassRecipient. Updating the notificationChannelUrl isn't allowed after the assignment has been published.
+    * Optional field to specify the URL of the channel to post the assignment publish notification. If not specified or null, defaults to the General channel. This field only applies to assignments where the assignTo value is educationAssignmentClassRecipient. Updating the notificationChannelUrl is not allowed after the assignment has been published.
     *
     * @return string|null The notificationChannelUrl
     */
@@ -586,7 +615,7 @@ class EducationAssignment extends Entity
 
     /**
     * Sets the notificationChannelUrl
-    * Optional field to specify the URL of the channel to post the assignment publish notification. If not specified or null, defaults to the General channel. This field only applies to assignments where the assignTo value is educationAssignmentClassRecipient. Updating the notificationChannelUrl isn't allowed after the assignment has been published.
+    * Optional field to specify the URL of the channel to post the assignment publish notification. If not specified or null, defaults to the General channel. This field only applies to assignments where the assignTo value is educationAssignmentClassRecipient. Updating the notificationChannelUrl is not allowed after the assignment has been published.
     *
     * @param string $val The notificationChannelUrl
     *
@@ -629,7 +658,7 @@ class EducationAssignment extends Entity
 
     /**
     * Gets the status
-    * Status of the Assignment.  You can't PATCH this value.  Possible values are: draft, scheduled, published, assigned.
+    * Status of the Assignment.  You can not PATCH this value.  Possible values are: draft, scheduled, published, assigned.
     *
     * @return EducationAssignmentStatus|null The status
     */
@@ -648,7 +677,7 @@ class EducationAssignment extends Entity
 
     /**
     * Sets the status
-    * Status of the Assignment.  You can't PATCH this value.  Possible values are: draft, scheduled, published, assigned.
+    * Status of the Assignment.  You can not PATCH this value.  Possible values are: draft, scheduled, published, assigned.
     *
     * @param EducationAssignmentStatus $val The status
     *

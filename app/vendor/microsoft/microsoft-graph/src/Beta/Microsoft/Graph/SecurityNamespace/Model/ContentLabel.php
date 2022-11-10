@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * ContentLabel class
 *
@@ -26,13 +26,14 @@ class ContentLabel extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the assignmentMethod
+    * Describes whether the label was applied by an automated (standard) process or a person (privileged).
     *
     * @return AssignmentMethod|null The assignmentMethod
     */
     public function getAssignmentMethod()
     {
         if (array_key_exists("assignmentMethod", $this->_propDict)) {
-            if (is_a($this->_propDict["assignmentMethod"], "\Beta\Microsoft\Graph\Security\Model\AssignmentMethod") || is_null($this->_propDict["assignmentMethod"])) {
+            if (is_a($this->_propDict["assignmentMethod"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\AssignmentMethod") || is_null($this->_propDict["assignmentMethod"])) {
                 return $this->_propDict["assignmentMethod"];
             } else {
                 $this->_propDict["assignmentMethod"] = new AssignmentMethod($this->_propDict["assignmentMethod"]);
@@ -44,6 +45,7 @@ class ContentLabel extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the assignmentMethod
+    * Describes whether the label was applied by an automated (standard) process or a person (privileged).
     *
     * @param AssignmentMethod $val The value to assign to the assignmentMethod
     *

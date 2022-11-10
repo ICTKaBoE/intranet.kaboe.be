@@ -116,6 +116,35 @@ class CredentialUserRegistrationsSummary extends \Beta\Microsoft\Graph\Model\Ent
     }
 
     /**
+    * Gets the mfaExcludedUserCount
+    * The number of users in the multi-factor authentication exclusion security group (Microsoft 365 Lighthouse - MFA exclusions). Optional. Read-only.
+    *
+    * @return int|null The mfaExcludedUserCount
+    */
+    public function getMfaExcludedUserCount()
+    {
+        if (array_key_exists("mfaExcludedUserCount", $this->_propDict)) {
+            return $this->_propDict["mfaExcludedUserCount"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the mfaExcludedUserCount
+    * The number of users in the multi-factor authentication exclusion security group (Microsoft 365 Lighthouse - MFA exclusions). Optional. Read-only.
+    *
+    * @param int $val The mfaExcludedUserCount
+    *
+    * @return CredentialUserRegistrationsSummary
+    */
+    public function setMfaExcludedUserCount($val)
+    {
+        $this->_propDict["mfaExcludedUserCount"] = intval($val);
+        return $this;
+    }
+
+    /**
     * Gets the mfaRegisteredUserCount
     * The number of users registered for multi-factor authentication. Optional. Read-only.
     *

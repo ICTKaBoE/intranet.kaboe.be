@@ -377,7 +377,6 @@ class OnlineMeeting extends Entity
 
     /**
     * Gets the externalId
-    * The external ID. A custom ID. Optional.
     *
     * @return string|null The externalId
     */
@@ -392,7 +391,6 @@ class OnlineMeeting extends Entity
 
     /**
     * Sets the externalId
-    * The external ID. A custom ID. Optional.
     *
     * @param string $val The externalId
     *

@@ -392,7 +392,7 @@ class VppToken extends Entity
     * Gets the roleScopeTagIds
     * Role Scope Tags IDs assigned to this entity.
     *
-    * @return string|null The roleScopeTagIds
+    * @return array|null The roleScopeTagIds
     */
     public function getRoleScopeTagIds()
     {
@@ -407,7 +407,7 @@ class VppToken extends Entity
     * Sets the roleScopeTagIds
     * Role Scope Tags IDs assigned to this entity.
     *
-    * @param string $val The roleScopeTagIds
+    * @param string[] $val The roleScopeTagIds
     *
     * @return VppToken
     */
@@ -419,7 +419,7 @@ class VppToken extends Entity
 
     /**
     * Gets the state
-    * Current state of the Apple Volume Purchase Program Token. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM.
+    * Current state of the Apple Volume Purchase Program Token. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM, duplicateLocationId.
     *
     * @return VppTokenState|null The state
     */
@@ -438,7 +438,7 @@ class VppToken extends Entity
 
     /**
     * Sets the state
-    * Current state of the Apple Volume Purchase Program Token. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM.
+    * Current state of the Apple Volume Purchase Program Token. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM. Possible values are: unknown, valid, expired, invalid, assignedToExternalMDM, duplicateLocationId.
     *
     * @param VppTokenState $val The state
     *

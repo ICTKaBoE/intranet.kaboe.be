@@ -115,7 +115,7 @@ class AppConsentRequest extends Entity
 
      /**
      * Gets the userConsentRequests
-    * A list of pending user consent requests.
+    * A list of pending user consent requests. Supports $filter (eq).
      *
      * @return array|null The userConsentRequests
      */
@@ -130,7 +130,7 @@ class AppConsentRequest extends Entity
 
     /**
     * Sets the userConsentRequests
-    * A list of pending user consent requests.
+    * A list of pending user consent requests. Supports $filter (eq).
     *
     * @param UserConsentRequest[] $val The userConsentRequests
     *

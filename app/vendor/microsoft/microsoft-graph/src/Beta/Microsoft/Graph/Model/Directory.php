@@ -173,7 +173,6 @@ class Directory extends Entity
 
      /**
      * Gets the deletedItems
-    * Recently deleted items. Read-only. Nullable.
      *
      * @return array|null The deletedItems
      */
@@ -188,7 +187,6 @@ class Directory extends Entity
 
     /**
     * Sets the deletedItems
-    * Recently deleted items. Read-only. Nullable.
     *
     * @param DirectoryObject[] $val The deletedItems
     *
@@ -317,7 +315,6 @@ class Directory extends Entity
 
      /**
      * Gets the featureRolloutPolicies
-    * Nullable.
      *
      * @return array|null The featureRolloutPolicies
      */
@@ -332,7 +329,6 @@ class Directory extends Entity
 
     /**
     * Sets the featureRolloutPolicies
-    * Nullable.
     *
     * @param FeatureRolloutPolicy[] $val The featureRolloutPolicies
     *

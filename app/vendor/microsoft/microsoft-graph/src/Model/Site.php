@@ -342,7 +342,6 @@ class Site extends BaseItem
 
      /**
      * Gets the externalColumns
-    * The collection of column definitions available in the site that are referenced from the sites in the parent hierarchy of the current site.
      *
      * @return array|null The externalColumns
      */
@@ -357,7 +356,6 @@ class Site extends BaseItem
 
     /**
     * Sets the externalColumns
-    * The collection of column definitions available in the site that are referenced from the sites in the parent hierarchy of the current site.
     *
     * @param ColumnDefinition[] $val The externalColumns
     *
@@ -426,6 +424,36 @@ class Site extends BaseItem
     public function setLists($val)
     {
         $this->_propDict["lists"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the operations
+    * The collection of long-running operations on the site.
+     *
+     * @return array|null The operations
+     */
+    public function getOperations()
+    {
+        if (array_key_exists("operations", $this->_propDict)) {
+           return $this->_propDict["operations"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the operations
+    * The collection of long-running operations on the site.
+    *
+    * @param RichLongRunningOperation[] $val The operations
+    *
+    * @return Site
+    */
+    public function setOperations($val)
+    {
+        $this->_propDict["operations"] = $val;
         return $this;
     }
 

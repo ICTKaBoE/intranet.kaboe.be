@@ -8,6 +8,7 @@
         "nelexa/zip": "^4.0",
         "dompdf/dompdf": "^1.2",
         "cloudmersive/cloudmersive_document_convert_api_client": "^2.1",
-        "mpdf/mpdf": "^8.1"
+        "mpdf/mpdf": "^8.1",
+        "pecee/simple-router": "4.3.7.2"
     }
 }

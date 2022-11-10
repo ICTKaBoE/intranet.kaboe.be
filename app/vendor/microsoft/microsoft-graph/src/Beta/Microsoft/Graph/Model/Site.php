@@ -405,7 +405,7 @@ class Site extends BaseItem
 
      /**
      * Gets the items
-    * Used to address any item contained in this site. This collection can't be enumerated.
+    * Used to address any item contained in this site. This collection cannot be enumerated.
      *
      * @return array|null The items
      */
@@ -420,7 +420,7 @@ class Site extends BaseItem
 
     /**
     * Sets the items
-    * Used to address any item contained in this site. This collection can't be enumerated.
+    * Used to address any item contained in this site. This collection cannot be enumerated.
     *
     * @param BaseItem[] $val The items
     *
@@ -584,7 +584,7 @@ class Site extends BaseItem
 
     /**
     * Gets the termStore
-    * The default termStore under this site.
+    * The termStore under this site.
     *
     * @return \Beta\Microsoft\Graph\TermStore\Model\Store|null The termStore
     */
@@ -603,7 +603,7 @@ class Site extends BaseItem
 
     /**
     * Sets the termStore
-    * The default termStore under this site.
+    * The termStore under this site.
     *
     * @param \Beta\Microsoft\Graph\TermStore\Model\Store $val The termStore
     *
@@ -617,7 +617,6 @@ class Site extends BaseItem
 
     /**
     * Gets the onenote
-    * Calls the OneNote service for notebook related operations.
     *
     * @return Onenote|null The onenote
     */
@@ -636,7 +635,6 @@ class Site extends BaseItem
 
     /**
     * Sets the onenote
-    * Calls the OneNote service for notebook related operations.
     *
     * @param Onenote $val The onenote
     *

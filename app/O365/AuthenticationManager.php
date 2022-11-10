@@ -19,10 +19,10 @@
 
 namespace O365;
 
-use Core\Config;
-use Security\Request;
+use Database\Repository\Setting;
 use Security\Session;
 use O365\RequestManager;
+use Router\Helpers;
 
 // We use the session to store tokens and data about the user. 
 Session::start();
@@ -49,12 +49,14 @@ class AuthenticationManager
      */
     public static function connect($username = null, $autoRedirect = true)
     {
+        $settingRepo = new Setting;
+        $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
         // Redirect the browser to the authorization endpoint. Auth endpoint is
         // https://login.microsoftonline.com/common/oauth2/authorize
-        $redirect = Config::get("o365/url/authority") . Config::get("o365/endpoint/authorize") .
+        $redirect = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.authorize")[0]->value .
             '?response_type=code' .
-            '&client_id=' . urlencode(Config::get("o365/client/id")) .
-            '&redirect_uri=' . urlencode(Config::get("o365/url/callback"));
+            '&client_id=' . urlencode($settingRepo->get("o365.client.id")[0]->value) .
+            '&redirect_uri=' . urlencode(str_replace('{{site:dev}}', $devmode ? 'dev.' : '', $settingRepo->get("o365.url.callback")[0]->value));
 
         if (!is_null($username)) $redirect .= "&login_hint=" . urlencode($username);
 
@@ -75,7 +77,9 @@ class AuthenticationManager
      */
     public static function acquireToken()
     {
-        $tokenEndpoint = Config::get("o365/url/authority") . Config::get("o365/endpoint/token");
+        $settingRepo = new Setting;
+        $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
+        $tokenEndpoint = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.token")[0]->value;
 
         // Send a POST request to the token endpoint to retrieve tokens.
         // Token endpoint is:
@@ -84,12 +88,12 @@ class AuthenticationManager
             $tokenEndpoint,
             array(),
             array(
-                'client_id' => Config::get("o365/client/id"),
-                'client_secret' => Config::get("o365/client/secret"),
+                'client_id' => $settingRepo->get("o365.client.id")[0]->value,
+                'client_secret' => $settingRepo->get("o365.client.secret")[0]->value,
                 'code' => Session::get('code'),
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => Config::get("o365/url/callback"),
-                'resource' => Config::get("o365/url/resource")
+                'redirect_uri' => str_replace('{{site:dev}}', $devmode ? 'dev.' : '', $settingRepo->get("o365.url.callback")[0]->value),
+                'resource' => $settingRepo->get("o365.url.resource")[0]->value
             )
         );
 
@@ -144,18 +148,15 @@ class AuthenticationManager
      */
     public static function disconnect()
     {
+        $settingRepo = new Setting;
         Session::stop();
 
-        $connectUrl = Request::host();
-
-        // Get the full URL of the index.php page to send it to the logout endpoint
-        $connectUrl .= '/index.php';
-        $connectUrl = str_replace("http", "https", $connectUrl);
+        $connectUrl = Helpers::url()->getScheme() . "://" . Helpers::url()->getHost();
 
         // Logout endpoint is in the form
         // https://login.microsoftonline.com/common/oauth2/logout
         // ?post_logout_redirect_uri=<full_url_of_your_start_page> 
-        $redirect = Config::get("o365/url/authority") . Config::get("o365/endpoint/logout") .
+        $redirect = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.logout")[0]->value .
             '?post_logout_redirect_uri=' . urlencode($connectUrl);
         header("Location: " . $redirect);
         exit();

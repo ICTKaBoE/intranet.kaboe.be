@@ -88,7 +88,7 @@ class AccessReviewInstanceDecisionItem extends Entity
 
     /**
     * Gets the appliedDateTime
-    * The timestamp when the approval decision was applied. The DatetimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.  Supports $select. Read-only.
+    * The timestamp when the approval decision was applied.00000000-0000-0000-0000-000000000000 if the assigned reviewer hasn't applied the decision or it was automatically applied. The DatetimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.  Supports $select. Read-only.
     *
     * @return \DateTime|null The appliedDateTime
     */
@@ -107,7 +107,7 @@ class AccessReviewInstanceDecisionItem extends Entity
 
     /**
     * Sets the appliedDateTime
-    * The timestamp when the approval decision was applied. The DatetimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.  Supports $select. Read-only.
+    * The timestamp when the approval decision was applied.00000000-0000-0000-0000-000000000000 if the assigned reviewer hasn't applied the decision or it was automatically applied. The DatetimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.  Supports $select. Read-only.
     *
     * @param \DateTime $val The appliedDateTime
     *
@@ -361,7 +361,7 @@ class AccessReviewInstanceDecisionItem extends Entity
 
     /**
     * Gets the reviewedBy
-    * The identifier of the reviewer. Supports $select. Read-only.
+    * The identifier of the reviewer.00000000-0000-0000-0000-000000000000 if the assigned reviewer hasn't reviewed. Supports $select. Read-only.
     *
     * @return UserIdentity|null The reviewedBy
     */
@@ -380,7 +380,7 @@ class AccessReviewInstanceDecisionItem extends Entity
 
     /**
     * Sets the reviewedBy
-    * The identifier of the reviewer. Supports $select. Read-only.
+    * The identifier of the reviewer.00000000-0000-0000-0000-000000000000 if the assigned reviewer hasn't reviewed. Supports $select. Read-only.
     *
     * @param UserIdentity $val The reviewedBy
     *

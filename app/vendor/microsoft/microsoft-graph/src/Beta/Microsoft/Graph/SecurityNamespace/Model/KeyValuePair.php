@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * KeyValuePair class
 *
@@ -25,6 +25,7 @@ class KeyValuePair extends \Beta\Microsoft\Graph\Model\Entity
 {
     /**
     * Gets the name
+    * Name for this key-value pair.
     *
     * @return string|null The name
     */
@@ -39,6 +40,7 @@ class KeyValuePair extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the name
+    * Name for this key-value pair.
     *
     * @param string $val The value of the name
     *
@@ -51,6 +53,7 @@ class KeyValuePair extends \Beta\Microsoft\Graph\Model\Entity
     }
     /**
     * Gets the value
+    * Value for this key-value pair.
     *
     * @return string|null The value
     */
@@ -65,6 +68,7 @@ class KeyValuePair extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the value
+    * Value for this key-value pair.
     *
     * @param string $val The value of the value
     *

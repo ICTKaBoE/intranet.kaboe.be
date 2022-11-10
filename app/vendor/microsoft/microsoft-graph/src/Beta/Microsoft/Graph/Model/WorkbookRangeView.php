@@ -26,7 +26,6 @@ class WorkbookRangeView extends Entity
 {
     /**
     * Gets the cellAddresses
-    * Represents the cell addresses
     *
     * @return string|null The cellAddresses
     */
@@ -41,7 +40,6 @@ class WorkbookRangeView extends Entity
 
     /**
     * Sets the cellAddresses
-    * Represents the cell addresses
     *
     * @param string $val The cellAddresses
     *
@@ -316,7 +314,7 @@ class WorkbookRangeView extends Entity
 
     /**
     * Gets the valueTypes
-    * Represents the type of data of each cell. Read-only. The possible values are: Unknown, Empty, String, Integer, Double, Boolean, Error.
+    * Represents the type of data of each cell. Read-only. Possible values are: Unknown, Empty, String, Integer, Double, Boolean, Error.
     *
     * @return string|null The valueTypes
     */
@@ -331,7 +329,7 @@ class WorkbookRangeView extends Entity
 
     /**
     * Sets the valueTypes
-    * Represents the type of data of each cell. Read-only. The possible values are: Unknown, Empty, String, Integer, Double, Boolean, Error.
+    * Represents the type of data of each cell. Read-only. Possible values are: Unknown, Empty, String, Integer, Double, Boolean, Error.
     *
     * @param string $val The valueTypes
     *

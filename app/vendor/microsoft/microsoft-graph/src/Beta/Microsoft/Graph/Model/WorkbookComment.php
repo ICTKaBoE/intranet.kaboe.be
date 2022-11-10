@@ -26,7 +26,7 @@ class WorkbookComment extends Entity
 {
     /**
     * Gets the content
-    * The content of comment.
+    * The content of the comment.
     *
     * @return string|null The content
     */
@@ -41,7 +41,7 @@ class WorkbookComment extends Entity
 
     /**
     * Sets the content
-    * The content of comment.
+    * The content of the comment.
     *
     * @param string $val The content
     *
@@ -85,7 +85,6 @@ class WorkbookComment extends Entity
 
      /**
      * Gets the replies
-    * Read-only. Nullable.
      *
      * @return array|null The replies
      */
@@ -100,7 +99,6 @@ class WorkbookComment extends Entity
 
     /**
     * Sets the replies
-    * Read-only. Nullable.
     *
     * @param WorkbookCommentReply[] $val The replies
     *

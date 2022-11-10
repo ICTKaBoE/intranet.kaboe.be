@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * MetadataAction class
 *
@@ -26,13 +26,14 @@ class MetadataAction extends InformationProtectionAction
 
     /**
     * Gets the metadataToAdd
+    * A collection of key-value pairs that should be added to the file.
     *
     * @return KeyValuePair|null The metadataToAdd
     */
     public function getMetadataToAdd()
     {
         if (array_key_exists("metadataToAdd", $this->_propDict)) {
-            if (is_a($this->_propDict["metadataToAdd"], "\Beta\Microsoft\Graph\Security\Model\KeyValuePair") || is_null($this->_propDict["metadataToAdd"])) {
+            if (is_a($this->_propDict["metadataToAdd"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\KeyValuePair") || is_null($this->_propDict["metadataToAdd"])) {
                 return $this->_propDict["metadataToAdd"];
             } else {
                 $this->_propDict["metadataToAdd"] = new KeyValuePair($this->_propDict["metadataToAdd"]);
@@ -44,6 +45,7 @@ class MetadataAction extends InformationProtectionAction
 
     /**
     * Sets the metadataToAdd
+    * A collection of key-value pairs that should be added to the file.
     *
     * @param KeyValuePair $val The value to assign to the metadataToAdd
     *
@@ -56,6 +58,7 @@ class MetadataAction extends InformationProtectionAction
     }
     /**
     * Gets the metadataToRemove
+    * A collection of strings that indicate which keys to remove from the file metadata.
     *
     * @return string|null The metadataToRemove
     */
@@ -70,6 +73,7 @@ class MetadataAction extends InformationProtectionAction
 
     /**
     * Sets the metadataToRemove
+    * A collection of strings that indicate which keys to remove from the file metadata.
     *
     * @param string $val The value of the metadataToRemove
     *

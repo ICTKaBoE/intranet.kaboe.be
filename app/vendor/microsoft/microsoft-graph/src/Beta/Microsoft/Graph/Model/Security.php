@@ -81,17 +81,48 @@ class Security extends Entity
     }
 
     /**
+    * Gets the cases
+    *
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\CasesRoot|null The cases
+    */
+    public function getCases()
+    {
+        if (array_key_exists("cases", $this->_propDict)) {
+            if (is_a($this->_propDict["cases"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\CasesRoot") || is_null($this->_propDict["cases"])) {
+                return $this->_propDict["cases"];
+            } else {
+                $this->_propDict["cases"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\CasesRoot($this->_propDict["cases"]);
+                return $this->_propDict["cases"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the cases
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\CasesRoot $val The cases
+    *
+    * @return Security
+    */
+    public function setCases($val)
+    {
+        $this->_propDict["cases"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the informationProtection
     *
-    * @return \Beta\Microsoft\Graph\Security\Model\InformationProtection|null The informationProtection
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtection|null The informationProtection
     */
     public function getInformationProtection()
     {
         if (array_key_exists("informationProtection", $this->_propDict)) {
-            if (is_a($this->_propDict["informationProtection"], "\Beta\Microsoft\Graph\Security\Model\InformationProtection") || is_null($this->_propDict["informationProtection"])) {
+            if (is_a($this->_propDict["informationProtection"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtection") || is_null($this->_propDict["informationProtection"])) {
                 return $this->_propDict["informationProtection"];
             } else {
-                $this->_propDict["informationProtection"] = new \Beta\Microsoft\Graph\Security\Model\InformationProtection($this->_propDict["informationProtection"]);
+                $this->_propDict["informationProtection"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtection($this->_propDict["informationProtection"]);
                 return $this->_propDict["informationProtection"];
             }
         }
@@ -101,13 +132,73 @@ class Security extends Entity
     /**
     * Sets the informationProtection
     *
-    * @param \Beta\Microsoft\Graph\Security\Model\InformationProtection $val The informationProtection
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\InformationProtection $val The informationProtection
     *
     * @return Security
     */
     public function setInformationProtection($val)
     {
         $this->_propDict["informationProtection"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the alertsV2
+    * A collection of alerts in Microsoft 365 Defender.
+     *
+     * @return array|null The alertsV2
+     */
+    public function getAlertsV2()
+    {
+        if (array_key_exists("alertsV2", $this->_propDict)) {
+           return $this->_propDict["alertsV2"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the alertsV2
+    * A collection of alerts in Microsoft 365 Defender.
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\Alert[] $val The alertsV2
+    *
+    * @return Security
+    */
+    public function setAlertsV2($val)
+    {
+        $this->_propDict["alertsV2"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the incidents
+    * A collection of incidents in Microsoft 365 Defender, each of which is a set of correlated alerts and associated metadata that reflects the story of an attack.
+     *
+     * @return array|null The incidents
+     */
+    public function getIncidents()
+    {
+        if (array_key_exists("incidents", $this->_propDict)) {
+           return $this->_propDict["incidents"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the incidents
+    * A collection of incidents in Microsoft 365 Defender, each of which is a set of correlated alerts and associated metadata that reflects the story of an attack.
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\Incident[] $val The incidents
+    *
+    * @return Security
+    */
+    public function setIncidents($val)
+    {
+        $this->_propDict["incidents"] = $val;
         return $this;
     }
 
@@ -144,10 +235,136 @@ class Security extends Entity
         return $this;
     }
 
+    /**
+    * Gets the labels
+    *
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\LabelsRoot|null The labels
+    */
+    public function getLabels()
+    {
+        if (array_key_exists("labels", $this->_propDict)) {
+            if (is_a($this->_propDict["labels"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\LabelsRoot") || is_null($this->_propDict["labels"])) {
+                return $this->_propDict["labels"];
+            } else {
+                $this->_propDict["labels"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\LabelsRoot($this->_propDict["labels"]);
+                return $this->_propDict["labels"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the labels
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\LabelsRoot $val The labels
+    *
+    * @return Security
+    */
+    public function setLabels($val)
+    {
+        $this->_propDict["labels"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the triggers
+    *
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggersRoot|null The triggers
+    */
+    public function getTriggers()
+    {
+        if (array_key_exists("triggers", $this->_propDict)) {
+            if (is_a($this->_propDict["triggers"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\TriggersRoot") || is_null($this->_propDict["triggers"])) {
+                return $this->_propDict["triggers"];
+            } else {
+                $this->_propDict["triggers"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggersRoot($this->_propDict["triggers"]);
+                return $this->_propDict["triggers"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the triggers
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggersRoot $val The triggers
+    *
+    * @return Security
+    */
+    public function setTriggers($val)
+    {
+        $this->_propDict["triggers"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the triggerTypes
+    *
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggerTypesRoot|null The triggerTypes
+    */
+    public function getTriggerTypes()
+    {
+        if (array_key_exists("triggerTypes", $this->_propDict)) {
+            if (is_a($this->_propDict["triggerTypes"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\TriggerTypesRoot") || is_null($this->_propDict["triggerTypes"])) {
+                return $this->_propDict["triggerTypes"];
+            } else {
+                $this->_propDict["triggerTypes"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggerTypesRoot($this->_propDict["triggerTypes"]);
+                return $this->_propDict["triggerTypes"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the triggerTypes
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\TriggerTypesRoot $val The triggerTypes
+    *
+    * @return Security
+    */
+    public function setTriggerTypes($val)
+    {
+        $this->_propDict["triggerTypes"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the threatSubmission
+    * A threat submission sent to Microsoft; for example, a suspicious email threat, URL threat, or file threat.
+    *
+    * @return \Beta\Microsoft\Graph\SecurityNamespace\Model\ThreatSubmissionRoot|null The threatSubmission
+    */
+    public function getThreatSubmission()
+    {
+        if (array_key_exists("threatSubmission", $this->_propDict)) {
+            if (is_a($this->_propDict["threatSubmission"], "\Beta\Microsoft\Graph\SecurityNamespace\Model\ThreatSubmissionRoot") || is_null($this->_propDict["threatSubmission"])) {
+                return $this->_propDict["threatSubmission"];
+            } else {
+                $this->_propDict["threatSubmission"] = new \Beta\Microsoft\Graph\SecurityNamespace\Model\ThreatSubmissionRoot($this->_propDict["threatSubmission"]);
+                return $this->_propDict["threatSubmission"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the threatSubmission
+    * A threat submission sent to Microsoft; for example, a suspicious email threat, URL threat, or file threat.
+    *
+    * @param \Beta\Microsoft\Graph\SecurityNamespace\Model\ThreatSubmissionRoot $val The threatSubmission
+    *
+    * @return Security
+    */
+    public function setThreatSubmission($val)
+    {
+        $this->_propDict["threatSubmission"] = $val;
+        return $this;
+    }
+
 
      /**
      * Gets the alerts
-    * Read-only. Nullable.
+    * Notifications for suspicious or potential security issues in a customer’s tenant.
      *
      * @return array|null The alerts
      */
@@ -162,7 +379,7 @@ class Security extends Entity
 
     /**
     * Sets the alerts
-    * Read-only. Nullable.
+    * Notifications for suspicious or potential security issues in a customer’s tenant.
     *
     * @param Alert[] $val The alerts
     *
@@ -373,6 +590,7 @@ class Security extends Entity
 
      /**
      * Gets the secureScores
+    * Measurements of tenants’ security posture to help protect them from threats.
      *
      * @return array|null The secureScores
      */
@@ -387,6 +605,7 @@ class Security extends Entity
 
     /**
     * Sets the secureScores
+    * Measurements of tenants’ security posture to help protect them from threats.
     *
     * @param SecureScore[] $val The secureScores
     *

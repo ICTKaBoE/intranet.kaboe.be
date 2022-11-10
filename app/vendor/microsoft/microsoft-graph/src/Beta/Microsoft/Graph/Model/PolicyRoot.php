@@ -88,6 +88,36 @@ class PolicyRoot implements \JsonSerializable
         return $this;
     }
 
+
+     /**
+     * Gets the authenticationStrengthPolicies
+    * The authentication method combinations that are to be used in scenarios defined by Azure AD Conditional Access.
+     *
+     * @return array|null The authenticationStrengthPolicies
+     */
+    public function getAuthenticationStrengthPolicies()
+    {
+        if (array_key_exists("authenticationStrengthPolicies", $this->_propDict)) {
+           return $this->_propDict["authenticationStrengthPolicies"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the authenticationStrengthPolicies
+    * The authentication method combinations that are to be used in scenarios defined by Azure AD Conditional Access.
+    *
+    * @param AuthenticationStrengthPolicy[] $val The authenticationStrengthPolicies
+    *
+    * @return PolicyRoot
+    */
+    public function setAuthenticationStrengthPolicies($val)
+    {
+        $this->_propDict["authenticationStrengthPolicies"] = $val;
+        return $this;
+    }
+
     /**
     * Gets the authenticationFlowsPolicy
     * The policy configuration of the self-service sign-up experience of external users.
@@ -151,6 +181,37 @@ class PolicyRoot implements \JsonSerializable
     public function setB2cAuthenticationMethodsPolicy($val)
     {
         $this->_propDict["b2cAuthenticationMethodsPolicy"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the deviceRegistrationPolicy
+    *
+    * @return DeviceRegistrationPolicy|null The deviceRegistrationPolicy
+    */
+    public function getDeviceRegistrationPolicy()
+    {
+        if (array_key_exists("deviceRegistrationPolicy", $this->_propDict)) {
+            if (is_a($this->_propDict["deviceRegistrationPolicy"], "\Beta\Microsoft\Graph\Model\DeviceRegistrationPolicy") || is_null($this->_propDict["deviceRegistrationPolicy"])) {
+                return $this->_propDict["deviceRegistrationPolicy"];
+            } else {
+                $this->_propDict["deviceRegistrationPolicy"] = new DeviceRegistrationPolicy($this->_propDict["deviceRegistrationPolicy"]);
+                return $this->_propDict["deviceRegistrationPolicy"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the deviceRegistrationPolicy
+    *
+    * @param DeviceRegistrationPolicy $val The deviceRegistrationPolicy
+    *
+    * @return PolicyRoot
+    */
+    public function setDeviceRegistrationPolicy($val)
+    {
+        $this->_propDict["deviceRegistrationPolicy"] = $val;
         return $this;
     }
 
@@ -342,6 +403,7 @@ class PolicyRoot implements \JsonSerializable
 
     /**
     * Gets the externalIdentitiesPolicy
+    * Represents the tenant-wide policy that controls whether external users can leave an Azure AD tenant via self-service controls.
     *
     * @return ExternalIdentitiesPolicy|null The externalIdentitiesPolicy
     */
@@ -360,6 +422,7 @@ class PolicyRoot implements \JsonSerializable
 
     /**
     * Sets the externalIdentitiesPolicy
+    * Represents the tenant-wide policy that controls whether external users can leave an Azure AD tenant via self-service controls.
     *
     * @param ExternalIdentitiesPolicy $val The externalIdentitiesPolicy
     *
@@ -859,6 +922,7 @@ class PolicyRoot implements \JsonSerializable
     *
     * @return array The list of properties
     */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $serializableProperties = $this->getProperties();

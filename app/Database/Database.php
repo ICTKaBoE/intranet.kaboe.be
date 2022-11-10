@@ -12,7 +12,7 @@ class Database
     public function __construct()
     {
         try {
-            $connection = new PDO("mysql:host=ID75803_intranet.db.webhosting.be;dbname=ID75803_intranet", "ID75803_intranet", "PianomanPA1");
+            $connection = new PDO("mysql:host=" . DB_SERVER . ";dbname=" . DB_DATABASE, DB_USERNAME, DB_PASSWORD);
 
             $this->builder = new Builder('mysql', function ($query, $queryString, $queryParameters) use ($connection) {
                 $statement = $connection->prepare($queryString);

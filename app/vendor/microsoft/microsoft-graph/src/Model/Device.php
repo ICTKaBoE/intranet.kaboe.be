@@ -474,9 +474,9 @@ class Device extends DirectoryObject
 
     /**
     * Gets the physicalIds
-    * For internal use only. Not nullable. Supports $filter (eq, not, ge, le, startsWith).
+    * For internal use only. Not nullable. Supports $filter (eq, not, ge, le, startsWith, and counting empty collections).
     *
-    * @return string|null The physicalIds
+    * @return array|null The physicalIds
     */
     public function getPhysicalIds()
     {
@@ -489,9 +489,9 @@ class Device extends DirectoryObject
 
     /**
     * Sets the physicalIds
-    * For internal use only. Not nullable. Supports $filter (eq, not, ge, le, startsWith).
+    * For internal use only. Not nullable. Supports $filter (eq, not, ge, le, startsWith, and counting empty collections).
     *
-    * @param string $val The physicalIds
+    * @param string[] $val The physicalIds
     *
     * @return Device
     */
@@ -532,9 +532,9 @@ class Device extends DirectoryObject
 
     /**
     * Gets the systemLabels
-    * List of labels applied to the device by the system.
+    * List of labels applied to the device by the system. Supports $filter (eq when counting empty collections).
     *
-    * @return string|null The systemLabels
+    * @return array|null The systemLabels
     */
     public function getSystemLabels()
     {
@@ -547,9 +547,9 @@ class Device extends DirectoryObject
 
     /**
     * Sets the systemLabels
-    * List of labels applied to the device by the system.
+    * List of labels applied to the device by the system. Supports $filter (eq when counting empty collections).
     *
-    * @param string $val The systemLabels
+    * @param string[] $val The systemLabels
     *
     * @return Device
     */
@@ -591,7 +591,7 @@ class Device extends DirectoryObject
 
      /**
      * Gets the memberOf
-    * Groups that this device is a member of. Read-only. Nullable. Supports $expand.
+    * Groups and administrative units that this device is a member of. Read-only. Nullable. Supports $expand.
      *
      * @return array|null The memberOf
      */
@@ -606,7 +606,7 @@ class Device extends DirectoryObject
 
     /**
     * Sets the memberOf
-    * Groups that this device is a member of. Read-only. Nullable. Supports $expand.
+    * Groups and administrative units that this device is a member of. Read-only. Nullable. Supports $expand.
     *
     * @param DirectoryObject[] $val The memberOf
     *
@@ -681,7 +681,7 @@ class Device extends DirectoryObject
 
      /**
      * Gets the transitiveMemberOf
-    * Groups that the device is a member of. This operation is transitive. Supports $expand.
+    * Groups and administrative units that the device is a member of. This operation is transitive. Supports $expand.
      *
      * @return array|null The transitiveMemberOf
      */
@@ -696,7 +696,7 @@ class Device extends DirectoryObject
 
     /**
     * Sets the transitiveMemberOf
-    * Groups that the device is a member of. This operation is transitive. Supports $expand.
+    * Groups and administrative units that the device is a member of. This operation is transitive. Supports $expand.
     *
     * @param DirectoryObject[] $val The transitiveMemberOf
     *

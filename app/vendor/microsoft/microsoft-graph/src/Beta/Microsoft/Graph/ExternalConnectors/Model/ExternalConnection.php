@@ -25,6 +25,72 @@ namespace Beta\Microsoft\Graph\ExternalConnectors\Model;
 class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 {
     /**
+    * Gets the activitySettings
+    * Collects configurable settings related to activities involving connector content.
+    *
+    * @return ActivitySettings|null The activitySettings
+    */
+    public function getActivitySettings()
+    {
+        if (array_key_exists("activitySettings", $this->_propDict)) {
+            if (is_a($this->_propDict["activitySettings"], "\Beta\Microsoft\Graph\ExternalConnectors\Model\ActivitySettings") || is_null($this->_propDict["activitySettings"])) {
+                return $this->_propDict["activitySettings"];
+            } else {
+                $this->_propDict["activitySettings"] = new ActivitySettings($this->_propDict["activitySettings"]);
+                return $this->_propDict["activitySettings"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the activitySettings
+    * Collects configurable settings related to activities involving connector content.
+    *
+    * @param ActivitySettings $val The activitySettings
+    *
+    * @return ExternalConnection
+    */
+    public function setActivitySettings($val)
+    {
+        $this->_propDict["activitySettings"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the complianceSettings
+    * The settings required for the connection to participate in eDiscovery, such as the display templates for eDiscovery results.
+    *
+    * @return ComplianceSettings|null The complianceSettings
+    */
+    public function getComplianceSettings()
+    {
+        if (array_key_exists("complianceSettings", $this->_propDict)) {
+            if (is_a($this->_propDict["complianceSettings"], "\Beta\Microsoft\Graph\ExternalConnectors\Model\ComplianceSettings") || is_null($this->_propDict["complianceSettings"])) {
+                return $this->_propDict["complianceSettings"];
+            } else {
+                $this->_propDict["complianceSettings"] = new ComplianceSettings($this->_propDict["complianceSettings"]);
+                return $this->_propDict["complianceSettings"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the complianceSettings
+    * The settings required for the connection to participate in eDiscovery, such as the display templates for eDiscovery results.
+    *
+    * @param ComplianceSettings $val The complianceSettings
+    *
+    * @return ExternalConnection
+    */
+    public function setComplianceSettings($val)
+    {
+        $this->_propDict["complianceSettings"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the configuration
     * Specifies additional application IDs that are allowed to manage the connection and to index content in the connection. Optional.
     *
@@ -116,7 +182,41 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
     }
 
     /**
+    * Gets the enabledContentExperiences
+    * The list of content experiences the connection will participate in. Possible values are search and compliance.
+    *
+    * @return ContentExperienceType|null The enabledContentExperiences
+    */
+    public function getEnabledContentExperiences()
+    {
+        if (array_key_exists("enabledContentExperiences", $this->_propDict)) {
+            if (is_a($this->_propDict["enabledContentExperiences"], "\Beta\Microsoft\Graph\ExternalConnectors\Model\ContentExperienceType") || is_null($this->_propDict["enabledContentExperiences"])) {
+                return $this->_propDict["enabledContentExperiences"];
+            } else {
+                $this->_propDict["enabledContentExperiences"] = new ContentExperienceType($this->_propDict["enabledContentExperiences"]);
+                return $this->_propDict["enabledContentExperiences"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the enabledContentExperiences
+    * The list of content experiences the connection will participate in. Possible values are search and compliance.
+    *
+    * @param ContentExperienceType $val The enabledContentExperiences
+    *
+    * @return ExternalConnection
+    */
+    public function setEnabledContentExperiences($val)
+    {
+        $this->_propDict["enabledContentExperiences"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the ingestedItemsCount
+    * The number of items ingested into a connection. This value is refreshed every 15 minutes. If the connection state is draft, then ingestedItemsCount will be null.
     *
     * @return int|null The ingestedItemsCount
     */
@@ -131,6 +231,7 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the ingestedItemsCount
+    * The number of items ingested into a connection. This value is refreshed every 15 minutes. If the connection state is draft, then ingestedItemsCount will be null.
     *
     * @param int $val The ingestedItemsCount
     *
@@ -206,7 +307,7 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the state
-    * Indicates the current state of the connection. Possible values are: draft, ready, obsolete, limitExceeded, unknownFutureValue.
+    * Indicates the current state of the connection. Possible values are draft, ready, obsolete, and limitExceeded. Required.
     *
     * @return ConnectionState|null The state
     */
@@ -225,7 +326,7 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the state
-    * Indicates the current state of the connection. Possible values are: draft, ready, obsolete, limitExceeded, unknownFutureValue.
+    * Indicates the current state of the connection. Possible values are draft, ready, obsolete, and limitExceeded. Required.
     *
     * @param ConnectionState $val The state
     *
@@ -240,7 +341,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
      /**
      * Gets the groups
-    * Read-only. Nullable.
      *
      * @return array|null The groups
      */
@@ -255,7 +355,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the groups
-    * Read-only. Nullable.
     *
     * @param ExternalGroup[] $val The groups
     *
@@ -270,7 +369,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
      /**
      * Gets the items
-    * Read-only. Nullable.
      *
      * @return array|null The items
      */
@@ -285,7 +383,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the items
-    * Read-only. Nullable.
     *
     * @param ExternalItem[] $val The items
     *
@@ -300,7 +397,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
      /**
      * Gets the operations
-    * Read-only. Nullable.
      *
      * @return array|null The operations
      */
@@ -315,7 +411,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the operations
-    * Read-only. Nullable.
     *
     * @param ConnectionOperation[] $val The operations
     *
@@ -360,7 +455,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the schema
-    * Read-only. Nullable.
     *
     * @return Schema|null The schema
     */
@@ -379,7 +473,6 @@ class ExternalConnection extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the schema
-    * Read-only. Nullable.
     *
     * @param Schema $val The schema
     *

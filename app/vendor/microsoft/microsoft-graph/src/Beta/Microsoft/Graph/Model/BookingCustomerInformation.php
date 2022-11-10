@@ -65,7 +65,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
 
     /**
     * Gets the customQuestionAnswers
-    * It consists of the list of custom questions and answers given by the customer as part of the appointment
+    * It consists of the list of custom questions and answers given by the customer as part of the appointment.
     *
     * @return BookingQuestionAnswer|null The customQuestionAnswers
     */
@@ -84,7 +84,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
 
     /**
     * Sets the customQuestionAnswers
-    * It consists of the list of custom questions and answers given by the customer as part of the appointment
+    * It consists of the list of custom questions and answers given by the customer as part of the appointment.
     *
     * @param BookingQuestionAnswer $val The value to assign to the customQuestionAnswers
     *
@@ -97,7 +97,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
     }
     /**
     * Gets the emailAddress
-    * The SMTP address of the bookingCustomer who is booking the appointment
+    * The SMTP address of the bookingCustomer who is booking the appointment.
     *
     * @return string|null The emailAddress
     */
@@ -112,7 +112,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
 
     /**
     * Sets the emailAddress
-    * The SMTP address of the bookingCustomer who is booking the appointment
+    * The SMTP address of the bookingCustomer who is booking the appointment.
     *
     * @param string $val The value of the emailAddress
     *
@@ -126,7 +126,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
 
     /**
     * Gets the location
-    * Represents location information for the bookingCustomer who is booking the appointment.
+    * Represents location information for the bookingCustomer who is booking the appointment.
     *
     * @return Location|null The location
     */
@@ -145,7 +145,7 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
 
     /**
     * Sets the location
-    * Represents location information for the bookingCustomer who is booking the appointment.
+    * Represents location information for the bookingCustomer who is booking the appointment.
     *
     * @param Location $val The value to assign to the location
     *
@@ -238,6 +238,34 @@ class BookingCustomerInformation extends BookingCustomerInformationBase
     public function setPhone($val)
     {
         $this->_propDict["phone"] = $val;
+        return $this;
+    }
+    /**
+    * Gets the smsNotificationsEnabled
+    * Indicates if the SMS notifications will be sent to the customer for the appointment
+    *
+    * @return bool|null The smsNotificationsEnabled
+    */
+    public function getSmsNotificationsEnabled()
+    {
+        if (array_key_exists("smsNotificationsEnabled", $this->_propDict)) {
+            return $this->_propDict["smsNotificationsEnabled"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the smsNotificationsEnabled
+    * Indicates if the SMS notifications will be sent to the customer for the appointment
+    *
+    * @param bool $val The value of the smsNotificationsEnabled
+    *
+    * @return BookingCustomerInformation
+    */
+    public function setSmsNotificationsEnabled($val)
+    {
+        $this->_propDict["smsNotificationsEnabled"] = $val;
         return $this;
     }
     /**

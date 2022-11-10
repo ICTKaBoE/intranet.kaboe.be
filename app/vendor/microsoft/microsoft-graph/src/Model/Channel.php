@@ -175,7 +175,7 @@ class Channel extends Entity
 
     /**
     * Gets the membershipType
-    * The type of the channel. Can be set during creation and can't be changed. Possible values are: standard - Channel inherits the list of members of the parent team; private - Channel can have members that are a subset of all the members on the parent team.
+    * The type of the channel. Can be set during creation and can't be changed. The possible values are: standard, private, unknownFutureValue, shared. The default value is standard. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value in this evolvable enum: shared.
     *
     * @return ChannelMembershipType|null The membershipType
     */
@@ -194,7 +194,7 @@ class Channel extends Entity
 
     /**
     * Sets the membershipType
-    * The type of the channel. Can be set during creation and can't be changed. Possible values are: standard - Channel inherits the list of members of the parent team; private - Channel can have members that are a subset of all the members on the parent team.
+    * The type of the channel. Can be set during creation and can't be changed. The possible values are: standard, private, unknownFutureValue, shared. The default value is standard. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value in this evolvable enum: shared.
     *
     * @param ChannelMembershipType $val The membershipType
     *
@@ -203,6 +203,35 @@ class Channel extends Entity
     public function setMembershipType($val)
     {
         $this->_propDict["membershipType"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the tenantId
+    * The ID of the Azure Active Directory tenant.
+    *
+    * @return string|null The tenantId
+    */
+    public function getTenantId()
+    {
+        if (array_key_exists("tenantId", $this->_propDict)) {
+            return $this->_propDict["tenantId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the tenantId
+    * The ID of the Azure Active Directory tenant.
+    *
+    * @param string $val The tenantId
+    *
+    * @return Channel
+    */
+    public function setTenantId($val)
+    {
+        $this->_propDict["tenantId"] = $val;
         return $this;
     }
 
@@ -325,6 +354,36 @@ class Channel extends Entity
     public function setMessages($val)
     {
         $this->_propDict["messages"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the sharedWithTeams
+    * A collection of teams with which a channel is shared.
+     *
+     * @return array|null The sharedWithTeams
+     */
+    public function getSharedWithTeams()
+    {
+        if (array_key_exists("sharedWithTeams", $this->_propDict)) {
+           return $this->_propDict["sharedWithTeams"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the sharedWithTeams
+    * A collection of teams with which a channel is shared.
+    *
+    * @param SharedWithChannelTeamInfo[] $val The sharedWithTeams
+    *
+    * @return Channel
+    */
+    public function setSharedWithTeams($val)
+    {
+        $this->_propDict["sharedWithTeams"] = $val;
         return $this;
     }
 

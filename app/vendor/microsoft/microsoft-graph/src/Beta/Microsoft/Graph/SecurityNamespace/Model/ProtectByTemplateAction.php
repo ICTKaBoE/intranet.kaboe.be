@@ -11,7 +11,7 @@
 * @license   https://opensource.org/licenses/MIT MIT License
 * @link      https://graph.microsoft.com
 */
-namespace Beta\Microsoft\Graph\Security\Model;
+namespace Beta\Microsoft\Graph\SecurityNamespace\Model;
 /**
 * ProtectByTemplateAction class
 *
@@ -25,6 +25,7 @@ class ProtectByTemplateAction extends InformationProtectionAction
 {
     /**
     * Gets the templateId
+    * The unique identifier for a protection template in Microsoft Purview Information Protection to apply to the content.
     *
     * @return string|null The templateId
     */
@@ -39,6 +40,7 @@ class ProtectByTemplateAction extends InformationProtectionAction
 
     /**
     * Sets the templateId
+    * The unique identifier for a protection template in Microsoft Purview Information Protection to apply to the content.
     *
     * @param string $val The value of the templateId
     *
