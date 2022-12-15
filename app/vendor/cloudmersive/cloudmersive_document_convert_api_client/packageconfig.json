@@ -1,9 +1,0 @@
-﻿{
-    "artifactVersion": "2.1.6",
-    "gitUserId": "Cloudmersive",
-    "gitRepoId": "Cloudmersive.APIClient.PHP.DocumentAndDataConvert",
-    "composerVendorName": "cloudmersive",
-    "composerProjectName": "cloudmersive_document_convert_api_client",
-    "packagePath": "cloudmersive_document_convert_api_client"
-
-}
