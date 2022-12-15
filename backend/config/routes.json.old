@@ -1,0 +1,51 @@
+[
+	{
+		"prefix": "/a",
+		"methods": {
+			"get": [
+				{
+					"path": "/selectModule",
+					"controller": "SelectModuleController"
+				},
+				{
+					"path": "/o365/callback",
+					"controller": "O365CallbackController"
+				},
+				"{module?}/{page?}/{method?}"
+			]
+		}
+	},
+	{
+		"prefix": "/p",
+		"methods": {
+			"get": [
+				{
+					"path": "/selectModule",
+					"controller": "SelectModuleController"
+				},
+				{
+					"path": "/notescreen/dashboard",
+					"controller": "NoteScreenController"
+				},
+				"/notescreen/display/{school}",
+				"/{module?}/{page?}/{method?}"
+			]
+		}
+	},
+	{
+		"prefix": "/api",
+		"methods": {
+			"get": [
+				"/{module?}/{page?}/{method?}"
+			]
+		}
+	},
+	{
+		"prefix": "/",
+		"methods": {
+			"get": [
+				"/{module?}/{page?}/{method?}"
+			]
+		}
+	}
+]

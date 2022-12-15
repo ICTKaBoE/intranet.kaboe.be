@@ -1,0 +1,132 @@
+[
+	{
+		"prefix": "/",
+		"methods": {
+			"get": []
+		}
+	},
+	{
+		"prefix": "/app",
+		"methods": {
+			"get": [
+				{
+					"path": "/selectModule",
+					"controller": "\\Controllers\\APP\\SelectModuleController"
+				},
+				"/{module?}/{page?}/{method?}/{id?}"
+			]
+		}
+	},
+	{
+		"prefix": "/public",
+		"methods": {
+			"get": [
+				"/{module?}/{page?}/{method?}/{id?}"
+			]
+		}
+	},
+	{
+		"prefix": "/api/v1.0",
+		"middleware": "\\Router\\Middleware\\ApiMiddleware",
+		"methods": {
+			"get": [
+				{
+					"path": "/user/o365/callback",
+					"controller": "\\Controllers\\API\\UserController",
+					"function": "callback"
+				},
+				{
+					"path": "/user/sync",
+					"controller": "\\Controllers\\API\\UserController",
+					"function": "sync"
+				},
+				{
+					"path": "/calendar/{prefix}/bike/home-work",
+					"controller": "\\Controllers\\API\\CalendarController",
+					"function": "homeWork"
+				},
+				{
+					"path": "/calendar/holliday",
+					"controller": "\\Controllers\\API\\CalendarController",
+					"function": "holliday"
+				},
+				{
+					"path": "/table/{prefix}/bike/distances",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "distances"
+				},
+				{
+					"path": "/select/{prefix}/bike/export/months",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "months"
+				},
+				{
+					"path": [
+						"/select/{prefix}/bike/export/school",
+						"/select/{prefix}/bike/distances/{method}/{id?}/school",
+						"/select/{prefix}/user/profile/school"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "school"
+				},
+				{
+					"path": "/select/{prefix}/bike/distances/{method}/{id?}/userAddress",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "userAddress"
+				},
+				{
+					"path": "/form/{prefix}/bike/distances/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getDistance"
+				},
+				{
+					"path": "/form/{prefix}/user/profile",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getProfile"
+				},
+				{
+					"path": "/form/{prefix}/bike/settings",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getBikeSettings"
+				}
+			],
+			"post": [
+				{
+					"path": "/form/{prefix}/user/login",
+					"controller": "\\Controllers\\API\\UserController",
+					"function": "login"
+				},
+				{
+					"path": "/form/{prefix}/user/profile",
+					"controller": "\\Controllers\\API\\UserController",
+					"function": "profile"
+				},
+				{
+					"path": "/form/{prefix}/bike/home-work",
+					"controller": "\\Controllers\\API\\BikeController",
+					"function": "post"
+				},
+				{
+					"path": "/form/{prefix}/bike/distances/delete/{id?}",
+					"controller": "\\Controllers\\API\\BikeController",
+					"function": "deleteDistance"
+				},
+				{
+					"path": "/form/{prefix}/bike/distances/{method}/{id?}",
+					"controller": "\\Controllers\\API\\BikeController",
+					"function": "postDistance"
+				},
+				{
+					"path": "/form/{prefix}/bike/export",
+					"controller": "\\Controllers\\API\\BikeController",
+					"function": "export"
+				},
+				{
+					"path": "/form/{prefix}/bike/settings",
+					"controller": "\\Controllers\\API\\BikeController",
+					"function": "settings"
+				}
+			]
+		}
+	}
+]
