@@ -125,6 +125,11 @@
 					"path": "/form/{prefix}/bike/settings",
 					"controller": "\\Controllers\\API\\BikeController",
 					"function": "settings"
+				},
+				{
+					"path": "/check/student/relation",
+					"controller": "\\Controllers\\API\\CheckController",
+					"function": "studentRelation"
 				}
 			]
 		}

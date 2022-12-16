@@ -14,7 +14,8 @@ class ApiMiddleware implements IMiddleware
 		"/api/v1.0/user/sync/",
 		"/api/v1.0/app/user/login/",
 		"/api/v1.0/user/o365/callback/",
-		"/api/v1.0/form/app/user/login/"
+		"/api/v1.0/form/app/user/login/",
+		"/api/v1.0/check/student/relation/"
 	];
 
 	public function handle(Request $request): void

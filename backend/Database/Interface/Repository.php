@@ -47,6 +47,7 @@ class Repository
     public function set(CustomObject $object)
     {
         try {
+            $object->init();
             $object = $object->toSqlArray();
             if (is_null($object[$this->idField])) return $this->insert($object);
             else return $this->update($object);

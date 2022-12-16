@@ -102,7 +102,7 @@ abstract class Helpers
 
 	static function isErrorPage()
 	{
-		return Strings::equal(self::get_module(), 'error');
+		return Strings::equal(self::getModule(), 'error');
 	}
 
 	static function getPageFolder()

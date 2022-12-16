@@ -77,4 +77,12 @@ abstract class Input
 
 		return $value;
 	}
+
+	static public function formatInsz($value)
+	{
+		$value = str_replace([".", "-"], "", $value);
+		if (Strings::isBlank($value)) return "";
+
+		return substr($value, 0, 2) . "." . substr($value, 2, 2) . "." . substr($value, 4, 2) . "-" . substr($value, 6, 3) . "." . substr($value, 9, 2);
+	}
 }
