@@ -1,5 +1,4 @@
 import Calendar from "../../../shared/ui/js/custom/objects/Calendar.js";
-import Helpers from "../../../shared/ui/js/custom/objects/Helpers.js";
 
 window.setRide = (info) => {
 	$.post(Calendar.INSTANCES[calendarId].action, {

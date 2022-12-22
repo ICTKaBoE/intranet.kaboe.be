@@ -4,8 +4,11 @@ namespace Controllers\API;
 
 use Security\User;
 use Controllers\ApiController;
+use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\School;
 use Database\Repository\UserAddress;
+use Ouzo\Utilities\Arrays;
+use Router\Helpers;
 
 class SelectController extends ApiController
 {
@@ -79,6 +82,26 @@ class SelectController extends ApiController
 	public function school()
 	{
 		$this->appendToJson("items", (new School)->get());
+		$this->handle();
+	}
+
+	public function checkStudentRelationInszClass()
+	{
+		$school = Helpers::input()->get('parentValue');
+
+		if (is_null($school)) $this->appendToJson('items', []);
+		else {
+			$items = (new CheckStudentRelationInsz)->getClassBySchool($school);
+			$selectItems = [
+				['name' => SELECT_ALL_VALUES]
+			];
+
+			foreach ($items as $index => $item) $selectItems[] = ['name' => $item];
+			$items = Arrays::orderBy($items, "name");
+
+			$this->appendToJson("items", $selectItems);
+		}
+
 		$this->handle();
 	}
 

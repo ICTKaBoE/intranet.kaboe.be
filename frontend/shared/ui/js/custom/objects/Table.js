@@ -12,6 +12,7 @@ export default class Table {
 		this.paging = this.table.hasAttribute("data-paging");
 		this.searching = this.table.hasAttribute("data-searching");
 		this.noRowsText = this.table.dataset.noRowsText || "No data found...";
+		this.extraData = {};
 
 		this.oldData = null;
 
@@ -29,7 +30,6 @@ export default class Table {
 		this.createStructure();
 		await this.getData();
 		this.createHeader();
-		this.clear();
 		this.createRows();
 		// Helpers.toggleWait();
 	};
@@ -56,9 +56,9 @@ export default class Table {
 	};
 
 	createHeader = () => {
-		if (this.oldData?.columns === this.data.columns) return;
+		if (this.oldData !== null && JSON.stringify(this.oldData?.columns) === JSON.stringify(this.data.columns)) return;
+		this.clearHeader();
 
-		this.thead.innerHTML = "";
 		let tr = document.createElement("tr");
 
 		$(this.data.columns).each((i, column) => {
@@ -86,47 +86,75 @@ export default class Table {
 	};
 
 	createRows = () => {
-		if (this.oldData?.rows === this.data.rows) return;
-		this.tbody.innerHTML = "";
+		if (this.oldData !== null && JSON.stringify(this.oldData?.rows) === JSON.stringify(this.data.rows)) return;
+		this.clearRows();
 
-		$(this.data.rows).each((i, row) => {
+		if (this.data.hasOwnProperty('rows') === false || this.data.rows.length === 0) {
 			let tr = document.createElement("tr");
-			if (this.data?.format?.row?.backgroundColorValue) tr.style.backgroundColor = Helpers.getObjectValue(row, this.data?.format?.row?.backgroundColorValue);
-			if (this.data?.format?.row?.textColorValue) tr.style.color = Helpers.getObjectValue(row, this.data?.format?.row?.textColorValue);
+			let td = document.createElement("td");
+			td.setAttribute("colspan", this.data.columns.length);
+			td.innerHTML = this.data.noRowsText || this.noRowsText;
 
-			$(this.data.columns).each((j, column) => {
-				let td = document.createElement("td");
-
-				if (column.type === "checkbox") {
-					let checkbox = document.createElement("input");
-					checkbox.type = "checkbox";
-					checkbox.classList.add("form-check-input", "m-0", "align-middle");
-					checkbox.value = Helpers.getObjectValue(row, column.data);
-					checkbox.onchange = () => {
-						this.checkboxCountCheck();
-					};
-
-					td.appendChild(checkbox);
-				} else {
-					td.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data), column?.type || 'string', column?.format);
-				}
-
-				tr.appendChild(td);
-			});
-
+			tr.appendChild(td);
 			this.tbody.appendChild(tr);
-		});
+
+		} else {
+			$(this.data.rows).each((i, row) => {
+				let tr = document.createElement("tr");
+				if (this.data?.format?.row?.backgroundColorValue) tr.style.backgroundColor = Helpers.getObjectValue(row, this.data?.format?.row?.backgroundColorValue);
+				if (this.data?.format?.row?.textColorValue) tr.style.color = Helpers.getObjectValue(row, this.data?.format?.row?.textColorValue);
+
+				$(this.data.columns).each((j, column) => {
+					let td = document.createElement("td");
+
+					if (column.type === "checkbox") {
+						let checkbox = document.createElement("input");
+						checkbox.type = "checkbox";
+						checkbox.classList.add("form-check-input", "m-0", "align-middle");
+						checkbox.value = Helpers.getObjectValue(row, column.data);
+						checkbox.onchange = () => {
+							this.checkboxCountCheck();
+						};
+
+						td.appendChild(checkbox);
+					} else if (column.type === "icon") {
+						let iconWrapper = document.createElement("span");
+						let icon = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0], column?.type || 'string', column?.format, row);
+
+						if (column.hoverValue && Helpers.getObjectValue(row, column.hoverValue)[0]) iconWrapper.title = Helpers.getObjectValue(row, column.hoverValue)[0];
+
+						iconWrapper.innerHTML = icon;
+						td.appendChild(iconWrapper);
+					} else {
+						td.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0], column?.type || 'string', column?.format, row);
+					}
+
+					tr.appendChild(td);
+				});
+
+				this.tbody.appendChild(tr);
+			});
+		}
 	};
 
 	getData = () => {
 		if (!this.source) return;
 
-		return $.get(this.source).done(data => {
+		return $.get(this.source, this.extraData).done(data => {
 			this.data = data;
 		});
 	};
 
 	clear = () => {
+		this.clearHeader();
+		this.clearRows();
+	};
+
+	clearHeader = () => {
+		this.thead.innerHTML = "";
+	};
+
+	clearRows = () => {
 		this.tbody.innerHTML = "";
 	};
 
@@ -134,7 +162,6 @@ export default class Table {
 		this.oldData = this.data;
 		await this.getData();
 		this.createHeader();
-		this.clear();
 		this.createRows();
 	};
 
@@ -161,6 +188,10 @@ export default class Table {
 			values.push(cb.value);
 		});
 
-		return values;
+		return values.join("-");
+	};
+
+	addExtraData = (key, value) => {
+		this.extraData[key] = value;
 	};
 };

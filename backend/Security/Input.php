@@ -18,6 +18,7 @@ abstract class Input
 	const INPUT_TYPE_URL = 'url';
 	const INPUT_TYPE_ARRAY = 'array';
 	const INPUT_TYPE_OBJECT = 'object';
+	const INPUT_TYPE_INSZ = 'insz';
 
 	static public function check($input, $type = self::INPUT_TYPE_STRING)
 	{
@@ -33,6 +34,9 @@ abstract class Input
 				break;
 			case self::INPUT_TYPE_OBJECT:
 				return is_object($input);
+				break;
+			case self::INPUT_TYPE_INSZ:
+				return self::checkInsz($input);
 				break;
 
 			default:
@@ -52,6 +56,24 @@ abstract class Input
 		return Strings::contains($input, "@");
 	}
 
+	static public function checkInsz($input)
+	{
+		if (self::empty($input)) return true;
+		$input = preg_replace('/[^0-9]/', "", $input);
+
+		$checksum = (int)substr($input, 9, 2);
+		$calculationPart = (int)substr($input, 0, 9);
+
+		$expectedChecksum = 97 - ($calculationPart % 97);
+		if ($expectedChecksum == $checksum) return true;
+
+		$calculationPart = (int)"2{$calculationPart}";
+
+		$expectedChecksum = 97 - ($calculationPart % 97);
+		if ($expectedChecksum == $checksum) return true;
+		return false;
+	}
+
 	static public function sanitize($input, $type = self::INPUT_TYPE_STRING)
 	{
 		switch ($type) {
@@ -66,23 +88,23 @@ abstract class Input
 		return htmlentities($input);
 	}
 
-	static public function convertToBool($value)
+	static public function convertToBool($input)
 	{
-		if (Strings::equal($value, "on")) return true;
-		else if (Strings::equal($value, "off")) return false;
-		else if (Strings::equal($value, "true")) return true;
-		else if (Strings::equal($value, "false")) return false;
-		else if (Strings::equal($value, "1")) return true;
-		else if (Strings::equal($value, "0")) return false;
+		if (Strings::equal($input, "on")) return true;
+		else if (Strings::equal($input, "off")) return false;
+		else if (Strings::equal($input, "true")) return true;
+		else if (Strings::equal($input, "false")) return false;
+		else if (Strings::equal($input, "1")) return true;
+		else if (Strings::equal($input, "0")) return false;
 
-		return $value;
+		return $input;
 	}
 
-	static public function formatInsz($value)
+	static public function formatInsz($input)
 	{
-		$value = str_replace([".", "-"], "", $value);
-		if (Strings::isBlank($value)) return "";
+		$input = preg_replace('/[^0-9]/', "", $input);
+		if (Strings::isBlank($input)) return "";
 
-		return substr($value, 0, 2) . "." . substr($value, 2, 2) . "." . substr($value, 4, 2) . "-" . substr($value, 6, 3) . "." . substr($value, 9, 2);
+		return substr($input, 0, 2) . "." . substr($input, 2, 2) . "." . substr($input, 4, 2) . "-" . substr($input, 6, 3) . "." . substr($input, 9, 2);
 	}
 }

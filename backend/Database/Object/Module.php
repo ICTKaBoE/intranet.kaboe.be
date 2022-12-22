@@ -19,6 +19,7 @@ class Module extends CustomObject
 		"order",
 		"redirect",
 		"assignUserRights",
+		"defaultRights",
 		"deleted"
 	];
 

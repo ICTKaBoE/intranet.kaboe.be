@@ -3,11 +3,11 @@
 namespace Controllers\API;
 
 use Controllers\ApiController;
+use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\UserProfile;
-use Router\Helpers;
 use Security\User;
 
 class FormController extends ApiController
@@ -35,6 +35,19 @@ class FormController extends ApiController
 		foreach ($settings as $setting) $returnSettings[$setting->key] = $setting->value;
 
 		$this->appendToJson("fields", $returnSettings);
+		$this->handle();
+	}
+
+	public function getCheckStudentRelationInsz($prefix, $method, $id)
+	{
+		$check = (new CheckStudentRelationInsz)->get($id)[0];
+		$check->check();
+
+		if (!$check->childInszIsCorrect) $this->setValidation("childInsz", state: self::VALIDATION_STATE_INVALID);
+		if (!$check->motherInszIsCorrect) $this->setValidation("motherInsz", state: self::VALIDATION_STATE_INVALID);
+		if (!$check->fatherInszIsCorrect) $this->setValidation("fatherInsz", state: self::VALIDATION_STATE_INVALID);
+
+		$this->appendToJson("fields", $check->toArray());
 		$this->handle();
 	}
 }

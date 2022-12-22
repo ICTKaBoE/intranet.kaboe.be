@@ -6,6 +6,7 @@ define("LOCATION_SHARED", LOCATION_FRONTEND . "/shared");
 define("LOCATION_APP", LOCATION_FRONTEND . "/app");
 define("LOCATION_PUBLIC", LOCATION_FRONTEND . "/public");
 define("LOCATION_ICON", LOCATION_SHARED . "/ui/icons/");
+define("LOCATION_IMAGE", LOCATION_SHARED . "/ui/img/");
 define("LOCATION_DOWNLOAD", LOCATION_ROOT . "/downloads");
 
 define("SECURITY_SESSION_ISSIGNEDIN", sha1("isSignedIn"));
@@ -19,9 +20,13 @@ define("DB_SERVER", "localhost");
 define("DB_DATABASE", "db_intranet2");
 define("DB_USERNAME", "application");
 define("DB_PASSWORD", "PianomanPA");
+define("DB_CHARSET", "utf8mb4");
 
 define("ROUTER_DEFAULT_PREFIX", "/app");
 define("ROUTER_DEFAULT_MIDDLEWARE", "\\Router\\Middleware\\DefaultMiddleware");
 define("ROUTER_DEFAULT_NAMESPACE", "\\Controllers");
 define("ROUTER_DEFAULT_CONTROLLER", "DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
+
+define("SELECT_ALL_VALUES", "Alle");
+define("INFORMAT_CURRENT_SCHOOLYEAR", "2022-23");

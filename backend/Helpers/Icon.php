@@ -3,12 +3,15 @@
 namespace Helpers;
 
 use DOMDocument;
+use Ouzo\Utilities\Strings;
 
 abstract class Icon
 {
 	static public function load($name, $add = [])
 	{
 		$html = file_get_contents(LOCATION_ICON . "{$name}.svg");
+		if (Strings::isBlank($html)) return "";
+
 		$dom = new DOMDocument();
 		$dom->loadHTML($html);
 

@@ -6,7 +6,7 @@
         "phpoffice/phpspreadsheet": "^1.22",
         "tecnickcom/tcpdf": "^6.4",
         "nelexa/zip": "^4.0",
-        "cloudmersive/cloudmersive_document_convert_api_client": "^2.1",
-        "pecee/simple-router": "4.3.7.2"
+        "pecee/simple-router": "4.3.7.2",
+        "guzzlehttp/guzzle": "^7.5"
     }
 }

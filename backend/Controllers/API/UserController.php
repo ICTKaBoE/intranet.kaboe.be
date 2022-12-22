@@ -21,10 +21,15 @@ use Database\Repository\UserSecurity;
 
 class UserController extends ApiController
 {
-	public function login()
+	public function login($prefix, $apiLogin = false)
 	{
 		$username = Helpers::input()->post("username")->getValue();
 		$password = Helpers::input()->post("password")->getValue();
+
+		if ($apiLogin) {
+			$username = Helpers::request()->getHeaders()['php_auth_user'];
+			$password = Helpers::request()->getHeaders()['php_auth_pw'];
+		}
 
 		if (!Input::check($username) || Input::empty($username))
 			$this->setValidation('username', 'Gebruikersnaam moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
@@ -33,7 +38,7 @@ class UserController extends ApiController
 			$this->setValidation('password', 'Wachtwoord moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
 
 		if ($this->validationIsAllGood()) {
-			if (Input::check($username, Input::INPUT_TYPE_EMAIL)) {
+			if (!$apiLogin && Input::check($username, Input::INPUT_TYPE_EMAIL)) {
 				$this->setRedirect(AuthenticationManager::connect($username, false));
 			} else {
 				$localUsers = (new LocalUser)->getByUsername($username);
@@ -55,7 +60,8 @@ class UserController extends ApiController
 							'id' => $correctUser->id
 						]);
 
-						$this->setRedirect(Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . Helpers::url((new Setting)->get(id: "page.default.afterLogin")[0]->value));
+						if (!$apiLogin) $this->setRedirect(Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . Helpers::url((new Setting)->get(id: "page.default.afterLogin")[0]->value));
+						else return true;
 					}
 				}
 			}
@@ -146,9 +152,16 @@ class UserController extends ApiController
 				else $userId = $user->id;
 
 				foreach ($modules as $module) {
+					$rights = str_split($module->defaultRights);
+					if (Strings::equal($rights[0], 0)) continue;
+
 					$userSecurity = $userSecurityRepo->getByUserAndModule($userId, $module->id) ?? new ObjectUserSecurity([
 						'moduleId' => $module->id,
-						'userId' => $userId
+						'userId' => $userId,
+						'view' => $rights[0],
+						'edit' => $rights[1],
+						'export' => $rights[2],
+						'changeSettings' => $rights[3]
 					]);
 
 					try {

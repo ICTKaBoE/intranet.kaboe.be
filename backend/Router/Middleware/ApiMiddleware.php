@@ -2,6 +2,7 @@
 
 namespace Router\Middleware;
 
+use Controllers\API\UserController;
 use Ouzo\Utilities\Arrays;
 use Pecee\Http\Middleware\IMiddleware;
 use Pecee\Http\Request;
@@ -22,8 +23,11 @@ class ApiMiddleware implements IMiddleware
 	{
 		if (!Arrays::contains(self::SKIP_SIGN_IN_CHECK, Helpers::url()->getRelativeUrl(false))) {
 			if (!User::isSignedIn()) {
-				Helpers::response()->httpCode(401);
-				Helpers::response()->json(["error" => "You are not authorized!"]);
+				if (!(new UserController)->login(true)) {
+
+					Helpers::response()->httpCode(401);
+					Helpers::response()->json(["error" => "You are not authorized!"]);
+				}
 			} else {
 				$request->authenticated = true;
 			}

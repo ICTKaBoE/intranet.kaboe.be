@@ -59,7 +59,7 @@ export default class Helpers {
 				.reduce((prev, cur) => prev && prev[cur], from)
 		);
 
-	static formatValue = (value, type, format) => {
+	static formatValue = (value, type, format, originalData = null) => {
 		if (undefined === format) return value;
 
 		switch (type) {
@@ -68,12 +68,50 @@ export default class Helpers {
 				if (format.precision) value.toFixed(format.precision);
 				if (format.prefix) value = `${format.prefix}${value}`;
 				if (format.suffix) value = `${value}${format.suffix}`;
-
-				return value;
 			} break;
 
-			default:
-				return value;
+			default: value = value;
 		}
+
+		if (format.textColor) {
+			let textColor = "";
+			if (typeof format.textColor == 'object') {
+				if (format.textColor.condition) {
+					let baseOnValue = this.getObjectValue(originalData, format.textColor.condition.baseOnValue)[0];
+
+					if (format.textColor.condition.ifTrue) {
+						if (baseOnValue === format.textColor.condition.ifTrue.check) textColor = format.textColor.condition.ifTrue.result;
+						else if (baseOnValue === format.textColor.condition.ifFalse.check) textColor = format.textColor.condition.ifFalse.result;
+					}
+				}
+			} else {
+				textColor = this.getObjectValue(originalData, format.textColor)[0];
+				if (textColor === undefined) textColor = format.textColor;
+			}
+
+			value = `<span class="text-${textColor}">${value}</span>`;
+		}
+
+		return value;
+	};
+
+	static request = ({ url, method = 'GET', data = {}, initiator, done = () => { }, fail = () => { }, always = () => { } }) => {
+		return $.ajax({
+			url: url,
+			method: method,
+			data: data || {},
+			cache: false,
+			processData: false,
+			contentType: false
+		})
+			.done(returnData => {
+				done(returnData);
+			})
+			.fail(returnData => {
+				fail(returnData);
+			})
+			.always(returnData => {
+				always(returnData);
+			});
 	};
 }

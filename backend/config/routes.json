@@ -56,6 +56,11 @@
 					"function": "distances"
 				},
 				{
+					"path": "/table/{prefix}/checklists/checkStudentRelationInsz/{school?}/{class?}",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "checkStudentRelationInsz"
+				},
+				{
 					"path": "/select/{prefix}/bike/export/months",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "months"
@@ -64,10 +69,16 @@
 					"path": [
 						"/select/{prefix}/bike/export/school",
 						"/select/{prefix}/bike/distances/{method}/{id?}/school",
-						"/select/{prefix}/user/profile/school"
+						"/select/{prefix}/user/profile/school",
+						"/select/{prefix}/checklists/checkStudentRelationInsz/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "school"
+				},
+				{
+					"path": "/select/{prefix}/checklists/checkStudentRelationInsz/class",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "checkStudentRelationInszClass"
 				},
 				{
 					"path": "/select/{prefix}/bike/distances/{method}/{id?}/userAddress",
@@ -88,6 +99,26 @@
 					"path": "/form/{prefix}/bike/settings",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getBikeSettings"
+				},
+				{
+					"path": "/form/{prefix}/checklists/checkStudentRelationInsz/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getCheckStudentRelationInsz"
+				},
+				{
+					"path": "/informat/student/{id?}",
+					"controller": "\\Controllers\\API\\InformatController",
+					"function": "student"
+				},
+				{
+					"path": "/informat/studentByRRN/{institute?}/{id?}",
+					"controller": "\\Controllers\\API\\InformatController",
+					"function": "studentByInstituteByRRN"
+				},
+				{
+					"path": "/check/student/relation",
+					"controller": "\\Controllers\\API\\CheckController",
+					"function": "studentRelation"
 				}
 			],
 			"post": [
@@ -127,9 +158,19 @@
 					"function": "settings"
 				},
 				{
-					"path": "/check/student/relation",
+					"path": "/form/{prefix}/checklists/checkStudentRelationInsz/{method}/{id}",
 					"controller": "\\Controllers\\API\\CheckController",
-					"function": "studentRelation"
+					"function": "postCheckStudentRelationInsz"
+				},
+				{
+					"path": "/{prefix}/checklists/checkStudentRelationInsz/approve/{id}",
+					"controller": "\\Controllers\\API\\CheckController",
+					"function": "approveCheckStudentRelationInsz"
+				},
+				{
+					"path": "/{prefix}/checklists/checkStudentRelationInsz/prepareForInformat/{id}/{school}/{class}",
+					"controller": "\\Controllers\\API\\CheckController",
+					"function": "prepareForInformat"
 				}
 			]
 		}

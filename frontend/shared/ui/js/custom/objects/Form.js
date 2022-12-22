@@ -13,6 +13,7 @@ export default class Form {
 		this.autocomplete = this.form.autocomplete || false;
 		this.prefill = this.form.dataset.prefill || false;
 		this.afterSubmit = this.form.dataset.afterSubmit || false;
+		this.lockedValue = this.form.dataset.lockedValue || false;
 
 		if (this.method !== 'GET' || this.method !== 'POST') this.method = 'POST';
 
@@ -65,18 +66,15 @@ export default class Form {
 		this.disable();
 		Helpers.toggleWait();
 
-		return $.ajax({
-			url: this.action,
-			method: this.method,
-			data: data,
-			cache: false,
-			processData: false,
-			contentType: false
-		}).done(returnData => {
+		let done = (returnData) => {
 			this.resetAfterSubmit();
-		}).fail(returnData => {
+		};
+
+		let fail = (returnData) => {
 			if (returnData.statusCode === 500) alert("Er is een fout gebeurd bij het laden van het formulier!");
-		}).always((returnData) => {
+		};
+
+		let always = (returnData) => {
 			let data = JSON.parse(returnData.responseText || JSON.stringify(returnData));
 
 			if (data.validation) this.processValidation(data.validation);
@@ -95,6 +93,15 @@ export default class Form {
 				this.enable();
 				Helpers.toggleWait();
 			}, 500);
+		};
+
+		return Helpers.request({
+			url: this.action,
+			method: this.method,
+			data: data,
+			done: done,
+			fail: fail,
+			always: always
 		});
 	};
 
@@ -138,15 +145,28 @@ export default class Form {
 	prefillForm = () => {
 		if (!this.prefill) return;
 
-		$.get(this.prefill).done(data => {
+		let done = (data) => {
 			if (data.fields) {
 				$.each(data.fields, (key, value) => {
 					this.setField(key, value);
 				});
+				if (this.lockedValue) {
+					if (data.fields[this.lockedValue] === true) this.disable();
+				}
 			}
-		}
-		).fail(() => {
+
+			if (data.validation) this.processValidation(data.validation);
+		};
+
+		let fail = () => {
 			alert("Er is een fout gebeurd tijdens het invullen van het formulier!");
+		};
+
+		Helpers.request({
+			url: this.prefill,
+			method: 'GET',
+			done: done,
+			fail: fail
 		});
 	};
 

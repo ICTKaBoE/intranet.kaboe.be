@@ -17,7 +17,6 @@ window.editUserHomeWorkDistance = () => {
 };
 
 window.deleteUserHomeWorkDistance = () => {
-	console.log(pageId);
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
 	if (values.length === 0) {
 		alert("Gelieve 1 of meerdere afstanden te selecteren!");

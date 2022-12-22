@@ -1,3 +1,5 @@
+import Helpers from "./Helpers.js";
+
 export default class Select {
 	static INSTANCES = {};
 
@@ -12,8 +14,10 @@ export default class Select {
 		this.loadSource = this.select.dataset.loadSource || false;
 		this.loadValue = this.select.dataset.loadValue || 'id';
 		this.loadLabel = this.select.dataset.loadLabel || false;
+		this.loadParams = {};
 		this.defaultValue = this.select.dataset.defaultValue || false;
 		this.multiple = this.select.hasAttribute("multiple");
+		this.parent = this.select.dataset.parentSelect || false;
 
 		this.init();
 	}
@@ -29,6 +33,18 @@ export default class Select {
 
 		this.createSelect();
 		this.disable();
+		if (this.parent) this.detectParentAndSetFunctions();
+		await this.loadSelect();
+		this.setDefaultValue();
+		this.enable();
+	};
+
+	reload = async () => {
+		this.disable();
+		this.clear();
+		this.destroy();
+		this.createSelect();
+		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
 		this.setDefaultValue();
 		this.enable();
@@ -59,7 +75,7 @@ export default class Select {
 			settings.searchField = [this.loadLabel];
 
 			settings.load = (query, callback) => {
-				$.get(this.loadSource).done(data => {
+				$.get(this.loadSource, this.loadParams).done(data => {
 					callback(data.items);
 				}).fail(() => {
 					callback();
@@ -92,6 +108,18 @@ export default class Select {
 		this.tomSelect.setValue(value, true);
 	};
 
+	getValue = () => {
+		return this.tomSelect.getValue();
+	};
+
+	setEventListener = (event, callback) => {
+		this.tomSelect.on(event, callback);
+	};
+
+	clear = () => {
+		if (this.tomSelect != undefined) this.tomSelect.clear();
+	};
+
 	enable = () => {
 		if (this.tomSelect != undefined) this.tomSelect.enable();
 		else this.select.disabled = false;
@@ -100,5 +128,25 @@ export default class Select {
 	disable = () => {
 		if (this.tomSelect != undefined) this.tomSelect.disable();
 		else this.select.disabled = true;
+	};
+
+	destroy = () => {
+		if (this.tomSelect != undefined) this.tomSelect.destroy();
+	};
+
+	setExtraLoadParam = (key, value) => {
+		this.loadParams[key] = value;
+	};
+
+	detectParentAndSetFunctions = () => {
+		if (!this.parentSelect) this.parentSelect = Select.INSTANCES[this.parent];
+
+		if (this.parentSelect) {
+			this.parentSelect.setEventListener('change', value => {
+				this.setExtraLoadParam('parentValue', value);
+				this.reload();
+			});
+
+		}
 	};
 }
