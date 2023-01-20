@@ -150,6 +150,7 @@ export default class Form {
 				$.each(data.fields, (key, value) => {
 					this.setField(key, value);
 				});
+
 				if (this.lockedValue) {
 					if (data.fields[this.lockedValue] === true) this.disable();
 				}

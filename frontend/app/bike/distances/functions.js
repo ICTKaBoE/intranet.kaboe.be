@@ -8,7 +8,8 @@ window.addUserHomeWorkDistance = () => {
 
 window.editUserHomeWorkDistance = () => {
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
-	if (values.length !== 1) {
+
+	if (values.length === 0 || values.includes("-")) {
 		alert("Gelieve 1 afstand te selecteren!");
 		return;
 	}

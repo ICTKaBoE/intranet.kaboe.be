@@ -57,8 +57,8 @@ class CheckController extends ApiController
 		$data = array_values($data);
 
 		foreach ($data as $index => $row) {
-			$checkStudentRelation = $checkStudentRelationRepo->getByInsz($row['Rijksregister kind']) ?? new ObjectCheckStudentRelationInsz;
-			if ($checkStudentRelation->locked || $checkStudentRelation->published) $checkStudentRelation = new ObjectCheckStudentRelationInsz;
+			$checkStudentRelation = $checkStudentRelationRepo->getByCheckField($row['Rijksregister kind']) ?? new ObjectCheckStudentRelationInsz;
+			if (!is_null($checkStudentRelation->id)) continue;
 
 			$school = Arrays::getValue($row, "Op welke school zit uw kind?", $checkStudentRelation->school);
 			$schoolId = $schoolRepo->getByName($school)->id;
@@ -79,6 +79,7 @@ class CheckController extends ApiController
 			$checkStudentRelation->informatStudentId = is_null($informatStudent) ? "" : $informatStudent->p_persoon;
 			$checkStudentRelation->informatInstituteNumber = is_null($informatStudent) ? "" : $informatStudent->instelnr;
 
+			$checkStudentRelation->checkField = Arrays::getValue($row, "Rijksregister kind", $checkStudentRelation->checkField);
 			$checkStudentRelation->school = Arrays::getValue($row, "Op welke school zit uw kind?", $checkStudentRelation->school);
 			$checkStudentRelation->class = Arrays::getValue($row, "In welke klas zit uw kind?", Arrays::getValue($row, "In welke klas zit uw kind?2", Arrays::getValue($row, "In welke klas zit uw kind?3", Arrays::getValue($row, "In welke klas zit uw kind?4", $checkStudentRelation->class))));
 			$checkStudentRelation->childName = Arrays::getValue($row, "Naam kind", $checkStudentRelation->childName);
@@ -97,6 +98,10 @@ class CheckController extends ApiController
 
 	public function postCheckStudentRelationInsz($prefix, $method, $id)
 	{
+		$informatStudentRepo = new Student;
+		$schoolRepo = new School;
+		$schoolInstituteRepo = new SchoolInstitute;
+
 		$childInsz = Helpers::input()->post("childInsz")->getValue();
 		$motherInsz = Helpers::input()->post("motherInsz")->getValue();
 		$fatherInsz = Helpers::input()->post("fatherInsz")->getValue();
@@ -113,6 +118,25 @@ class CheckController extends ApiController
 		if ($this->validationIsAllGood()) {
 			$repo = new CheckStudentRelationInsz;
 			$checkStudentRelation = $repo->get($id)[0];
+
+			$school = $checkStudentRelation->school;
+			$schoolId = $schoolRepo->getByName($school)->id;
+			$institutes = $schoolInstituteRepo->getBySchoolId($schoolId);
+
+			$informatStudent = null;
+
+			foreach ($institutes as $institute) {
+				$informatStudentRepo->setInstituteNumber($institute->instituteNumber);
+				$is = $informatStudentRepo->getByRRN($childInsz);
+
+				if (!is_null($is)) {
+					$informatStudent = $is;
+					break;
+				}
+			}
+
+			$checkStudentRelation->informatStudentId = is_null($informatStudent) ? "" : $informatStudent->p_persoon;
+			$checkStudentRelation->informatInstituteNumber = is_null($informatStudent) ? "" : $informatStudent->instelnr;
 
 			$checkStudentRelation->childInsz = $childInsz;
 			$checkStudentRelation->motherInsz = $motherInsz;
@@ -245,7 +269,7 @@ class CheckController extends ApiController
 					}
 				}
 
-				$item->published = 1;
+				$item->published = true;
 				$repo->set($item);
 
 				$rowStart++;

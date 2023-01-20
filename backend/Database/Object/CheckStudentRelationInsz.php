@@ -11,6 +11,7 @@ class CheckStudentRelationInsz extends CustomObject
 {
 	protected $objectAttributes = [
 		"id",
+		"checkField",
 		"informatStudentId",
 		"informatInstituteNumber",
 		"school",
@@ -35,7 +36,8 @@ class CheckStudentRelationInsz extends CustomObject
 		$this->locked = Input::convertToBool($this->locked);
 		$this->published = Input::convertToBool($this->published);
 
-		$this->classOnly = explode(" (", $this->class)[0];
+		$this->classOnly = explode(" van ", $this->class)[0];
+		$this->classOnly = explode(" (", $this->classOnly)[0];
 
 		$this->formLocked = $this->locked || $this->published;
 		$this->foundInInformat = !Strings::equal($this->informatStudentId, 0);

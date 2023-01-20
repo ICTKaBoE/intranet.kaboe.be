@@ -5,9 +5,12 @@ namespace Controllers\API;
 use Security\User;
 use Controllers\ApiController;
 use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\LocalUser;
+use Database\Repository\Module;
 use Database\Repository\School;
 use Database\Repository\UserAddress;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 use Router\Helpers;
 
 class SelectController extends ApiController
@@ -108,6 +111,18 @@ class SelectController extends ApiController
 	public function userAddress()
 	{
 		$this->appendToJson("items", (new UserAddress)->getByUserId(User::getLoggedInUser()->id));
+		$this->handle();
+	}
+
+	public function modulesAssignRights()
+	{
+		$this->appendToJson("items", (new Module)->get());
+		$this->handle();
+	}
+
+	public function settingsRightsUsers()
+	{
+		$this->appendToJson("items", Arrays::orderBy(Arrays::filter((new LocalUser)->get(), fn ($lu) => Strings::isNotBlank($lu->fullName)), "fullName"));
 		$this->handle();
 	}
 }

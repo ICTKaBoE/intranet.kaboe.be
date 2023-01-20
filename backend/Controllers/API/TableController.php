@@ -10,6 +10,7 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\UserSecurity;
 
 class TableController extends ApiController
 {
@@ -265,6 +266,72 @@ class TableController extends ApiController
 
 			Arrays::each($studentRelationInsz, fn ($s) => $s->check());
 			$this->appendToJson("rows", array_values($studentRelationInsz));
+		}
+
+		$this->handle();
+	}
+
+	public function settingsRights()
+	{
+		$module = Helpers::input()->get('module');
+
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Naam",
+					"data" => "user.fullName",
+				],
+				[
+					"title" => "E-mail",
+					"data" => "user.username",
+				],
+				[
+					"type" => "icon",
+					"title" => Icon::load("eye"),
+					"data" => "viewIcon",
+					"class" => ["w-1"],
+				],
+				[
+					"type" => "icon",
+					"title" => Icon::load("pencil"),
+					"data" => "editIcon",
+					"class" => ["w-1"],
+				],
+				[
+					"type" => "icon",
+					"title" => Icon::load("file-export"),
+					"data" => "exportIcon",
+					"class" => ["w-1"],
+				],
+				[
+					"type" => "icon",
+					"title" => Icon::load("settings"),
+					"data" => "changeSettingsIcon",
+					"class" => ["w-1"],
+				],
+				[
+					"type" => "icon",
+					"title" => Icon::load("lock"),
+					"data" => "lockedIcon",
+					"class" => ["w-1"],
+				],
+			]
+		);
+
+		if (is_null($module)) {
+			$this->appendToJson("noRowsText", "Gelieve eerst een module te kiezen...");
+		} else {
+			$userRights = (new UserSecurity)->getByModuleId($module->getValue());
+			Arrays::each($userRights, fn ($ur) => $ur->link());
+			$userRights = Arrays::filter($userRights, fn ($ur) => Strings::isNotBlank($ur->user->fullName));
+			$userRights = Arrays::orderBy($userRights, 'tableOrder');
+			$this->appendToJson("rows", array_values($userRights));
 		}
 
 		$this->handle();

@@ -3,11 +3,14 @@
 namespace Controllers\API;
 
 use Controllers\ApiController;
+use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
+use Database\Repository\Setting;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\UserProfile;
+use Database\Repository\UserSecurity;
 use Security\User;
 
 class FormController extends ApiController
@@ -48,6 +51,26 @@ class FormController extends ApiController
 		if (!$check->fatherInszIsCorrect) $this->setValidation("fatherInsz", state: self::VALIDATION_STATE_INVALID);
 
 		$this->appendToJson("fields", $check->toArray());
+		$this->handle();
+	}
+
+	public function settingsGeneral()
+	{
+		$_settings = (new Setting)->get();
+		$settings = [];
+
+		foreach ($_settings as $setting) $settings[$setting->id] = $setting->value;
+
+		$this->appendToJson("fields", $settings);
+		$this->handle();
+	}
+
+	public function settingsRights($prefix, $method, $id)
+	{
+		if ($method == "edit") $item = (new UserSecurity)->get($id)[0];
+		else $item = new ObjectUserSecurity(['moduleId' => $id]);
+
+		$this->appendToJson("fields", $item->toArray());
 		$this->handle();
 	}
 }

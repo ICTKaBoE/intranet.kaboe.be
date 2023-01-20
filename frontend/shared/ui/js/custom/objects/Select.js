@@ -18,6 +18,7 @@ export default class Select {
 		this.defaultValue = this.select.dataset.defaultValue || false;
 		this.multiple = this.select.hasAttribute("multiple");
 		this.parent = this.select.dataset.parentSelect || false;
+		this.disabled = this.select.hasAttribute("disabled") || false;
 
 		this.init();
 	}
@@ -30,13 +31,14 @@ export default class Select {
 
 	init = async () => {
 		this.select.setAttribute("role", "select");
+		this.select.removeAttribute("disabled");
 
 		this.createSelect();
 		this.disable();
 		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
 		this.setDefaultValue();
-		this.enable();
+		if (!this.disabled) this.enable();
 	};
 
 	reload = async () => {
@@ -47,12 +49,12 @@ export default class Select {
 		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
 		this.setDefaultValue();
-		this.enable();
+		if (!this.disabled) this.enable();
 	};
 
 	createSelect = () => {
 		let settings = {
-			plugins: this.multiple ? ['remove_button'] : [],
+			plugins: this.multiple ? ['remove_button', 'checkbox_options'] : [],
 			hideSelected: false,
 			maxOptions: null,
 			maxItems: this.multiple ? null : 1,

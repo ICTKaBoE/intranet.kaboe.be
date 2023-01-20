@@ -13,6 +13,11 @@
 					"path": "/selectModule",
 					"controller": "\\Controllers\\APP\\SelectModuleController"
 				},
+				{
+					"path": "/settings/general",
+					"controller": "\\Controllers\\APP\\SettingsController",
+					"function": "general"
+				},
 				"/{module?}/{page?}/{method?}/{id?}"
 			]
 		}
@@ -51,6 +56,11 @@
 					"function": "holliday"
 				},
 				{
+					"path": "/chart/{prefix}/checklists/dashboard/checkStudentRelationInsz/{school?}",
+					"controller": "\\Controllers\\API\\ChartController",
+					"function": "checkStudentRelationInsz"
+				},
+				{
 					"path": "/table/{prefix}/bike/distances",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "distances"
@@ -59,6 +69,11 @@
 					"path": "/table/{prefix}/checklists/checkStudentRelationInsz/{school?}/{class?}",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "checkStudentRelationInsz"
+				},
+				{
+					"path": "/table/{prefix}/settings/rights",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "settingsRights"
 				},
 				{
 					"path": "/select/{prefix}/bike/export/months",
@@ -81,9 +96,22 @@
 					"function": "checkStudentRelationInszClass"
 				},
 				{
+					"path": [
+						"/select/{prefix}/settings/rights/modulesAssignRights",
+						"/select/{prefix}/settings/rights/{method}/{id}/modules"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "modulesAssignRights"
+				},
+				{
 					"path": "/select/{prefix}/bike/distances/{method}/{id?}/userAddress",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "userAddress"
+				},
+				{
+					"path": "/select/{prefix}/settings/rights/{method}/{moduleId?}/users",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "settingsRightsUsers"
 				},
 				{
 					"path": "/form/{prefix}/bike/distances/{method}/{id}",
@@ -104,6 +132,16 @@
 					"path": "/form/{prefix}/checklists/checkStudentRelationInsz/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getCheckStudentRelationInsz"
+				},
+				{
+					"path": "/form/{prefix}/settings/general",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "settingsGeneral"
+				},
+				{
+					"path": "/form/{prefix}/settings/rights/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "settingsRights"
 				},
 				{
 					"path": "/informat/student/{id?}",
@@ -163,6 +201,16 @@
 					"function": "postCheckStudentRelationInsz"
 				},
 				{
+					"path": "/form/{prefix}/settings/general",
+					"controller": "\\Controllers\\API\\SettingsController",
+					"function": "general"
+				},
+				{
+					"path": "/form/{prefix}/settings/rights/{method}/{id}",
+					"controller": "\\Controllers\\API\\SettingsController",
+					"function": "rights"
+				},
+				{
 					"path": "/{prefix}/checklists/checkStudentRelationInsz/approve/{id}",
 					"controller": "\\Controllers\\API\\CheckController",
 					"function": "approveCheckStudentRelationInsz"
@@ -171,6 +219,11 @@
 					"path": "/{prefix}/checklists/checkStudentRelationInsz/prepareForInformat/{id}/{school}/{class}",
 					"controller": "\\Controllers\\API\\CheckController",
 					"function": "prepareForInformat"
+				},
+				{
+					"path": "/{prefix}/settings/rights/delete/{id}",
+					"controller": "\\Controllers\\API\\SettingsController",
+					"function": "deleteRights"
 				}
 			]
 		}

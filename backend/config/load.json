@@ -30,6 +30,13 @@
 		{
 			"tag": "link",
 			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
 				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css?1643465883",
 				"rel": "stylesheet"
 			}

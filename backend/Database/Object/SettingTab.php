@@ -3,28 +3,25 @@
 namespace Database\Object;
 
 use Database\Interface\CustomObject;
-use Security\Input;
+use Helpers\Icon;
 
-class Setting extends CustomObject
+class SettingTab extends CustomObject
 {
 	protected $objectAttributes = [
 		"id",
 		"moduleId",
-		"settingTabId",
 		"name",
-		"type",
-		"options",
-		"value",
+		"icon",
+		"order",
 		"deleted"
 	];
 
 	protected $encodeAttributes = [
-		"name",
-		"value"
+		"name"
 	];
 
 	public function init()
 	{
-		$this->value = Input::convertToBool($this->value);
+		$this->iconData = $this->icon ? Icon::load($this->icon) : "";
 	}
 }

@@ -99,6 +99,7 @@ class DefaultController
 		$this->layout = str_replace("{{calendar:action}}", "{{api:url}}/calendar" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select" . Helpers::getApiPath(), $this->layout);
+		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);

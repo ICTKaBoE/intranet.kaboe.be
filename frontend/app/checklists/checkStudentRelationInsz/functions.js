@@ -15,7 +15,8 @@ window.filterRelation = () => {
 
 window.acceptRelation = () => {
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
-	if (values.length === 0) {
+
+	if (values === "") {
 		alert("Gelieve 1 of meerdere lijnen te selecteren!");
 		return;
 	} else {
@@ -34,16 +35,18 @@ window.acceptRelation = () => {
 
 window.editRelation = () => {
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
-	if (values.length !== 1) {
+
+	if (values === "") {
 		alert("Gelieve 1 lijn te selecteren!");
 		return;
 	}
 
-	Helpers.redirect(`/edit/${values[0]}`);
+	Helpers.redirect(`/edit/${values}`);
 };
 
 window.prepareForInformat = () => {
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
+
 	if (values.length == 0) {
 		Table.INSTANCES[`tbl${pageId}`].checkAll();
 		Table.INSTANCES[`tbl${pageId}`].checkboxCountCheck();
@@ -103,6 +106,6 @@ let btnPrepare = new Button({
 });
 
 Helpers.addButtonToPageTitle(btnFilter);
-Helpers.addButtonToPageTitle(btnAccept);
 Helpers.addButtonToPageTitle(btnEdit);
+Helpers.addButtonToPageTitle(btnAccept);
 Helpers.addButtonToPageTitle(btnPrepare);

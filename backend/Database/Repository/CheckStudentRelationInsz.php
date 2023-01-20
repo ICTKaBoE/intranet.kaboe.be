@@ -16,8 +16,14 @@ class CheckStudentRelationInsz extends Repository
 
 	public function getByInsz($insz)
 	{
-		$items = $this->getNotPublished();
+		$items = $this->get();
 		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->childInsz, Input::formatInsz($insz))));
+	}
+
+	public function getByCheckField($insz)
+	{
+		$items = $this->get();
+		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->checkField, $insz)));
 	}
 
 	public function getNotPublished()
@@ -34,7 +40,7 @@ class CheckStudentRelationInsz extends Repository
 
 	public function getClassBySchool($school)
 	{
-		$items = $this->getNotPublished();
+		$items = $this->get();
 		$classes = Arrays::filter($items, fn ($i) => Strings::equal($i->school, $school));
 		$classes = Arrays::map($classes, fn ($i) => $i->class);
 
@@ -43,7 +49,7 @@ class CheckStudentRelationInsz extends Repository
 
 	public function getByInstitute($institute)
 	{
-		$items = $this->getNotPublished();
+		$items = $this->get();
 		return array_values(Arrays::filter($items, fn ($i) => Strings::equal($i->informatInstituteNumber, $institute)));
 	}
 }
