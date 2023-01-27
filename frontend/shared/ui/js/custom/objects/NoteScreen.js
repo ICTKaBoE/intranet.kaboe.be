@@ -16,6 +16,12 @@ export default class NoteScreen {
 		this.activePage = 0;
 		this.activeArticle = 0;
 
+		$.ajaxSetup({
+			headers: {
+				Authentication: 'Basic ' + btoa('viewscreen:viewscreen')
+			}
+		});
+
 		this.init();
 	}
 

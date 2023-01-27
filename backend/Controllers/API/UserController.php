@@ -24,19 +24,26 @@ class UserController extends ApiController
 {
 	public function login($prefix, $apiLogin = false)
 	{
-		$username = Helpers::input()->post("username")->getValue();
-		$password = Helpers::input()->post("password")->getValue();
+		$username = $password = null;
 
 		if ($apiLogin) {
-			$username = Helpers::request()->getHeaders()['php_auth_user'];
-			$password = Helpers::request()->getHeaders()['php_auth_pw'];
+			$authentication = Helpers::request()->getHeaders()['http_authentication'];
+			$authentication = explode(":", base64_decode(str_replace("Basic ", "", $authentication)));
+			$username = $authentication[0];
+			$password = $authentication[1];
+		} else {
+			$username = Helpers::input()->post("username")->getValue();
+			$password = Helpers::input()->post("password")->getValue();
 		}
+		// die(var_dump($username));
 
-		if (!Input::check($username) || Input::empty($username))
-			$this->setValidation('username', 'Gebruikersnaam moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
+		if (!$apiLogin) {
+			if (!Input::check($username) || Input::empty($username))
+				$this->setValidation('username', 'Gebruikersnaam moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
 
-		if (!Input::isEmail($username) && (!Input::check($password) || Input::empty($password)))
-			$this->setValidation('password', 'Wachtwoord moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
+			if (!Input::isEmail($username) && (!Input::check($password) || Input::empty($password)))
+				$this->setValidation('password', 'Wachtwoord moet ingevuld zijn!', self::VALIDATION_STATE_INVALID);
+		}
 
 		if ($this->validationIsAllGood()) {
 			if (!$apiLogin && Input::check($username, Input::INPUT_TYPE_EMAIL)) {
@@ -56,6 +63,7 @@ class UserController extends ApiController
 
 					if (is_null($correctUser)) $this->setValidation('password', 'Wachtwoord is niet correct!', self::VALIDATION_STATE_INVALID);
 					else {
+						if ($apiLogin && !$correctUser->api) return false;
 						Session::set(SECURITY_SESSION_ISSIGNEDIN, [
 							'method' => SECURITY_SESSION_SIGNINMETHOD_LOCAL,
 							'id' => $correctUser->id

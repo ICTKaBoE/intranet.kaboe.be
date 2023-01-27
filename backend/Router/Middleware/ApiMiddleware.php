@@ -23,8 +23,7 @@ class ApiMiddleware implements IMiddleware
 	{
 		if (!Arrays::contains(self::SKIP_SIGN_IN_CHECK, Helpers::url()->getRelativeUrl(false))) {
 			if (!User::isSignedIn()) {
-				if (!(new UserController)->login(true)) {
-
+				if (!(new UserController)->login(prefix: null, apiLogin: true)) {
 					Helpers::response()->httpCode(401);
 					Helpers::response()->json(["error" => "You are not authorized!"]);
 				}
