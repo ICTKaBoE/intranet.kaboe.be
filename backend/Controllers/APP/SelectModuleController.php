@@ -47,10 +47,8 @@ class SelectModuleController extends DefaultController
 
 	private function writeButtons()
 	{
-		$userSecurityRepo = new UserSecurity;
-		$modules = (new Module)->get();
-		$modules = Arrays::filter($modules, fn ($m) => Strings::contains($m->scope, trim(Helpers::getPrefix(), "/")));
-		$modules = Arrays::filter($modules, fn ($m) => $userSecurityRepo->hasPermissionToEnter($m->id, User::getLoggedInUser()->id));
+		$modules = (new Module)->getByScope(trim(Helpers::getPrefix(), "/"));
+		$modules = Arrays::filter($modules, fn ($m) => User::hasPermissionToEnter($m->id, User::getLoggedInUser()->id));
 
 		foreach ($modules as $module) {
 			$buttonTemplate = self::TEMPLATE_MODULE_BUTTON;

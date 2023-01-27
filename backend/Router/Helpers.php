@@ -65,7 +65,7 @@ abstract class Helpers
 
 	static function getModule()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::contains(self::request()->getLoadedRoute()->getParameters(), "module")) return self::request()->getLoadedRoute()->getParameters()['module'];
+		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "module")) return self::request()->getLoadedRoute()->getParameters()['module'];
 
 		$url = trim(self::url()->getRelativeUrl(false), "/");
 		return explode("/", $url)[1] ?? false;
@@ -73,7 +73,7 @@ abstract class Helpers
 
 	static function getPage()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::contains(self::request()->getLoadedRoute()->getParameters(), "page")) return self::request()->getLoadedRoute()->getParameters()['page'];
+		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "page")) return self::request()->getLoadedRoute()->getParameters()['page'];
 
 		$url = trim(self::url()->getRelativeUrl(false), "/");
 		return explode("/", $url)[2] ?? false;
@@ -81,7 +81,7 @@ abstract class Helpers
 
 	static function getMethod()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::contains(self::request()->getLoadedRoute()->getParameters(), "method")) return self::request()->getLoadedRoute()->getParameters()['method'];
+		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "method")) return self::request()->getLoadedRoute()->getParameters()['method'];
 
 		$url = trim(self::url()->getRelativeUrl(false), "/");
 		return explode("/", $url)[3] ?? false;
@@ -89,7 +89,7 @@ abstract class Helpers
 
 	static function getId()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::contains(self::request()->getLoadedRoute()->getParameters(), "id")) return self::request()->getLoadedRoute()->getParameters()['id'];
+		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "id")) return self::request()->getLoadedRoute()->getParameters()['id'];
 
 		$url = trim(self::url()->getRelativeUrl(false), "/");
 		return explode("/", $url)[4] ?? false;
@@ -107,11 +107,11 @@ abstract class Helpers
 
 	static function getPageFolder()
 	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? "/form" : ""));
+		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/form") : ""));
 	}
 
 	static function getApiPath()
 	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? "/" . self::getMethod() : "") . (self::getId() ? "/" . self::getId() : ""));
+		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/" . self::getMethod()) : "") . (self::getId() ? "/" . self::getId() : ""));
 	}
 }

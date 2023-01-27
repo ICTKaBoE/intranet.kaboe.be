@@ -10,6 +10,7 @@ class School extends CustomObject
 		"id",
 		"name",
 		"color",
+		"logo",
 		"deleted"
 	];
 

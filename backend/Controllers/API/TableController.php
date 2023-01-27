@@ -10,6 +10,9 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\NoteScreenArticle;
+use Database\Repository\NoteScreenPage;
+use Database\Repository\School;
 use Database\Repository\UserSecurity;
 
 class TableController extends ApiController
@@ -261,9 +264,11 @@ class TableController extends ApiController
 			$this->appendToJson("noRowsText", "Gelieve eerst te filteren...");
 		} else {
 			$studentRelationInsz = (new CheckStudentRelationInsz)->getNotPublished();
-			if (!is_null($school)) $studentRelationInsz = Arrays::filter($studentRelationInsz, fn ($s) => Strings::equal($s->school, $school->getValue()));
+			$school = (new School)->get($school->getValue())[0];
+			$studentRelationInsz = Arrays::filter($studentRelationInsz, fn ($s) => Strings::equal($s->school, $school->name));
 			if (!is_null($class) && Strings::isNotBlank($class->getValue()) && !(Strings::equal($class->getValue(), 0) || Strings::equal($class->getValue(), SELECT_ALL_VALUES))) $studentRelationInsz = Arrays::filter($studentRelationInsz, fn ($s) => Strings::equal($s->class, $class->getValue()));
 
+			$studentRelationInsz = Arrays::orderBy($studentRelationInsz, 'childName');
 			Arrays::each($studentRelationInsz, fn ($s) => $s->check());
 			$this->appendToJson("rows", array_values($studentRelationInsz));
 		}
@@ -334,6 +339,55 @@ class TableController extends ApiController
 			$this->appendToJson("rows", array_values($userRights));
 		}
 
+		$this->handle();
+	}
+
+	public function noteScreenPages($prefix, $schoolId)
+	{
+
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Naam",
+					"data" => "name",
+				],
+			]
+		);
+
+		$this->appendToJson("rows", array_values((new NoteScreenPage)->getBySchoolId($schoolId)));
+		$this->handle();
+	}
+
+	public function noteScreenArticles($prefix, $schoolId)
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Pagina",
+					"data" => "page.name"
+				],
+				[
+					"title" => "Titel",
+					"data" => "title",
+				],
+			]
+		);
+
+		$rows = (new NoteScreenArticle)->getBySchoolId($schoolId);
+		Arrays::each($rows, fn ($nsa) => $nsa->link());
+		$this->appendToJson("rows", array_values($rows));
 		$this->handle();
 	}
 }

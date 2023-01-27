@@ -4,15 +4,13 @@ use Security\User;
 use Router\Helpers;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Module;
-use Database\Repository\UserSecurity;
 use Database\Repository\ModuleNavigation;
 
 $module = (new Module)->getByModule(Helpers::getModule());
 $navItems = (new ModuleNavigation)->getByModuleId($module->id);
-$userSecurityRepo = new UserSecurity;
 
-$navItems = Arrays::filter($navItems, function ($ni) use ($module, $userSecurityRepo) {
-	return $userSecurityRepo->hasPermissionToEnterSub($ni, $module->id, User::getLoggedInUser()->id);
+$navItems = Arrays::filter($navItems, function ($ni) use ($module) {
+	return User::hasPermissionToEnterSub($ni, $module->id, User::getLoggedInUser()->id);
 });
 ?>
 

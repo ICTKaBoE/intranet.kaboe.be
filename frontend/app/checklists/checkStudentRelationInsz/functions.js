@@ -109,3 +109,7 @@ Helpers.addButtonToPageTitle(btnFilter);
 Helpers.addButtonToPageTitle(btnEdit);
 Helpers.addButtonToPageTitle(btnAccept);
 Helpers.addButtonToPageTitle(btnPrepare);
+
+setTimeout(() => {
+	filter();
+}, 500);

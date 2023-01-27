@@ -52,4 +52,10 @@ class CheckStudentRelationInsz extends Repository
 		$items = $this->get();
 		return array_values(Arrays::filter($items, fn ($i) => Strings::equal($i->informatInstituteNumber, $institute)));
 	}
+
+	public function getBySchoolName($schoolName)
+	{
+		$items = $this->get();
+		return array_values(Arrays::filter($items, fn ($i) => Strings::equal($i->school, $schoolName)));
+	}
 }

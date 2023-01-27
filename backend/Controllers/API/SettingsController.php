@@ -55,8 +55,8 @@ class SettingsController extends ApiController
 		$item->changeSettings = $changeSettings;
 
 		$repo->set($item);
-
-		// $this->setRedirect("/{$prefix}/settings/rights");
+		$this->setRedirect("/{$prefix}/settings/rights");
+		$this->handle();
 	}
 
 	public function deleteRights($prefix, $id)

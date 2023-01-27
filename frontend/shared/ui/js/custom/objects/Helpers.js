@@ -41,14 +41,10 @@ export default class Helpers {
 		document.getElementById("pagetitle-buttons").appendChild(button.write());
 	};
 
-	static loadIcon = (name) => {
-		let icon = $.ajax({
-			url: `/frontend/shared/ui/icons/${name}.svg`,
-			async: false
-		});
-
-		return icon.responseText;
-	};
+	static loadIcon = (name) => $.ajax({
+		url: `/frontend/shared/ui/icons/${name}.svg`,
+		async: false
+	}).responseText;
 
 	static getObjectValue = (from, ...selectors) =>
 		[...selectors].map(s =>
@@ -113,5 +109,14 @@ export default class Helpers {
 			.always(returnData => {
 				always(returnData);
 			});
+	};
+
+	static sleep = (ms) => {
+		const date = Date.now();
+		let currentDate = null;
+
+		do {
+			currentDate = Date.now();
+		} while (currentDate - date < ms);
 	};
 }

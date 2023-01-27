@@ -118,6 +118,12 @@
 		{
 			"tag": "script",
 			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/tinymce/tinymce.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
 				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js?1643465883"
 			}
 		},

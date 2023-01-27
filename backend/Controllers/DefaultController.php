@@ -3,25 +3,23 @@
 namespace Controllers;
 
 use Database\Repository\Setting;
+use Database\Repository\UserProfile;
 use O365\AuthenticationManager;
 use Router\Helpers;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Security\User;
 
 class DefaultController
 {
 	public $layout = "";
 
-	const LAYOUT_OVERRIDE = [
-		"/public/error/404" => "nocomponents",
-		"/app/error/404" => "nocomponents",
-		"/app/user/login" => "nocomponents"
-	];
 	const SHORT_TAG = ["meta", "link"];
 	const COMPONENTS = [
 		"footer" => \Controllers\COMPONENT\FooterComponentController::class,
 		"header" => \Controllers\COMPONENT\HeaderComponentController::class,
+		"schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class
@@ -43,6 +41,7 @@ class DefaultController
 		$this->loadActions();
 		$this->loadOthers();
 		$this->loadSettings();
+		$this->loadUserDetails();
 	}
 
 	protected function getLayout()
@@ -64,7 +63,17 @@ class DefaultController
 
 	private function storeLayout()
 	{
-		$file = Arrays::getValue(self::LAYOUT_OVERRIDE, Helpers::getPageFolder(), "default");
+		$overrides = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layoutOverride.json"), true);
+
+		$file = false;
+		foreach ($overrides as $key => $paths) {
+			if (Arrays::contains($paths, Helpers::getPageFolder())) {
+				$file = $key;
+				break;
+			}
+		}
+
+		if (!$file) $file = "default";
 
 		ob_start();
 		require_once LOCATION_SHARED . "/layout/{$file}.php";
@@ -100,6 +109,7 @@ class DefaultController
 		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart" . Helpers::getApiPath(), $this->layout);
+		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);
@@ -116,6 +126,22 @@ class DefaultController
 	{
 		foreach ($this->getSettings() as $setting) {
 			$this->layout = str_replace('{{' . $setting->id . '}}', $setting->value, $this->layout);
+		}
+	}
+
+	private function loadUserDetails()
+	{
+		$user = User::getLoggedInUser();
+		if (!$user) return;
+
+		$profile = (new UserProfile)->getByUserId($user->id);
+
+		foreach ($user as $key => $value) {
+			$this->layout = str_replace("{{user:{$key}}}", $value, $this->layout);
+		}
+
+		foreach ($profile as $key => $value) {
+			$this->layout = str_replace("{{user:profile:{$key}}}", $value, $this->layout);
 		}
 	}
 

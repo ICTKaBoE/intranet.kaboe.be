@@ -35,18 +35,12 @@ class ChartController extends ApiController
 		];
 
 		foreach ($sRepo->get() as $idx => $school) {
-			$toBeChecked = $locked = $published = 0;
+			$items = $repo->getBySchoolName($school->name);
+			Arrays::each($items, fn ($i) => $i->check());
 
-			$institutes = $iRepo->getBySchoolId($school->id);
-
-			foreach ($institutes as $institute) {
-				$items = $repo->getByInstitute($institute->instituteNumber);
-				Arrays::each($items, fn ($i) => $i->check());
-
-				$toBeChecked += count($items);
-				$locked += Arrays::count($items, fn ($i) => Strings::equal($i->locked, true));
-				$published += Arrays::count($items, fn ($i) => Strings::equal($i->published, true));
-			}
+			$toBeChecked = count($items);
+			$locked = Arrays::count($items, fn ($i) => Strings::equal($i->locked, true));
+			$published = Arrays::count($items, fn ($i) => Strings::equal($i->published, true));
 
 			$toBeChecked -= $locked;
 			$locked -= $published;

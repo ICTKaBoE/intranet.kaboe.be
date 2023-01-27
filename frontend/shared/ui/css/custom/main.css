@@ -6,3 +6,14 @@
 .fc .fc-bg-event {
   opacity: 1 !important;
 }
+
+.navbar-brand-image {
+  height: 100px;
+}
+
+.clock {
+  padding: 1rem;
+  border-radius: 6px;
+  letter-spacing: 0.25rem;
+  color: white;
+}

@@ -7,6 +7,8 @@ use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
+use Database\Repository\NoteScreenArticle;
+use Database\Repository\NoteScreenPage;
 use Database\Repository\Setting;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\UserProfile;
@@ -71,6 +73,18 @@ class FormController extends ApiController
 		else $item = new ObjectUserSecurity(['moduleId' => $id]);
 
 		$this->appendToJson("fields", $item->toArray());
+		$this->handle();
+	}
+
+	public function notescreenPages($prefix, $method, $id)
+	{
+		$this->appendToJson("fields", (new NoteScreenPage)->get($id)[0]->toArray());
+		$this->handle();
+	}
+
+	public function notescreenArticles($prefix, $method, $id)
+	{
+		$this->appendToJson("fields", (new NoteScreenArticle)->get($id)[0]->toArray());
 		$this->handle();
 	}
 }

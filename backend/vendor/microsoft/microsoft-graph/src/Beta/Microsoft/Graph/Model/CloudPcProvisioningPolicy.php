@@ -174,6 +174,33 @@ class CloudPcProvisioningPolicy extends Entity
     }
 
     /**
+    * Gets the enableSingleSignOn
+    *
+    * @return bool|null The enableSingleSignOn
+    */
+    public function getEnableSingleSignOn()
+    {
+        if (array_key_exists("enableSingleSignOn", $this->_propDict)) {
+            return $this->_propDict["enableSingleSignOn"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the enableSingleSignOn
+    *
+    * @param bool $val The enableSingleSignOn
+    *
+    * @return CloudPcProvisioningPolicy
+    */
+    public function setEnableSingleSignOn($val)
+    {
+        $this->_propDict["enableSingleSignOn"] = boolval($val);
+        return $this;
+    }
+
+    /**
     * Gets the gracePeriodInHours
     * The number of hours to wait before reprovisioning/deprovisioning happens. Read-only.
     *
@@ -324,7 +351,7 @@ class CloudPcProvisioningPolicy extends Entity
 
     /**
     * Gets the managedBy
-    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, unknownFutureValue. Read-only.
+    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, rpaBox, unknownFutureValue. Read-only.
     *
     * @return CloudPcManagementService|null The managedBy
     */
@@ -343,7 +370,7 @@ class CloudPcProvisioningPolicy extends Entity
 
     /**
     * Sets the managedBy
-    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, unknownFutureValue. Read-only.
+    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, rpaBox, unknownFutureValue. Read-only.
     *
     * @param CloudPcManagementService $val The managedBy
     *

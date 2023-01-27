@@ -26,7 +26,15 @@
 		"prefix": "/public",
 		"methods": {
 			"get": [
-				"/{module?}/{page?}/{method?}/{id?}"
+				{
+					"path": "/selectModule",
+					"controller": "\\Controllers\\PUBLIC\\SelectModuleController"
+				},
+				{
+					"path": "/notescreen/pages",
+					"controller": "\\Controllers\\PUBLIC\\SelectSchoolController"
+				},
+				"/{module?}/{page?}/{id?}"
 			]
 		}
 	},
@@ -76,6 +84,16 @@
 					"function": "settingsRights"
 				},
 				{
+					"path": "/table/{prefix}/notescreen/pages/{schoolId}",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "noteScreenPages"
+				},
+				{
+					"path": "/table/{prefix}/notescreen/articles/{schoolId}",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "noteScreenArticles"
+				},
+				{
 					"path": "/select/{prefix}/bike/export/months",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "months"
@@ -114,6 +132,11 @@
 					"function": "settingsRightsUsers"
 				},
 				{
+					"path": "/select/{prefix}/notescreen/articles/{method}/{id?}/pages",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "notescreenPages"
+				},
+				{
 					"path": "/form/{prefix}/bike/distances/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getDistance"
@@ -142,6 +165,21 @@
 					"path": "/form/{prefix}/settings/rights/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "settingsRights"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/pages/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "notescreenPages"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/articles/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "notescreenArticles"
+				},
+				{
+					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
+					"controller": "\\Controllers\\API\\NoteScreenController",
+					"function": "viewscreen"
 				},
 				{
 					"path": "/informat/student/{id?}",
@@ -206,9 +244,29 @@
 					"function": "general"
 				},
 				{
-					"path": "/form/{prefix}/settings/rights/{method}/{id}",
+					"path": "/form/{prefix}/settings/rights/{method}/{id?}",
 					"controller": "\\Controllers\\API\\SettingsController",
 					"function": "rights"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/pages/delete/{id?}",
+					"controller": "\\Controllers\\API\\NoteScreenController",
+					"function": "deletePages"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/pages/{method}/{id?}",
+					"controller": "\\Controllers\\API\\NoteScreenController",
+					"function": "pages"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/articles/delete/{id?}",
+					"controller": "\\Controllers\\API\\NoteScreenController",
+					"function": "deleteArticles"
+				},
+				{
+					"path": "/form/{prefix}/notescreen/articles/{method}/{id?}",
+					"controller": "\\Controllers\\API\\NoteScreenController",
+					"function": "articles"
 				},
 				{
 					"path": "/{prefix}/checklists/checkStudentRelationInsz/approve/{id}",

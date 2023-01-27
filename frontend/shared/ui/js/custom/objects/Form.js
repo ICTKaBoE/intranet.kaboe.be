@@ -1,6 +1,7 @@
 import Helpers from "./Helpers.js";
 import Select from "./Select.js";
 import DatePicker from "./DatePicker.js";
+import TinyMCE from "./TinyMCE.js";
 
 export default class Form {
 	static INSTANCES = {};
@@ -197,6 +198,10 @@ export default class Form {
 
 			case 'datepicker':
 				DatePicker.INSTANCES[field.id].setDate(value);
+				break;
+
+			case 'tinymce':
+				TinyMCE.INSTANCES[field.id].setValue(value);
 				break;
 
 			default: field.value = value;

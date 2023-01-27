@@ -3,15 +3,17 @@
 namespace Controllers\API;
 
 use Security\User;
-use Controllers\ApiController;
-use Database\Repository\CheckStudentRelationInsz;
-use Database\Repository\LocalUser;
-use Database\Repository\Module;
-use Database\Repository\School;
-use Database\Repository\UserAddress;
+use Router\Helpers;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Router\Helpers;
+use Controllers\ApiController;
+use Database\Repository\Module;
+use Database\Repository\School;
+use Database\Repository\LocalUser;
+use Database\Repository\UserAddress;
+use Database\Repository\UserProfile;
+use Database\Repository\NoteScreenPage;
+use Database\Repository\CheckStudentRelationInsz;
 
 class SelectController extends ApiController
 {
@@ -123,6 +125,12 @@ class SelectController extends ApiController
 	public function settingsRightsUsers()
 	{
 		$this->appendToJson("items", Arrays::orderBy(Arrays::filter((new LocalUser)->get(), fn ($lu) => Strings::isNotBlank($lu->fullName)), "fullName"));
+		$this->handle();
+	}
+
+	public function notescreenPages()
+	{
+		$this->appendToJson("items", (new NoteScreenPage)->getBySchoolId((new UserProfile)->getByUserId(User::getLoggedInUser()->id)->mainSchoolId));
 		$this->handle();
 	}
 }

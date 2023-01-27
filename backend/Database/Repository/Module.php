@@ -13,6 +13,13 @@ class Module extends Repository
 		parent::__construct("tbl_module", \Database\Object\Module::class);
 	}
 
+	public function getByScope($scope)
+	{
+		$items = $this->get();
+		$items = Arrays::filter($items, fn ($i) => Strings::contains($i->scope, $scope));
+		return $items;
+	}
+
 	public function getByModule($module)
 	{
 		$items = $this->get(deleted: true);

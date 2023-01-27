@@ -11,6 +11,7 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\LocalUser as ObjectLocalUser;
+use Database\Object\UserProfile as ObjectUserProfile;
 use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Repository\Module;
 use O365\AuthenticationManager;
@@ -111,7 +112,8 @@ class UserController extends ApiController
 
 		if ($this->validationIsAllGood()) {
 			$userProfileRepo = new UserProfile;
-			$profile = $userProfileRepo->get(User::getLoggedInUser()->id)[0];
+			$profile = $userProfileRepo->get(User::getLoggedInUser()->id)[0] ?? new ObjectUserProfile();
+			$profile->userId = User::getLoggedInUser()->id;
 			$profile->mainSchoolId = $mainSchoolId;
 			$profile->bankAccount = $bankAccount;
 

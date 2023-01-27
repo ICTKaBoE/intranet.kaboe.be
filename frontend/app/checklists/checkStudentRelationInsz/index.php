@@ -14,7 +14,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<label for="school" class="form-label">School</label>
-					<select name="school" id="school" data-load-source="{{select:action}}/school" data-load-value="name" data-load-label="name" required></select>
+					<select name="school" id="school" data-load-source="{{select:action}}/school" data-default-value="{{user:profile:mainSchoolId}}" data-load-value="id" data-load-label="name" required></select>
 					<div class="invalid-feedback" data-feedback-input="school"></div>
 				</div>
 

@@ -182,7 +182,7 @@ class CheckController extends ApiController
 		$informatSRepo = new Student;
 		$informatRRepo = new Relation;
 
-		$school = $sRepo->getByName($school);
+		$school = $sRepo->get($school)[0];
 		$schoolInstitutes = $iRepo->getBySchoolId($school->id);
 
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
