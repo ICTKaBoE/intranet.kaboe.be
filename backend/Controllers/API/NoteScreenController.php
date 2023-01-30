@@ -68,6 +68,7 @@ class NoteScreenController extends ApiController
 		$title = Helpers::input()->post('title')->getValue();
 		$pageId = Helpers::input()->post('notescreenPageId')->getValue();
 		$content = Helpers::input()->post('content')->getValue();
+		$displayTime = Helpers::input()->post('displayTime')->getValue();
 
 		if (!Input::check($title) && Input::empty($title)) $this->setValidation("title", "Titel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 		if (!Input::check($pageId, Input::INPUT_TYPE_INT) && Input::empty($pageId)) $this->setValidation("pageId", "Pagina moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
@@ -80,6 +81,7 @@ class NoteScreenController extends ApiController
 			$article->notescreenPageId = $pageId;
 			$article->title = $title;
 			$article->content = $content;
+			$article->displayTime = $displayTime;
 			$repo->set($article);
 		}
 

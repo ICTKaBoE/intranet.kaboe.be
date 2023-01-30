@@ -32,6 +32,12 @@
 						<textarea role="tinymce" name="content" id="content"></textarea>
 						<div class="invalid-feedback" data-feedback-input="content"></div>
 					</div>
+
+					<div class="">
+						<label class="form-label" for="displayTime">Toon tijd (milliseconden)</label>
+						<input type="number" name="displayTime" id="displayTime" class="form-control" required min="0" max="60000">
+						<div class="invalid-feedback" data-feedback-input="displayTime"></div>
+					</div>
 				</div>
 
 				<div class="card-footer text-end">
