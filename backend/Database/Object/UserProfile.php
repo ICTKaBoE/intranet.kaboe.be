@@ -16,19 +16,15 @@ class UserProfile extends CustomObject
 		"deleted"
 	];
 
-	protected $userName = "";
-	protected $userFirstName = "";
-
 	public function init()
 	{
-		$this->userName = $this->user->name;
-		$this->userFirstName = $this->user->firstName;
 	}
 
 	public function link()
 	{
 		$this->mainSchool = (new School)->get($this->mainSchoolId)[0];
 		$this->user = (new LocalUser)->get($this->userId)[0];
+
 		return $this;
 	}
 }

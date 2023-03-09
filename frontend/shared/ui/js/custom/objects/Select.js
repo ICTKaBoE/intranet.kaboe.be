@@ -107,7 +107,7 @@ export default class Select {
 	};
 
 	setValue = (value) => {
-		this.tomSelect.setValue(value, true);
+		this.tomSelect.setValue(value, false);
 	};
 
 	getValue = () => {

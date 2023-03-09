@@ -342,8 +342,9 @@ class TableController extends ApiController
 		$this->handle();
 	}
 
-	public function noteScreenPages($prefix, $schoolId)
+	public function noteScreenPages()
 	{
+		$schoolId = Helpers::input()->get('schoolId');
 
 		$this->appendToJson(
 			'columns',
@@ -364,8 +365,10 @@ class TableController extends ApiController
 		$this->handle();
 	}
 
-	public function noteScreenArticles($prefix, $schoolId)
+	public function noteScreenArticles()
 	{
+		$schoolId = Helpers::input()->get('schoolId');
+
 		$this->appendToJson(
 			'columns',
 			[

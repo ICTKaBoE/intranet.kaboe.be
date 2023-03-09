@@ -148,7 +148,8 @@ export default class Form {
 
 		let done = (data) => {
 			if (data.fields) {
-				$.each(data.fields, (key, value) => {
+				let fields = Helpers.flattenObject(data.fields);
+				$.each(fields, (key, value) => {
 					this.setField(key, value);
 				});
 

@@ -84,12 +84,12 @@
 					"function": "settingsRights"
 				},
 				{
-					"path": "/table/{prefix}/notescreen/pages/{schoolId}",
+					"path": "/table/{prefix}/notescreen/pages",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "noteScreenPages"
 				},
 				{
-					"path": "/table/{prefix}/notescreen/articles/{schoolId}",
+					"path": "/table/{prefix}/notescreen/articles",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "noteScreenArticles"
 				},
@@ -103,7 +103,9 @@
 						"/select/{prefix}/bike/export/school",
 						"/select/{prefix}/bike/distances/{method}/{id?}/school",
 						"/select/{prefix}/user/profile/school",
-						"/select/{prefix}/checklists/checkStudentRelationInsz/school"
+						"/select/{prefix}/checklists/checkStudentRelationInsz/school",
+						"/select/{prefix}/notescreen/pages/school",
+						"/select/{prefix}/notescreen/articles/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "school"
@@ -180,6 +182,11 @@
 					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
 					"controller": "\\Controllers\\API\\NoteScreenController",
 					"function": "viewscreen"
+				},
+				{
+					"path": "/taskboard/{prefix}/maintenance/requests/{schoolId?}",
+					"controller": "\\Controllers\\API\\TaskBoardController",
+					"function": "maintenanceRequests"
 				},
 				{
 					"path": "/informat/student/{id?}",
@@ -267,6 +274,16 @@
 					"path": "/form/{prefix}/notescreen/articles/{method}/{id?}",
 					"controller": "\\Controllers\\API\\NoteScreenController",
 					"function": "articles"
+				},
+				{
+					"path": "/form/{prefix}/maintenance/requests/{method}/{id?}",
+					"controller": "\\Controllers\\API\\MaintenanceController",
+					"function": "request"
+				},
+				{
+					"path": "/taskboard/{prefix}/maintenance/requests/{id}/{status}",
+					"controller": "\\Controllers\\API\\MaintenanceController",
+					"function": "setRequestStatus"
 				},
 				{
 					"path": "/{prefix}/checklists/checkStudentRelationInsz/approve/{id}",

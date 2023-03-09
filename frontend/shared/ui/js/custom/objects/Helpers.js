@@ -43,7 +43,8 @@ export default class Helpers {
 
 	static loadIcon = (name) => $.ajax({
 		url: `/frontend/shared/ui/icons/${name}.svg`,
-		async: false
+		async: false,
+		cache: true,
 	}).responseText;
 
 	static getObjectValue = (from, ...selectors) =>
@@ -54,6 +55,33 @@ export default class Helpers {
 				.filter(t => t !== '')
 				.reduce((prev, cur) => prev && prev[cur], from)
 		);
+
+	static flattenObject = (obj) => {
+		// The object which contains the
+		// final result
+		let result = {};
+
+		// loop through the object "ob"
+		for (const i in obj) {
+
+			// We check the type of the i using
+			// typeof() function and recursively
+			// call the function again
+			if ((typeof obj[i]) === 'object' && !Array.isArray(obj[i])) {
+				const temp = this.flattenObject(obj[i]);
+				for (const j in temp) {
+					// Store temp in result
+					result[i + '.' + j] = temp[j];
+				}
+			}
+
+			// Else store ob[i] in result directly
+			else {
+				result[i] = obj[i];
+			}
+		}
+		return result;
+	};
 
 	static formatValue = (value, type, format, originalData = null) => {
 		if (undefined === format) return value;
@@ -91,11 +119,11 @@ export default class Helpers {
 		return value;
 	};
 
-	static request = ({ url, method = 'GET', data = {}, initiator, done = () => { }, fail = () => { }, always = () => { } }) => {
+	static request = ({ url, method = 'GET', data = null, initiator, done = () => { }, fail = () => { }, always = () => { } }) => {
 		return $.ajax({
 			url: url,
 			method: method,
-			data: data || {},
+			data: data || null,
 			cache: false,
 			processData: false,
 			contentType: false

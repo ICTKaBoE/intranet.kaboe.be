@@ -2,6 +2,11 @@ import Button from "../../../shared/ui/js/custom/objects/Button.js";
 import Helpers from "../../../shared/ui/js/custom/objects/Helpers.js";
 import Table from "../../../shared/ui/js/custom/objects/Table.js";
 
+window.loadTable = (value) => {
+	Table.INSTANCES[`tbl${pageId}`].addExtraData('schoolId', value);
+	Table.INSTANCES[`tbl${pageId}`].reload();
+};
+
 window.addArticle = () => {
 	Helpers.redirect("/add");
 };

@@ -110,6 +110,7 @@ class DefaultController
 		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen" . Helpers::getApiPath(), $this->layout);
+		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard" . Helpers::getApiPath(), $this->layout);
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);

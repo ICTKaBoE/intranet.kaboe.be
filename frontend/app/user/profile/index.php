@@ -4,15 +4,15 @@
 			<div class="card-body">
 				<div class="row mb-3">
 					<div class="col-6">
-						<label class="form-label" for="userName">Naam</label>
-						<input type="text" name="userName" id="userName" class="form-control" readonly>
-						<div class="invalid-feedback" data-feedback-input="userName"></div>
+						<label class="form-label" for="user.name">Naam</label>
+						<input type="text" name="user.name" id="user.name" class="form-control" readonly>
+						<div class="invalid-feedback" data-feedback-input="user.name"></div>
 					</div>
 
 					<div class="col-6">
-						<label class="form-label" for="userFirstName">Voornaam</label>
-						<input type="text" name="userFirstName" id="userFirstName" class="form-control" readonly>
-						<div class="invalid-feedback" data-feedback-input="userFirstName"></div>
+						<label class="form-label" for="user.firstName">Voornaam</label>
+						<input type="text" name="user.firstName" id="user.firstName" class="form-control" readonly>
+						<div class="invalid-feedback" data-feedback-input="user.firstName"></div>
 					</div>
 				</div>
 
