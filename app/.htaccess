@@ -1,6 +1,0 @@
-<If "%{HTTP:X-Requested-With} in {'XMLHttpRequest'} ">
-    Allow from all
-</If>
-<Else>
-    Allow from all
-</Else>

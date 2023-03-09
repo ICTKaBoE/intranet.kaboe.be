@@ -1,0 +1,12 @@
+{
+    "require": {
+        "letsdrink/ouzo-goodies": "^1.8",
+        "microsoft/microsoft-graph": "^1.52",
+        "clancats/hydrahon": "^1.1",
+        "phpoffice/phpspreadsheet": "^1.22",
+        "tecnickcom/tcpdf": "^6.4",
+        "nelexa/zip": "^4.0",
+        "pecee/simple-router": "4.3.7.2",
+        "guzzlehttp/guzzle": "^7.5"
+    }
+}

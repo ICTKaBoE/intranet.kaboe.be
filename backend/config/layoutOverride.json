@@ -1,0 +1,14 @@
+{
+	"nocomponents": [
+		"/public/error/404",
+		"/app/error/404",
+		"/app/user/login"
+	],
+	"minimal": [
+		"/public/selectModule",
+		"/public/notescreen/dashboard"
+	],
+	"schoolCustomLayout": [
+		"/public/notescreen/viewscreen"
+	]
+}

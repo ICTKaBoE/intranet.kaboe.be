@@ -1,0 +1,138 @@
+{
+	"head": [
+		{
+			"tag": "meta",
+			"attributes": {
+				"charset": "UTF-8"
+			}
+		},
+		{
+			"tag": "meta",
+			"attributes": {
+				"http-equiv": "X-UA-Compatible",
+				"content": "IE=edge"
+			}
+		},
+		{
+			"tag": "meta",
+			"attributes": {
+				"name": "viewport",
+				"content": "width=device-width, initial-scale=1.0"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css?1643465883",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-flags.min.css?1643465883",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-payments.min.css?1643465883",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-vendors.min.css?1643465883",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/ui/css/custom/main.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "https://code.jquery.com/jquery-3.6.0.min.js",
+				"integrity": "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=",
+				"crossorigin": "anonymous"
+			}
+		}
+	],
+	"body": [
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/tom-select/dist/js/tom-select.complete.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/locales-all.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/litepicker/dist/litepicker.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/list.js/dist/list.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/tinymce/tinymce.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js?1643465883"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"type": "module",
+				"src": "{{site:url}}/frontend/shared/ui/js/custom/main.js"
+			}
+		}
+	]
+}
