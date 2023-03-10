@@ -15,13 +15,18 @@ class ModuleSetting extends Repository
 
 	public function getByModule($moduleId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId));
+		$statement = $this->prepareSelect();
+		$statement->where('moduleId', $moduleId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getByModuleAndKey($moduleId, $key): \Database\Object\ModuleSetting
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId) && Strings::equal($i->key, $key)));
+		$statement = $this->prepareSelect();
+		$statement->where('moduleId', $moduleId);
+		$statement->where('key', $key);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

@@ -15,13 +15,18 @@ class NoteScreenArticle extends Repository
 
 	public function getBySchoolId($schoolId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->schoolId, $schoolId));
+		$statement = $this->prepareSelect();
+		$statement->where('schoolId', $schoolId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getBySchoolAndPage($schoolId, $pageId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->schoolId, $schoolId) && Strings::equal($i->notescreenPageId, $pageId));
+		$statement = $this->prepareSelect();
+		$statement->where('schoolId', $schoolId);
+		$statement->where('notescreenPageId', $pageId);
+
+		return $this->executeSelect($statement);
 	}
 }

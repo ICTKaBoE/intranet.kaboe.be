@@ -15,13 +15,18 @@ class ModuleNavigation extends Repository
 
 	public function getByModuleId($moduleId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId));
+		$statement = $this->prepareSelect();
+		$statement->where('moduleId', $moduleId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getByModuleAndPage($moduleId, $page)
 	{
-		$items = $this->get(deleted: true);
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId) && Strings::equal($i->page, $page)));
+		$statement = $this->prepareSelect(deleted: true);
+		$statement->where('moduleId', $moduleId);
+		$statement->where('page', $page);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

@@ -15,21 +15,25 @@ class Module extends Repository
 
 	public function getByScope($scope)
 	{
-		$items = $this->get();
-		$items = Arrays::filter($items, fn ($i) => Strings::contains($i->scope, $scope));
-		return $items;
+		$statement = $this->prepareSelect();
+		$statement->where('scope', 'LIKE', "%$scope%");
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getByModule($module)
 	{
-		$items = $this->get(deleted: true);
-		$items = Arrays::filter($items, fn ($i) => Strings::equal($i->module, $module));
-		return Arrays::firstOrNull($items);
+		$statement = $this->prepareSelect(deleted: true);
+		$statement->where('module', $module);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 
 	public function getWhereAssignUserRights()
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->assignUserRights, 1));
+		$statement = $this->prepareSelect();
+		$statement->where('assignUserRights', 1);
+
+		return $this->executeSelect($statement);
 	}
 }

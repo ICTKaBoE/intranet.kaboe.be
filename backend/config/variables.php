@@ -16,11 +16,19 @@ define("SECURITY_DEFAULT_GROUP", 2);
 define("SECURITY_SESSION_SIGNINMETHOD_LOCAL", "local");
 define("SECURITY_SESSION_SIGNINMETHOD_O365", "o365");
 
-define("DB_SERVER", "localhost");
-define("DB_DATABASE", "db_intranet2");
-define("DB_USERNAME", "application");
-define("DB_PASSWORD", "PianomanPA");
-define("DB_CHARSET", "utf8mb4");
+if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
+	define("DB_SERVER", "localhost");
+	define("DB_DATABASE", "db_intranet2");
+	define("DB_USERNAME", "application");
+	define("DB_PASSWORD", "PianomanPA");
+	define("DB_CHARSET", "utf8mb4");
+} else {
+	define("DB_SERVER", "ID75803_intranet.db.webhosting.be");
+	define("DB_DATABASE", "ID75803_intranet");
+	define("DB_USERNAME", "ID75803_intranet");
+	define("DB_PASSWORD", "PianomanPA125");
+	define("DB_CHARSET", "utf8mb4");
+}
 
 define("ROUTER_DEFAULT_PREFIX", "/app");
 define("ROUTER_DEFAULT_MIDDLEWARE", "\\Router\\Middleware\\DefaultMiddleware");

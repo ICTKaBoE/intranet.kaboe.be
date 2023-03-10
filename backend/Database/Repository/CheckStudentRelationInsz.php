@@ -16,46 +16,61 @@ class CheckStudentRelationInsz extends Repository
 
 	public function getByInsz($insz)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->childInsz, Input::formatInsz($insz))));
+		$statement = $this->prepareSelect();
+		$statement->where('childInsz', Input::formatInsz($insz));
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 
 	public function getByCheckField($insz)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->checkField, $insz)));
+		$statement = $this->prepareSelect();
+		$statement->where('checkField', $insz);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 
 	public function getNotPublished()
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->published, false));
+		$statement = $this->prepareSelect();
+		$statement->where('published', false);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getApprovedAndNotPublished()
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->locked, true) && Strings::equal($i->published, false));
+		$statement = $this->prepareSelect();
+		$statement->where('locked', true);
+		$statement->where('published', false);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getClassBySchool($school)
 	{
-		$items = $this->get();
-		$classes = Arrays::filter($items, fn ($i) => Strings::equal($i->school, $school));
-		$classes = Arrays::map($classes, fn ($i) => $i->class);
+		$statement = $this->prepareSelect();
+		$statement->where('school', $school);
+
+		$items = $this->executeSelect($statement);
+		$classes = Arrays::map($items, fn ($i) => $i->class);
 
 		return array_unique($classes);
 	}
 
 	public function getByInstitute($institute)
 	{
-		$items = $this->get();
-		return array_values(Arrays::filter($items, fn ($i) => Strings::equal($i->informatInstituteNumber, $institute)));
+		$statement = $this->prepareSelect();
+		$statement->where('informatInstituteNumber', $institute);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getBySchoolName($schoolName)
 	{
-		$items = $this->get();
-		return array_values(Arrays::filter($items, fn ($i) => Strings::equal($i->school, $schoolName)));
+		$statement = $this->prepareSelect();
+		$statement->where('school', $schoolName);
+
+		return $this->executeSelect($statement);
 	}
 }

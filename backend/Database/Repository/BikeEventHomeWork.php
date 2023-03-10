@@ -15,19 +15,26 @@ class BikeEventHomeWork extends Repository
 
 	public function getByUserId($userId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getByIdAndDate($userId, $date)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId) && Strings::equal($i->date, $date)));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+		$statement->where('date', $date);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 
 	public function getBySchoolId($schoolId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->userMainSchoolId, $schoolId));
+		$statement = $this->prepareSelect();
+		$statement->where('userMainSchoolId', $schoolId);
+
+		return $this->executeSelect($statement);
 	}
 }

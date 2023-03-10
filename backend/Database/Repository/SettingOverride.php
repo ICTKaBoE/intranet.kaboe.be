@@ -15,9 +15,10 @@ class SettingOverride extends Repository
 
 	public function getBySettingAndModule($settingId, $moduleId)
 	{
-		$items = $this->get();
-		$items = Arrays::filter($items, fn ($i) => Strings::equal($i->settingId, $settingId) && Strings::equal($i->moduleId, $moduleId));
+		$statement = $this->prepareSelect();
+		$statement->where('settingId', $settingId);
+		$statement->where('moduleId', $moduleId);
 
-		return Arrays::firstOrNull($items);
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

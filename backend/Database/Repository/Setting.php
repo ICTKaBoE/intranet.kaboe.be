@@ -15,7 +15,9 @@ class Setting extends Repository
 
 	public function getByTabId($tabId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->settingTabId, $tabId));
+		$statement = $this->prepareSelect();
+		$statement->where('settingTabId', $tabId);
+
+		return $this->executeSelect($statement);
 	}
 }

@@ -22,22 +22,26 @@ class UserSecurity extends Repository
 
 	public function getByModuleId($moduleId)
 	{
-		$items = $this->get();
-		$items = Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId));
-		return $items;
+		$statement = $this->prepareSelect();
+		$statement->where('moduleId', $moduleId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getByUserId($userId)
 	{
-		$items = $this->get();
-		$items = Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId));
-		return array_values(Arrays::orderBy($items, 'moduleId'));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+
+		return Arrays::orderBy($this->executeSelect($statement), 'moduleId');
 	}
 
 	public function getByUserAndModule($userId, $moduleId)
 	{
-		$items = $this->get();
-		$items = Arrays::filter($items, fn ($i) => Strings::equal($i->moduleId, $moduleId) && Strings::equal($i->userId, $userId));
-		return Arrays::firstOrNull($items);
+		$statement = $this->prepareSelect();
+		$statement->where('moduleId', $moduleId);
+		$statement->where('userId', $userId);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

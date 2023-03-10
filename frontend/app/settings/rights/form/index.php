@@ -13,8 +13,8 @@
 				</div>
 
 				<div class="form-group mb-3">
-					<label for="userId" class="form-label">Gebruiker(s)</label>
-					<select class="form-control" name="userId" id="userId" data-load-source="{{select:action}}/users" data-load-value="id" data-load-label="fullName" multiple required></select>
+					<label for="userId" class="form-label">Gebruiker</label>
+					<select class="form-control" name="userId" id="userId" data-load-source="{{select:action}}/users" data-load-value="id" data-load-label="fullName" required></select>
 					<div class="invalid-feedback" data-feedback-input="user"></div>
 				</div>
 

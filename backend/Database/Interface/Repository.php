@@ -4,6 +4,7 @@ namespace Database\Interface;
 
 use Database\Database;
 use Ouzo\Utilities\Arrays;
+use Database\Interface\CustomObject;
 
 class Repository
 {
@@ -17,7 +18,7 @@ class Repository
         $this->orderDirection = $orderDirection;
         $this->deletedField = $deletedField;
 
-        $this->repoTable = $this->db->builder->table($this->table);
+        $this->repoTable = $this->db->getBuilder()->table($this->table);
     }
 
     protected function convertRowsToObject($rows)
@@ -33,15 +34,30 @@ class Repository
         return new $this->object($row);
     }
 
-    public function get($id = null, $order = true, $deleted = false)
+    protected function prepareSelect($id = null, $order = true, $deleted = false)
     {
         $statement = $this->repoTable->select();
         if (!is_null($id)) $statement->where($this->idField, $id);
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
         if ($order && $this->orderField) $statement->orderBy($this->orderField, $this->orderDirection);
 
+        return $statement;
+    }
+
+    protected function executeSelect($statement)
+    {
+        $objects = [];
         $rows = $statement->get();
-        return $this->convertRowsToObject($rows);
+
+        foreach ($rows as $row) $objects[] = new $this->object($row);
+
+        return $objects;
+    }
+
+    public function get($id = null, $order = true, $deleted = false)
+    {
+        $statement = $this->prepareSelect($id, $order, $deleted);
+        return $this->executeSelect($statement);
     }
 
     public function set(CustomObject $object)
@@ -49,6 +65,7 @@ class Repository
         try {
             $object->init();
             $object = $object->toSqlArray();
+
             if (is_null($object[$this->idField])) return $this->insert($object);
             else return $this->update($object);
         } catch (\Exception $e) {

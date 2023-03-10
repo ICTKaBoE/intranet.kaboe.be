@@ -15,7 +15,9 @@ class NoteScreenPage extends Repository
 
 	public function getBySchoolId($schoolId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->schoolId, $schoolId));
+		$statement = $this->prepareSelect();
+		$statement->where('schoolId', $schoolId);
+
+		return $this->executeSelect($statement);
 	}
 }

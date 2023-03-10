@@ -62,6 +62,7 @@ class UserController extends ApiController
 					}
 
 					if (is_null($correctUser)) $this->setValidation('password', 'Wachtwoord is niet correct!', self::VALIDATION_STATE_INVALID);
+					else if ($correctUser->active == 0) $this->setValidation("username", "Gebruiker kan niet aanmelden!", self::VALIDATION_STATE_INVALID);
 					else {
 						if ($apiLogin && !$correctUser->api) return false;
 						Session::set(SECURITY_SESSION_ISSIGNEDIN, [
@@ -142,7 +143,7 @@ class UserController extends ApiController
 		$group = $groupRepo->getByDisplayName('secur.intranet.kaboe.be')->doRequest()[0];
 		$modules = (new Module)->getWhereAssignUserRights();
 
-		$allMembers = $groupRepo->getMembersById($group->getId())->doRequestAllPages(\Microsoft\Graph\Model\User::class, 300);
+		$allMembers = $groupRepo->getMembersByGroupId($group->getId())->doRequestAllPages(\Microsoft\Graph\Model\User::class, 300);
 		$allMembers = Arrays::filter($allMembers, fn ($m) => Strings::equalsIgnoreCase($m->getODataType(), "#microsoft.graph.user"));
 
 		foreach ($allMembers as $member) {
@@ -155,6 +156,7 @@ class UserController extends ApiController
 				$user->username = $member->getMail();
 				$user->jobTitle = $member->getJobTitle();
 				$user->companyName = $member->getCompanyName();
+				$user->active = $member->getAccountEnabled();
 
 				$userId = $localUserRepo->set($user);
 

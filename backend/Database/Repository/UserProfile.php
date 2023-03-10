@@ -15,7 +15,9 @@ class UserProfile extends Repository
 
 	public function getByUserId($userId)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId)));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

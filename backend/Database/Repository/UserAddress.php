@@ -15,13 +15,18 @@ class UserAddress extends Repository
 
 	public function getByUserId($userId)
 	{
-		$items = $this->get();
-		return Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function getCurrentByUserId($userId)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->userId, $userId) && Strings::equal($i->current, 1)));
+		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
+		$statement->where('current', 1);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

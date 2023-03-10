@@ -16,7 +16,6 @@ class ChartController extends ApiController
 	{
 		$repo = new CheckStudentRelationInsz;
 		$sRepo = new School;
-		$iRepo = new SchoolInstitute;
 
 		$this->appendToJson(["xaxis", "categories"], Arrays::map($sRepo->get(), fn ($s) => $s->name));
 		$series = [

@@ -16,8 +16,10 @@ class LocalUser extends Repository
 	public function getByUsername($username)
 	{
 		try {
-			$items = $this->get();
-			return Arrays::filter($items, fn ($i) => Strings::equal($i->username, $username));
+			$statement = $this->prepareSelect();
+			$statement->where('username', $username);
+
+			return $this->executeSelect($statement);
 		} catch (\Exception $e) {
 			die(var_dump("LocalUser:getByUsername - " . $e->getMessage()));
 		}
@@ -26,10 +28,10 @@ class LocalUser extends Repository
 	public function getByO365Id($o365id)
 	{
 		try {
-			$items = $this->get();
-			$items = Arrays::filter($items, fn ($i) => Strings::equal($i->o365Id, $o365id));
+			$statement = $this->prepareSelect();
+			$statement->where('o365Id', $o365id);
 
-			return Arrays::firstOrNull($items);
+			return Arrays::firstOrNull($this->executeSelect($statement));
 		} catch (\Exception $e) {
 			die(var_dump("LocalUser:getByO365Id - " . $e->getMessage()));
 		}

@@ -57,14 +57,14 @@ class Group extends Repository
     public function getByDisplayName($displayName)
     {
         return $this->createRequest()
-            ->setSelect(['displayName', 'id', 'mail'])
+            ->setSelect(['displayName', 'id'])
             ->setFilter("displayName eq '{$displayName}'");
     }
 
-    public function getMembersById($id)
+    public function getMembersByGroupId($id)
     {
         return $this->createRequest()
-            ->setSelect(['companyName', 'givenName', 'id', 'jobTitle', 'mail', 'surname'])
+            ->setSelect(['companyName', 'givenName', 'id', 'jobTitle', 'mail', 'surname', 'accountEnabled'])
             ->setOid($id)
             ->getMembers();
     }

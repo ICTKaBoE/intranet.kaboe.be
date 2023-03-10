@@ -10,6 +10,8 @@ use ClanCats\Hydrahon\Query\Sql\FetchableInterface;
 class Database
 {
     private static $instance = null;
+    private $connection = null;
+    private $builder = null;
 
     private function __construct()
     {
@@ -35,5 +37,10 @@ class Database
         if (!self::$instance instanceof self) self::$instance = new self;
 
         return self::$instance;
+    }
+
+    public function getBuilder()
+    {
+        return $this->builder;
     }
 }

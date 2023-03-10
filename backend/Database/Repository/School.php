@@ -15,7 +15,9 @@ class School extends Repository
 
 	public function getByName($name)
 	{
-		$items = $this->get();
-		return Arrays::firstOrNull(Arrays::filter($items, fn ($i) => Strings::equal($i->name, $name)));
+		$statement = $this->prepareSelect();
+		$statement->where('name', $name);
+
+		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 }

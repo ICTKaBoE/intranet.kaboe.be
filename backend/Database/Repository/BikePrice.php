@@ -15,7 +15,11 @@ class BikePrice extends Repository
 
 	public function getBetween($date)
 	{
-		$items = $this->get();
-		return Arrays::first(Arrays::filter($items, fn ($i) => Clock::at($date)->isAfterOrEqualTo(Clock::at($i->validFrom)) && Clock::at($date)->isBeforeOrEqualTo(Clock::at($i->validUntil))));
+		$statement = $this->prepareSelect();
+		$statement
+			->where("validFrom", "<=", Clock::at($date)->format("Y-m-d"))
+			->where("validUntil", ">=", Clock::at($date)->format("Y-m-d"));
+
+		return Arrays::first($this->executeSelect($statement));
 	}
 }
