@@ -44,6 +44,11 @@
 		"methods": {
 			"get": [
 				{
+					"path": "/update/database/{vMajor}/{vMinor}",
+					"controller": "\\Controllers\\API\\UpdateController",
+					"function": "database"
+				},
+				{
 					"path": "/user/o365/callback",
 					"controller": "\\Controllers\\API\\UserController",
 					"function": "callback"

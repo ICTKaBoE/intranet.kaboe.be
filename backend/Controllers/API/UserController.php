@@ -27,10 +27,16 @@ class UserController extends ApiController
 		$username = $password = null;
 
 		if ($apiLogin) {
-			$authentication = Helpers::request()->getHeaders()['http_authentication'];
-			$authentication = explode(":", base64_decode(str_replace("Basic ", "", $authentication)));
-			$username = $authentication[0];
-			$password = $authentication[1];
+			$authentication = Helpers::request()->getHeaders()['http_authentication'] ?? false;
+
+			if ($authentication) {
+				$authentication = explode(":", base64_decode(str_replace("Basic ", "", $authentication)));
+				$username = $authentication[0];
+				$password = $authentication[1];
+			} else {
+				$username = Helpers::request()->getHeaders()['php_auth_user'];
+				$password = Helpers::request()->getHeaders()['php_auth_pw'];
+			}
 		} else {
 			$username = Helpers::input()->post("username")->getValue();
 			$password = Helpers::input()->post("password")->getValue();

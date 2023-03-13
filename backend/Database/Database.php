@@ -39,8 +39,28 @@ class Database
         return self::$instance;
     }
 
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
     public function getBuilder()
     {
         return $this->builder;
+    }
+
+    public function beginTransaction()
+    {
+        $this->connection->beginTransaction();
+    }
+
+    public function commit()
+    {
+        $this->connection->commit();
+    }
+
+    public function rollback()
+    {
+        $this->connection->rollBack();
     }
 }

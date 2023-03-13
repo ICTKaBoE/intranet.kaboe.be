@@ -2,6 +2,7 @@
 define("LOCATION_ROOT", dirname(dirname(__DIR__)));
 define("LOCATION_FRONTEND", LOCATION_ROOT . "/frontend");
 define("LOCATION_BACKEND", LOCATION_ROOT . "/backend");
+define("LOCATION_SQL", LOCATION_ROOT . "/sql");
 define("LOCATION_SHARED", LOCATION_FRONTEND . "/shared");
 define("LOCATION_APP", LOCATION_FRONTEND . "/app");
 define("LOCATION_PUBLIC", LOCATION_FRONTEND . "/public");
