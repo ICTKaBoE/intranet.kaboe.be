@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '2.3.x-dev',
-        'version' => '2.3.9999999.9999999-dev',
+        'pretty_version' => '2.6.x-dev',
+        'version' => '2.6.9999999.9999999-dev',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '1e704732df5a48c97fbde798fcce29bb2d3bd964',
+        'reference' => '6e1c81f161c02a43333c1f79ef3ad95e614c0e3e',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '2.3.x-dev',
-            'version' => '2.3.9999999.9999999-dev',
+            'pretty_version' => '2.6.x-dev',
+            'version' => '2.6.9999999.9999999-dev',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '1e704732df5a48c97fbde798fcce29bb2d3bd964',
+            'reference' => '6e1c81f161c02a43333c1f79ef3ad95e614c0e3e',
             'dev_requirement' => false,
         ),
         'clancats/hydrahon' => array(
@@ -56,12 +56,12 @@
             'dev_requirement' => false,
         ),
         'guzzlehttp/psr7' => array(
-            'pretty_version' => '2.4.3',
-            'version' => '2.4.3.0',
+            'pretty_version' => '2.4.4',
+            'version' => '2.4.4.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/psr7',
             'aliases' => array(),
-            'reference' => '67c26b443f348a51926030c83481b85718457d3d',
+            'reference' => '3cf1b6d4f0c820a2cf8bcaec39fc698f3443b5cf',
             'dev_requirement' => false,
         ),
         'letsdrink/ouzo-goodies' => array(
@@ -101,12 +101,12 @@
             'dev_requirement' => false,
         ),
         'microsoft/microsoft-graph' => array(
-            'pretty_version' => '1.86.0',
-            'version' => '1.86.0.0',
+            'pretty_version' => '1.92.0',
+            'version' => '1.92.0.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../microsoft/microsoft-graph',
             'aliases' => array(),
-            'reference' => '9cfeb800243ec46e44d63d88264e08cd7b289500',
+            'reference' => '11bdfe4692002ccd40a36faca844916109f1939e',
             'dev_requirement' => false,
         ),
         'myclabs/php-enum' => array(
@@ -137,12 +137,12 @@
             'dev_requirement' => false,
         ),
         'phpoffice/phpspreadsheet' => array(
-            'pretty_version' => '1.26.0',
-            'version' => '1.26.0.0',
+            'pretty_version' => '1.28.0',
+            'version' => '1.28.0.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpoffice/phpspreadsheet',
             'aliases' => array(),
-            'reference' => '5b6ceea9705b068f993e268e4debc566c2637063',
+            'reference' => '6e81cf39bbd93ebc3a4e8150444c41e8aa9b769a',
             'dev_requirement' => false,
         ),
         'psr/http-client' => array(
@@ -218,12 +218,12 @@
             'dev_requirement' => false,
         ),
         'symfony/finder' => array(
-            'pretty_version' => 'v6.0.17',
-            'version' => '6.0.17.0',
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/finder',
             'aliases' => array(),
-            'reference' => 'd467d625fc88f7cebf96f495e588a7196a669db1',
+            'reference' => '5cc9cac6586fc0c28cd173780ca696e419fefa11',
             'dev_requirement' => false,
         ),
         'tecnickcom/tcpdf' => array(

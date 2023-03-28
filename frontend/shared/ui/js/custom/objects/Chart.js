@@ -4,10 +4,10 @@ export default class Chart {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.chart = element;
-		this.id = this.chart.id || false;
-		this.type = this.chart.dataset.type || 'line';
-		this.source = this.chart.dataset.source || false;
+		this.element = element;
+		this.id = this.element.id || false;
+		this.type = this.element.dataset.type || 'line';
+		this.source = this.element.dataset.source || false;
 
 		this.data = {};
 		this.extraData = {};
@@ -76,7 +76,7 @@ export default class Chart {
 	createChart = () => {
 		if (!this.data.series) return;
 
-		this.apexChart = new ApexCharts(this.chart, this.options);
+		this.apexChart = new ApexCharts(this.element, this.options);
 		this.apexChart.render();
 	};
 

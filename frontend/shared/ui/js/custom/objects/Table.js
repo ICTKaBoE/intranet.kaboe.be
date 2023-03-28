@@ -4,14 +4,14 @@ export default class Table {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.table = element;
-		this.id = this.table.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
-		this.source = this.table.dataset.source || false;
-		this.info = this.table.hasAttribute("data-info");
-		this.paging = this.table.hasAttribute("data-paging");
-		this.searching = this.table.hasAttribute("data-searching");
-		this.noRowsText = this.table.dataset.noRowsText || "No data found...";
+		this.source = this.element.dataset.source || false;
+		this.info = this.element.hasAttribute("data-info");
+		this.paging = this.element.hasAttribute("data-paging");
+		this.searching = this.element.hasAttribute("data-searching");
+		this.noRowsText = this.element.dataset.noRowsText || "No data found...";
 		this.extraData = {};
 
 		this.oldData = null;
@@ -35,23 +35,23 @@ export default class Table {
 	};
 
 	createStructure = () => {
-		if (!this.table.classList.contains('table')) this.table.classList.add("table");
-		if (!this.table.classList.contains('card-table')) this.table.classList.add("card-table");
-		if (!this.table.classList.contains('table-vcenter')) this.table.classList.add("table-vcenter");
-		if (!this.table.classList.contains('text-nowrap')) this.table.classList.add("text-nowrap");
-		if (!this.table.classList.contains('datatable')) this.table.classList.add("datatable");
+		if (!this.element.classList.contains('table')) this.element.classList.add("table");
+		if (!this.element.classList.contains('card-table')) this.element.classList.add("card-table");
+		if (!this.element.classList.contains('table-vcenter')) this.element.classList.add("table-vcenter");
+		if (!this.element.classList.contains('text-nowrap')) this.element.classList.add("text-nowrap");
+		if (!this.element.classList.contains('datatable')) this.element.classList.add("datatable");
 
-		this.thead = $(this.table).find("thead")[0];
-		this.tbody = $(this.table).find("tbody")[0];
+		this.thead = $(this.element).find("thead")[0];
+		this.tbody = $(this.element).find("tbody")[0];
 
 		if (undefined === this.thead) {
 			this.thead = document.createElement("thead");
-			this.table.appendChild(this.thead);
+			this.element.appendChild(this.thead);
 		}
 
 		if (undefined === this.tbody) {
 			this.tbody = document.createElement("tbody");
-			this.table.appendChild(this.tbody);
+			this.element.appendChild(this.tbody);
 		}
 	};
 
@@ -101,6 +101,8 @@ export default class Table {
 		} else {
 			$(this.data.rows).each((i, row) => {
 				let tr = document.createElement("tr");
+				if (row.id) tr.setAttribute("data-id", row.id);
+
 				if (this.data?.format?.row?.backgroundColorValue) tr.style.backgroundColor = Helpers.getObjectValue(row, this.data?.format?.row?.backgroundColorValue);
 				if (this.data?.format?.row?.textColorValue) tr.style.color = Helpers.getObjectValue(row, this.data?.format?.row?.textColorValue);
 
@@ -131,6 +133,12 @@ export default class Table {
 
 					tr.appendChild(td);
 				});
+
+				if (this.data?.actions?.row?.doubleClick) tr.ondblclick = () => {
+					this.uncheckAll();
+					$(tr).find("input:checkbox").prop("checked", true);
+					window[this.data?.actions?.row?.doubleClick]();
+				};
 
 				this.tbody.appendChild(tr);
 			});

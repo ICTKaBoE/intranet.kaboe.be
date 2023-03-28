@@ -3,6 +3,7 @@
 namespace Database\Interface;
 
 use Ouzo\Utilities\Arrays;
+use ReflectionObject;
 use ReflectionProperty;
 
 class CustomObject
@@ -52,6 +53,18 @@ class CustomObject
         $array = [];
         foreach ($this->objectAttributes as $objAtt) {
             $array[$objAtt] = $this->$objAtt;
+        }
+
+        return $array;
+    }
+
+    public function getKeys()
+    {
+        $array = [];
+        $reflect = new ReflectionObject($this);
+
+        foreach ($reflect->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+            $array[] = $prop->getName();
         }
 
         return $array;

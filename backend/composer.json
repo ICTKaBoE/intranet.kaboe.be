@@ -1,7 +1,7 @@
 {
     "require": {
         "letsdrink/ouzo-goodies": "^1.8",
-        "microsoft/microsoft-graph": "^1.52",
+        "microsoft/microsoft-graph": "^1.8",
         "clancats/hydrahon": "^1.1",
         "phpoffice/phpspreadsheet": "^1.22",
         "tecnickcom/tcpdf": "^6.4",

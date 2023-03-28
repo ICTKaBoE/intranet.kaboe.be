@@ -2,15 +2,15 @@ export default class Calendar {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.calendar = element;
-		this.id = this.calendar.id || false;
-		this.dateClick = this.calendar.dataset.dateClick || false;
-		this.source = this.calendar.dataset.source || false;
-		this.action = this.calendar.dataset.action || false;
+		this.element = element;
+		this.id = this.element.id || false;
+		this.dateClick = this.element.dataset.dateClick || false;
+		this.source = this.element.dataset.source || false;
+		this.action = this.element.dataset.action || false;
 
 		this.range = {};
-		this.range.start = this.calendar.dataset.rangeStart || false;
-		this.range.end = this.calendar.dataset.rangeEnd || false;
+		this.range.start = this.element.dataset.rangeStart || false;
+		this.range.end = this.element.dataset.rangeEnd || false;
 
 		if (String(this.source).charAt(0) == '[') {
 			this.source = String(this.source).replace("[", "").replace("]", "");
@@ -56,11 +56,11 @@ export default class Calendar {
 			else options.events = this.source;
 		}
 
-		this.calendarObject = new FullCalendar.Calendar(this.calendar, options);
-		this.calendarObject.render();
+		this.elementObject = new FullCalendar.Calendar(this.element, options);
+		this.elementObject.render();
 	};
 
 	reload = () => {
-		this.calendarObject.refetchEvents();
+		this.elementObject.refetchEvents();
 	};
 }

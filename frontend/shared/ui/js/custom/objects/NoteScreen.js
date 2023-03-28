@@ -4,10 +4,10 @@ export default class NoteScreen {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.notescreen = element;
-		this.id = this.notescreen.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
-		this.source = this.notescreen.dataset.source || false;
+		this.source = this.element.dataset.source || false;
 		this.data = null;
 
 		this.pages = {};
@@ -57,8 +57,8 @@ export default class NoteScreen {
 		this.articleContainer = document.createElement("div");
 		this.articleContainer.classList.add("col-9");
 
-		this.notescreen.appendChild(this.pagesContainer);
-		this.notescreen.appendChild(this.articleContainer);
+		this.element.appendChild(this.pagesContainer);
+		this.element.appendChild(this.articleContainer);
 	};
 
 	getData = () => {

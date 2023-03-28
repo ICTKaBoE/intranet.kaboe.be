@@ -38,4 +38,23 @@ class Staff extends CustomObject
 		"Iban",
 		"Bic"
 	];
+
+	public function init()
+	{
+		$this->removeArray();
+
+		if ($this->Geslacht == 1) $this->GeslachtForDB = "M";
+		else if ($this->Geslacht == 2) $this->GeslachtForDB = "F";
+		else $this->GeslachtForDB = "X";
+
+		if ($this->Actief == "J") $this->ActiefForDB = 1;
+		else $this->ActiefForDB = 0;
+	}
+
+	private function removeArray()
+	{
+		foreach ($this->objectAttributes as $attr) {
+			if (is_array($this->$attr)) $this->$attr = null;
+		}
+	}
 }

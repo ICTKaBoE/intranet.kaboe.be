@@ -2,6 +2,7 @@
 
 namespace Security;
 
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 
 abstract class Input
@@ -106,5 +107,48 @@ abstract class Input
 		if (Strings::isBlank($input)) return "";
 
 		return substr($input, 0, 2) . "." . substr($input, 2, 2) . "." . substr($input, 4, 2) . "-" . substr($input, 6, 3) . "." . substr($input, 9, 2);
+	}
+
+	static public function convertArrayToCsv($array, $delimiter = ";")
+	{
+		$csv = "";
+		$array = array_values($array);
+		$keys = $array[0]->getKeys();
+
+		$csv = implode($delimiter, $keys) . PHP_EOL;
+
+		foreach ($array as $row) {
+			$row = (array)$row;
+			$row = Arrays::filterByAllowedKeys($row, $keys);
+
+			$csv .= implode($delimiter, $row) . PHP_EOL;
+		}
+
+		return $csv;
+	}
+
+	static public function clean($input)
+	{
+		$utf8 = array(
+			'/[áàâãªä]/u'   =>   'a',
+			'/[ÁÀÂÃÄ]/u'    =>   'A',
+			'/[ÍÌÎÏ]/u'     =>   'I',
+			'/[íìîï]/u'     =>   'i',
+			'/[éèêë]/u'     =>   'e',
+			'/[ÉÈÊË]/u'     =>   'E',
+			'/[óòôõºö]/u'   =>   'o',
+			'/[ÓÒÔÕÖ]/u'    =>   'O',
+			'/[úùûü]/u'     =>   'u',
+			'/[ÚÙÛÜ]/u'     =>   'U',
+			'/ç/'           =>   'c',
+			'/Ç/'           =>   'C',
+			'/ñ/'           =>   'n',
+			'/Ñ/'           =>   'N',
+			'/–/'           =>   '', // UTF-8 hyphen to "normal" hyphen
+			'/[’‘‹›‚]/u'    =>   '', // Literally a single quote
+			'/[“”«»„]/u'    =>   '', // Double quote
+			'/ /'           =>   ' ', // nonbreaking space (equiv. to 0x160)
+		);
+		return preg_replace(array_keys($utf8), array_values($utf8), $input);
 	}
 }

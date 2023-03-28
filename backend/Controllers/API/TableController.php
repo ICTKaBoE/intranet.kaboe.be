@@ -10,6 +10,7 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\Helpdesk;
 use Database\Repository\NoteScreenArticle;
 use Database\Repository\NoteScreenPage;
 use Database\Repository\School;
@@ -391,6 +392,56 @@ class TableController extends ApiController
 		$rows = (new NoteScreenArticle)->getBySchoolId($schoolId);
 		Arrays::each($rows, fn ($nsa) => $nsa->link());
 		$this->appendToJson("rows", array_values($rows));
+		$this->handle();
+	}
+
+	public function helpdeskTickets($prefix, $scope)
+	{
+		$rows = [];
+
+		$this->appendToJson(["actions", "row", "doubleClick"], "viewDetails");
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Status",
+					"data" => "statusLabel",
+					"width" => 120
+				],
+				[
+					"title" => "Prioriteit",
+					"data" => "priorityLabel",
+					"width" => 120
+				],
+				[
+					"title" => "School",
+					"data" => "school.name",
+					"width" => 120
+				],
+				[
+					"title" => "Onderwerp",
+					"data" => "subject"
+				],
+				[
+					"title" => "Laatste activiteit",
+					"data" => "age",
+					"width" => 200
+				]
+			]
+		);
+
+		if (Strings::equal($scope, "mine")) $rows = (new Helpdesk)->getMine();
+		else if (Strings::equal($scope, "assigned")) $rows = (new Helpdesk)->getAssigned();
+		else $rows = (new Helpdesk)->get();
+
+		Arrays::each($rows, fn ($r) => $r->link());
+		$this->appendToJson("rows", array_values($rows));
+
 		$this->handle();
 	}
 }

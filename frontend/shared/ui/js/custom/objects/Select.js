@@ -4,21 +4,21 @@ export default class Select {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.select = element;
-		this.id = this.select.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
 		this.render = {};
-		this.render.item = this.select.dataset.renderItem || false;
-		this.render.option = this.select.dataset.renderOption || false;
-		this.onChange = this.select.dataset.onChange || false;
-		this.loadSource = this.select.dataset.loadSource || false;
-		this.loadValue = this.select.dataset.loadValue || 'id';
-		this.loadLabel = this.select.dataset.loadLabel || false;
+		this.render.item = this.element.dataset.renderItem || false;
+		this.render.option = this.element.dataset.renderOption || false;
+		this.onChange = this.element.dataset.onChange || false;
+		this.loadSource = this.element.dataset.loadSource || false;
+		this.loadValue = this.element.dataset.loadValue || 'id';
+		this.loadLabel = this.element.dataset.loadLabel || false;
 		this.loadParams = {};
-		this.defaultValue = this.select.dataset.defaultValue || false;
-		this.multiple = this.select.hasAttribute("multiple");
-		this.parent = this.select.dataset.parentSelect || false;
-		this.disabled = this.select.hasAttribute("disabled") || false;
+		this.defaultValue = this.element.dataset.defaultValue || false;
+		this.multiple = this.element.hasAttribute("multiple");
+		this.parent = this.element.dataset.parentSelect || false;
+		this.disabled = this.element.hasAttribute("disabled") || false;
 
 		this.init();
 	}
@@ -30,8 +30,8 @@ export default class Select {
 	}
 
 	init = async () => {
-		this.select.setAttribute("role", "select");
-		this.select.removeAttribute("disabled");
+		this.element.setAttribute("role", "select");
+		this.element.removeAttribute("disabled");
 
 		this.createSelect();
 		this.disable();
@@ -85,7 +85,7 @@ export default class Select {
 			};
 		}
 
-		this.tomSelect = new TomSelect(this.select, settings);
+		this.tomSelect = new TomSelect(this.element, settings);
 	};
 
 	loadSelect = () => {
@@ -124,12 +124,12 @@ export default class Select {
 
 	enable = () => {
 		if (this.tomSelect != undefined) this.tomSelect.enable();
-		else this.select.disabled = false;
+		else this.element.disabled = false;
 	};
 
 	disable = () => {
 		if (this.tomSelect != undefined) this.tomSelect.disable();
-		else this.select.disabled = true;
+		else this.element.disabled = true;
 	};
 
 	destroy = () => {

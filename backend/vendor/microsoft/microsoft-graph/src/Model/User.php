@@ -320,7 +320,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the createdDateTime
-    * The date and time the user was created, in ISO 8601 format and in UTC time. The value cannot be modified and is automatically populated when the entity is created. Nullable. For on-premises users, the value represents when they were first created in Azure AD. Property is null for some users created before June 2018 and on-premises users that were synced to Azure AD before June 2018. Read-only.  Read-only. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in).
+    * The date and time the user was created, in ISO 8601 format and in UTC time. The value cannot be modified and is automatically populated when the entity is created. Nullable. For on-premises users, the value represents when they were first created in Azure AD. Property is null for some users created before June 2018 and on-premises users that were synced to Azure AD before June 2018. Read-only. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in).
     *
     * @return \DateTime|null The createdDateTime
     */
@@ -339,7 +339,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the createdDateTime
-    * The date and time the user was created, in ISO 8601 format and in UTC time. The value cannot be modified and is automatically populated when the entity is created. Nullable. For on-premises users, the value represents when they were first created in Azure AD. Property is null for some users created before June 2018 and on-premises users that were synced to Azure AD before June 2018. Read-only.  Read-only. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in).
+    * The date and time the user was created, in ISO 8601 format and in UTC time. The value cannot be modified and is automatically populated when the entity is created. Nullable. For on-premises users, the value represents when they were first created in Azure AD. Property is null for some users created before June 2018 and on-premises users that were synced to Azure AD before June 2018. Read-only. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in).
     *
     * @param \DateTime $val The createdDateTime
     *
@@ -497,6 +497,39 @@ class User extends DirectoryObject
     public function setEmployeeId($val)
     {
         $this->_propDict["employeeId"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the employeeLeaveDateTime
+    * The date and time when the user left or will leave the organization. To read this property, the calling app must be assigned the User-LifeCycleInfo.Read.All permission. To write this property, the calling app must be assigned the User.Read.All and User-LifeCycleInfo.ReadWrite.All permissions. To read this property in delegated scenarios, the admin needs one of the following Azure AD roles: Lifecycle Workflows Administrator, Global Reader, or Global Administrator. To write this property in delegated scenarios, the admin needs the Global Administrator role. Supports $filter (eq, ne, not , ge, le, in). For more information, see Configure the employeeLeaveDateTime property for a user.
+    *
+    * @return \DateTime|null The employeeLeaveDateTime
+    */
+    public function getEmployeeLeaveDateTime()
+    {
+        if (array_key_exists("employeeLeaveDateTime", $this->_propDict)) {
+            if (is_a($this->_propDict["employeeLeaveDateTime"], "\DateTime") || is_null($this->_propDict["employeeLeaveDateTime"])) {
+                return $this->_propDict["employeeLeaveDateTime"];
+            } else {
+                $this->_propDict["employeeLeaveDateTime"] = new \DateTime($this->_propDict["employeeLeaveDateTime"]);
+                return $this->_propDict["employeeLeaveDateTime"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the employeeLeaveDateTime
+    * The date and time when the user left or will leave the organization. To read this property, the calling app must be assigned the User-LifeCycleInfo.Read.All permission. To write this property, the calling app must be assigned the User.Read.All and User-LifeCycleInfo.ReadWrite.All permissions. To read this property in delegated scenarios, the admin needs one of the following Azure AD roles: Lifecycle Workflows Administrator, Global Reader, or Global Administrator. To write this property in delegated scenarios, the admin needs the Global Administrator role. Supports $filter (eq, ne, not , ge, le, in). For more information, see Configure the employeeLeaveDateTime property for a user.
+    *
+    * @param \DateTime $val The employeeLeaveDateTime
+    *
+    * @return User
+    */
+    public function setEmployeeLeaveDateTime($val)
+    {
+        $this->_propDict["employeeLeaveDateTime"] = $val;
         return $this;
     }
 

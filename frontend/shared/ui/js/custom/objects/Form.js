@@ -7,14 +7,14 @@ export default class Form {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.form = element;
-		this.id = this.form.id || false;
-		this.method = this.form.method || 'POST';
-		this.action = this.form.action || false;
-		this.autocomplete = this.form.autocomplete || false;
-		this.prefill = this.form.dataset.prefill || false;
-		this.afterSubmit = this.form.dataset.afterSubmit || false;
-		this.lockedValue = this.form.dataset.lockedValue || false;
+		this.element = element;
+		this.id = this.element.id || false;
+		this.method = this.element.method || 'POST';
+		this.action = this.element.action || false;
+		this.autocomplete = this.element.autocomplete || false;
+		this.prefill = this.element.dataset.prefill || false;
+		this.afterSubmit = this.element.dataset.afterSubmit || false;
+		this.lockedValue = this.element.dataset.lockedValue || false;
 
 		if (this.method !== 'GET' || this.method !== 'POST') this.method = 'POST';
 
@@ -36,16 +36,16 @@ export default class Form {
 	};
 
 	disableAutocomplete = () => {
-		if (this.autocomplete !== false) this.form.autocomplete = "off";
+		if (this.autocomplete !== false) this.element.autocomplete = "off";
 	};
 
 	disableValidation = () => {
-		this.form.setAttribute("novalidate", "");
+		this.element.setAttribute("novalidate", "");
 	};
 
 	setRequireds = () => {
-		$(this.form).find("[required], select[required]").each((idx, el) => {
-			$(this.form).find(`[for='${el.id}'], [for='${el.id}-ts-control']`).addClass("required");
+		$(this.element).find("[required], select[required]").each((idx, el) => {
+			$(this.element).find(`[for='${el.id}'], [for='${el.id}-ts-control']`).addClass("required");
 		});
 	};
 
@@ -59,11 +59,11 @@ export default class Form {
 	};
 
 	attachEvent = (on, cb) => {
-		this.form.addEventListener(on, cb);
+		this.element.addEventListener(on, cb);
 	};
 
 	submit = () => {
-		let data = new FormData(this.form);
+		let data = new FormData(this.element);
 		this.disable();
 		Helpers.toggleWait();
 
@@ -83,7 +83,7 @@ export default class Form {
 			if (data.download) this.precessDownload(data.download);
 			if (data.reload) window.location.reload();
 			if (data.redirect) window.location.href = data.redirect;
-			if (data.reset) this.form.reset();
+			if (data.reset) this.element.reset();
 			if (data.toggleModal) Helpers.toggleModal(data.toggleModal);
 
 			if (this.afterSubmit) {
@@ -120,15 +120,15 @@ export default class Form {
 	};
 
 	resetValidation = () => {
-		$(this.form).find(":input").removeClass("is-valid").removeClass("is-invalid");
+		$(this.element).find(":input").removeClass("is-valid").removeClass("is-invalid");
 	};
 
 	processValidation = (data) => {
 		$.each(data, (input, validation) => {
-			$(this.form)
+			$(this.element)
 				.find(`[name='${input}']`)
 				.addClass(`is-${validation.state}`);
-			$(this.form)
+			$(this.element)
 				.find(`[data-feedback-input='${input}']`)
 				.html(validation.feedback);
 		});
@@ -221,15 +221,15 @@ export default class Form {
 	};
 
 	disable = () => {
-		$(this.form).find(":input").prop("disabled", true);
+		$(this.element).find(":input").prop("disabled", true);
 	};
 
 	enable = () => {
-		$(this.form).find(":input").prop("disabled", false);
+		$(this.element).find(":input").prop("disabled", false);
 	};
 
 	reset = () => {
 		this.resetValidation();
-		this.form.reset();
+		this.element.reset();
 	};
 }

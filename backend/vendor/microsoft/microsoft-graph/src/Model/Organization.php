@@ -204,6 +204,35 @@ class Organization extends DirectoryObject
     }
 
     /**
+    * Gets the defaultUsageLocation
+    * Two-letter ISO 3166 country code indicating the default service usage location of an organization.
+    *
+    * @return string|null The defaultUsageLocation
+    */
+    public function getDefaultUsageLocation()
+    {
+        if (array_key_exists("defaultUsageLocation", $this->_propDict)) {
+            return $this->_propDict["defaultUsageLocation"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the defaultUsageLocation
+    * Two-letter ISO 3166 country code indicating the default service usage location of an organization.
+    *
+    * @param string $val The defaultUsageLocation
+    *
+    * @return Organization
+    */
+    public function setDefaultUsageLocation($val)
+    {
+        $this->_propDict["defaultUsageLocation"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the displayName
     * The display name for the tenant.
     *
@@ -325,6 +354,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the partnerTenantType
+    * The type of partnership this tenant has with Microsoft. The possible values are: microsoftSupport, syndicatePartner, breadthPartner, breadthPartnerDelegatedAdmin, resellerPartnerDelegatedAdmin, valueAddedResellerPartnerDelegatedAdmin, unknownFutureValue. Nullable. For more information about the possible types, see partnerTenantType values.
     *
     * @return PartnerTenantType|null The partnerTenantType
     */
@@ -343,6 +373,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the partnerTenantType
+    * The type of partnership this tenant has with Microsoft. The possible values are: microsoftSupport, syndicatePartner, breadthPartner, breadthPartnerDelegatedAdmin, resellerPartnerDelegatedAdmin, valueAddedResellerPartnerDelegatedAdmin, unknownFutureValue. Nullable. For more information about the possible types, see partnerTenantType values.
     *
     * @param PartnerTenantType $val The partnerTenantType
     *
@@ -618,6 +649,7 @@ class Organization extends DirectoryObject
 
     /**
     * Gets the tenantType
+    * Not nullable. The tenant type option that was selected when the tenant was created. The possible values are:  AAD - An enterprise identity access management (IAM) service that serves business-to-employee and business-to-business (B2B) scenarios.  AAD B2C A customer identity access management (CIAM) service that serves business-to-consumer (B2C) scenarios.
     *
     * @return string|null The tenantType
     */
@@ -632,6 +664,7 @@ class Organization extends DirectoryObject
 
     /**
     * Sets the tenantType
+    * Not nullable. The tenant type option that was selected when the tenant was created. The possible values are:  AAD - An enterprise identity access management (IAM) service that serves business-to-employee and business-to-business (B2B) scenarios.  AAD B2C A customer identity access management (CIAM) service that serves business-to-consumer (B2C) scenarios.
     *
     * @param string $val The tenantType
     *

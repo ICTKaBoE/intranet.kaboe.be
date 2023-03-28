@@ -23,4 +23,12 @@ class Student extends Repository
 
 		return Arrays::firstOrNull($items);
 	}
+
+	public function getByInstituteNumber($iNumber)
+	{
+		$this->setInstituteNumber($iNumber);
+		$items = $this->get();
+
+		return $items;
+	}
 }

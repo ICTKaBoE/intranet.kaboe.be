@@ -781,6 +781,37 @@ class Application extends DirectoryObject
         return $this;
     }
 
+    /**
+    * Gets the requestSignatureVerification
+    *
+    * @return RequestSignatureVerification|null The requestSignatureVerification
+    */
+    public function getRequestSignatureVerification()
+    {
+        if (array_key_exists("requestSignatureVerification", $this->_propDict)) {
+            if (is_a($this->_propDict["requestSignatureVerification"], "\Microsoft\Graph\Model\RequestSignatureVerification") || is_null($this->_propDict["requestSignatureVerification"])) {
+                return $this->_propDict["requestSignatureVerification"];
+            } else {
+                $this->_propDict["requestSignatureVerification"] = new RequestSignatureVerification($this->_propDict["requestSignatureVerification"]);
+                return $this->_propDict["requestSignatureVerification"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the requestSignatureVerification
+    *
+    * @param RequestSignatureVerification $val The requestSignatureVerification
+    *
+    * @return Application
+    */
+    public function setRequestSignatureVerification($val)
+    {
+        $this->_propDict["requestSignatureVerification"] = $val;
+        return $this;
+    }
+
 
      /**
      * Gets the requiredResourceAccess
@@ -1052,6 +1083,34 @@ class Application extends DirectoryObject
     public function setWeb($val)
     {
         $this->_propDict["web"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the appManagementPolicies
+     *
+     * @return array|null The appManagementPolicies
+     */
+    public function getAppManagementPolicies()
+    {
+        if (array_key_exists("appManagementPolicies", $this->_propDict)) {
+           return $this->_propDict["appManagementPolicies"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the appManagementPolicies
+    *
+    * @param AppManagementPolicy[] $val The appManagementPolicies
+    *
+    * @return Application
+    */
+    public function setAppManagementPolicies($val)
+    {
+        $this->_propDict["appManagementPolicies"] = $val;
         return $this;
     }
 

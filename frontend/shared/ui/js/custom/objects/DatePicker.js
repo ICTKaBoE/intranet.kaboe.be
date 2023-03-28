@@ -4,8 +4,8 @@ export default class DatePicker {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.input = element;
-		this.id = this.input.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
 		this.init();
 	}
@@ -22,7 +22,7 @@ export default class DatePicker {
 
 	createPicker = () => {
 		let settings = {
-			element: this.input,
+			element: this.element,
 			lang: 'nl-BE',
 			buttonText: {
 				previousMonth: Helpers.loadIcon("chevron-left"),

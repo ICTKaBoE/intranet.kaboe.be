@@ -2,12 +2,12 @@ export default class Clock {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.clock = element;
-		this.id = this.clock.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
-		this.showDate = this.clock.hasAttribute("data-show-date") || false;
-		this.showTime = this.clock.hasAttribute("data-show-time") || false;
-		this.backgroundColor = this.clock.dataset.backgroundColor;
+		this.showDate = this.element.hasAttribute("data-show-date") || false;
+		this.showTime = this.element.hasAttribute("data-show-time") || false;
+		this.backgroundColor = this.element.dataset.backgroundColor;
 
 		this.init();
 	}
@@ -19,7 +19,7 @@ export default class Clock {
 	}
 
 	init = () => {
-		this.clock.style.backgroundColor = this.backgroundColor;
+		this.element.style.backgroundColor = this.backgroundColor;
 
 		this.displayTime();
 		setInterval(this.displayTime, 500);
@@ -47,6 +47,6 @@ export default class Clock {
 	};
 
 	displayTime = () => {
-		this.clock.innerHTML = this.getCurrentTime();
+		this.element.innerHTML = this.getCurrentTime();
 	};
 }

@@ -266,7 +266,7 @@ class CloudPcOnPremisesConnection extends Entity
 
     /**
     * Gets the managedBy
-    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, rpaBox, unknownFutureValue. Read-only.
+    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, unknownFutureValue, rpaBox. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: rpaBox. Read-only.
     *
     * @return CloudPcManagementService|null The managedBy
     */
@@ -285,7 +285,7 @@ class CloudPcOnPremisesConnection extends Entity
 
     /**
     * Sets the managedBy
-    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, rpaBox, unknownFutureValue. Read-only.
+    * Specifies which services manage the Azure network connection. Possible values are: windows365, devBox, unknownFutureValue, rpaBox. Note that you must use the Prefer: include-unknown-enum-members request header to get the following value(s) in this evolvable enum: rpaBox. Read-only.
     *
     * @param CloudPcManagementService $val The managedBy
     *
@@ -506,6 +506,7 @@ class CloudPcOnPremisesConnection extends Entity
 
     /**
     * Gets the virtualNetworkLocation
+    * Indicates resource location of the virtual target network. Read-only, computed value.
     *
     * @return string|null The virtualNetworkLocation
     */
@@ -520,6 +521,7 @@ class CloudPcOnPremisesConnection extends Entity
 
     /**
     * Sets the virtualNetworkLocation
+    * Indicates resource location of the virtual target network. Read-only, computed value.
     *
     * @param string $val The virtualNetworkLocation
     *

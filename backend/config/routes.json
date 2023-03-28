@@ -54,9 +54,29 @@
 					"function": "callback"
 				},
 				{
-					"path": "/user/sync",
-					"controller": "\\Controllers\\API\\UserController",
-					"function": "sync"
+					"path": "/sync/ad/user",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "adUser"
+				},
+				{
+					"path": "/sync/ad/computer",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "adComputer"
+				},
+				{
+					"path": "/sync/informat/staff",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "informatStaff"
+				},
+				{
+					"path": "/sync/informat/student",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "informatStudent"
+				},
+				{
+					"path": "/sync/management/staff",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "managementStaff"
 				},
 				{
 					"path": "/calendar/{prefix}/bike/home-work",

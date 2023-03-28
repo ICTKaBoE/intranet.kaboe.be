@@ -7,6 +7,7 @@ import DatePicker from './objects/DatePicker.js';
 import Clock from './objects/Clock.js';
 import NoteScreen from './objects/NoteScreen.js';
 import TinyMCE from './objects/TinyMCE.js';
+
 Select.ScanAndCreate();
 Calendar.ScanAndCreate();
 DatePicker.ScanAndCreate();

@@ -2,8 +2,8 @@ export default class TinyMCE {
 	static INSTANCES = {};
 
 	constructor(element) {
-		this.tinymce = element;
-		this.id = this.tinymce.id || false;
+		this.element = element;
+		this.id = this.element.id || false;
 
 		this.init();
 	}
