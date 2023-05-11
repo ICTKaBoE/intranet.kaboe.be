@@ -11,6 +11,7 @@ class School extends CustomObject
 		"name",
 		"color",
 		"logo",
+		"deviceNamePrefix",
 		"deleted"
 	];
 

@@ -14,17 +14,18 @@ window.editUserHomeWorkDistance = () => {
 		return;
 	}
 
-	Helpers.redirect(`/edit/${values[0]}`);
+	Helpers.redirect(`/edit/${values}`);
 };
 
 window.deleteUserHomeWorkDistance = () => {
 	let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
+
 	if (values.length === 0) {
 		alert("Gelieve 1 of meerdere afstanden te selecteren!");
 		return;
 	}
 
-	Helpers.redirect(`/delete/${values.join("-")}`);
+	Helpers.redirect(`/delete/${values}`);
 };
 
 let btnAdd = new Button({

@@ -15,7 +15,9 @@ export default class Form {
 		this.prefill = this.element.dataset.prefill || false;
 		this.afterSubmit = this.element.dataset.afterSubmit || false;
 		this.lockedValue = this.element.dataset.lockedValue || false;
+		this.noReserAfterSubmit = this.element.dataset.noReserAfterSubmit || false;
 
+		this.defaultStates = {};
 		if (this.method !== 'GET' || this.method !== 'POST') this.method = 'POST';
 
 		this.init();
@@ -28,11 +30,23 @@ export default class Form {
 	}
 
 	init = () => {
+		this.checkDefaultStates();
 		this.disableAutocomplete();
 		this.disableValidation();
 		this.setRequireds();
 		this.attachDefaultEvents();
 		this.prefillForm();
+	};
+
+	checkDefaultStates = () => {
+		$(this.element).find(":input").each((id, el) => {
+			if (!el.id) return;
+
+			this.defaultStates[el.id] = {
+				readonly: el.hasAttribute("readonly"),
+				disabled: el.hasAttribute("disabled")
+			};
+		});
 	};
 
 	disableAutocomplete = () => {
@@ -68,7 +82,7 @@ export default class Form {
 		Helpers.toggleWait();
 
 		let done = (returnData) => {
-			this.resetAfterSubmit();
+			if (!this.noReserAfterSubmit) this.resetAfterSubmit();
 		};
 
 		let fail = (returnData) => {
@@ -91,8 +105,8 @@ export default class Form {
 			}
 
 			setTimeout(() => {
-				this.enable();
 				Helpers.toggleWait();
+				this.enable();
 			}, 500);
 		};
 
@@ -193,8 +207,10 @@ export default class Form {
 
 	setFieldValue = (field, value) => {
 		switch (field.role) {
-			case 'select':
+			case 'select': {
+				Select.INSTANCES[field.id].defaultValue = value;
 				Select.INSTANCES[field.id].setValue(value);
+			}
 				break;
 
 			case 'datepicker':
@@ -221,11 +237,22 @@ export default class Form {
 	};
 
 	disable = () => {
-		$(this.element).find(":input").prop("disabled", true);
+		$(this.element).find(":input").each((idx, el) => {
+			if (!el.id) return;
+
+			if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.disable();
+			else el.setAttribute("disabled", "");
+		});
 	};
 
 	enable = () => {
-		$(this.element).find(":input").prop("disabled", false);
+		$(this.element).find(":input").each((idx, el) => {
+			if (!el.id) return;
+			if (this.defaultStates[el.id]?.disabled === true) return;
+
+			if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.enable();
+			else el.removeAttribute("disabled");
+		});
 	};
 
 	reset = () => {

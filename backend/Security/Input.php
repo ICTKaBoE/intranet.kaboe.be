@@ -48,6 +48,7 @@ abstract class Input
 	static public function empty($input)
 	{
 		if (self::check($input, self::INPUT_TYPE_ARRAY)) return empty($input);
+		if (self::check($input, self::INPUT_TYPE_INT) !== false && (int)$input == 0) return false;
 
 		return Strings::isBlank($input) || is_null($input) || empty($input);
 	}

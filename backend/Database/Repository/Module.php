@@ -16,6 +16,7 @@ class Module extends Repository
 	public function getByScope($scope)
 	{
 		$statement = $this->prepareSelect();
+		$statement->where("visible", 1);
 		$statement->where('scope', 'LIKE', "%$scope%");
 
 		return $this->executeSelect($statement);

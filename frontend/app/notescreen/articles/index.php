@@ -6,9 +6,7 @@
 				<select name="sel{{page:id}}" id="sel{{page:id}}" data-load-source="{{select:action}}/school" data-default-value="{{user:profile:mainSchoolId}}" data-load-value="id" data-load-label="name" data-on-change="loadTable" required></select>
 			</div>
 
-			<div class="table-responsive">
-				<table role="table" id="tbl{{page:id}}" data-source="{{table:action}}"></table>
-			</div>
+			<table role="table" id="tbl{{page:id}}" data-source="{{table:action}}"></table>
 		</div>
 	</div>
 </div>

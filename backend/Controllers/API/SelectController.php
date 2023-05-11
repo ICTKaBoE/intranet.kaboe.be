@@ -14,6 +14,12 @@ use Database\Repository\UserAddress;
 use Database\Repository\UserProfile;
 use Database\Repository\NoteScreenPage;
 use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\ManagementBuilding;
+use Database\Repository\ManagementCabinet;
+use Database\Repository\ManagementComputer;
+use Database\Repository\ManagementPatchpanel;
+use Database\Repository\ManagementRoom;
+use Helpers\Mapping;
 
 class SelectController extends ApiController
 {
@@ -122,7 +128,7 @@ class SelectController extends ApiController
 		$this->handle();
 	}
 
-	public function settingsRightsUsers()
+	public function users()
 	{
 		$this->appendToJson("items", Arrays::orderBy(Arrays::filter((new LocalUser)->get(), fn ($lu) => Strings::isNotBlank($lu->fullName)), "fullName"));
 		$this->handle();
@@ -131,6 +137,172 @@ class SelectController extends ApiController
 	public function notescreenPages()
 	{
 		$this->appendToJson("items", (new NoteScreenPage)->getBySchoolId((new UserProfile)->getByUserId(User::getLoggedInUser()->id)->mainSchoolId));
+		$this->handle();
+	}
+
+	public function helpdeskPriority()
+	{
+		$_items = Mapping::get("helpdesk/priority");
+		$items = [];
+
+		foreach ($_items as $item => $rest) {
+			$items[] = [
+				"id" => $item,
+				...$rest
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function helpdeskStatus()
+	{
+		$_items = Mapping::get("helpdesk/status");
+		$items = [];
+
+		foreach ($_items as $item => $rest) {
+			$items[] = [
+				"id" => $item,
+				...$rest
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function helpdeskType()
+	{
+		$_items = Mapping::get("helpdesk/type");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function helpdeskSubtype()
+	{
+		$_items = Mapping::get("helpdesk/subtype");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function managementBuilding()
+	{
+		$schoolId = Helpers::input()->get('parentValue');
+
+		$this->appendToJson("items", (new ManagementBuilding)->getBySchool($schoolId));
+		$this->handle();
+	}
+
+	public function managementRoom()
+	{
+		$buildingId = Helpers::input()->get('parentValue');
+
+		if (is_null($buildingId)) $this->appendToJson('items', []);
+		else {
+			$items = (new ManagementRoom)->getByBuilding($buildingId);
+			$items = Arrays::orderBy($items, "fullNumber");
+			$this->appendToJson("items", $items);
+		}
+		$this->handle();
+	}
+
+	public function managementCabinet()
+	{
+		$roomId = Helpers::input()->get('parentValue');
+
+		if (is_null($roomId)) $this->appendToJson('items', []);
+		else {
+			$items = (new ManagementCabinet)->getByRoom($roomId);
+			$this->appendToJson("items", $items);
+		}
+		$this->handle();
+	}
+
+	public function managementPatchpanel()
+	{
+		$cabinetId = Helpers::input()->get('parentValue');
+
+		if (is_null($cabinetId)) $this->appendToJson('items', []);
+		else {
+			$items = (new ManagementPatchpanel)->getByCabinet($cabinetId);
+			$this->appendToJson("items", $items);
+		}
+		$this->handle();
+	}
+
+	public function managementComputerType()
+	{
+		$_items = Mapping::get("management/computer/type");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function managementComputerOSType()
+	{
+		$_items = Mapping::get("management/computer/osType");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function managementComputerOSArchitecture()
+	{
+		$_items = Mapping::get("management/computer/osArchitecture");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function managementComputer()
+	{
+		$schoolId = Helpers::url()->getParam("schoolId");
+		$type = Helpers::url()->getParam("type");
+
+		$this->appendToJson("items", (new ManagementComputer)->getBySchoolAndType($schoolId, $type));
 		$this->handle();
 	}
 }

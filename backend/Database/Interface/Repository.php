@@ -44,20 +44,20 @@ class Repository
         return $statement;
     }
 
-    protected function executeSelect($statement)
+    protected function executeSelect($statement, $nl2br = true)
     {
         $objects = [];
         $rows = $statement->get();
 
-        foreach ($rows as $row) $objects[] = new $this->object($row);
+        foreach ($rows as $row) $objects[] = new $this->object($row, nl2br: $nl2br);
 
         return $objects;
     }
 
-    public function get($id = null, $order = true, $deleted = false)
+    public function get($id = null, $order = true, $deleted = false, $nl2br = true)
     {
         $statement = $this->prepareSelect($id, $order, $deleted);
-        return $this->executeSelect($statement);
+        return $this->executeSelect($statement, $nl2br);
     }
 
     public function set(CustomObject $object)

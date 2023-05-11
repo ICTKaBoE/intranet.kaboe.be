@@ -1,7 +1,5 @@
 <div class="card">
-	<div class="table-responsive">
-		<table role="table" id="tbl{{page:id}}" data-source="{{table:action}}"></table>
-	</div>
+	<table role="table" id="tbl{{page:id}}" data-source="{{table:action}}"></table>
 </div>
 
 <div class="modal modal-blur fade" id="modal-{{page:id}}" tabindex="-1" style="display: none;" aria-hidden="true" role="dialog">

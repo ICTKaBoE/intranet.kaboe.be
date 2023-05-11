@@ -18,6 +18,11 @@
 					"controller": "\\Controllers\\APP\\SettingsController",
 					"function": "general"
 				},
+				{
+					"path": "/helpdesk/details",
+					"controller": "\\Controllers\\APP\\HelpdeskController",
+					"function": "details"
+				},
 				"/{module?}/{page?}/{method?}/{id?}"
 			]
 		}
@@ -57,11 +62,6 @@
 					"path": "/sync/ad/user",
 					"controller": "\\Controllers\\API\\SyncController",
 					"function": "adUser"
-				},
-				{
-					"path": "/sync/ad/computer",
-					"controller": "\\Controllers\\API\\SyncController",
-					"function": "adComputer"
 				},
 				{
 					"path": "/sync/informat/staff",
@@ -104,6 +104,11 @@
 					"function": "checkStudentRelationInsz"
 				},
 				{
+					"path": "/table/{prefix}/user/address",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "userAddress"
+				},
+				{
 					"path": "/table/{prefix}/settings/rights",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "settingsRights"
@@ -119,6 +124,66 @@
 					"function": "noteScreenArticles"
 				},
 				{
+					"path": "/table/{prefix}/helpdesk/{type}",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "helpdesk"
+				},
+				{
+					"path": "/table/{prefix}/management/building",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementBuilding"
+				},
+				{
+					"path": "/table/{prefix}/management/rooms",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementRoom"
+				},
+				{
+					"path": "/table/{prefix}/management/cabinet",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementCabinet"
+				},
+				{
+					"path": "/table/{prefix}/management/patchpanel",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementPatchpanel"
+				},
+				{
+					"path": "/table/{prefix}/management/firewall",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementFirewall"
+				},
+				{
+					"path": "/table/{prefix}/management/switch",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementSwitch"
+				},
+				{
+					"path": "/table/{prefix}/management/accesspoint",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementAccesspoint"
+				},
+				{
+					"path": "/table/{prefix}/management/computer",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementComputer"
+				},
+				{
+					"path": "/table/{prefix}/management/peripheral",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementPeripheral"
+				},
+				{
+					"path": "/table/{prefix}/management/printer",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementPrinter"
+				},
+				{
+					"path": "/table/{prefix}/management/cable",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementCable"
+				},
+				{
 					"path": "/select/{prefix}/bike/export/months",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "months"
@@ -130,7 +195,10 @@
 						"/select/{prefix}/user/profile/school",
 						"/select/{prefix}/checklists/checkStudentRelationInsz/school",
 						"/select/{prefix}/notescreen/pages/school",
-						"/select/{prefix}/notescreen/articles/school"
+						"/select/{prefix}/notescreen/articles/school",
+						"/select/{prefix}/helpdesk/details/school",
+						"/select/{prefix}/helpdesk/mine/new/school",
+						"/select/{prefix}/management/{page}/{method?}/{id?}/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "school"
@@ -154,14 +222,86 @@
 					"function": "userAddress"
 				},
 				{
-					"path": "/select/{prefix}/settings/rights/{method}/{moduleId?}/users",
+					"path": [
+						"/select/{prefix}/settings/rights/{method}/{moduleId?}/users",
+						"/select/{prefix}/helpdesk/details/users"
+					],
 					"controller": "\\Controllers\\API\\SelectController",
-					"function": "settingsRightsUsers"
+					"function": "users"
 				},
 				{
 					"path": "/select/{prefix}/notescreen/articles/{method}/{id?}/pages",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "notescreenPages"
+				},
+				{
+					"path": [
+						"/select/{prefix}/helpdesk/details/priority",
+						"/select/{prefix}/helpdesk/mine/new/priority"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "helpdeskPriority"
+				},
+				{
+					"path": "/select/{prefix}/helpdesk/details/status",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "helpdeskStatus"
+				},
+				{
+					"path": [
+						"/select/{prefix}/helpdesk/details/type",
+						"/select/{prefix}/helpdesk/mine/new/type"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "helpdeskType"
+				},
+				{
+					"path": [
+						"/select/{prefix}/helpdesk/details/subtype",
+						"/select/{prefix}/helpdesk/mine/new/subtype"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "helpdeskSubtype"
+				},
+				{
+					"path": "/select/{prefix}/helpdesk/mine/new/computer",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementComputer"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/building",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementBuilding"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/room",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementRoom"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/cabinet",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementCabinet"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/patchpanel",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementPatchpanel"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/type",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementComputerType"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/ostype",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementComputerOSType"
+				},
+				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/osarchitecture",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementComputerOSArchitecture"
 				},
 				{
 					"path": "/form/{prefix}/bike/distances/{method}/{id}",
@@ -204,6 +344,51 @@
 					"function": "notescreenArticles"
 				},
 				{
+					"path": "/form/{prefix}/helpdesk/details/details/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "helpdeskDetails"
+				},
+				{
+					"path": "/form/{prefix}/management/building/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementBuilding"
+				},
+				{
+					"path": "/form/{prefix}/management/rooms/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementRoom"
+				},
+				{
+					"path": "/form/{prefix}/management/cabinet/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementCabinet"
+				},
+				{
+					"path": "/form/{prefix}/management/patchpanel/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementPatchpanel"
+				},
+				{
+					"path": "/form/{prefix}/management/firewall/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementFirewall"
+				},
+				{
+					"path": "/form/{prefix}/management/switch/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementSwitch"
+				},
+				{
+					"path": "/form/{prefix}/management/accesspoint/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementAccesspoint"
+				},
+				{
+					"path": "/form/{prefix}/management/computer/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementComputer"
+				},
+				{
 					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
 					"controller": "\\Controllers\\API\\NoteScreenController",
 					"function": "viewscreen"
@@ -230,6 +415,11 @@
 				}
 			],
 			"post": [
+				{
+					"path": "/sync/ad/management/computer",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "adManagementComputer"
+				},
 				{
 					"path": "/form/{prefix}/user/login",
 					"controller": "\\Controllers\\API\\UserController",
@@ -304,6 +494,81 @@
 					"path": "/form/{prefix}/maintenance/requests/{method}/{id?}",
 					"controller": "\\Controllers\\API\\MaintenanceController",
 					"function": "request"
+				},
+				{
+					"path": "/form/{prefix}/helpdesk/details/details/{id}",
+					"controller": "\\Controllers\\API\\HelpdeskController",
+					"function": "details"
+				},
+				{
+					"path": "/form/{prefix}/helpdesk/details/thread/{id}",
+					"controller": "\\Controllers\\API\\HelpdeskController",
+					"function": "thread"
+				},
+				{
+					"path": "/form/{prefix}/helpdesk/mine/new",
+					"controller": "\\Controllers\\API\\HelpdeskController",
+					"function": "newTicket"
+				},
+				{
+					"path": "/form/{prefix}/management/building/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "building"
+				},
+				{
+					"path": "/form/{prefix}/management/rooms/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "room"
+				},
+				{
+					"path": "/form/{prefix}/management/cabinet/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "cabinet"
+				},
+				{
+					"path": "/form/{prefix}/management/patchpanel/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "patchpanel"
+				},
+				{
+					"path": "/form/{prefix}/management/firewall/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "firewall"
+				},
+				{
+					"path": "/form/{prefix}/management/switch/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "switch"
+				},
+				{
+					"path": "/form/{prefix}/management/accesspoint/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "accesspoint"
+				},
+				{
+					"path": "/form/{prefix}/management/computer/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "computer"
+				},
+				{
+					"path": "/form/{prefix}/management/peripheral/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "peripheral"
+				},
+				{
+					"path": "/form/{prefix}/management/printer/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "printer"
+				},
+				{
+					"path": "/form/{prefix}/management/cable/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "cable"
+				},
+				{
+					"path": "/{prefix}/helpdesk/open/claim/{id}",
+					"controller": "\\Controllers\\API\\HelpdeskController",
+					"function": "claim"
 				},
 				{
 					"path": "/taskboard/{prefix}/maintenance/requests/{id}/{status}",

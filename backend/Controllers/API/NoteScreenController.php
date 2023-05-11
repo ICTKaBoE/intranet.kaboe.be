@@ -27,7 +27,7 @@ class NoteScreenController extends ApiController
 	{
 		$name = Helpers::input()->post('name')->getValue();
 
-		if (!Input::check($name) && Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
 		if ($this->validationIsAllGood()) {
 			$repo = new NoteScreenPage;
@@ -70,8 +70,8 @@ class NoteScreenController extends ApiController
 		$content = Helpers::input()->post('content')->getValue();
 		$displayTime = Helpers::input()->post('displayTime')->getValue();
 
-		if (!Input::check($title) && Input::empty($title)) $this->setValidation("title", "Titel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-		if (!Input::check($pageId, Input::INPUT_TYPE_INT) && Input::empty($pageId)) $this->setValidation("pageId", "Pagina moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($title) || Input::empty($title)) $this->setValidation("title", "Titel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($pageId, Input::INPUT_TYPE_INT) || Input::empty($pageId)) $this->setValidation("pageId", "Pagina moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
 		if ($this->validationIsAllGood()) {
 			$repo = new NoteScreenArticle;

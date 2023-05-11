@@ -40,6 +40,7 @@ class DefaultController
 		$this->loadContent();
 		$this->loadActions();
 		$this->loadOthers();
+		$this->loadUrlParams();
 		$this->loadSettings();
 		$this->loadUserDetails();
 	}
@@ -127,6 +128,13 @@ class DefaultController
 	{
 		foreach ($this->getSettings() as $setting) {
 			$this->layout = str_replace('{{' . $setting->id . '}}', $setting->value, $this->layout);
+		}
+	}
+
+	private function loadUrlParams()
+	{
+		foreach (Helpers::url()->getParams() as $key => $value) {
+			$this->layout = str_replace("{{url:param:{$key}}}", $value, $this->layout);
 		}
 	}
 

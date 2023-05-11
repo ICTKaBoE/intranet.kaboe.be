@@ -10,21 +10,28 @@ class CustomObject
 {
     protected $objectAttributes = [];
     protected $encodeAttributes = [];
+    protected $nl2br = [];
     protected $linkObjects = true;
 
-    public function __construct($attributes = [], $encode = false)
+    public function __construct($attributes = [], $encode = false, $nl2br = true)
     {
         foreach ($this->objectAttributes as $objAtt) {
             $this->$objAtt = Arrays::getValue($attributes, $objAtt, null);
         }
 
         $this->encode();
+        if ($nl2br) $this->nl2br();
         $this->init();
     }
 
     public function encode()
     {
         foreach ($this->encodeAttributes as $encode) $this->$encode = utf8_encode($this->$encode);
+    }
+
+    public function nl2br()
+    {
+        foreach ($this->nl2br as $nl) $this->$nl = nl2br($this->$nl);
     }
 
     public function init()

@@ -18,8 +18,11 @@ export default class Select {
 		this.defaultValue = this.element.dataset.defaultValue || false;
 		this.multiple = this.element.hasAttribute("multiple");
 		this.parent = this.element.dataset.parentSelect || false;
-		this.disabled = this.element.hasAttribute("disabled") || false;
+		this.defaultDisabled = this.element.hasAttribute("disabled") || false;
 
+		this.eventListeners = [];
+
+		this.loaded = false;
 		this.init();
 	}
 
@@ -27,6 +30,16 @@ export default class Select {
 		$("select").each((ids, el) => {
 			Select.INSTANCES[el.id] = new Select(el);
 		});
+	}
+
+	static Loaded() {
+		let allLoaded = true;
+
+		Object.keys(Select.INSTANCES).forEach(key => {
+			if (!Select.INSTANCES[key].loaded) allLoaded = false;
+		});
+
+		return allLoaded;
 	}
 
 	init = async () => {
@@ -38,18 +51,22 @@ export default class Select {
 		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
 		this.setDefaultValue();
-		if (!this.disabled) this.enable();
+		if (!this.defaultDisabled) this.enable();
+		this.loaded = true;
 	};
 
 	reload = async () => {
+		this.loaded = false;
 		this.disable();
 		this.clear();
 		this.destroy();
 		this.createSelect();
 		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
+		this.setEventListeners();
 		this.setDefaultValue();
-		if (!this.disabled) this.enable();
+		if (!this.defaultDisabled) this.enable();
+		this.loaded = true;
 	};
 
 	createSelect = () => {
@@ -102,19 +119,39 @@ export default class Select {
 
 	setDefaultValue = () => {
 		if (this.defaultValue) {
-			this.setValue(this.defaultValue);
+			this.setValue(this.defaultValue, false);
 		}
 	};
 
-	setValue = (value) => {
-		this.tomSelect.setValue(value, false);
+	setValue = (value, silent = false) => {
+		this.tomSelect.setValue(value, silent);
 	};
 
 	getValue = () => {
 		return this.tomSelect.getValue();
 	};
 
+	getItemDetails = () => {
+		let value = this.getValue();
+		let details = null;
+
+		$.each(this.tomSelect.options, (idx, opt) => {
+			if (opt[this.loadValue] == value) {
+				details = opt;
+			}
+		});
+
+		return details;
+	};
+
+	setEventListeners = () => {
+		Object.keys(this.eventListeners).forEach(key => {
+			this.setEventListener(key, this.eventListeners[key]);
+		});
+	};
+
 	setEventListener = (event, callback) => {
+		this.eventListeners[event] = callback;
 		this.tomSelect.on(event, callback);
 	};
 
@@ -123,6 +160,8 @@ export default class Select {
 	};
 
 	enable = () => {
+		if (this.defaultDisabled) return;
+
 		if (this.tomSelect != undefined) this.tomSelect.enable();
 		else this.element.disabled = false;
 	};
@@ -148,7 +187,6 @@ export default class Select {
 				this.setExtraLoadParam('parentValue', value);
 				this.reload();
 			});
-
 		}
 	};
 }

@@ -97,11 +97,11 @@ class BikeController extends ApiController
 		$distance = Helpers::input()->post('distance')->getValue();
 		$color = Helpers::input()->post('color', false)->getValue();
 
-		if (!Input::check($alias) && Input::empty($alias)) $this->setValidation("alias", "Alias moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-		if (!Input::check($startAddress) && Input::empty($startAddress)) $this->setValidation("startAddressId", "Start adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-		if (!Input::check($endSchool) && Input::empty($endSchool)) $this->setValidation("endSchoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-		if (!Input::check($distance) && Input::empty($distance)) $this->setValidation("distance", "Afstand moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-		if (!Input::check($color) && Input::empty($color)) $this->setValidation("color", "Kleur moet aangeduid zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($alias) || Input::empty($alias)) $this->setValidation("alias", "Alias moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($startAddress) || Input::empty($startAddress)) $this->setValidation("startAddressId", "Start adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($endSchool) || Input::empty($endSchool)) $this->setValidation("endSchoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($distance) || Input::empty($distance)) $this->setValidation("distance", "Afstand moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		if (!Input::check($color) || Input::empty($color)) $this->setValidation("color", "Kleur moet aangeduid zijn!", self::VALIDATION_STATE_INVALID);
 
 		if ($this->validationIsAllGood()) {
 			if ($id) {

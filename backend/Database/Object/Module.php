@@ -20,6 +20,7 @@ class Module extends CustomObject
 		"redirect",
 		"assignUserRights",
 		"defaultRights",
+		"visible",
 		"deleted"
 	];
 

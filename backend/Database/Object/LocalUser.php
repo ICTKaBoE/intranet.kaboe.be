@@ -23,8 +23,6 @@ class LocalUser extends CustomObject
 	];
 
 	protected $encodeAttributes = [
-		"name",
-		"firstName",
 		"jobTitle",
 		"companyName"
 	];

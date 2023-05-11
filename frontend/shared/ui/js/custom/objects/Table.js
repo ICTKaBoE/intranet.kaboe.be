@@ -8,10 +8,8 @@ export default class Table {
 		this.id = this.element.id || false;
 
 		this.source = this.element.dataset.source || false;
-		this.info = this.element.hasAttribute("data-info");
-		this.paging = this.element.hasAttribute("data-paging");
-		this.searching = this.element.hasAttribute("data-searching");
-		this.noRowsText = this.element.dataset.noRowsText || "No data found...";
+		this.noRowsText = this.element.dataset.noRowsText || "No Data Found...";
+		this.doubleClick = this.element.dataset.doubleClick || false;
 		this.extraData = {};
 
 		this.oldData = null;
@@ -36,9 +34,10 @@ export default class Table {
 
 	createStructure = () => {
 		if (!this.element.classList.contains('table')) this.element.classList.add("table");
+		if (!this.element.classList.contains('table-responsive')) this.element.classList.add("table-responsive");
 		if (!this.element.classList.contains('card-table')) this.element.classList.add("card-table");
 		if (!this.element.classList.contains('table-vcenter')) this.element.classList.add("table-vcenter");
-		if (!this.element.classList.contains('text-nowrap')) this.element.classList.add("text-nowrap");
+		// if (!this.element.classList.contains('text-nowrap')) this.element.classList.add("text-nowrap");
 		if (!this.element.classList.contains('datatable')) this.element.classList.add("datatable");
 
 		this.thead = $(this.element).find("thead")[0];
@@ -103,8 +102,8 @@ export default class Table {
 				let tr = document.createElement("tr");
 				if (row.id) tr.setAttribute("data-id", row.id);
 
-				if (this.data?.format?.row?.backgroundColorValue) tr.style.backgroundColor = Helpers.getObjectValue(row, this.data?.format?.row?.backgroundColorValue);
-				if (this.data?.format?.row?.textColorValue) tr.style.color = Helpers.getObjectValue(row, this.data?.format?.row?.textColorValue);
+				if (this.data?.format?.row?.backgroundColorValue) tr.style.backgroundColor = Helpers.getObjectValue(row, this.data?.format?.row?.backgroundColorValue) || "";
+				if (this.data?.format?.row?.textColorValue) tr.style.color = Helpers.getObjectValue(row, this.data?.format?.row?.textColorValue) || "";
 
 				$(this.data.columns).each((j, column) => {
 					let td = document.createElement("td");
@@ -121,23 +120,39 @@ export default class Table {
 						td.appendChild(checkbox);
 					} else if (column.type === "icon") {
 						let iconWrapper = document.createElement("span");
-						let icon = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0], column?.type || 'string', column?.format, row);
+						let icon = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0] || "", column?.type || 'string', column?.format, row);
 
-						if (column.hoverValue && Helpers.getObjectValue(row, column.hoverValue)[0]) iconWrapper.title = Helpers.getObjectValue(row, column.hoverValue)[0];
+						if (column.hoverValue && Helpers.getObjectValue(row, column.hoverValue)[0] || "") iconWrapper.title = Helpers.getObjectValue(row, column.hoverValue)[0];
 
 						iconWrapper.innerHTML = icon;
 						td.appendChild(iconWrapper);
+					} else if (column.type === "badge") {
+						let badge = document.createElement("span");
+						badge.classList.add("badge");
+
+						if (column.backgroundColor) badge.classList.add(`bg-${Helpers.getObjectValue(row, column.backgroundColor)[0] || ""}`);
+						if (column.backgroundColorCustom) badge.style.backgroundColor = Helpers.getObjectValue(row, column.backgroundColorCustom)[0] || "";
+						if (column.data) badge.innerHTML = Helpers.getObjectValue(row, column.data)[0] || "";
+
+						td.appendChild(badge);
+					} else if (column.type === "url") {
+						let url = document.createElement("A");
+						url.href = `http://${Helpers.getObjectValue(row, column.data)[0]}`;
+						url.target = "_blank";
+						url.innerHTML = Helpers.getObjectValue(row, column.data)[0];
+
+						td.appendChild(url);
 					} else {
-						td.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0], column?.type || 'string', column?.format, row);
+						td.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0] || "", column?.type || 'string', column?.format, row);
 					}
 
 					tr.appendChild(td);
 				});
 
-				if (this.data?.actions?.row?.doubleClick) tr.ondblclick = () => {
+				if (this.doubleClick) tr.ondblclick = () => {
 					this.uncheckAll();
 					$(tr).find("input:checkbox").prop("checked", true);
-					window[this.data?.actions?.row?.doubleClick]();
+					window[this.doubleClick]();
 				};
 
 				this.tbody.appendChild(tr);

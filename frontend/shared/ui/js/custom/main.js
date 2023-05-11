@@ -7,6 +7,7 @@ import DatePicker from './objects/DatePicker.js';
 import Clock from './objects/Clock.js';
 import NoteScreen from './objects/NoteScreen.js';
 import TinyMCE from './objects/TinyMCE.js';
+import Helpers from './objects/Helpers.js';
 
 Select.ScanAndCreate();
 Calendar.ScanAndCreate();
@@ -15,9 +16,11 @@ Table.ScanAndCreate();
 Chart.ScanAndCreate();
 TinyMCE.ScanAndCreate();
 
-setTimeout(() => {
+window.checkAllLoadedCallback = () => {
 	Form.ScanAndCreate();
 
 	Clock.ScanAndCreate();
 	NoteScreen.ScanAndCreate();
-}, 1000);
+};
+
+Helpers.CheckAllLoaded(window.checkAllLoadedCallback);

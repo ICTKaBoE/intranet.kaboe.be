@@ -1,0 +1,75 @@
+{
+	"helpdesk": {
+		"priority": {
+			"L": {
+				"description": "Laag",
+				"color": "green"
+			},
+			"M": {
+				"description": "Middelmatig",
+				"color": "orange"
+			},
+			"H": {
+				"description": "Hoog",
+				"color": "red"
+			}
+		},
+		"status": {
+			"N": {
+				"description": "Nieuw",
+				"color": "blue"
+			},
+			"O": {
+				"description": "Open",
+				"color": "green"
+			},
+			"AC": {
+				"description": "Wachtend op controle",
+				"color": "orange"
+			},
+			"AO": {
+				"description": "Wachtend op bestelling",
+				"color": "orange"
+			},
+			"AR": {
+				"description": "Wachtend op herstelling",
+				"color": "red"
+			},
+			"C": {
+				"description": "Gesloten",
+				"color": "secondary"
+			}
+		},
+		"type": {
+			"L": "Laptop",
+			"D": "Desktop",
+			"B": "Beamer",
+			"P": "Printer",
+			"O": "Andere"
+		},
+		"subtype": {
+			"B": "Batterij",
+			"K": "Toetsenbord",
+			"M": "Muis",
+			"S": "Scherm",
+			"O": "Andere"
+		}
+	},
+	"management": {
+		"computer": {
+			"type": {
+				"L": "Laptop",
+				"D": "Desktop"
+			},
+			"osType": {
+				"W": "Windows",
+				"L": "Linux",
+				"C": "CentOS"
+			},
+			"osArchitecture": {
+				"32": "32-bit",
+				"64": "64-bit"
+			}
+		}
+	}
+}

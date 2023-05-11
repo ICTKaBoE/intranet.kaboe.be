@@ -31,6 +31,7 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
             'PhpZip\\' => 7,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'Pecee\\' => 6,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'O' => 
         array (
@@ -92,6 +93,10 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
         'Pecee\\' => 
         array (
             0 => __DIR__ . '/..' . '/pecee/simple-router/src/Pecee',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'Ouzo\\' => 
         array (

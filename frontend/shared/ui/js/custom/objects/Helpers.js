@@ -1,3 +1,6 @@
+import Form from "./Form.js";
+import Select from "./Select.js";
+
 export default class Helpers {
 	static toggleWait = () => {
 		this.toggleModal('wait');
@@ -146,5 +149,18 @@ export default class Helpers {
 		do {
 			currentDate = Date.now();
 		} while (currentDate - date < ms);
+	};
+
+	static CheckAllLoaded = (callback) => {
+		let intv = setInterval(() => {
+			allLoaded();
+		}, 100);
+
+		let allLoaded = () => {
+			if (Select.Loaded()) {
+				clearInterval(intv);
+				callback();
+			}
+		};
 	};
 }

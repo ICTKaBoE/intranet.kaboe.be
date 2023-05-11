@@ -2,18 +2,28 @@
 
 namespace Controllers\API;
 
+use Security\User;
 use Controllers\ApiController;
-use Database\Object\UserSecurity as ObjectUserSecurity;
-use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\Module;
-use Database\Repository\ModuleSetting;
-use Database\Repository\NoteScreenArticle;
-use Database\Repository\NoteScreenPage;
 use Database\Repository\Setting;
-use Database\Repository\UserHomeWorkDistance;
+use Database\Repository\Helpdesk;
 use Database\Repository\UserProfile;
 use Database\Repository\UserSecurity;
-use Security\User;
+use Database\Repository\ModuleSetting;
+use Database\Repository\ManagementRoom;
+use Database\Repository\ManagementVlan;
+use Database\Repository\NoteScreenPage;
+use Database\Repository\ManagementCabinet;
+use Database\Repository\NoteScreenArticle;
+use Database\Repository\ManagementBuilding;
+use Database\Repository\ManagementFirewall;
+use Database\Repository\ManagementPatchpanel;
+use Database\Repository\UserHomeWorkDistance;
+use Database\Repository\CheckStudentRelationInsz;
+use Database\Object\UserSecurity as ObjectUserSecurity;
+use Database\Repository\ManagementAccesspoint;
+use Database\Repository\ManagementComputer;
+use Database\Repository\ManagementSwitch;
 
 class FormController extends ApiController
 {
@@ -85,6 +95,87 @@ class FormController extends ApiController
 	public function notescreenArticles($prefix, $method, $id)
 	{
 		$this->appendToJson("fields", (new NoteScreenArticle)->get($id)[0]->toArray());
+		$this->handle();
+	}
+
+	public function helpdeskDetails($prefix, $id)
+	{
+		$details = (new Helpdesk)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementBuilding($prefix, $method, $id)
+	{
+		$details = (new ManagementBuilding)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementRoom($prefix, $method, $id)
+	{
+		$details = (new ManagementRoom)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementCabinet($prefix, $method, $id)
+	{
+		$details = (new ManagementCabinet)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementPatchpanel($prefix, $method, $id)
+	{
+		$details = (new ManagementPatchpanel)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementFirewall($prefix, $method, $id)
+	{
+		$details = (new ManagementFirewall)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementSwitch($prefix, $method, $id)
+	{
+		$details = (new ManagementSwitch)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementAccesspoint($prefix, $method, $id)
+	{
+		$details = (new ManagementAccesspoint)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementComputer($prefix, $method, $id)
+	{
+		$details = (new ManagementComputer)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
 		$this->handle();
 	}
 }
