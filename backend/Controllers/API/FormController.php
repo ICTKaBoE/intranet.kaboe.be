@@ -11,7 +11,6 @@ use Database\Repository\UserProfile;
 use Database\Repository\UserSecurity;
 use Database\Repository\ModuleSetting;
 use Database\Repository\ManagementRoom;
-use Database\Repository\ManagementVlan;
 use Database\Repository\NoteScreenPage;
 use Database\Repository\ManagementCabinet;
 use Database\Repository\NoteScreenArticle;
@@ -104,6 +103,18 @@ class FormController extends ApiController
 		$details->link();
 
 		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function helpdeskSettings()
+	{
+		$module = (new Module)->getByModule("helpdesk");
+		$settings = (new ModuleSetting)->getByModule($module->id);
+
+		$returnSettings = [];
+		foreach ($settings as $setting) $returnSettings[$setting->key] = $setting->value;
+
+		$this->appendToJson("fields", $returnSettings);
 		$this->handle();
 	}
 

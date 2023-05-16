@@ -59,6 +59,16 @@ class Helpdesk extends CustomObject
 
 		$this->subject = $this->typeFull . " - " . $this->subtypeFull;
 		$this->lastAction = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s");
+
+		$age = Clock::at($this->creationDateTime)->toDateTime()->diff(Clock::now()->toDateTime());
+		if ($age->y == 0 && $age->m == 0 && $age->d == 0 && $age->h == 0 && $age->i == 0) $this->age = $age->s . " seconden";
+		else if ($age->y == 0 && $age->m == 0 && $age->d == 0 && $age->h == 0) $this->age = $age->i . " minuten";
+		else if ($age->y == 0 && $age->m == 0 && $age->d == 0) $this->age = $age->h . " uren";
+		else if ($age->y == 0 && $age->m == 0) $this->age = $age->d . " dagen";
+		else if ($age->y == 0) $this->age = $age->m . " maanden";
+		else $this->age = $age->y . " jaren";
+
+		$this->formLocked = (($this->creatorId == User::getLoggedInUser()->id && $this->assignedToId != User::getLoggedInUser()->id) || Strings::equal($this->status, 'C'));
 	}
 
 	public function link()
@@ -67,8 +77,6 @@ class Helpdesk extends CustomObject
 		$this->school = (new School)->get($this->schoolId)[0];
 		$this->creator = $localUserRepo->get(id: $this->creatorId)[0];
 		$this->assignedTo = (is_null($this->assignedToId) ? false : $localUserRepo->get(id: $this->assignedToId)[0]);
-
-		$this->formLocked = ($this->creator->id == User::getLoggedInUser()->id) || Strings::equal($this->status, 'C');
 
 		return $this;
 	}

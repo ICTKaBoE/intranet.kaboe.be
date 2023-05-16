@@ -10,6 +10,7 @@ export default class Table {
 		this.source = this.element.dataset.source || false;
 		this.noRowsText = this.element.dataset.noRowsText || "No Data Found...";
 		this.doubleClick = this.element.dataset.doubleClick || false;
+		this.autoRefresh = this.element.dataset.autoRefresh || false;
 		this.extraData = {};
 
 		this.oldData = null;
@@ -24,12 +25,11 @@ export default class Table {
 	}
 
 	init = async () => {
-		// Helpers.toggleWait();
 		this.createStructure();
 		await this.getData();
 		this.createHeader();
 		this.createRows();
-		// Helpers.toggleWait();
+		if (this.autoRefresh) this.startAutoRefresh();
 	};
 
 	createStructure = () => {
@@ -216,5 +216,19 @@ export default class Table {
 
 	addExtraData = (key, value) => {
 		this.extraData[key] = value;
+	};
+
+	removeExtraData = (key) => {
+		delete this.extraData[key];
+	};
+
+	clearExtraData = () => {
+		this.extraData = {};
+	};
+
+	startAutoRefresh = () => {
+		setInterval(() => {
+			this.reload();
+		}, this.autoRefresh * 1000);
 	};
 };

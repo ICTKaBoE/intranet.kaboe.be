@@ -39,7 +39,7 @@
 
 						<div class="col-md-6 mb-3">
 							<label class="form-label" for="cabinetId">Netwerkkast</label>
-							<select name="cabinetId" id="cabinetId" data-load-source="{{select:action}}/cabinet" data-load-value="id" data-load-label="name" data-parent-select="roomId" required></select>
+							<select name="cabinetId" id="cabinetId" data-load-source="{{select:action}}/cabinet" data-load-value="id" data-load-label="name" data-parent-select="roomId"></select>
 							<div class="invalid-feedback" data-feedback-input="cabinetId"></div>
 						</div>
 					</div>

@@ -72,8 +72,6 @@ class ManagementController extends ApiController
 		if (!$delete) {
 			if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($buildingId, Input::INPUT_TYPE_INT) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-			if (!Input::check($floor, Input::INPUT_TYPE_INT) || Input::empty($floor)) $this->setValidation("floor", "Verdiep moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-			if (!Input::check($number, Input::INPUT_TYPE_INT) || Input::empty($number)) $this->setValidation("number", "Nummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 		}
 
 		if ($this->validationIsAllGood()) {
@@ -263,7 +261,6 @@ class ManagementController extends ApiController
 			if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($buildingId, Input::INPUT_TYPE_INT) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-			if (!Input::check($cabinetId, Input::INPUT_TYPE_INT) || Input::empty($cabinetId)) $this->setValidation("cabinetId", "Netwerkkast moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($ports, Input::INPUT_TYPE_INT) || Input::empty($ports)) $this->setValidation("ports", "Aantal poorten moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($brand) || Input::empty($brand)) $this->setValidation("brand", "Merk moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);

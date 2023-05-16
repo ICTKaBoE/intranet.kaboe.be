@@ -79,7 +79,7 @@
 					<div class="col">
 						<label class="form-check">
 							<input class="form-check-input" type="checkbox" id="new" name="new" />
-							<span class="form-check-label">Nieuw ticket aanmaken na aanmaken</span>
+							<span class="form-check-label">Nog een ticket aanmaken</span>
 						</label>
 					</div>
 

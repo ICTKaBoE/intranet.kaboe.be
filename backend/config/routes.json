@@ -196,8 +196,10 @@
 						"/select/{prefix}/checklists/checkStudentRelationInsz/school",
 						"/select/{prefix}/notescreen/pages/school",
 						"/select/{prefix}/notescreen/articles/school",
+						"/select/{prefix}/helpdesk/open/school",
 						"/select/{prefix}/helpdesk/details/school",
 						"/select/{prefix}/helpdesk/mine/new/school",
+						"/select/{prefix}/helpdesk/assignedToMe/school",
 						"/select/{prefix}/management/{page}/{method?}/{id?}/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
@@ -224,7 +226,9 @@
 				{
 					"path": [
 						"/select/{prefix}/settings/rights/{method}/{moduleId?}/users",
-						"/select/{prefix}/helpdesk/details/users"
+						"/select/{prefix}/helpdesk/open/users",
+						"/select/{prefix}/helpdesk/details/users",
+						"/select/{prefix}/helpdesk/settings/users"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "users"
@@ -233,6 +237,11 @@
 					"path": "/select/{prefix}/notescreen/articles/{method}/{id?}/pages",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "notescreenPages"
+				},
+				{
+					"path": "/select/{prefix}/helpdesk/details/users/assignable",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "helpdeskAssignToUsers"
 				},
 				{
 					"path": [
@@ -347,6 +356,11 @@
 					"path": "/form/{prefix}/helpdesk/details/details/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "helpdeskDetails"
+				},
+				{
+					"path": "/form/{prefix}/helpdesk/settings",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "helpdeskSettings"
 				},
 				{
 					"path": "/form/{prefix}/management/building/{method}/{id}",
@@ -509,6 +523,11 @@
 					"path": "/form/{prefix}/helpdesk/mine/new",
 					"controller": "\\Controllers\\API\\HelpdeskController",
 					"function": "newTicket"
+				},
+				{
+					"path": "/form/{prefix}/helpdesk/settings",
+					"controller": "\\Controllers\\API\\HelpdeskController",
+					"function": "settings"
 				},
 				{
 					"path": "/form/{prefix}/management/building/{method}/{id?}",

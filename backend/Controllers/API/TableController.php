@@ -457,6 +457,14 @@ class TableController extends ApiController
 
 	public function helpdesk($prefix, $type)
 	{
+		$schoolId = Helpers::url()->getParam("school");
+		$creatorId = Helpers::url()->getParam("creator");
+
+		$filters = [
+			"schoolId" => $schoolId,
+			"creatorId" => $creatorId
+		];
+
 		$this->appendToJson(
 			'columns',
 			[
@@ -466,18 +474,9 @@ class TableController extends ApiController
 					"data" => "id"
 				],
 				[
-					"type" => "badge",
-					"title" => "School",
-					"data" => "school.name",
-					"backgroundColorCustom" => "school.color",
-					"width" => 100
-				],
-				[
-					"type" => "badge",
-					"title" => "Prioriteit",
-					"data" => "priorityFull",
-					"backgroundColor" => "priorityColor",
-					"width" => 100
+					"title" => "#",
+					"data" => "number",
+					"width" => 150
 				],
 				[
 					"type" => "badge",
@@ -487,13 +486,27 @@ class TableController extends ApiController
 					"width" => 150
 				],
 				[
-					"title" => "#",
-					"data" => "number",
+					"type" => "badge",
+					"title" => "School",
+					"data" => "school.name",
+					"backgroundColorCustom" => "school.color",
 					"width" => 100
+				],
+				[
+					"title" => "Leeftijd",
+					"data" => "age",
+					"width" => 150
 				],
 				[
 					"title" => "Onderwerp",
 					"data" => "subject",
+				],
+				[
+					"type" => "badge",
+					"title" => "Prioriteit",
+					"data" => "priorityFull",
+					"backgroundColor" => "priorityColor",
+					"width" => 100
 				],
 				[
 					"title" => "Aangemaakt door",
@@ -513,7 +526,7 @@ class TableController extends ApiController
 			]
 		);
 
-		$rows = (new Helpdesk)->getByViewType($type);
+		$rows = (new Helpdesk)->getByViewTypeWithFilters($type, $filters);
 		Arrays::each($rows, fn ($r) => $r->link());
 		$this->appendToJson("rows", $rows);
 		$this->handle();
@@ -852,8 +865,7 @@ class TableController extends ApiController
 				],
 				[
 					"title" => "Naam",
-					"data" => "name",
-					"width" => 150
+					"data" => "name"
 				],
 				[
 					"title" => "Merk",
@@ -883,7 +895,8 @@ class TableController extends ApiController
 				[
 					"type" => "url",
 					"title" => "Beheerlink",
-					"data" => "ip"
+					"data" => "ip",
+					"width" => 150
 				]
 			]
 		);

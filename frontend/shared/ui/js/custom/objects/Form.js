@@ -76,8 +76,29 @@ export default class Form {
 		this.element.addEventListener(on, cb);
 	};
 
+	getSubmitData = () => {
+		let data = {};
+
+		$(this.element).find(":input").each((id, el) => {
+			if (null !== el.role) {
+				if (el.role === "select") {
+					let v = Select.INSTANCES[el.id].getValue();
+					data[el.id] = (typeof v == "string" ? v : v.join(";"));
+				} else data[el.id] = el.value;
+			}
+		});
+
+		return data;
+	};
+
 	submit = () => {
-		let data = new FormData(this.element);
+		let data = new FormData;
+		let submitData = this.getSubmitData();
+
+		Object.keys(submitData).forEach(k => {
+			data.append(k, submitData[k]);
+		});
+
 		this.disable();
 		Helpers.toggleWait();
 

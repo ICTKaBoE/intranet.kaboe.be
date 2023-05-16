@@ -6,16 +6,20 @@ use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\Mapping;
+use Mail\HelpdeskMail;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Helpdesk as ObjectHelpdesk;
+use Database\Repository\Module;
 use Database\Repository\Helpdesk;
+use Database\Repository\ModuleSetting;
 use Database\Repository\HelpdeskAction;
 use Database\Repository\HelpdeskThread;
+use Database\Object\Helpdesk as ObjectHelpdesk;
 use Database\Object\HelpdeskAction as ObjectHelpdeskAction;
 use Database\Object\HelpdeskThread as ObjectHelpdeskThread;
-use Mail\HelpdeskMail;
+use Database\Object\ModuleSetting as ObjectModuleSetting;
+use Ouzo\Utilities\Arrays;
 
 class HelpdeskController extends ApiController
 {
@@ -33,6 +37,7 @@ class HelpdeskController extends ApiController
 			$repo = new Helpdesk;
 			$actionRepo = new HelpdeskAction;
 			$detailsDescriptionExtra = "";
+			$sendMailToAssignee = false;
 
 			$helpdesk = $repo->get($id)[0];
 
@@ -40,7 +45,10 @@ class HelpdeskController extends ApiController
 			if (!Strings::equal($status, $helpdesk->status)) $detailsDescriptionExtra .= "<br />Status gewijzigd ({$helpdesk->statusFull} -> " . Mapping::get("helpdesk/status/{$status}/description") . ")";
 			if (!Strings::equal($type, $helpdesk->type)) $detailsDescriptionExtra .= "<br />Type gewijzigd ({$helpdesk->typeFull} -> " . Mapping::get("helpdesk/type/{$type}") . ")";
 			if (!Strings::equal($subtype, $helpdesk->subtype)) $detailsDescriptionExtra .= "<br />Sub-type gewijzigd ({$helpdesk->subtypeFull} -> " . Mapping::get("helpdesk/subtype/{$subtype}") . ")";
-			if (!Strings::equal($assignedToId, $helpdesk->assignedToId)) $detailsDescriptionExtra .= "<br />Toegewezen aan gewijzigd";
+			if (!Strings::equal($assignedToId, $helpdesk->assignedToId)) {
+				$detailsDescriptionExtra .= "<br />Toegewezen aan gewijzigd";
+				$sendMailToAssignee = true;
+			}
 
 			$helpdesk->priority = $priority;
 			$helpdesk->status = $status;
@@ -55,6 +63,9 @@ class HelpdeskController extends ApiController
 				'creationDateTime' => $now,
 				'description' => $localUser->fullName . " updated details" . $detailsDescriptionExtra
 			]));
+
+			$helpdesk->link();
+			if ($sendMailToAssignee) (new HelpdeskMail)->sendAssignMail($helpdesk->assignedTo->username, $helpdesk->assignedTo->fullName, $helpdesk->number);
 		}
 
 		if (!$this->validationIsAllGood()) {
@@ -113,6 +124,7 @@ class HelpdeskController extends ApiController
 
 			$helpdesk->link();
 			if ($helpdesk->creatorId != $localUser->id) (new HelpdeskMail)->sendUpdateMail($helpdesk->creator->username, $helpdesk->creator->fullName, $helpdesk->number);
+			if ($helpdesk->assignedToId != 0 && $helpdesk->assignedToId != $localUser->id) (new HelpdeskMail)->sendUpdateAssignedToMail($helpdesk->assignedTo->username, $helpdesk->assignedTo->fullName, $helpdesk->number);
 		}
 
 		if (!$this->validationIsAllGood()) {
@@ -124,6 +136,7 @@ class HelpdeskController extends ApiController
 
 	public function newTicket($prefix)
 	{
+		$id = null;
 		$schoolId = Helpers::input()->post('schoolId')->getValue();
 		$priority = Helpers::input()->post('priority')->getValue();
 		$type = Helpers::input()->post('type')->getValue();
@@ -194,7 +207,7 @@ class HelpdeskController extends ApiController
 
 		if (!$this->validationIsAllGood()) {
 			$this->setHttpCode(400);
-		} else $this->setRedirect("/{$prefix}/helpdesk/mine" . (is_null($new) ? "" : "/new"));
+		} else $this->setRedirect((is_null($new) ? (is_null($id) ? "/{$prefix}/helpdesk/mine" : "/{$prefix}/helpdesk/details/{$id}") : "/{$prefix}/helpdesk/mine/new"));
 
 		$this->handle();
 	}
@@ -223,6 +236,45 @@ class HelpdeskController extends ApiController
 		if (!$this->validationIsAllGood()) {
 			$this->setHttpCode(400);
 		} else $this->setReload();
+		$this->handle();
+	}
+
+	public function settings()
+	{
+		$settings = [
+			"format" => "T-ST-######",
+			"assignToIds" => "",
+			"informNewToIds" => ""
+		];
+
+		$module = (new Module)->getByModule('helpdesk');
+		$moduleSettingRepo = new ModuleSetting;
+
+		foreach ($settings as $setting => $defaultValue) {
+			$moduleSetting = $moduleSettingRepo->getByModuleAndKey($module->id, $setting);
+			$value = isset($_POST[$setting]) ? Helpers::input()->post($setting)->getValue() : $defaultValue;
+
+			if (is_array($value)) {
+				$value = Arrays::map($value, fn ($v) => $v->getValue());
+				$value = implode(";", $value);
+			}
+
+			if (is_null($moduleSetting)) {
+				$moduleSetting = new ObjectModuleSetting([
+					'moduleId' => $module->id,
+					'key' => $setting,
+					'value' => Input::convertToBool($value)
+				]);
+			} else {
+				$moduleSetting->value = Input::convertToBool($value);
+			}
+
+			$moduleSettingRepo->set($moduleSetting);
+		}
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		}
 		$this->handle();
 	}
 }

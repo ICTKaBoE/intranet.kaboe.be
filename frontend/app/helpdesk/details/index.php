@@ -100,7 +100,7 @@
 
 				<div class="mb-2">
 					<label class="form-label mb-1" for="assignedToId">Toegewezen aan</label>
-					<select name="assignedToId" id="assignedToId" data-load-source="{{select:action}}/users" data-load-value="id" data-load-label="fullName"></select>
+					<select name="assignedToId" id="assignedToId" data-load-source="{{select:action}}/users/assignable" data-load-value="id" data-load-label="fullName"></select>
 					<div class="invalid-feedback" data-feedback-input="assignedToId"></div>
 				</div>
 			</div>

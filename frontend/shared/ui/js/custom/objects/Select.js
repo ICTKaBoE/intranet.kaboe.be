@@ -16,7 +16,7 @@ export default class Select {
 		this.loadLabel = this.element.dataset.loadLabel || false;
 		this.loadParams = {};
 		this.defaultValue = this.element.dataset.defaultValue || false;
-		this.multiple = this.element.hasAttribute("multiple");
+		this.multiple = this.element.hasAttribute("data-multiple");
 		this.parent = this.element.dataset.parentSelect || false;
 		this.defaultDisabled = this.element.hasAttribute("disabled") || false;
 
@@ -75,6 +75,7 @@ export default class Select {
 			hideSelected: false,
 			maxOptions: null,
 			maxItems: this.multiple ? null : 1,
+			delimiter: this.multiple ? ";" : null,
 			copyClassesToDropdown: false,
 			dropdownClass: 'dropdown-menu ts-dropdown',
 			optionClass: 'dropdown-item',
@@ -124,7 +125,9 @@ export default class Select {
 	};
 
 	setValue = (value, silent = false) => {
-		this.tomSelect.setValue(value, silent);
+		if (this.multiple) {
+			for (let v of value.split(";")) this.tomSelect.addItem(v, true);
+		} else this.tomSelect.setValue(value, silent);
 	};
 
 	getValue = () => {

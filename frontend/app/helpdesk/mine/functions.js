@@ -4,6 +4,12 @@ import Table from "../../../shared/ui/js/custom/objects/Table.js";
 
 window.showDetails = () => {
 	let id = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
+
+	if (id.length === 0 || id.includes("-")) {
+		alert("Gelieve 1 ticket te selecteren!");
+		return;
+	}
+
 	Helpers.redirect(`/../details?id=${id}`);
 };
 
@@ -19,8 +25,13 @@ let btnCreate = new Button({
 	onclick: "createHelpdesk"
 });
 
-Helpers.addButtonToPageTitle(btnCreate);
+let btnShow = new Button({
+	type: "icon-text",
+	text: "Toon details",
+	icon: "eye",
+	backgroundColor: "yellow",
+	onclick: "showDetails"
+});
 
-setInterval(() => {
-	Table.INSTANCES[`tbl${pageId}`].reload();
-}, 10000);
+Helpers.addButtonToPageTitle(btnCreate);
+Helpers.addButtonToPageTitle(btnShow);

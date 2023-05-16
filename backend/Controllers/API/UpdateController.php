@@ -22,10 +22,9 @@ class UpdateController extends ApiController
 		$lines = Arrays::filter($lines, fn ($l) => !Strings::startsWith($l, "-- "));
 		$lines = Arrays::map($lines, fn ($l) => trim($l));
 
-		$database = Database::getInstance();
-		$connection = $database->getConnection();
-
 		try {
+			$database = Database::getInstance();
+			$connection = $database->getConnection();
 			$database->beginTransaction();
 
 			foreach ($lines as $line) {

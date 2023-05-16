@@ -19,6 +19,7 @@ use Database\Repository\ManagementCabinet;
 use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementPatchpanel;
 use Database\Repository\ManagementRoom;
+use Database\Repository\ModuleSetting;
 use Helpers\Mapping;
 
 class SelectController extends ApiController
@@ -137,6 +138,20 @@ class SelectController extends ApiController
 	public function notescreenPages()
 	{
 		$this->appendToJson("items", (new NoteScreenPage)->getBySchoolId((new UserProfile)->getByUserId(User::getLoggedInUser()->id)->mainSchoolId));
+		$this->handle();
+	}
+
+	public function helpdeskAssignToUsers()
+	{
+		$assignToIds = explode(";", (new ModuleSetting)->getByModuleAndKey((new Module)->getByModule("helpdesk")->id, "assignToIds")->value);
+		$items = Arrays::filter((new LocalUser)->get(), fn ($lu) => Strings::isNotBlank($lu->fullName));
+
+		$users = [];
+		foreach ($items as $item) {
+			if (Arrays::contains($assignToIds, $item->id)) $users[] = $item;
+		}
+
+		$this->appendToJson("items", Arrays::orderBy($users, "fullName"));
 		$this->handle();
 	}
 
