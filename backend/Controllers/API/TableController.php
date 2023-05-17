@@ -22,7 +22,9 @@ use Database\Repository\ManagementPatchpanel;
 use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\ManagementAccesspoint;
+use Database\Repository\ManagementBeamer;
 use Database\Repository\ManagementComputer;
+use Database\Repository\ManagementPrinter;
 use Database\Repository\ManagementSwitch;
 use Database\Repository\UserAddress;
 
@@ -474,7 +476,7 @@ class TableController extends ApiController
 					"data" => "id"
 				],
 				[
-					"title" => "#",
+					"title" => "Nummer",
 					"data" => "number",
 					"width" => 150
 				],
@@ -495,7 +497,8 @@ class TableController extends ApiController
 				[
 					"title" => "Leeftijd",
 					"data" => "age",
-					"width" => 150
+					"width" => 150,
+					"class" => ["d-none", "d-md-table-cell"]
 				],
 				[
 					"title" => "Onderwerp",
@@ -521,7 +524,8 @@ class TableController extends ApiController
 				[
 					"title" => "Laatste activiteit",
 					"data" => "lastAction",
-					"width" => 200
+					"width" => 200,
+					"class" => ["d-none", "d-md-table-cell"]
 				]
 			]
 		);
@@ -966,6 +970,112 @@ class TableController extends ApiController
 
 		$rows = (new ManagementComputer)->get();
 		Arrays::each($rows, fn ($nsa) => $nsa->link());
+		$this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
+		$this->handle();
+	}
+
+	public function managementBeamer()
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "School",
+					"data" => "school.name",
+					"width" => 120
+				],
+				[
+					"title" => "Gebouw",
+					"data" => "building.name",
+					"width" => 100
+				],
+				[
+					"title" => "Lokaal",
+					"data" => "room.name",
+					"width" => 100
+				],
+				[
+					"title" => "Merk",
+					"data" => "brand",
+					"width" => 200
+				],
+				[
+					"title" => "Type",
+					"data" => "type",
+					"width" => 200
+				],
+				[
+					"title" => "Serienummer",
+					"data" => "serialnumber"
+				]
+			]
+		);
+
+		$rows = (new ManagementBeamer)->get();
+		Arrays::each($rows, fn ($row) => $row->link());
+		$this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
+		$this->handle();
+	}
+
+	public function managementPrinter()
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "School",
+					"data" => "school.name",
+					"width" => 120
+				],
+				[
+					"title" => "Gebouw",
+					"data" => "building.name",
+					"width" => 100
+				],
+				[
+					"title" => "Lokaal",
+					"data" => "room.name",
+					"width" => 100
+				],
+				[
+					"title" => "Naam",
+					"data" => "name",
+					"width" => 250
+				],
+				[
+					"title" => "Merk",
+					"data" => "brand",
+					"width" => 200
+				],
+				[
+					"title" => "Type",
+					"data" => "type",
+					"width" => 200
+				],
+				[
+					"title" => "Kleurmodus",
+					"data" => "colormodeFull",
+					"width" => 100
+				],
+				[
+					"title" => "Serienummer",
+					"data" => "serialnumber"
+				]
+			]
+		);
+
+		$rows = (new ManagementPrinter)->get();
+		Arrays::each($rows, fn ($row) => $row->link());
 		$this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
 		$this->handle();
 	}

@@ -162,12 +162,12 @@ class DefaultController
 		$json = Arrays::getValue($json, $position, []);
 
 		$html = "";
+		$fileTags = ["src", "href"];
 
 		foreach ($json as $line) {
 			$isFolder = $line['isFolder'] ?? false;
 
 			if ($isFolder) {
-				die(var_dump(Path::normalize(LOCATION_PUBLIC . "/" . $line['folder'])));
 				$files = array_values(array_diff(scandir(Path::normalize(LOCATION_PUBLIC . "/" . $line['folder'])), ['.', '..']));
 
 				foreach ($files as $file) {
@@ -184,6 +184,10 @@ class DefaultController
 				$html .= "<{$line['tag']}";
 
 				foreach ($line['attributes'] as $key => $value) {
+					if (Arrays::contains($fileTags, $key)) {
+						$value .= "?" . filemtime(str_replace("{{site:url}}", LOCATION_ROOT, $value));
+					}
+
 					$html .= " {$key}=\"{$value}\"";
 				}
 

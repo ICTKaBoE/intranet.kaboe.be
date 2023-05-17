@@ -8,6 +8,7 @@ use Security\Input;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\ManagementAccesspoint as ObjectManagementAccesspoint;
+use Database\Object\ManagementBeamer as ObjectManagementBeamer;
 use Database\Repository\UserProfile;
 use Database\Repository\ManagementRoom;
 use Database\Repository\ManagementVlan;
@@ -21,9 +22,12 @@ use Database\Object\ManagementBuilding as ObjectManagementBuilding;
 use Database\Object\ManagementComputer as ObjectManagementComputer;
 use Database\Object\ManagementFirewall as ObjectManagementFirewall;
 use Database\Object\ManagementPatchpanel as ObjectManagementPatchpanel;
+use Database\Object\ManagementPrinter as ObjectManagementPrinter;
 use Database\Object\ManagementSwitch as ObjectManagementSwitch;
 use Database\Repository\ManagementAccesspoint;
+use Database\Repository\ManagementBeamer;
 use Database\Repository\ManagementComputer;
+use Database\Repository\ManagementPrinter;
 use Database\Repository\ManagementSwitch;
 
 class ManagementController extends ApiController
@@ -429,6 +433,102 @@ class ManagementController extends ApiController
 		if (!$this->validationIsAllGood()) {
 			$this->setHttpCode(400);
 		} else $this->appendToJson('redirect', "/{$prefix}/management/computer");
+		$this->handle();
+	}
+
+	public function beamer($prefix, $method, $id = null)
+	{
+		$schoolId = Helpers::input()->post('schoolId')?->getValue();
+		$buildingId = Helpers::input()->post('buildingId')?->getValue();
+		$roomId = Helpers::input()->post('roomId')?->getValue();
+		$brand = Helpers::input()->post('brand')?->getValue();
+		$type = Helpers::input()->post('type')?->getValue();
+		$serialnumber = Helpers::input()->post('serialnumber')?->getValue();
+		$delete = Strings::equal($method, "delete");
+
+		if (!$delete) {
+			if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($buildingId, Input::INPUT_TYPE_INT) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($brand) || Input::empty($brand)) $this->setValidation("brand", "Merk moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", "Type moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($serialnumber) || Input::empty($serialnumber)) $this->setValidation("serialnumber", "Serienummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		}
+
+		if ($this->validationIsAllGood()) {
+			$repo = new ManagementBeamer;
+			$beamer = is_null($id) ? new ObjectManagementBeamer : $repo->get($id)[0];
+
+			if (!empty($repo->checkAlreadyExist($schoolId, $serialnumber, $id))) {
+				$this->setValidation("brand", "Er bestaat al een beamer met deze combinatie!", self::VALIDATION_STATE_INVALID);
+			} else {
+				if (!$delete) {
+					$beamer->schoolId = $schoolId;
+					$beamer->buildingId = $buildingId;
+					$beamer->roomId = $roomId;
+					$beamer->brand = $brand;
+					$beamer->type = $type;
+					$beamer->serialnumber = $serialnumber;
+				} else $beamer->deleted = true;
+
+				$repo->set($beamer);
+			}
+		}
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		} else $this->appendToJson('redirect', "/{$prefix}/management/beamer");
+		$this->handle();
+	}
+
+	public function printer($prefix, $method, $id = null)
+	{
+		$schoolId = Helpers::input()->post('schoolId')?->getValue();
+		$buildingId = Helpers::input()->post('buildingId')?->getValue();
+		$roomId = Helpers::input()->post('roomId')?->getValue();
+		$name = Helpers::input()->post('name')?->getValue();
+		$brand = Helpers::input()->post('brand')?->getValue();
+		$type = Helpers::input()->post('type')?->getValue();
+		$serialnumber = Helpers::input()->post('serialnumber')?->getValue();
+		$colormode = Helpers::input()->post('colormode')?->getValue();
+		$delete = Strings::equal($method, "delete");
+
+		if (!$delete) {
+			if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($buildingId, Input::INPUT_TYPE_INT) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($brand) || Input::empty($brand)) $this->setValidation("brand", "Merk moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", "Type moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($serialnumber) || Input::empty($serialnumber)) $this->setValidation("serialnumber", "Serienummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($colormode) || Input::empty($colormode)) $this->setValidation("colormode", "Kleurmodus moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		}
+
+		if ($this->validationIsAllGood()) {
+			$repo = new ManagementPrinter;
+			$printer = is_null($id) ? new ObjectManagementPrinter : $repo->get($id)[0];
+
+			if (!empty($repo->checkAlreadyExist($schoolId, $serialnumber, $id))) {
+				$this->setValidation("brand", "Er bestaat al een beamer met deze combinatie!", self::VALIDATION_STATE_INVALID);
+			} else {
+				if (!$delete) {
+					$printer->schoolId = $schoolId;
+					$printer->buildingId = $buildingId;
+					$printer->roomId = $roomId;
+					$printer->name = $name;
+					$printer->brand = $brand;
+					$printer->type = $type;
+					$printer->serialnumber = $serialnumber;
+					$printer->colormode = $colormode;
+				} else $printer->deleted = true;
+
+				$repo->set($printer);
+			}
+		}
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		} else $this->appendToJson('redirect', "/{$prefix}/management/printer");
 		$this->handle();
 	}
 }

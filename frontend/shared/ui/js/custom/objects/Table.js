@@ -37,7 +37,7 @@ export default class Table {
 		if (!this.element.classList.contains('table-responsive')) this.element.classList.add("table-responsive");
 		if (!this.element.classList.contains('card-table')) this.element.classList.add("card-table");
 		if (!this.element.classList.contains('table-vcenter')) this.element.classList.add("table-vcenter");
-		// if (!this.element.classList.contains('text-nowrap')) this.element.classList.add("text-nowrap");
+		if (!this.element.classList.contains('table-mobile-md')) this.element.classList.add("table-mobile-md");
 		if (!this.element.classList.contains('datatable')) this.element.classList.add("datatable");
 
 		this.thead = $(this.element).find("thead")[0];
@@ -63,7 +63,7 @@ export default class Table {
 		$(this.data.columns).each((i, column) => {
 			let th = document.createElement("th");
 
-			if (column.class) th.classList.add(column.class);
+			if (column.class) th.classList.add(...column.class);
 			if (column.width) th.style.width = Number.isInteger(column.width) ? column.width + "px" : column.width;
 			if (column.title) th.innerHTML = column.title;
 			if (column.type === "checkbox") {
@@ -107,6 +107,8 @@ export default class Table {
 
 				$(this.data.columns).each((j, column) => {
 					let td = document.createElement("td");
+					if (column.class) td.classList.add(...column.class);
+					if (column.title) td.dataset.label = column.title;
 
 					if (column.type === "checkbox") {
 						let checkbox = document.createElement("input");

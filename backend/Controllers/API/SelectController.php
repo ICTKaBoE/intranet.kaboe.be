@@ -320,4 +320,20 @@ class SelectController extends ApiController
 		$this->appendToJson("items", (new ManagementComputer)->getBySchoolAndType($schoolId, $type));
 		$this->handle();
 	}
+
+	public function managementPrinterColorMode()
+	{
+		$_items = Mapping::get("management/printer/colormode");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"description" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
+		$this->handle();
+	}
 }

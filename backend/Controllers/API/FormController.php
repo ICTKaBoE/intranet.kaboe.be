@@ -21,6 +21,7 @@ use Database\Repository\UserHomeWorkDistance;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Repository\ManagementAccesspoint;
+use Database\Repository\ManagementBeamer;
 use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementSwitch;
 
@@ -184,6 +185,24 @@ class FormController extends ApiController
 	public function managementComputer($prefix, $method, $id)
 	{
 		$details = (new ManagementComputer)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementBeamer($prefix, $method, $id)
+	{
+		$details = (new ManagementBeamer)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function managementPrinter($prefix, $method, $id)
+	{
+		$details = (new ManagementBeamer)->get($id)[0];
 		$details->link();
 
 		$this->appendToJson("fields", $details->toArray());

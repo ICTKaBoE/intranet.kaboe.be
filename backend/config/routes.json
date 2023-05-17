@@ -169,14 +169,19 @@
 					"function": "managementComputer"
 				},
 				{
-					"path": "/table/{prefix}/management/peripheral",
+					"path": "/table/{prefix}/management/beamer",
 					"controller": "\\Controllers\\API\\TableController",
-					"function": "managementPeripheral"
+					"function": "managementBeamer"
 				},
 				{
 					"path": "/table/{prefix}/management/printer",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "managementPrinter"
+				},
+				{
+					"path": "/table/{prefix}/management/peripheral",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "managementPeripheral"
 				},
 				{
 					"path": "/table/{prefix}/management/cable",
@@ -313,6 +318,11 @@
 					"function": "managementComputerOSArchitecture"
 				},
 				{
+					"path": "/select/{prefix}/management/{page}/{method}/{id?}/colormode",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "managementPrinterColorMode"
+				},
+				{
 					"path": "/form/{prefix}/bike/distances/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getDistance"
@@ -401,6 +411,16 @@
 					"path": "/form/{prefix}/management/computer/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "managementComputer"
+				},
+				{
+					"path": "/form/{prefix}/management/beamer/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementBeamer"
+				},
+				{
+					"path": "/form/{prefix}/management/printer/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "managementPrinter"
 				},
 				{
 					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
@@ -570,14 +590,19 @@
 					"function": "computer"
 				},
 				{
-					"path": "/form/{prefix}/management/peripheral/{method}/{id?}",
+					"path": "/form/{prefix}/management/beamer/{method}/{id?}",
 					"controller": "\\Controllers\\API\\ManagementController",
-					"function": "peripheral"
+					"function": "beamer"
 				},
 				{
 					"path": "/form/{prefix}/management/printer/{method}/{id?}",
 					"controller": "\\Controllers\\API\\ManagementController",
 					"function": "printer"
+				},
+				{
+					"path": "/form/{prefix}/management/peripheral/{method}/{id?}",
+					"controller": "\\Controllers\\API\\ManagementController",
+					"function": "peripheral"
 				},
 				{
 					"path": "/form/{prefix}/management/cable/{method}/{id?}",

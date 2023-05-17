@@ -80,7 +80,7 @@ export default class Form {
 		let data = {};
 
 		$(this.element).find(":input").each((id, el) => {
-			if (null !== el.role) {
+			if (null !== el.name) {
 				if (el.role === "select") {
 					let v = Select.INSTANCES[el.id].getValue();
 					data[el.id] = (typeof v == "string" ? v : v.join(";"));
@@ -94,6 +94,7 @@ export default class Form {
 	submit = () => {
 		let data = new FormData;
 		let submitData = this.getSubmitData();
+		console.log(submitData);
 
 		Object.keys(submitData).forEach(k => {
 			data.append(k, submitData[k]);

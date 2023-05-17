@@ -70,6 +70,12 @@
 				"32": "32-bit",
 				"64": "64-bit"
 			}
+		},
+		"printer": {
+			"colormode": {
+				"B": "Zwart",
+				"YMCB": "YMC+B"
+			}
 		}
 	}
 }

@@ -37,28 +37,28 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-flags.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-flags.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-payments.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-payments.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-vendors.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-vendors.min.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -124,7 +124,7 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js?1643465883"
+				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js"
 			}
 		},
 		{
