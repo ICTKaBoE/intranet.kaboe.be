@@ -2,10 +2,11 @@
 
 namespace Database\Object;
 
+use Helpers\Mapping;
 use Database\Repository\School;
 use Database\Interface\CustomObject;
-use Database\Repository\ManagementBuilding;
 use Database\Repository\ManagementRoom;
+use Database\Repository\ManagementBuilding;
 
 class ManagementPrinter extends CustomObject
 {
@@ -32,7 +33,7 @@ class ManagementPrinter extends CustomObject
 
 	public function init()
 	{
-		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->roomId}-{$this->brand}-{$this->type}";
+		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->roomId}-{$this->name}";
 		$this->colormodeFull = Mapping::get("management/printer/colormode/{$this->colormode}");
 	}
 }

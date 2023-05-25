@@ -9,7 +9,6 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\ManagementAccesspoint as ObjectManagementAccesspoint;
 use Database\Object\ManagementBeamer as ObjectManagementBeamer;
-use Database\Repository\UserProfile;
 use Database\Repository\ManagementRoom;
 use Database\Repository\ManagementVlan;
 use Database\Repository\ManagementCabinet;
