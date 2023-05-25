@@ -9,13 +9,13 @@
 				<div class="row">
 					<div class="col-lg-6 mb-3">
 						<label class="form-label" for="schoolId">School</label>
-						<select name="schoolId" id="schoolId" data-load-source="{{select:action}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:profile:mainSchoolId}}" data-on-change="check"></select>
+						<select name="schoolId" id="schoolId" data-load-source="{{select:action}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:profile:mainSchoolId}}" data-on-change="check" required></select>
 						<div class="invalid-feedback" data-feedback-input="schoolId"></div>
 					</div>
 
 					<div class="col-lg-6 mb-3">
 						<label class="form-label" for="priority">Prioriteit</label>
-						<select name="priority" id="priority" data-load-source="{{select:action}}/priority" data-load-value="id" data-load-label="description" data-default-value="L"></select>
+						<select name="priority" id="priority" data-load-source="{{select:action}}/priority" data-load-value="id" data-load-label="description" data-default-value="L" required></select>
 						<div class="invalid-feedback" data-feedback-input="priority"></div>
 					</div>
 				</div>
@@ -25,7 +25,7 @@
 				<div class="row">
 					<div class="col-lg-6 mb-3">
 						<label class="form-label" for="type">Type</label>
-						<select name="type" id="type" data-load-source="{{select:action}}/type" data-load-value="id" data-load-label="description" data-default-value="O" data-on-change="check"></select>
+						<select name="type" id="type" data-load-source="{{select:action}}/type" data-load-value="id" data-load-label="description" data-default-value="O" data-on-change="check" required></select>
 						<div class="invalid-feedback" data-feedback-input="type"></div>
 					</div>
 
@@ -60,9 +60,9 @@
 
 				<div class="mb-3">
 					<label class="form-label" for="deviceName">Toestelnaam</label>
-					<input type="text" name="deviceName" id="deviceNameCustom" class="form-control">
+					<input type="text" name="deviceName" id="deviceNameCustom" class="form-control" required>
 					<div id="deviceNameSelectWrapper" class="d-none">
-						<select name="deviceName" id="deviceNameSelect" data-load-source="{{select:action}}/computer" data-load-value="name" data-load-label="name"></select>
+						<select name="deviceName" id="deviceNameSelect" data-load-source="{{select:action}}/computer" data-load-value="name" data-load-label="name" required></select>
 					</div>
 					<div class="invalid-feedback" data-feedback-input="deviceName"></div>
 				</div>

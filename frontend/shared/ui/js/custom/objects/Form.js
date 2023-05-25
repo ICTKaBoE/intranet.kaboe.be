@@ -80,11 +80,13 @@ export default class Form {
 		let data = {};
 
 		$(this.element).find(":input").each((id, el) => {
-			if (null !== el.name) {
+			if (null !== el && null !== el.name) {
 				if (el.role === "select") {
 					let v = Select.INSTANCES[el.id].getValue();
-					data[el.id] = (typeof v == "string" ? v : v.join(";"));
-				} else data[el.id] = el.value;
+					data[el.name] = (typeof v == "string" ? v : v.join(";"));
+				} else if (el.type === "radio" || el.type === "checkbox") {
+					if (el.checked) data[el.name] = el.value;
+				} else data[el.name] = el.value;
 			}
 		});
 
@@ -94,7 +96,6 @@ export default class Form {
 	submit = () => {
 		let data = new FormData;
 		let submitData = this.getSubmitData();
-		console.log(submitData);
 
 		Object.keys(submitData).forEach(k => {
 			data.append(k, submitData[k]);

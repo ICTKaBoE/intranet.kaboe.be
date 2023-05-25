@@ -509,7 +509,7 @@ class ManagementController extends ApiController
 			$printer = is_null($id) ? new ObjectManagementPrinter : $repo->get($id)[0];
 
 			if (!empty($repo->checkAlreadyExist($schoolId, $serialnumber, $id))) {
-				$this->setValidation("brand", "Er bestaat al een beamer met deze combinatie!", self::VALIDATION_STATE_INVALID);
+				$this->setValidation("brand", "Er bestaat al een printer met deze combinatie!", self::VALIDATION_STATE_INVALID);
 			} else {
 				if (!$delete) {
 					$printer->schoolId = $schoolId;

@@ -996,7 +996,7 @@ class TableController extends ApiController
 				],
 				[
 					"title" => "Lokaal",
-					"data" => "room.name",
+					"data" => "room.fullNumber",
 					"width" => 100
 				],
 				[
@@ -1044,7 +1044,7 @@ class TableController extends ApiController
 				],
 				[
 					"title" => "Lokaal",
-					"data" => "room.name",
+					"data" => "room.fullNumber",
 					"width" => 100
 				],
 				[

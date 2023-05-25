@@ -207,7 +207,7 @@ class HelpdeskController extends ApiController
 
 		if (!$this->validationIsAllGood()) {
 			$this->setHttpCode(400);
-		} else $this->setRedirect((is_null($new) ? (is_null($id) ? "/{$prefix}/helpdesk/mine" : "/{$prefix}/helpdesk/details/{$id}") : "/{$prefix}/helpdesk/mine/new"));
+		} else $this->setRedirect((is_null($new) ? (is_null($id) ? "/{$prefix}/helpdesk/mine" : "/{$prefix}/helpdesk/details?id={$id}") : "/{$prefix}/helpdesk/mine/new"));
 
 		$this->handle();
 	}
