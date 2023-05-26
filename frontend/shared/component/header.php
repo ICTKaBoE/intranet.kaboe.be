@@ -3,7 +3,7 @@
 use Helpers\Icon;
 
 ?>
-<header class="navbar navbar-expand-md navbar-dark d-print-none">
+<header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
 	<div class="container-fluid">
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
 			<span class="navbar-toggler-icon"></span>
@@ -59,6 +59,7 @@ use Helpers\Icon;
 				<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
 					<a href="/app/user/profile" class="dropdown-item">Profiel</a>
 					<div class="dropdown-divider"></div>
+					<a href="/app/user/settings" class="dropdown-item">Instellingen</a>
 					<a href="/app/user/logout" class="dropdown-item">Afmelden</a>
 				</div>
 			</div>

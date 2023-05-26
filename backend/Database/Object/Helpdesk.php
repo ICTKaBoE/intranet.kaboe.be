@@ -57,7 +57,7 @@ class Helpdesk extends CustomObject
 			$this->number = str_replace($hashes, str_pad($this->id, $count, 0, STR_PAD_LEFT), $this->number);
 		}
 
-		$this->subject = $this->typeFull . " - " . $this->subtypeFull;
+		$this->subject = (Strings::isNotBlank($this->deviceName) ? "{$this->deviceName} - " : "") . $this->typeFull . (Strings::equal($this->type, "O") ? "" : " - {$this->subtypeFull}");
 		$this->lastAction = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s");
 
 		$age = Clock::at($this->creationDateTime)->toDateTime()->diff(Clock::now()->toDateTime());

@@ -201,6 +201,7 @@ class HelpdeskController extends ApiController
 				'description' => $localUser->fullName . " created ticket"
 			]));
 
+			$helpdesk->init();
 			$helpdesk->link();
 			(new HelpdeskMail)->sendCreationMail($helpdesk->creator->username, $helpdesk->creator->fullName, $helpdesk->number);
 		}
