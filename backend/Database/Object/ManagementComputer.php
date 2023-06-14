@@ -43,6 +43,8 @@ class ManagementComputer extends CustomObject
 		$this->typeFull = Mapping::get("management/computer/type/{$this->type}");
 		$this->osTypeFull = Mapping::get("management/computer/osType/{$this->osType}");
 		$this->osArchitectureFull = Mapping::get("management/computer/osArchitecture/{$this->osArchitecture}");
+
+		$this->shortDescription = "{$this->name} ({$this->systemManufacturer} {$this->systemModel} / SN: {$this->systemSerialnumber})";
 	}
 
 	public function link()

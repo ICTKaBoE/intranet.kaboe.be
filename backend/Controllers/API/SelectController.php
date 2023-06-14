@@ -4,6 +4,7 @@ namespace Controllers\API;
 
 use Security\User;
 use Router\Helpers;
+use Helpers\Mapping;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
@@ -12,15 +13,15 @@ use Database\Repository\School;
 use Database\Repository\LocalUser;
 use Database\Repository\UserAddress;
 use Database\Repository\UserProfile;
+use Database\Repository\ModuleSetting;
+use Database\Repository\ManagementRoom;
 use Database\Repository\NoteScreenPage;
-use Database\Repository\CheckStudentRelationInsz;
-use Database\Repository\ManagementBuilding;
 use Database\Repository\ManagementCabinet;
+use Database\Repository\ManagementBuilding;
 use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementPatchpanel;
-use Database\Repository\ManagementRoom;
-use Database\Repository\ModuleSetting;
-use Helpers\Mapping;
+use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\OrderSupplier;
 
 class SelectController extends ApiController
 {
@@ -120,6 +121,22 @@ class SelectController extends ApiController
 	public function userAddress()
 	{
 		$this->appendToJson("items", (new UserAddress)->getByUserId(User::getLoggedInUser()->id));
+		$this->handle();
+	}
+
+	public function userStartType()
+	{
+		$_items = Mapping::get("user/start");
+		$items = [];
+
+		foreach ($_items as $key => $value) {
+			$items[] = [
+				"id" => $key,
+				"name" => $value
+			];
+		}
+
+		$this->appendToJson("items", $items);
 		$this->handle();
 	}
 
@@ -334,6 +351,12 @@ class SelectController extends ApiController
 		}
 
 		$this->appendToJson("items", $items);
+		$this->handle();
+	}
+
+	public function orderSupplier()
+	{
+		$this->appendToJson("items", (new OrderSupplier)->get());
 		$this->handle();
 	}
 }

@@ -31,5 +31,6 @@ class ManagementBeamer extends CustomObject
 	public function init()
 	{
 		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->roomId}-{$this->brand}-{$this->type}";
+		$this->shortDescription = "{$this->brand} {$this->type} (SN: {$this->serialnumber})";
 	}
 }

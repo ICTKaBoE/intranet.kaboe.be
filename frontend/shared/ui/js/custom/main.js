@@ -8,6 +8,8 @@ import Clock from './objects/Clock.js';
 import NoteScreen from './objects/NoteScreen.js';
 import TinyMCE from './objects/TinyMCE.js';
 import Helpers from './objects/Helpers.js';
+import Toast from './objects/Toast.js';
+import Notification from './objects/Notification.js';
 
 Select.ScanAndCreate();
 Calendar.ScanAndCreate();
@@ -15,6 +17,8 @@ DatePicker.ScanAndCreate();
 Table.ScanAndCreate();
 Chart.ScanAndCreate();
 TinyMCE.ScanAndCreate();
+Notification.ScanAndCreate();
+Toast.Create();
 
 window.checkAllLoadedCallback = () => {
 	Form.ScanAndCreate();

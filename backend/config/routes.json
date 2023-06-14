@@ -56,7 +56,7 @@
 				{
 					"path": "/user/o365/callback",
 					"controller": "\\Controllers\\API\\UserController",
-					"function": "callback"
+					"function": "O365Callback"
 				},
 				{
 					"path": "/sync/ad/user",
@@ -64,19 +64,19 @@
 					"function": "adUser"
 				},
 				{
-					"path": "/sync/informat/staff",
+					"path": "/sync/informat",
 					"controller": "\\Controllers\\API\\SyncController",
 					"function": "informatStaff"
-				},
-				{
-					"path": "/sync/informat/student",
-					"controller": "\\Controllers\\API\\SyncController",
-					"function": "informatStudent"
 				},
 				{
 					"path": "/sync/management/staff",
 					"controller": "\\Controllers\\API\\SyncController",
 					"function": "managementStaff"
+				},
+				{
+					"path": "/notifications",
+					"controller": "\\Controllers\\API\\NotificationController",
+					"function": "get"
 				},
 				{
 					"path": "/calendar/{prefix}/bike/home-work",
@@ -96,7 +96,7 @@
 				{
 					"path": "/table/{prefix}/bike/distances",
 					"controller": "\\Controllers\\API\\TableController",
-					"function": "distances"
+					"function": "bikeDistances"
 				},
 				{
 					"path": "/table/{prefix}/checklists/checkStudentRelationInsz/{school?}/{class?}",
@@ -107,6 +107,11 @@
 					"path": "/table/{prefix}/user/address",
 					"controller": "\\Controllers\\API\\TableController",
 					"function": "userAddress"
+				},
+				{
+					"path": "/table/{prefix}/user/start",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "userStart"
 				},
 				{
 					"path": "/table/{prefix}/settings/rights",
@@ -189,6 +194,28 @@
 					"function": "managementCable"
 				},
 				{
+					"path": "/table/{prefix}/orders/overview",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "order"
+				},
+				{
+					"path": "/table/{prefix}/orders/overview/{method?}/{id}",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "orderLine"
+				},
+				{
+					"path": "/table/{prefix}/orders/suppliers",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "orderSupplier"
+				},
+				{
+					"path": [
+						"/select/{prefix}/user/start/{method?}/{id?}/type"
+					],
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "userStartType"
+				},
+				{
 					"path": "/select/{prefix}/bike/export/months",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "months"
@@ -205,7 +232,8 @@
 						"/select/{prefix}/helpdesk/details/school",
 						"/select/{prefix}/helpdesk/mine/new/school",
 						"/select/{prefix}/helpdesk/assignedToMe/school",
-						"/select/{prefix}/management/{page}/{method?}/{id?}/school"
+						"/select/{prefix}/management/{page}/{method?}/{id?}/school",
+						"/select/{prefix}/orders/{page}/{method?}/{id?}/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "school"
@@ -233,7 +261,8 @@
 						"/select/{prefix}/settings/rights/{method}/{moduleId?}/users",
 						"/select/{prefix}/helpdesk/open/users",
 						"/select/{prefix}/helpdesk/details/users",
-						"/select/{prefix}/helpdesk/settings/users"
+						"/select/{prefix}/helpdesk/settings/users",
+						"/select/{prefix}/orders/{page}/{method?}/{id?}/users"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "users"
@@ -323,6 +352,11 @@
 					"function": "managementPrinterColorMode"
 				},
 				{
+					"path": "/select/{prefix}/orders/{page?}/{method?}/{id?}/supplier",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "orderSupplier"
+				},
+				{
 					"path": "/form/{prefix}/bike/distances/{method}/{id}",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getDistance"
@@ -331,6 +365,11 @@
 					"path": "/form/{prefix}/user/profile",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getProfile"
+				},
+				{
+					"path": "/form/{prefix}/user/start/{method}/{id?}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getUserStart"
 				},
 				{
 					"path": "/form/{prefix}/bike/settings",
@@ -423,6 +462,16 @@
 					"function": "managementPrinter"
 				},
 				{
+					"path": "/form/{prefix}/orders/overview/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "order"
+				},
+				{
+					"path": "/form/{prefix}/orders/suppliers/{method}/{id}",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "orderSupplier"
+				},
+				{
 					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
 					"controller": "\\Controllers\\API\\NoteScreenController",
 					"function": "viewscreen"
@@ -463,6 +512,11 @@
 					"path": "/form/{prefix}/user/profile",
 					"controller": "\\Controllers\\API\\UserController",
 					"function": "profile"
+				},
+				{
+					"path": "/form/{prefix}/user/start/{method}/{id?}",
+					"controller": "\\Controllers\\API\\UserController",
+					"function": "start"
 				},
 				{
 					"path": "/form/{prefix}/bike/home-work",
@@ -608,6 +662,11 @@
 					"path": "/form/{prefix}/management/cable/{method}/{id?}",
 					"controller": "\\Controllers\\API\\ManagementController",
 					"function": "cable"
+				},
+				{
+					"path": "/form/{prefix}/orders/suppliers/{method}/{id?}",
+					"controller": "\\Controllers\\API\\OrderController",
+					"function": "supplier"
 				},
 				{
 					"path": "/{prefix}/helpdesk/open/claim/{id}",

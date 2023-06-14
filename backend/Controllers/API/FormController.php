@@ -12,18 +12,21 @@ use Database\Repository\UserSecurity;
 use Database\Repository\ModuleSetting;
 use Database\Repository\ManagementRoom;
 use Database\Repository\NoteScreenPage;
+use Database\Repository\ManagementBeamer;
+use Database\Repository\ManagementSwitch;
 use Database\Repository\ManagementCabinet;
 use Database\Repository\NoteScreenArticle;
 use Database\Repository\ManagementBuilding;
+use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementFirewall;
 use Database\Repository\ManagementPatchpanel;
 use Database\Repository\UserHomeWorkDistance;
+use Database\Repository\ManagementAccesspoint;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Object\UserSecurity as ObjectUserSecurity;
-use Database\Repository\ManagementAccesspoint;
-use Database\Repository\ManagementBeamer;
-use Database\Repository\ManagementComputer;
-use Database\Repository\ManagementSwitch;
+use Database\Repository\Order;
+use Database\Repository\OrderSupplier;
+use Database\Repository\UserStart;
 
 class FormController extends ApiController
 {
@@ -38,6 +41,12 @@ class FormController extends ApiController
 		$profile = (new UserProfile)->getByUserId(User::getLoggedInUser()->id);
 		if (!is_null($profile)) $profile->link()->toArray();
 		$this->appendToJson("fields", $profile);
+		$this->handle();
+	}
+
+	public function getUserStart($prefix, $method, $id)
+	{
+		$this->appendToJson("fields", (new UserStart)->get($id)[0]->toArray());
 		$this->handle();
 	}
 
@@ -203,6 +212,24 @@ class FormController extends ApiController
 	public function managementPrinter($prefix, $method, $id)
 	{
 		$details = (new ManagementBeamer)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function order($prefix, $method, $id)
+	{
+		$details = (new Order)->get($id)[0];
+		$details->link();
+
+		$this->appendToJson("fields", $details->toArray());
+		$this->handle();
+	}
+
+	public function orderSupplier($prefix, $method, $id)
+	{
+		$details = (new OrderSupplier)->get($id)[0];
 		$details->link();
 
 		$this->appendToJson("fields", $details->toArray());

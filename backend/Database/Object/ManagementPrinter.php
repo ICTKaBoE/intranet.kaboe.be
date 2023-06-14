@@ -35,5 +35,7 @@ class ManagementPrinter extends CustomObject
 	{
 		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->roomId}-{$this->name}";
 		$this->colormodeFull = Mapping::get("management/printer/colormode/{$this->colormode}");
+
+		$this->shortDescription = "{$this->name} ({$this->brand} {$this->type} / SN: {$this->serialnumber})";
 	}
 }

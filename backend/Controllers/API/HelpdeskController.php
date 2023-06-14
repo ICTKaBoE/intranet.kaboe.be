@@ -8,6 +8,7 @@ use Security\Input;
 use Helpers\Mapping;
 use Mail\HelpdeskMail;
 use Ouzo\Utilities\Clock;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Module;
@@ -16,10 +17,9 @@ use Database\Repository\ModuleSetting;
 use Database\Repository\HelpdeskAction;
 use Database\Repository\HelpdeskThread;
 use Database\Object\Helpdesk as ObjectHelpdesk;
+use Database\Object\ModuleSetting as ObjectModuleSetting;
 use Database\Object\HelpdeskAction as ObjectHelpdeskAction;
 use Database\Object\HelpdeskThread as ObjectHelpdeskThread;
-use Database\Object\ModuleSetting as ObjectModuleSetting;
-use Ouzo\Utilities\Arrays;
 
 class HelpdeskController extends ApiController
 {

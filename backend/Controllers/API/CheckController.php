@@ -9,6 +9,7 @@ use Security\Input;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\School;
 use Informat\Repository\Student;
@@ -17,7 +18,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Database\Repository\SchoolInstitute;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Object\CheckStudentRelationInsz as ObjectCheckStudentRelationInsz;
-use Ouzo\Utilities\Strings;
 
 class CheckController extends ApiController
 {

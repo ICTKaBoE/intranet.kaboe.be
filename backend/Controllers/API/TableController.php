@@ -10,23 +10,26 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\School;
 use Database\Repository\Helpdesk;
+use Database\Repository\UserAddress;
 use Database\Repository\UserSecurity;
 use Database\Repository\ManagementRoom;
-use Database\Repository\ManagementVlan;
 use Database\Repository\NoteScreenPage;
+use Database\Repository\ManagementBeamer;
+use Database\Repository\ManagementSwitch;
 use Database\Repository\ManagementCabinet;
+use Database\Repository\ManagementPrinter;
 use Database\Repository\NoteScreenArticle;
 use Database\Repository\ManagementBuilding;
+use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementFirewall;
 use Database\Repository\ManagementPatchpanel;
 use Database\Repository\UserHomeWorkDistance;
-use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\ManagementAccesspoint;
-use Database\Repository\ManagementBeamer;
-use Database\Repository\ManagementComputer;
-use Database\Repository\ManagementPrinter;
-use Database\Repository\ManagementSwitch;
-use Database\Repository\UserAddress;
+use Database\Repository\CheckStudentRelationInsz;
+use Database\Repository\Order;
+use Database\Repository\OrderLine;
+use Database\Repository\OrderSupplier;
+use Database\Repository\UserStart;
 
 class TableController extends ApiController
 {
@@ -44,6 +47,7 @@ class TableController extends ApiController
 				[
 					"title" => "Straat",
 					"data" => "street",
+					"width" => 300
 				],
 				[
 					"title" => "Huisnummer",
@@ -67,8 +71,7 @@ class TableController extends ApiController
 				],
 				[
 					"title" => "Land",
-					"data" => "country",
-					"width" => 200
+					"data" => "country"
 				]
 			]
 		);
@@ -79,7 +82,40 @@ class TableController extends ApiController
 		$this->handle();
 	}
 
-	public function distances()
+	public function userStart()
+	{
+		$this->appendToJson(
+			key: 'columns',
+			data: [
+				[
+					"type" => "checkbox",
+					"data" => "id",
+					"class" => ["w-1"]
+				],
+				[
+					"title" => "Naam",
+					"data" => "name",
+					"width" => 150
+				],
+				[
+					"title" => "Type",
+					"data" => "typeFull",
+					"width" => 150
+				],
+				[
+					"title" => "Link",
+					"data" => "url"
+				]
+			]
+		);
+
+		$items = (new UserStart)->getByUserId(User::getLoggedInUser()->id);
+		$this->appendToJson("rows", array_values($items));
+
+		$this->handle();
+	}
+
+	public function bikeDistances()
 	{
 		$this->appendToJson(
 			key: 'columns',
@@ -1077,6 +1113,131 @@ class TableController extends ApiController
 		$rows = (new ManagementPrinter)->get();
 		Arrays::each($rows, fn ($row) => $row->link());
 		$this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
+		$this->handle();
+	}
+
+	public function order()
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Nummer",
+					"data" => "number",
+					"width" => 150
+				],
+				[
+					"type" => "badge",
+					"title" => "Status",
+					"data" => "statusFull",
+					"backgroundColor" => "statusColor",
+					"width" => 150
+				],
+				[
+					"type" => "badge",
+					"title" => "School",
+					"data" => "school.name",
+					"backgroundColorCustom" => "school.color",
+					"width" => 100
+				],
+				[
+					"title" => "Leverancier",
+					"data" => "supplier.name",
+					"width" => 150
+				],
+				[
+					"title" => "Aangevraagd door",
+					"data" => "creator.fullName",
+					"width" => 150
+				],
+				[
+					"title" => "Goed te keuren door",
+					"data" => "acceptor.fullName"
+				]
+			]
+		);
+
+		$rows = (new Order)->get();
+		Arrays::each($rows, fn ($r) => $r->link());
+		$this->appendToJson("rows", $rows);
+		$this->handle();
+	}
+
+	public function orderLine($prefix, $method = null, $id)
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Aantal",
+					"data" => "amount",
+					"width" => 100
+				],
+				[
+					"title" => "Beschrijving",
+					"data" => "what",
+					"width" => 200
+				],
+				[
+					"title" => "Voor",
+					"data" => "asset.shortDescription",
+					"format" => [
+						"length" => 75
+					]
+				]
+			]
+		);
+
+		$rows = (new OrderLine)->getByOrder($id);
+		Arrays::each($rows, fn ($r) => $r->link());
+		$this->appendToJson("rows", $rows);
+		$this->handle();
+	}
+
+	public function orderSupplier()
+	{
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"title" => "Naam",
+					"data" => "name"
+				],
+				[
+					"title" => "Contactpersoon",
+					"data" => "contact",
+					"width" => 200
+				],
+				[
+					"title" => "E-mail",
+					"data" => "email",
+					"width" => 300
+				],
+				[
+					"title" => "Telefoon",
+					"data" => "phone",
+					"width" => 200
+				]
+			]
+		);
+
+		$rows = (new OrderSupplier)->get();
+		$this->appendToJson("rows", $rows);
 		$this->handle();
 	}
 }

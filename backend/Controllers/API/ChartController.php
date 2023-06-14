@@ -2,13 +2,11 @@
 
 namespace Controllers\API;
 
-use Controllers\ApiController;
-use Database\Repository\CheckStudentRelationInsz;
-use Database\Repository\School;
-use Database\Repository\SchoolInstitute;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Router\Helpers;
+use Controllers\ApiController;
+use Database\Repository\School;
+use Database\Repository\CheckStudentRelationInsz;
 
 class ChartController extends ApiController
 {

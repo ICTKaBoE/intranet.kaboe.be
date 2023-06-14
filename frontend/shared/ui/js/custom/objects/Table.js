@@ -11,6 +11,7 @@ export default class Table {
 		this.noRowsText = this.element.dataset.noRowsText || "No Data Found...";
 		this.doubleClick = this.element.dataset.doubleClick || false;
 		this.autoRefresh = this.element.dataset.autoRefresh || false;
+		this.small = this.element.hasAttribute("data-small");
 		this.extraData = {};
 
 		this.oldData = null;
@@ -39,6 +40,7 @@ export default class Table {
 		if (!this.element.classList.contains('table-vcenter')) this.element.classList.add("table-vcenter");
 		if (!this.element.classList.contains('table-mobile-md')) this.element.classList.add("table-mobile-md");
 		if (!this.element.classList.contains('datatable')) this.element.classList.add("datatable");
+		if (this.small && !this.element.classList.contains("table-sm")) this.element.classList.add("table-sm");
 
 		this.thead = $(this.element).find("thead")[0];
 		this.tbody = $(this.element).find("tbody")[0];

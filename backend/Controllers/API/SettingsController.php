@@ -2,12 +2,12 @@
 
 namespace Controllers\API;
 
+use Router\Helpers;
+use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Repository\Setting;
 use Database\Repository\UserSecurity;
-use Ouzo\Utilities\Strings;
-use Router\Helpers;
+use Database\Object\UserSecurity as ObjectUserSecurity;
 
 class SettingsController extends ApiController
 {

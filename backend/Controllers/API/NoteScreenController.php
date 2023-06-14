@@ -2,16 +2,16 @@
 
 namespace Controllers\API;
 
+use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Controllers\ApiController;
-use Database\Object\NoteScreenArticle as ObjectNoteScreenArticle;
-use Database\Object\NoteScreenPage as ObjectNoteScreenPage;
-use Database\Repository\NoteScreenPage;
-use Database\Repository\NoteScreenArticle;
 use Database\Repository\School;
 use Database\Repository\UserProfile;
-use Security\User;
+use Database\Repository\NoteScreenPage;
+use Database\Repository\NoteScreenArticle;
+use Database\Object\NoteScreenPage as ObjectNoteScreenPage;
+use Database\Object\NoteScreenArticle as ObjectNoteScreenArticle;
 
 class NoteScreenController extends ApiController
 {

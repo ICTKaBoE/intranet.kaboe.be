@@ -2,11 +2,9 @@
 
 namespace Controllers\API;
 
-use finfo;
 use Router\Helpers;
 use Security\Input;
 use Ouzo\Utilities\Clock;
-use Management\Management;
 use O365\Repository\Group;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
@@ -14,14 +12,15 @@ use Controllers\ApiController;
 use Informat\Repository\Staff;
 use Database\Repository\Module;
 use Database\Repository\LocalUser;
-use Database\Repository\SyncStaff;
+use Database\Repository\InformatStaff;
 use Database\Repository\UserSecurity;
 use Database\Repository\SchoolInstitute;
 use Database\Repository\ManagementComputer;
 use Database\Object\LocalUser as ObjectLocalUser;
-use Database\Object\ManagementComputer as ObjectManagementComputer;
-use Database\Object\SyncStaff as ObjectSyncStaff;
+use Database\Object\InformatStaff as ObjectInformatStaff;
 use Database\Object\UserSecurity as ObjectUserSecurity;
+use Database\Object\ManagementComputer as ObjectManagementComputer;
+use Informat\Repository\Student;
 
 class SyncController extends ApiController
 {
@@ -80,21 +79,35 @@ class SyncController extends ApiController
 		}
 	}
 
+	public function informat()
+	{
+		// $this->informatStudent();
+		// $this->informatStaff();
+		$this->informatStaffNomination();
+		$this->handle();
+	}
+
+	public function informatStudent()
+	{
+		$informatStudentRepo = new Student;
+		$instituteRepo = new SchoolInstitute;
+	}
+
 	public function informatStaff()
 	{
 		$informatStaffRepo = new Staff;
 		$instituteRepo = new SchoolInstitute;
-		$syncStaffRepo = new SyncStaff;
+		$syncInformatStaffRepo = new InformatStaff;
 
 		foreach ($instituteRepo->get() as $institute) {
 			try {
-				$syncStaffRepo->db->beginTransaction();
+				$syncInformatStaffRepo->db->beginTransaction();
 
 				$informatStaffRepo->setInstituteNumber($institute->instituteNumber);
 				$staff = $informatStaffRepo->get();
 
 				foreach ($staff as $s) {
-					$syncStaff = $syncStaffRepo->getByInformatUID($s->p_persoon) ?? new ObjectSyncStaff;
+					$syncStaff = $syncInformatStaffRepo->getByInformatUID($s->p_persoon) ?? new ObjectInformatStaff;
 					$syncStaff->informatUID = $s->p_persoon;
 					$syncStaff->masterNumber = $s->Stamnummer;
 					$syncStaff->name = $s->Naam;
@@ -118,32 +131,18 @@ class SyncController extends ApiController
 					$syncStaff->bankId = $s->Bic;
 					$syncStaff->active = $s->ActiefForDB;
 
-					$syncStaffRepo->set($syncStaff);
+					$syncInformatStaffRepo->set($syncStaff);
 				}
 
-				$syncStaffRepo->db->commit();
+				$syncInformatStaffRepo->db->commit();
 			} catch (\Exception $e) {
-				$syncStaffRepo->db->rollback();
+				$syncInformatStaffRepo->db->rollback();
 			}
 		}
-
-		$this->handle();
 	}
 
-	public function managementStaff()
+	public function informatStaffNomination()
 	{
-		$syncStaffRepo = new SyncStaff;
-		$management = new Management;
-
-		foreach ($syncStaffRepo->get() as $syncStaff) {
-			try {
-				$management->addOrUpdateUser($syncStaff->schoolEmail, MANAGEMENT_DEFAULT_PASS, $syncStaff->name, $syncStaff->firstName, $syncStaff->informatUID, active: $syncStaff->active);
-			} catch (\Exception $e) {
-				$this->appendToJson("error", $e->getMessage());
-			}
-		}
-
-		$this->handle();
 	}
 
 	public function adManagementComputer()

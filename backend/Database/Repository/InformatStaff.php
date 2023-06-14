@@ -5,11 +5,11 @@ namespace Database\Repository;
 use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
 
-class SyncStaff extends Repository
+class InformatStaff extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_sync_staff", \Database\Object\SyncStaff::class, orderField: 'name');
+		parent::__construct("tbl_informat_staff", \Database\Object\InformatStaff::class, orderField: 'name');
 	}
 
 	public function getByInformatUID($informatUID)

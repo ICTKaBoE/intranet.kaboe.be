@@ -6,7 +6,7 @@ use Database\Interface\CustomObject;
 use Ouzo\Utilities\Strings;
 use Security\Input;
 
-class SyncStaff extends CustomObject
+class InformatStaff extends CustomObject
 {
 	protected $objectAttributes = [
 		"id",

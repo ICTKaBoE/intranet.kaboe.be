@@ -2,6 +2,9 @@
 
 namespace Controllers\API;
 
+use Helpers\PDF;
+use Helpers\ZIP;
+use Helpers\Date;
 use Helpers\Excel;
 use Security\User;
 use Router\Helpers;
@@ -11,24 +14,19 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School;
-use Database\Repository\LocalUser;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Database\Repository\BikeEventHomeWork;
-use Database\Repository\UserHomeWorkDistance;
-use Database\Object\BikeEventHomeWork as ObjectBikeEventHomeWork;
-use Database\Object\ModuleSetting as ObjectModuleSetting;
-use Database\Object\UserHomeWorkDistance as ObjectUserHomeWorkDistance;
-use Database\Repository\BikePrice;
 use Database\Repository\Module;
-use Database\Repository\ModuleSetting;
+use Database\Repository\School;
+use Database\Repository\BikePrice;
+use Database\Repository\LocalUser;
 use Database\Repository\UserAddress;
 use Database\Repository\UserProfile;
-use Helpers\Date;
-use Helpers\PDF;
-use Helpers\ZIP;
+use Database\Repository\ModuleSetting;
+use Database\Repository\BikeEventHomeWork;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Database\Repository\UserHomeWorkDistance;
+use Database\Object\ModuleSetting as ObjectModuleSetting;
+use Database\Object\BikeEventHomeWork as ObjectBikeEventHomeWork;
+use Database\Object\UserHomeWorkDistance as ObjectUserHomeWorkDistance;
 
 class BikeController extends ApiController
 {
@@ -211,12 +209,14 @@ class BikeController extends ApiController
 		$per = Helpers::input()->post('per')->getValue();
 		$school = Helpers::input()->post('school');
 		if (!is_null($school)) $school = $school->getValue();
-		if (is_array($school)) {
+		if (is_array($school) && !Strings::contains($school, ";")) {
 			$s = [];
 			foreach ($school as $sch)
 				$s[] = $sch->getValue();
 
 			$school = $s;
+		} else if (Strings::contains($school, ";")) {
+			$school = explode(";", $school);
 		} else $school = [$school];
 		$start = Helpers::input()->post('start')->getValue();
 		$end = Helpers::input()->post('end')->getValue();

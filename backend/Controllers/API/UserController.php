@@ -6,19 +6,15 @@ use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Security\Session;
-use O365\Repository\Group;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\LocalUser as ObjectLocalUser;
-use Database\Object\UserProfile as ObjectUserProfile;
-use Database\Object\UserSecurity as ObjectUserSecurity;
-use Database\Repository\Module;
 use O365\AuthenticationManager;
 use Database\Repository\Setting;
 use Database\Repository\LocalUser;
 use Database\Repository\UserProfile;
-use Database\Repository\UserSecurity;
+use Database\Object\UserProfile as ObjectUserProfile;
+use Database\Object\UserStart as ObjectUserStart;
+use Database\Repository\UserStart;
 
 class UserController extends ApiController
 {
@@ -86,7 +82,7 @@ class UserController extends ApiController
 		$this->handle();
 	}
 
-	public function callback()
+	public function O365Callback()
 	{
 		if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['code'])) {
 			Session::start();
@@ -135,6 +131,51 @@ class UserController extends ApiController
 		}
 
 		if (!$this->validationIsAllGood()) $this->setHttpCode(400);
+		$this->handle();
+	}
+
+	public function start($prefix, $method, $id = null)
+	{
+		$name = Helpers::input()->post('name')->getValue();
+		$url = Helpers::input()->post('url')->getValue();
+		$type = Helpers::input()->post('type')->getValue();
+		$icon = Helpers::input()->post('icon')->getValue();
+		$width = Helpers::input()->post('width')->getValue();
+		$delete = Strings::equal($method, "delete");
+
+		if (!$delete) {
+			if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($url) || Input::empty($url)) $this->setValidation("url", "Link moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", "Type moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+			if (!Input::check($width, Input::INPUT_TYPE_INT) || Input::empty($width)) $this->setValidation("width", "Breedte moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+		}
+
+		if ($this->validationIsAllGood()) {
+			$repo = new UserStart;
+			$start = is_null($id) ? new ObjectUserStart : $repo->get($id)[0];
+			$userId = User::getLoggedInUser()->id;
+
+			if (!empty($repo->checkAlreadyExist($userId, $name, $id))) {
+				$this->setValidation("name", "Er bestaat al een item met deze naam!", self::VALIDATION_STATE_INVALID);
+			} else {
+				if (!$delete) {
+					if ($width > 12) $width = 12;
+
+					$start->userId = $userId;
+					$start->name = $name;
+					$start->url = $url;
+					$start->type = $type;
+					$start->icon = $icon;
+					$start->width = $width;
+				} else $start->deleted = true;
+
+				$repo->set($start);
+			}
+		}
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		} else $this->appendToJson('redirect', "/{$prefix}/user/start");
 		$this->handle();
 	}
 }

@@ -10,5 +10,9 @@
 	],
 	"schoolCustomLayout": [
 		"/public/notescreen/viewscreen"
+	],
+	"noPageTitleAndMenubar": [
+		"/app/selectModule",
+		"/public/selectModule"
 	]
 }

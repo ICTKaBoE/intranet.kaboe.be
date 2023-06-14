@@ -2,10 +2,10 @@
 
 namespace Controllers\API;
 
-use Controllers\ApiController;
 use Database\Database;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Controllers\ApiController;
 
 class UpdateController extends ApiController
 {

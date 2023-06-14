@@ -19,7 +19,7 @@
 
 				<div class="mb-3">
 					<label class="form-label" for="school">Scholen</label>
-					<select name="school[]" id="school" data-load-source="{{select:action}}/school" data-load-value="id" data-load-label="name" multiple required></select>
+					<select name="school" id="school" data-load-source="{{select:action}}/school" data-load-value="id" data-load-label="name" data-multiple required></select>
 					<div class="invalid-feedback" data-feedback-input="school"></div>
 				</div>
 

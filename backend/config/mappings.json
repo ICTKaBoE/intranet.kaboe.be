@@ -77,5 +77,73 @@
 				"YMCB": "YMC+B"
 			}
 		}
+	},
+	"order": {
+		"status": {
+			"N": {
+				"description": "Nieuw",
+				"color": "blue"
+			},
+			"QR": {
+				"description": "Offerte aangevraagd",
+				"color": "orange"
+			},
+			"QO": {
+				"description": "Offerte verkregen",
+				"color": "orange"
+			},
+			"W": {
+				"description": "Wachtend op goedkeuring",
+				"color": "orange"
+			},
+			"PA": {
+				"description": "DEELS Goedgekeurd/Geweigerd",
+				"color": "teal"
+			},
+			"A": {
+				"description": "Goedgekeurd",
+				"color": "orange"
+			},
+			"D": {
+				"description": "Geweigerd",
+				"color": "red"
+			},
+			"O": {
+				"description": "Besteld",
+				"color": "orange"
+			},
+			"S": {
+				"description": "Onderweg",
+				"color": "orange"
+			},
+			"PR": {
+				"description": "DEELS Ontvangen",
+				"color": "lime"
+			},
+			"R": {
+				"description": "Ontvangen",
+				"color": "green"
+			},
+			"C": {
+				"description": "Gesloten",
+				"color": "secondary"
+			}
+		},
+		"line": {
+			"for": {
+				"L": "Laptop",
+				"D": "Desktop",
+				"P": "Printer",
+				"B": "Beamer",
+				"O": "Andere"
+			}
+		}
+	},
+	"user": {
+		"start": {
+			"I": "Icoon",
+			"IN": "Icoon + Naam",
+			"N": "Naam"
+		}
 	}
 }
