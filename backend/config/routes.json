@@ -66,7 +66,17 @@
 				{
 					"path": "/sync/informat",
 					"controller": "\\Controllers\\API\\SyncController",
-					"function": "informatStaff"
+					"function": "informat"
+				},
+				{
+					"path": "/sync/student",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "student"
+				},
+				{
+					"path": "/sync/teacher",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "teacher"
 				},
 				{
 					"path": "/sync/management/staff",
@@ -209,6 +219,11 @@
 					"function": "orderSupplier"
 				},
 				{
+					"path": "/table/{prefix}/synchronisation/student",
+					"controller": "\\Controllers\\API\\TableController",
+					"function": "syncStudent"
+				},
+				{
 					"path": [
 						"/select/{prefix}/user/start/{method?}/{id?}/type"
 					],
@@ -233,7 +248,8 @@
 						"/select/{prefix}/helpdesk/mine/new/school",
 						"/select/{prefix}/helpdesk/assignedToMe/school",
 						"/select/{prefix}/management/{page}/{method?}/{id?}/school",
-						"/select/{prefix}/orders/{page}/{method?}/{id?}/school"
+						"/select/{prefix}/orders/{page}/{method?}/{id?}/school",
+						"/select/{prefix}/synchronisation/student/school"
 					],
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "school"
@@ -242,6 +258,11 @@
 					"path": "/select/{prefix}/checklists/checkStudentRelationInsz/class",
 					"controller": "\\Controllers\\API\\SelectController",
 					"function": "checkStudentRelationInszClass"
+				},
+				{
+					"path": "/select/{prefix}/synchronisation/student/class",
+					"controller": "\\Controllers\\API\\SelectController",
+					"function": "syncClass"
 				},
 				{
 					"path": [
@@ -502,6 +523,21 @@
 					"path": "/sync/ad/management/computer",
 					"controller": "\\Controllers\\API\\SyncController",
 					"function": "adManagementComputer"
+				},
+				{
+					"path": "/sync/student/time",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "syncStudentTimeUpdate"
+				},
+				{
+					"path": "/sync/student/{id}",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "syncStudentUpdate"
+				},
+				{
+					"path": "/synchronisation/student/{id}/resetPassword/{random}",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "syncStudentResetPassword"
 				},
 				{
 					"path": "/form/{prefix}/user/login",

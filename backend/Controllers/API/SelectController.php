@@ -22,6 +22,7 @@ use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementPatchpanel;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\OrderSupplier;
+use Database\Repository\SyncStudent;
 
 class SelectController extends ApiController
 {
@@ -100,7 +101,7 @@ class SelectController extends ApiController
 
 	public function checkStudentRelationInszClass()
 	{
-		$school = Helpers::input()->get('parentValue');
+		$school = Helpers::input()->get('parentValue')?->getValue();
 
 		if (is_null($school)) $this->appendToJson('items', []);
 		else {
@@ -111,6 +112,26 @@ class SelectController extends ApiController
 
 			foreach ($items as $index => $item) $selectItems[] = ['name' => $item];
 			$items = Arrays::orderBy($items, "name");
+
+			$this->appendToJson("items", $selectItems);
+		}
+
+		$this->handle();
+	}
+
+	public function syncClass()
+	{
+		$school = Helpers::input()->get('parentValue')?->getValue();
+
+		if (is_null($school)) $this->appendToJson('items', []);
+		else {
+			$items = (new SyncStudent)->getClassBySchool($school);
+			$selectItems = [
+				['name' => SELECT_ALL_VALUES]
+			];
+
+			$items = Arrays::map($items, fn ($i) => ["name" => trim($i)]);
+			$selectItems = array_merge($selectItems, Arrays::orderBy($items, "name"));
 
 			$this->appendToJson("items", $selectItems);
 		}

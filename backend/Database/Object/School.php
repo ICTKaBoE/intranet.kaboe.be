@@ -12,6 +12,9 @@ class School extends CustomObject
 		"color",
 		"logo",
 		"deviceNamePrefix",
+		"adSecGroupFolderName",
+		"adSecGroupPostfix",
+		"adUserDescription",
 		"deleted"
 	];
 

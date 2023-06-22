@@ -5,11 +5,11 @@ namespace Database\Repository;
 use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
 
-class InformatStaff extends Repository
+class InformatStaffAssignment extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_informat_staff", \Database\Object\InformatStaff::class, orderField: 'name');
+		parent::__construct("tbl_informat_staff_assignment", \Database\Object\InformatStaffAssignment::class, orderField: 'start');
 	}
 
 	public function getByInformatUID($informatUID)
@@ -20,11 +20,11 @@ class InformatStaff extends Repository
 		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
 
-	public function getBySchoolEmail($schoolEmail)
+	public function getByInformatStaffUID($informatStaffUID)
 	{
 		$statement = $this->prepareSelect();
-		$statement->where("schoolEmail", $schoolEmail);
+		$statement->where('informatStaffUID', $informatStaffUID);
 
-		return Arrays::firstOrNull($this->executeSelect($statement));
+		return $this->executeSelect($statement);
 	}
 }

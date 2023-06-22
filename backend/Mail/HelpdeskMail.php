@@ -23,7 +23,6 @@ class HelpdeskMail extends Mail
 		";
 
 		$this->setBody($body);
-		$this->build();
 		$this->send();
 	}
 
@@ -47,7 +46,6 @@ class HelpdeskMail extends Mail
 		";
 
 		$this->setBody($body);
-		$this->build();
 		$this->send();
 	}
 
@@ -70,7 +68,6 @@ class HelpdeskMail extends Mail
 		";
 
 		$this->setBody($body);
-		$this->build();
 		$this->send();
 	}
 
@@ -93,7 +90,6 @@ class HelpdeskMail extends Mail
 		";
 
 		$this->setBody($body);
-		$this->build();
 		$this->send();
 	}
 }

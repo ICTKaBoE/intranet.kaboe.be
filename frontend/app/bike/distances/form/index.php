@@ -24,7 +24,7 @@
 					<div class="row mb-3">
 						<div class="col-7">
 							<label for="startAddressId" class="form-label">Start adres</label>
-							<select name="startAddressId" id="startAddressId" data-load-source="{{select:action}}/userAddress" data-load-value="id" data-load-label="formatted" required></select>
+							<select name="startAddressId" id="startAddressId" data-load-source="{{select:action}}/userAddress" data-load-value="id" data-load-label="formattedCurrent" required></select>
 							<div class="invalid-feedback" data-feedback-input="startAddressId"></div>
 						</div>
 

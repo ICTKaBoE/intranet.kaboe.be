@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Database\Repository\Module;
+use Database\Repository\ModuleSetting;
 use Database\Repository\Setting;
 use Database\Repository\UserProfile;
 use O365\AuthenticationManager;
@@ -42,6 +44,7 @@ class DefaultController
 		$this->loadOthers();
 		$this->loadUrlParams();
 		$this->loadSettings();
+		$this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
@@ -128,6 +131,13 @@ class DefaultController
 	{
 		foreach ($this->getSettings() as $setting) {
 			$this->layout = str_replace('{{' . $setting->id . '}}', $setting->value, $this->layout);
+		}
+	}
+
+	private function loadModuleSettings()
+	{
+		foreach ($this->getModuleSettings() as $setting) {
+			$this->layout = str_replace('{{module:' . $setting->key . '}}', $setting->value, $this->layout);
 		}
 	}
 
@@ -236,5 +246,10 @@ class DefaultController
 	private function getSettings()
 	{
 		return (new Setting)->get(order: false);
+	}
+
+	private function getModuleSettings()
+	{
+		return (new ModuleSetting)->getByModule((new Module)->getByModule(Helpers::getModule())->id);
 	}
 }

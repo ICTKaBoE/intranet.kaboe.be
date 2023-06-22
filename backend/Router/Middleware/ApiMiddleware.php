@@ -13,7 +13,8 @@ class ApiMiddleware implements IMiddleware
 {
 	const SKIP_SIGN_IN_CHECK = [
 		"/api/v1.0/user/sync/",
-		"/api/v1.0/sync/ad/user",
+		"/api/v1.0/sync/ad/user/",
+		"/api/v1.0/sync/informat/",
 		"/api/v1.0/app/user/login/",
 		"/api/v1.0/user/o365/callback/",
 		"/api/v1.0/form/app/user/login/",

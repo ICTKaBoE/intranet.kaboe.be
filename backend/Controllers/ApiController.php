@@ -23,6 +23,7 @@ class ApiController
 
 		if ($this->validation) Arrays::setNestedValue($this->json, ['validation'], $this->validation);
 		if ($this->redirect) Arrays::setNestedValue($this->json, ['redirect'], $this->redirect);
+		if ($this->error) Arrays::setNestedValue($this->json, ['error'], $this->error);
 		if ($this->reload) Arrays::setNestedValue($this->json, ['reload'], $this->reload);
 
 		Helpers::response()->json($this->json);
@@ -37,6 +38,11 @@ class ApiController
 	{
 		Arrays::setNestedValue($this->validation, [$input, 'state'], $state);
 		if (!is_null($feedback)) Arrays::setNestedValue($this->validation, [$input, 'feedback'], $feedback);
+	}
+
+	protected function setError($error)
+	{
+		$this->error = $error;
 	}
 
 	protected function removeValidation($input)

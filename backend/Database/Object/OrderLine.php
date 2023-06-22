@@ -7,6 +7,7 @@ use Database\Repository\ManagementBeamer;
 use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementPrinter;
 use Database\Repository\Order;
+use Helpers\Icon;
 use Helpers\Mapping;
 use Ouzo\Utilities\Strings;
 use Security\Input;
@@ -31,6 +32,8 @@ class OrderLine extends CustomObject
 	{
 		$this->forDescription = Mapping::get("order/line/for/{$this->for}");
 		$this->accepted = Input::convertToBool($this->accepted);
+
+		$this->quotationVatIncludedIcon = Icon::load($this->quotationVatIncluded ? "check" : "x");
 	}
 
 	public function link()

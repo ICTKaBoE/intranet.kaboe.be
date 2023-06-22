@@ -3,6 +3,7 @@
 namespace Database\Object;
 
 use Database\Interface\CustomObject;
+use Helpers\Mapping;
 use Ouzo\Utilities\Strings;
 use Security\Input;
 
@@ -43,5 +44,7 @@ class InformatStaff extends CustomObject
 		$email = $firstName . "." . $name . "@" . EMAIL_SUFFIX;
 
 		if (!Strings::equal($this->schoolEmail, $email)) $this->schoolEmail = str_replace(" ", "", strtolower($email));
+		$this->addressCountryFull = Mapping::get("sync/informatStaff/country/{$this->addressCountry}");
+		$this->addressHash = str_replace(" ", "", strtolower("{$this->addressStreet}{$this->addressNumber}{$this->addressBus}{$this->addressZipcode}{$this->addressCity}{$this->addressCountryFull}"));
 	}
 }

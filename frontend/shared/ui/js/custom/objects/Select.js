@@ -50,6 +50,7 @@ export default class Select {
 		this.disable();
 		if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
+		// this.setEventListeners();
 		this.setDefaultValue();
 		if (!this.defaultDisabled) this.enable();
 		this.loaded = true;
@@ -61,7 +62,7 @@ export default class Select {
 		this.clear();
 		this.destroy();
 		this.createSelect();
-		if (this.parent) this.detectParentAndSetFunctions();
+		// if (this.parent) this.detectParentAndSetFunctions();
 		await this.loadSelect();
 		this.setEventListeners();
 		this.setDefaultValue();

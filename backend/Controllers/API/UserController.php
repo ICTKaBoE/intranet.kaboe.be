@@ -136,14 +136,15 @@ class UserController extends ApiController
 
 	public function start($prefix, $method, $id = null)
 	{
-		$name = Helpers::input()->post('name')->getValue();
-		$url = Helpers::input()->post('url')->getValue();
-		$type = Helpers::input()->post('type')->getValue();
-		$icon = Helpers::input()->post('icon')->getValue();
-		$width = Helpers::input()->post('width')->getValue();
 		$delete = Strings::equal($method, "delete");
 
 		if (!$delete) {
+			$name = Helpers::input()->post('name')->getValue();
+			$url = Helpers::input()->post('url')->getValue();
+			$type = Helpers::input()->post('type')->getValue();
+			$icon = Helpers::input()->post('icon')->getValue();
+			$width = Helpers::input()->post('width')->getValue();
+
 			if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($url) || Input::empty($url)) $this->setValidation("url", "Link moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 			if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", "Type moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);

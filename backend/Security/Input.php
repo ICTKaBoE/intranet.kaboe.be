@@ -146,10 +146,12 @@ abstract class Input
 			'/ñ/'           =>   'n',
 			'/Ñ/'           =>   'N',
 			'/–/'           =>   '', // UTF-8 hyphen to "normal" hyphen
-			'/[’‘‹›‚]/u'    =>   '', // Literally a single quote
+			'/-/'           =>   '', // UTF-8 hyphen to "normal" hyphen
+			'/[’‘\'‹›‚]/u'    =>   '', // Literally a single quote
 			'/[“”«»„]/u'    =>   '', // Double quote
-			'/ /'           =>   ' ', // nonbreaking space (equiv. to 0x160)
+			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)
 		);
+
 		return preg_replace(array_keys($utf8), array_values($utf8), $input);
 	}
 }

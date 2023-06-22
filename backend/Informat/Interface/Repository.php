@@ -61,6 +61,10 @@ class Repository
 
     protected function convertRowToObject($row)
     {
+        foreach ($row as $key => $value) {
+            if (is_array($value) && empty($value)) $row[$key] = null;
+        }
+
         return new $this->object($row);
     }
 

@@ -145,5 +145,13 @@
 			"IN": "Icoon + Naam",
 			"N": "Naam"
 		}
+	},
+	"sync": {
+		"informatStaff": {
+			"country": {
+				"00150": "België",
+				"00129": "Nederland"
+			}
+		}
 	}
 }

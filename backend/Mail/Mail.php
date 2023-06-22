@@ -71,6 +71,7 @@ class Mail
 	public function send()
 	{
 		try {
+			$this->build();
 			$this->mail->send();
 		} catch (\Exception	$e) {
 			throw $e;

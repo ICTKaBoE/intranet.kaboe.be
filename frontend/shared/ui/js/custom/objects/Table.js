@@ -14,6 +14,8 @@ export default class Table {
 		this.small = this.element.hasAttribute("data-small");
 		this.extraData = {};
 
+		this.usedIcons = {};
+
 		this.oldData = null;
 
 		this.init();
@@ -146,6 +148,42 @@ export default class Table {
 						url.innerHTML = Helpers.getObjectValue(row, column.data)[0];
 
 						td.appendChild(url);
+					} else if (column.type === "password") {
+						if (Helpers.getObjectValue(row, column.data)[0] == "" || Helpers.getObjectValue(row, column.data)[0] == null) { }
+						else {
+							let group = document.createElement("div");
+							group.classList.add("row", "m-0");
+
+							let passwordLabel = document.createElement("span");
+							passwordLabel.classList.add("row", "d-none");
+							passwordLabel.innerHTML = Helpers.getObjectValue(row, column.data)[0];
+							group.appendChild(passwordLabel);
+
+							let passwordHashLabel = document.createElement("span");
+							passwordHashLabel.classList.add("row");
+							passwordHashLabel.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0] || "", column?.type || 'string', column?.format, row);
+							group.appendChild(passwordHashLabel);
+
+							let eyeContainer = document.createElement("span");
+							eyeContainer.classList.add("col-1");
+
+							if (!this.usedIcons.hasOwnProperty("eye")) this.usedIcons["eye"] = Helpers.loadIcon("eye");
+							eyeContainer.innerHTML = this.usedIcons["eye"];
+
+							eyeContainer.onmousedown = () => {
+								passwordHashLabel.classList.add("d-none");
+								passwordLabel.classList.remove("d-none");
+							};
+
+							eyeContainer.onmouseup = () => {
+								passwordLabel.classList.add("d-none");
+								passwordHashLabel.classList.remove("d-none");
+							};
+
+							group.appendChild(eyeContainer);
+
+							td.appendChild(group);
+						}
 					} else {
 						td.innerHTML = Helpers.formatValue(Helpers.getObjectValue(row, column.data)[0] || "", column?.type || 'string', column?.format, row);
 					}

@@ -29,6 +29,7 @@ use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\Order;
 use Database\Repository\OrderLine;
 use Database\Repository\OrderSupplier;
+use Database\Repository\SyncStudent;
 use Database\Repository\UserStart;
 
 class TableController extends ApiController
@@ -1194,6 +1195,22 @@ class TableController extends ApiController
 					"format" => [
 						"length" => 75
 					]
+				],
+				[
+					"type" => "double",
+					"title" => "Offerte prijs",
+					"data" => "quotationPrice",
+					"format" => [
+						"prefix" => "&euro; ",
+						"precision" => 2
+					],
+					"width" => 50
+				],
+				[
+					"type" => "icon",
+					"title" => "Incl. btw",
+					"data" => "quotationVatIncludedIcon",
+					"class" => ["w-1"]
 				]
 			]
 		);
@@ -1238,6 +1255,78 @@ class TableController extends ApiController
 
 		$rows = (new OrderSupplier)->get();
 		$this->appendToJson("rows", $rows);
+		$this->handle();
+	}
+
+	public function syncStudent()
+	{
+		$school = Helpers::input()->get('school')?->getValue();
+		$class  = Helpers::input()->get('class')?->getValue();
+
+		$this->appendToJson(
+			'columns',
+			[
+				[
+					"type" => "checkbox",
+					"class" => ["w-1"],
+					"data" => "id"
+				],
+				[
+					"type" => "badge",
+					"title" => "School",
+					"data" => "institute.school.name",
+					"backgroundColorCustom" => "institute.school.color",
+					"width" => 100
+				],
+				[
+					"title" => "Klas",
+					"data" => "class",
+					"width" => 70
+				],
+				[
+					"title" => "Naam",
+					"data" => "name",
+					"width" => 200
+				],
+				[
+					"title" => "Voornaam",
+					"data" => "firstName",
+					"width" => 200
+				],
+				[
+					"title" => "E-mail",
+					"data" => "email"
+				],
+				[
+					"type" => "password",
+					"title" => "Wachtwoord",
+					"data" => "password",
+					"width" => 150,
+					"format" => [
+						"replace" => "*"
+					]
+				],
+				[
+					"title" => "Laatste sync",
+					"data" => "lastAdSyncTime",
+					"width" => 200
+				],
+				[
+					"title" => "Laatste foutmelding",
+					"data" => "lastAdSyncError",
+				]
+			]
+		);
+
+
+		if (is_null($school) || is_null($class)) {
+			$this->appendToJson("noRowsText", "Gelieve eerst te filteren...");
+		} else {
+			$rows = (new SyncStudent)->getBySchool($school);
+			if ($class && $class !== SELECT_ALL_VALUES) $rows = Arrays::filter($rows, fn ($r) => Strings::equal($r->class, $class));
+			Arrays::each($rows, fn ($row) => $row->link());
+			$this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
+		}
 		$this->handle();
 	}
 }

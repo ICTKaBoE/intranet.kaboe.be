@@ -96,6 +96,14 @@ export default class Helpers {
 				if (format.prefix) value = `${format.prefix}${value}`;
 				if (format.suffix) value = `${value}${format.suffix}`;
 			} break;
+			case 'password': {
+				let str = "";
+				let replace = format?.replace || "*";
+				let length = value.length;
+
+				for (let i = 0; i < length; i++) str += replace;
+				value = str;
+			}
 
 			default: value = value;
 		}
