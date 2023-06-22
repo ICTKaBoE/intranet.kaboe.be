@@ -10,7 +10,7 @@ CREATE TABLE `tbl_sync_student` (
   `class` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `description` varchar(254) COLLATE utf8_unicode_ci DEFAULT NULL,
   `companyName` varchar(254) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `memberOf` blob DEFAULT '{{ad:domain}}/Users',
+  `memberOf` blob DEFAULT "{{ad:domain}}/Users",
   `samAccountName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `ou` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `password` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
