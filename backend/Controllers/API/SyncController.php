@@ -355,14 +355,14 @@ class SyncController extends ApiController
 				$ou = str_replace("{{school:adUserDescription}}", $school->adUserDescription, $ou);
 
 				$action = "N";
-				if (Strings::isBlank($student->lastAdSyncTime)) $action = "C" . PHP_EOL . "UP" . PHP_EOL . "U" . PHP_EOL . "A";
-				else if (!is_null($lastSubscription?->end) && Clock::now()->isAfter(Clock::at($lastSubscription->end))) $action = "DA";
-				else if (Strings::isNotBlank($student->ou) && !Strings::equal($student->ou, $ou)) $action = "U" . PHP_EOL . "M";
+				if (Strings::isBlank($student->lastAdSyncTime)) $action = "C\nUP\nU\nA";
+				if (!is_null($lastSubscription?->end) && Clock::now()->isAfter(Clock::at($lastSubscription->end))) $action = "DA";
+				else if (Strings::isNotBlank($student->ou) && !Strings::equal($student->ou, $ou)) $action = "U\nM";
 
 				$lastSuccessActions = explode(PHP_EOL, $student->lastAdSyncSuccessAction);
 				foreach ($lastSuccessActions as $lsa) {
 					if (Strings::contains($action, $lsa)) {
-						$action = str_replace([$lsa, "{$lsa}" . PHP_EOL], "", $action);
+						$action = str_replace([$lsa, "{$lsa}\n"], "", $action);
 					}
 				}
 

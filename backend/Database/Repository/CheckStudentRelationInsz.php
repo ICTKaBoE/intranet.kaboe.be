@@ -4,7 +4,6 @@ namespace Database\Repository;
 
 use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
 use Security\Input;
 
 class CheckStudentRelationInsz extends Repository
@@ -49,6 +48,8 @@ class CheckStudentRelationInsz extends Repository
 
 	public function getClassBySchool($school)
 	{
+		$school = (new School)->get($school)[0]->name;
+
 		$statement = $this->prepareSelect();
 		$statement->where('school', $school);
 

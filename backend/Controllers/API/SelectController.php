@@ -23,6 +23,7 @@ use Database\Repository\ManagementPatchpanel;
 use Database\Repository\CheckStudentRelationInsz;
 use Database\Repository\OrderSupplier;
 use Database\Repository\SyncStudent;
+use Ouzo\Utilities\Comparator;
 
 class SelectController extends ApiController
 {
@@ -110,8 +111,9 @@ class SelectController extends ApiController
 				['name' => SELECT_ALL_VALUES]
 			];
 
-			foreach ($items as $index => $item) $selectItems[] = ['name' => $item];
-			$items = Arrays::orderBy($items, "name");
+			$items = Arrays::map($items, fn ($i) => ["name" => trim($i)]);
+			$items = Arrays::sort($items, Comparator::compareBy('name'));
+			$selectItems = array_merge($selectItems, $items);
 
 			$this->appendToJson("items", $selectItems);
 		}
@@ -131,7 +133,8 @@ class SelectController extends ApiController
 			];
 
 			$items = Arrays::map($items, fn ($i) => ["name" => trim($i)]);
-			$selectItems = array_merge($selectItems, Arrays::orderBy($items, "name"));
+			$items = Arrays::sort($items, Comparator::compareBy('name'));
+			$selectItems = array_merge($selectItems, $items);
 
 			$this->appendToJson("items", $selectItems);
 		}
