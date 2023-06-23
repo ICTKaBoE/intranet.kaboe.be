@@ -235,4 +235,16 @@ class FormController extends ApiController
 		$this->appendToJson("fields", $details->toArray());
 		$this->handle();
 	}
+
+	public function getSyncSettings()
+	{
+		$module = (new Module)->getByModule("synchronisation");
+		$settings = (new ModuleSetting)->getByModule($module->id);
+
+		$returnSettings = [];
+		foreach ($settings as $setting) $returnSettings[$setting->key] = $setting->value;
+
+		$this->appendToJson("fields", $returnSettings);
+		$this->handle();
+	}
 }

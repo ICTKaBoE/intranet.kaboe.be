@@ -493,6 +493,11 @@
 					"function": "orderSupplier"
 				},
 				{
+					"path": "/form/{prefix}/synchronisation/settings",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getSyncSettings"
+				},
+				{
 					"path": "/notescreen/{prefix}/notescreen/viewscreen/{schoolId}",
 					"controller": "\\Controllers\\API\\NoteScreenController",
 					"function": "viewscreen"
@@ -703,6 +708,11 @@
 					"path": "/form/{prefix}/orders/suppliers/{method}/{id?}",
 					"controller": "\\Controllers\\API\\OrderController",
 					"function": "supplier"
+				},
+				{
+					"path": "/form/{prefix}/synchronisation/settings",
+					"controller": "\\Controllers\\API\\SyncController",
+					"function": "settings"
 				},
 				{
 					"path": "/{prefix}/helpdesk/open/claim/{id}",

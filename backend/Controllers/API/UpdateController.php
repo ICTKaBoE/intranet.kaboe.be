@@ -25,17 +25,14 @@ class UpdateController extends ApiController
 		try {
 			$database = Database::getInstance();
 			$connection = $database->getConnection();
-			$database->beginTransaction();
 
 			foreach ($lines as $line) {
 				$stmt = $connection->prepare($line);
 				$stmt->execute();
 			}
 
-			$database->commit();
 			$this->appendToJson("update", "Success");
 		} catch (\Exception $e) {
-			$database->rollback();
 			$this->appendToJson("update", "Failed: {$e->getMessage()}");
 		}
 

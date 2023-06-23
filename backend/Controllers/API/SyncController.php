@@ -25,6 +25,7 @@ use Database\Repository\ManagementComputer;
 use Database\Object\LocalUser as ObjectLocalUser;
 use Database\Object\UserSecurity as ObjectUserSecurity;
 use Database\Object\ManagementComputer as ObjectManagementComputer;
+use Database\Object\ModuleSetting as ObjectModuleSetting;
 use Database\Object\SyncStudent as ObjectSyncStudent;
 use Database\Object\SyncTeacher as ObjectSyncTeacher;
 use Database\Object\UserAddress as ObjectUserAddress;
@@ -597,6 +598,38 @@ class SyncController extends ApiController
 
 		if (!$this->validationIsAllGood()) $this->setHttpCode(400);
 		else $this->appendToJson("message", "Success!");
+		$this->handle();
+	}
+
+	public function settings()
+	{
+		$settings = [
+			"syncToAdFrom" => 1,
+			"dictionary" => NULL
+		];
+		$module = (new Module)->getByModule('synchronisation');
+		$moduleSettingRepo = new ModuleSetting;
+
+		foreach ($settings as $setting => $defaultValue) {
+			$moduleSetting = $moduleSettingRepo->getByModuleAndKey($module->id, $setting);
+			$value = isset($_POST[$setting]) ? Helpers::input()->post($setting)->getValue() : $defaultValue;
+
+			if (is_null($moduleSetting)) {
+				$moduleSetting = new ObjectModuleSetting([
+					'moduleId' => $module->id,
+					'key' => $setting,
+					'value' => $value
+				]);
+			} else {
+				$moduleSetting->value = $value;
+			}
+
+			$moduleSettingRepo->set($moduleSetting);
+		}
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		}
 		$this->handle();
 	}
 }
