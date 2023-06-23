@@ -94,4 +94,9 @@ class Repository
         $statement = $this->repoTable->insert($object);
         return $statement->execute();
     }
+
+    public function deleteWhereDeleteTrue()
+    {
+        $this->repoTable->delete()->where("deleted", 1)->execute();
+    }
 }

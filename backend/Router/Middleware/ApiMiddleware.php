@@ -12,6 +12,7 @@ use Security\User;
 class ApiMiddleware implements IMiddleware
 {
 	const SKIP_SIGN_IN_CHECK = [
+		"/api/v1.0/clean/",
 		"/api/v1.0/user/sync/",
 		"/api/v1.0/sync/ad/user/",
 		"/api/v1.0/sync/informat/",

@@ -49,6 +49,11 @@
 		"methods": {
 			"get": [
 				{
+					"path": "/clean",
+					"controller": "\\Controllers\\API\\CleanController",
+					"function": "start"
+				},
+				{
 					"path": "/update/database/{vMajor}/{vMinor}",
 					"controller": "\\Controllers\\API\\UpdateController",
 					"function": "database"

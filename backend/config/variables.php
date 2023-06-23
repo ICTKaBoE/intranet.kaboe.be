@@ -39,13 +39,23 @@ define("ROUTER_DEFAULT_CONTROLLER", "DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");
-define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') < 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
+define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
 
 define("EMAIL_SUFFIX", "coltd.be");
 
 define("SYNC_DEFAULT_COMPANY_NAME", "Basisscholen");
 define("SYNC_DEFAULT_MEMBEROF_STUDENT", "secur.leerlingen.{{school:adSecGroupPostfix}}");
 define("SYNC_DEFAULT_OU_STUDENT", "OU={{school:adUserDescription}},OU=Leerlingen,OU=BASISSCHOLEN,OU=UsersCOLTD,OU=COLTD,DC=coltd,DC=be");
+
+define("CLEAN_DATES", [
+	"bikeEvent" => [
+		"date" => "8-31",
+		"year" => 1
+	],
+	"helpdesk" => [
+		"month" => 1
+	]
+]);
 
 define("MANAGEMENT_DEFAULT_PASS", "@KaBoE123");
 if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
