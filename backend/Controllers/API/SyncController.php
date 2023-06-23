@@ -166,19 +166,14 @@ class SyncController extends ApiController
 	{
 		$id = explode("-", $id);
 
-		$module = (new Module)->getByModule('synchronisation');
-		$moduleSettingRepo = new ModuleSetting;
 		$syncStudentRepo = new SyncStudent;
-		$dictionary = $moduleSettingRepo->getByModuleAndKey($module->id, "dictionary")->value;
-		$words = explode(PHP_EOL, $dictionary);
 
 		foreach ($id as $_id) {
 			$student = $syncStudentRepo->get($_id)[0];
 			$password = $student->password;
 
 			if (Strings::equal($random, "true")) {
-				$password = Arrays::randElement($words);
-				$password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
+				$password = $this->generatePassword();
 			}
 
 			$student->password = $password;
@@ -188,6 +183,19 @@ class SyncController extends ApiController
 
 		$this->setReload();
 		$this->handle();
+	}
+
+	private function generatePassword()
+	{
+		$module = (new Module)->getByModule('synchronisation');
+		$moduleSettingRepo = new ModuleSetting;
+		$dictionary = $moduleSettingRepo->getByModuleAndKey($module->id, "dictionary")->value;
+		$words = explode(PHP_EOL, $dictionary);
+
+		$password = Arrays::randElement($words);
+		$password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
+
+		return $password;
 	}
 
 	public function informatStudent()
@@ -344,6 +352,7 @@ class SyncController extends ApiController
 				$student = $syncStudentRepo->getByInformatUID($istudent->informatUID) ?? new ObjectSyncStudent;
 
 				$uid = $istudent->informatUID;
+				$password = $student->password;
 
 				$firstNameClean = Input::clean($istudent->firstName);
 				$nameClean = Input::clean($istudent->name);
@@ -355,9 +364,12 @@ class SyncController extends ApiController
 				$ou = str_replace("{{school:adUserDescription}}", $school->adUserDescription, $ou);
 
 				$action = "N";
-				if (Strings::isBlank($student->lastAdSyncTime)) $action = "C\nUP\nU\nA";
 				if (!is_null($lastSubscription?->end) && Clock::now()->isAfter(Clock::at($lastSubscription->end))) $action = "DA";
 				else if (Strings::isNotBlank($student->ou) && !Strings::equal($student->ou, $ou)) $action = "U\nM";
+				else if (Strings::isBlank($student->lastAdSyncTime)) {
+					$password = $this->generatePassword();
+					$action = "C\nUP\nU\nA";
+				}
 
 				$lastSuccessActions = explode(PHP_EOL, $student->lastAdSyncSuccessAction);
 				foreach ($lastSuccessActions as $lsa) {
@@ -377,6 +389,7 @@ class SyncController extends ApiController
 				$student->email = strtolower("{$firstNameClean}.{$nameClean}@student." . EMAIL_SUFFIX);
 				$student->description = $school->adUserDescription;
 				$student->companyName = SYNC_DEFAULT_COMPANY_NAME;
+				$student->password = $password;
 				$student->memberOf = $memberOf;
 				$student->samAccountName = substr(explode("@", $student->email)[0], 0, 19);
 				$student->ou = $ou;
