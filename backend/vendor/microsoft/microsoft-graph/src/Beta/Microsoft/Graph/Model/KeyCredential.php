@@ -120,7 +120,7 @@ class KeyCredential extends Entity
 
     /**
     * Gets the key
-    * Value for the key credential. Should be a Base64 encoded value. Returned only on $select for a single object, that is, GET applications/{applicationId}?$select=keyCredentials or GET servicePrincipals/{servicePrincipalId}?$select=keyCredentials; otherwise, it is always null.
+    * Value for the key credential. Should be a Base64 encoded value. Returned only on $select for a single object, that is, GET applications/{applicationId}?$select=keyCredentials or GET servicePrincipals/{servicePrincipalId}?$select=keyCredentials; otherwise, it is always null.  From a .cer certificate, you can read the key using the Convert.ToBase64String() method. For more information, see Get the certificate key.
     *
     * @return \GuzzleHttp\Psr7\Stream|null The key
     */
@@ -139,7 +139,7 @@ class KeyCredential extends Entity
 
     /**
     * Sets the key
-    * Value for the key credential. Should be a Base64 encoded value. Returned only on $select for a single object, that is, GET applications/{applicationId}?$select=keyCredentials or GET servicePrincipals/{servicePrincipalId}?$select=keyCredentials; otherwise, it is always null.
+    * Value for the key credential. Should be a Base64 encoded value. Returned only on $select for a single object, that is, GET applications/{applicationId}?$select=keyCredentials or GET servicePrincipals/{servicePrincipalId}?$select=keyCredentials; otherwise, it is always null.  From a .cer certificate, you can read the key using the Convert.ToBase64String() method. For more information, see Get the certificate key.
     *
     * @param \GuzzleHttp\Psr7\Stream $val The value to assign to the key
     *
@@ -213,7 +213,7 @@ class KeyCredential extends Entity
     }
     /**
     * Gets the type
-    * The type of key credential; for example, Symmetric, AsymmetricX509Cert.
+    * The type of key credential; for example, Symmetric, AsymmetricX509Cert, or X509CertAndPassword.
     *
     * @return string|null The type
     */
@@ -228,7 +228,7 @@ class KeyCredential extends Entity
 
     /**
     * Sets the type
-    * The type of key credential; for example, Symmetric, AsymmetricX509Cert.
+    * The type of key credential; for example, Symmetric, AsymmetricX509Cert, or X509CertAndPassword.
     *
     * @param string $val The value of the type
     *
@@ -241,7 +241,7 @@ class KeyCredential extends Entity
     }
     /**
     * Gets the usage
-    * A string that describes the purpose for which the key can be used; for example, Verify.
+    * A string that describes the purpose for which the key can be used; for example, None​, Verify​, PairwiseIdentifier​, Delegation​, Decrypt​, Encrypt​, HashedIdentifier​, SelfSignedTls, or Sign. If usage is Sign​, the type should be X509CertAndPassword​, and the passwordCredentials​ for signing should be defined.
     *
     * @return string|null The usage
     */
@@ -256,7 +256,7 @@ class KeyCredential extends Entity
 
     /**
     * Sets the usage
-    * A string that describes the purpose for which the key can be used; for example, Verify.
+    * A string that describes the purpose for which the key can be used; for example, None​, Verify​, PairwiseIdentifier​, Delegation​, Decrypt​, Encrypt​, HashedIdentifier​, SelfSignedTls, or Sign. If usage is Sign​, the type should be X509CertAndPassword​, and the passwordCredentials​ for signing should be defined.
     *
     * @param string $val The value of the usage
     *

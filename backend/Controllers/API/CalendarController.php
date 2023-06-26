@@ -7,6 +7,7 @@ use Ouzo\Utilities\Arrays;
 use Controllers\ApiController;
 use Database\Repository\Holliday;
 use Database\Repository\BikeEventHomeWork;
+use Database\Repository\SupervisionEvent;
 
 class CalendarController extends ApiController
 {
@@ -46,6 +47,28 @@ class CalendarController extends ApiController
 					"text-{$event->userHomeWorkDistance->textColor}"
 				],
 				"allDay" => true,
+			]);
+		}
+
+		$this->handle();
+	}
+
+	public function supervision()
+	{
+		$user = User::getLoggedInUser();
+		$events = (new SupervisionEvent)->getByUserId($user->id);
+		$events = Arrays::filter($events, fn ($e) => !(is_null($e->start) && is_null($e->end)));
+
+		foreach ($events as $event) {
+			$event->link();
+			$this->appendToJson(data: [
+				"id" => $event->id,
+				"start" => $event->start,
+				"end" => $event->end,
+				"classNames" => [
+					"bg-green",
+					"text-white"
+				],
 			]);
 		}
 

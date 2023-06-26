@@ -966,7 +966,7 @@ class Application extends DirectoryObject
 
     /**
     * Gets the tags
-    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith).
+    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith) and $search.
     *
     * @return array|null The tags
     */
@@ -981,7 +981,7 @@ class Application extends DirectoryObject
 
     /**
     * Sets the tags
-    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith).
+    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith) and $search.
     *
     * @param string[] $val The tags
     *
@@ -1322,6 +1322,37 @@ class Application extends DirectoryObject
     public function setTokenLifetimePolicies($val)
     {
         $this->_propDict["tokenLifetimePolicies"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the synchronization
+    *
+    * @return Synchronization|null The synchronization
+    */
+    public function getSynchronization()
+    {
+        if (array_key_exists("synchronization", $this->_propDict)) {
+            if (is_a($this->_propDict["synchronization"], "\Microsoft\Graph\Model\Synchronization") || is_null($this->_propDict["synchronization"])) {
+                return $this->_propDict["synchronization"];
+            } else {
+                $this->_propDict["synchronization"] = new Synchronization($this->_propDict["synchronization"]);
+                return $this->_propDict["synchronization"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the synchronization
+    *
+    * @param Synchronization $val The synchronization
+    *
+    * @return Application
+    */
+    public function setSynchronization($val)
+    {
+        $this->_propDict["synchronization"] = $val;
         return $this;
     }
 

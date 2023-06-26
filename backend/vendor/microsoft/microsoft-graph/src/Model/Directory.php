@@ -56,6 +56,66 @@ class Directory extends Entity
 
 
      /**
+     * Gets the attributeSets
+    * Group of related custom security attribute definitions.
+     *
+     * @return array|null The attributeSets
+     */
+    public function getAttributeSets()
+    {
+        if (array_key_exists("attributeSets", $this->_propDict)) {
+           return $this->_propDict["attributeSets"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the attributeSets
+    * Group of related custom security attribute definitions.
+    *
+    * @param AttributeSet[] $val The attributeSets
+    *
+    * @return Directory
+    */
+    public function setAttributeSets($val)
+    {
+        $this->_propDict["attributeSets"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the customSecurityAttributeDefinitions
+    * Schema of a custom security attributes (key-value pairs).
+     *
+     * @return array|null The customSecurityAttributeDefinitions
+     */
+    public function getCustomSecurityAttributeDefinitions()
+    {
+        if (array_key_exists("customSecurityAttributeDefinitions", $this->_propDict)) {
+           return $this->_propDict["customSecurityAttributeDefinitions"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the customSecurityAttributeDefinitions
+    * Schema of a custom security attributes (key-value pairs).
+    *
+    * @param CustomSecurityAttributeDefinition[] $val The customSecurityAttributeDefinitions
+    *
+    * @return Directory
+    */
+    public function setCustomSecurityAttributeDefinitions($val)
+    {
+        $this->_propDict["customSecurityAttributeDefinitions"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the deletedItems
     * Recently deleted items. Read-only. Nullable.
      *

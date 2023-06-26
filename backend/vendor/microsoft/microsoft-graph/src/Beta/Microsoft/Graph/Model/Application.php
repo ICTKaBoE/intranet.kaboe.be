@@ -117,6 +117,39 @@ class Application extends DirectoryObject
     }
 
     /**
+    * Gets the authenticationBehaviors
+    * The collection of authentication behaviors set for the application. Authentication behaviors are unset by default and must be explicitly enabled (or disabled). Returned only on $select.
+    *
+    * @return AuthenticationBehaviors|null The authenticationBehaviors
+    */
+    public function getAuthenticationBehaviors()
+    {
+        if (array_key_exists("authenticationBehaviors", $this->_propDict)) {
+            if (is_a($this->_propDict["authenticationBehaviors"], "\Beta\Microsoft\Graph\Model\AuthenticationBehaviors") || is_null($this->_propDict["authenticationBehaviors"])) {
+                return $this->_propDict["authenticationBehaviors"];
+            } else {
+                $this->_propDict["authenticationBehaviors"] = new AuthenticationBehaviors($this->_propDict["authenticationBehaviors"]);
+                return $this->_propDict["authenticationBehaviors"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the authenticationBehaviors
+    * The collection of authentication behaviors set for the application. Authentication behaviors are unset by default and must be explicitly enabled (or disabled). Returned only on $select.
+    *
+    * @param AuthenticationBehaviors $val The authenticationBehaviors
+    *
+    * @return Application
+    */
+    public function setAuthenticationBehaviors($val)
+    {
+        $this->_propDict["authenticationBehaviors"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the certification
     * Specifies the certification status of the application.
     *
@@ -915,7 +948,7 @@ class Application extends DirectoryObject
 
     /**
     * Gets the tags
-    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith).
+    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith) and $search.
     *
     * @return array|null The tags
     */
@@ -930,7 +963,7 @@ class Application extends DirectoryObject
 
     /**
     * Sets the tags
-    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith).
+    * Custom strings that can be used to categorize and identify the application. Not nullable. Strings added here will also appear in the tags property of any associated service principals.Supports $filter (eq, not, ge, le, startsWith) and $search.
     *
     * @param string[] $val The tags
     *

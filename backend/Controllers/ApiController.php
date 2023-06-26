@@ -24,6 +24,7 @@ class ApiController
 		if ($this->validation) Arrays::setNestedValue($this->json, ['validation'], $this->validation);
 		if ($this->redirect) Arrays::setNestedValue($this->json, ['redirect'], $this->redirect);
 		if ($this->error) Arrays::setNestedValue($this->json, ['error'], $this->error);
+		if ($this->toast) Arrays::setNestedValue($this->json, ['toast'], $this->toast);
 		if ($this->reload) Arrays::setNestedValue($this->json, ['reload'], $this->reload);
 
 		Helpers::response()->json($this->json);
@@ -43,6 +44,14 @@ class ApiController
 	protected function setError($error)
 	{
 		$this->error = $error;
+	}
+
+	protected function setToast($message, $type = self::VALIDATION_STATE_VALID)
+	{
+		$this->toast = [
+			"type" => $type,
+			"message" => $message
+		];
 	}
 
 	protected function removeValidation($input)

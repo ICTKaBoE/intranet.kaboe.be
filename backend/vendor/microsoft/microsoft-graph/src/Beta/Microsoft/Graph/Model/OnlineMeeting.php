@@ -178,6 +178,35 @@ class OnlineMeeting extends Entity
     }
 
     /**
+    * Gets the allowRecording
+    * Indicates whether recording is enabled for the meeting.
+    *
+    * @return bool|null The allowRecording
+    */
+    public function getAllowRecording()
+    {
+        if (array_key_exists("allowRecording", $this->_propDict)) {
+            return $this->_propDict["allowRecording"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the allowRecording
+    * Indicates whether recording is enabled for the meeting.
+    *
+    * @param bool $val The allowRecording
+    *
+    * @return OnlineMeeting
+    */
+    public function setAllowRecording($val)
+    {
+        $this->_propDict["allowRecording"] = boolval($val);
+        return $this;
+    }
+
+    /**
     * Gets the allowTeamworkReactions
     * Indicates if Teams reactions are enabled for the meeting.
     *
@@ -203,6 +232,35 @@ class OnlineMeeting extends Entity
     public function setAllowTeamworkReactions($val)
     {
         $this->_propDict["allowTeamworkReactions"] = boolval($val);
+        return $this;
+    }
+
+    /**
+    * Gets the allowTranscription
+    * Indicates whether transcription is enabled for the meeting.
+    *
+    * @return bool|null The allowTranscription
+    */
+    public function getAllowTranscription()
+    {
+        if (array_key_exists("allowTranscription", $this->_propDict)) {
+            return $this->_propDict["allowTranscription"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the allowTranscription
+    * Indicates whether transcription is enabled for the meeting.
+    *
+    * @param bool $val The allowTranscription
+    *
+    * @return OnlineMeeting
+    */
+    public function setAllowTranscription($val)
+    {
+        $this->_propDict["allowTranscription"] = boolval($val);
         return $this;
     }
 
@@ -330,6 +388,37 @@ class OnlineMeeting extends Entity
     public function setAudioConferencing($val)
     {
         $this->_propDict["audioConferencing"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the broadcastRecording
+    *
+    * @return \GuzzleHttp\Psr7\Stream|null The broadcastRecording
+    */
+    public function getBroadcastRecording()
+    {
+        if (array_key_exists("broadcastRecording", $this->_propDict)) {
+            if (is_a($this->_propDict["broadcastRecording"], "\GuzzleHttp\Psr7\Stream") || is_null($this->_propDict["broadcastRecording"])) {
+                return $this->_propDict["broadcastRecording"];
+            } else {
+                $this->_propDict["broadcastRecording"] = \GuzzleHttp\Psr7\Utils::streamFor($this->_propDict["broadcastRecording"]);
+                return $this->_propDict["broadcastRecording"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the broadcastRecording
+    *
+    * @param \GuzzleHttp\Psr7\Stream $val The broadcastRecording
+    *
+    * @return OnlineMeeting
+    */
+    public function setBroadcastRecording($val)
+    {
+        $this->_propDict["broadcastRecording"] = $val;
         return $this;
     }
 
@@ -832,6 +921,7 @@ class OnlineMeeting extends Entity
 
     /**
     * Gets the shareMeetingChatHistoryDefault
+    * Specifies whether meeting chat history is shared with participants.  Possible values are: all, none, unknownFutureValue.
     *
     * @return MeetingChatHistoryDefaultMode|null The shareMeetingChatHistoryDefault
     */
@@ -850,6 +940,7 @@ class OnlineMeeting extends Entity
 
     /**
     * Sets the shareMeetingChatHistoryDefault
+    * Specifies whether meeting chat history is shared with participants.  Possible values are: all, none, unknownFutureValue.
     *
     * @param MeetingChatHistoryDefaultMode $val The shareMeetingChatHistoryDefault
     *
@@ -1107,6 +1198,34 @@ class OnlineMeeting extends Entity
     public function setRegistration($val)
     {
         $this->_propDict["registration"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the recordings
+     *
+     * @return array|null The recordings
+     */
+    public function getRecordings()
+    {
+        if (array_key_exists("recordings", $this->_propDict)) {
+           return $this->_propDict["recordings"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the recordings
+    *
+    * @param CallRecording[] $val The recordings
+    *
+    * @return OnlineMeeting
+    */
+    public function setRecordings($val)
+    {
+        $this->_propDict["recordings"] = $val;
         return $this;
     }
 

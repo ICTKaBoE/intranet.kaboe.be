@@ -239,6 +239,72 @@ class AuthenticationMethodsPolicy extends Entity
         return $this;
     }
 
+    /**
+    * Gets the reportSuspiciousActivitySettings
+    * Enable users to report unexpected voice call or phone app notification multi-factor authentication prompts as suspicious.
+    *
+    * @return ReportSuspiciousActivitySettings|null The reportSuspiciousActivitySettings
+    */
+    public function getReportSuspiciousActivitySettings()
+    {
+        if (array_key_exists("reportSuspiciousActivitySettings", $this->_propDict)) {
+            if (is_a($this->_propDict["reportSuspiciousActivitySettings"], "\Beta\Microsoft\Graph\Model\ReportSuspiciousActivitySettings") || is_null($this->_propDict["reportSuspiciousActivitySettings"])) {
+                return $this->_propDict["reportSuspiciousActivitySettings"];
+            } else {
+                $this->_propDict["reportSuspiciousActivitySettings"] = new ReportSuspiciousActivitySettings($this->_propDict["reportSuspiciousActivitySettings"]);
+                return $this->_propDict["reportSuspiciousActivitySettings"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the reportSuspiciousActivitySettings
+    * Enable users to report unexpected voice call or phone app notification multi-factor authentication prompts as suspicious.
+    *
+    * @param ReportSuspiciousActivitySettings $val The reportSuspiciousActivitySettings
+    *
+    * @return AuthenticationMethodsPolicy
+    */
+    public function setReportSuspiciousActivitySettings($val)
+    {
+        $this->_propDict["reportSuspiciousActivitySettings"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the systemCredentialPreferences
+    * Prompt users with their most-preferred credential for multifactor authentication.
+    *
+    * @return SystemCredentialPreferences|null The systemCredentialPreferences
+    */
+    public function getSystemCredentialPreferences()
+    {
+        if (array_key_exists("systemCredentialPreferences", $this->_propDict)) {
+            if (is_a($this->_propDict["systemCredentialPreferences"], "\Beta\Microsoft\Graph\Model\SystemCredentialPreferences") || is_null($this->_propDict["systemCredentialPreferences"])) {
+                return $this->_propDict["systemCredentialPreferences"];
+            } else {
+                $this->_propDict["systemCredentialPreferences"] = new SystemCredentialPreferences($this->_propDict["systemCredentialPreferences"]);
+                return $this->_propDict["systemCredentialPreferences"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the systemCredentialPreferences
+    * Prompt users with their most-preferred credential for multifactor authentication.
+    *
+    * @param SystemCredentialPreferences $val The systemCredentialPreferences
+    *
+    * @return AuthenticationMethodsPolicy
+    */
+    public function setSystemCredentialPreferences($val)
+    {
+        $this->_propDict["systemCredentialPreferences"] = $val;
+        return $this;
+    }
+
 
      /**
      * Gets the authenticationMethodConfigurations

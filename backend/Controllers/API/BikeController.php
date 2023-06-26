@@ -243,7 +243,7 @@ class BikeController extends ApiController
 		$lastPayDate = (new ModuleSetting)->getByModuleAndKey($module->id, "lastPayDate")->value;
 		$schoolRepo = new School();
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-		$zipFileName = "exportPerSchool.zip";
+		$zipFileName = "Fietsvergoeding - Export Per School.zip";
 		$monthsBetweenDates = Date::monthsBetweenDates($start, $end, "M Y");
 
 		foreach ($schoolIds as $index => $schoolId) {
@@ -339,7 +339,7 @@ class BikeController extends ApiController
 		$lastPayDate = (new ModuleSetting)->getByModuleAndKey($module->id, "lastPayDate")->value;
 		$schoolRepo = new School();
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-		$filename = "exportPerSchool.xlsx";
+		$filename = "Fietsvergoeding - Export Per School.xlsx";
 		$monthsBetweenDates = Date::monthsBetweenDates($start, $end, "M Y");
 
 		// $overview = [];
@@ -475,7 +475,7 @@ class BikeController extends ApiController
 		$module = (new Module)->getByModule('bike');
 		$lastPayDate = (new ModuleSetting)->getByModuleAndKey($module->id, "lastPayDate")->value;
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-		$zipFileName = "exportPerTeacher.zip";
+		$zipFileName = "Fietsvergoeding - Export Per Leerkracht.zip";
 		$monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 		$groupedEvents = $this->getEventsGroupedByMonthByTeacherBySchool($start, $end, $schoolIds);
 
@@ -594,7 +594,7 @@ class BikeController extends ApiController
 		$module = (new Module)->getByModule('bike');
 		$lastPayDate = (new ModuleSetting)->getByModuleAndKey($module->id, "lastPayDate")->value;
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-		$filename = "exportPerTeacher.xlsx";
+		$filename = "Fietsvergoeding - Export Per Leerkracht.xlsx";
 		$monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 		$excel = new Excel("{$folder}/{$filename}");
 		$groupedEvents = $this->getEventsGroupedByMonthByTeacherBySchool($start, $end, $schoolIds);

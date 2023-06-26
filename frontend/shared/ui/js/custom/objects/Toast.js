@@ -18,12 +18,12 @@ export default class Toast {
 	createStructure = () => {
 		if (!this.container) {
 			this.container = document.createElement("DIV");
-			this.container.classList.add("toast-container", "position-fixed", "bottom-0", "end-0", "p-3");
+			this.container.classList.add("toast-container", "position-fixed", "top-0", "end-0", "p-3");
 			document.body.appendChild(this.container);
 		}
 	};
 
-	show = (creator, content) => {
+	show = (creator, content, type = "valid") => {
 		let toast = document.createElement("div");
 		toast.classList.add("toast", "mb-2");
 		toast.role = "alert";
@@ -31,7 +31,7 @@ export default class Toast {
 		toast.ariaAtomic = true;
 
 		let toastHeader = document.createElement("div");
-		toastHeader.classList.add("toast-header");
+		toastHeader.classList.add("toast-header", `text-bg-${(type === 'valid' ? 'green' : 'red')}`);
 
 		let strong = document.createElement("strong");
 		strong.classList.add("me-auto");

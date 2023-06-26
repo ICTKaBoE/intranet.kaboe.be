@@ -25,6 +25,7 @@ class RemovedState extends Entity
 {
     /**
     * Gets the reason
+    * The removal reason for the participant resource.
     *
     * @return string|null The reason
     */
@@ -39,6 +40,7 @@ class RemovedState extends Entity
 
     /**
     * Sets the reason
+    * The removal reason for the participant resource.
     *
     * @param string $val The value of the reason
     *

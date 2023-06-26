@@ -26,7 +26,7 @@ class MediaStream extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the audioCodec
-    * Codec name used to encode audio for transmission on the network. Possible values are: unknown, invalid, cn, pcma, pcmu, amrWide, g722, g7221, g7221c, g729, multiChannelAudio, muchv2, opus, satin, satinFullband, rtAudio8, rtAudio16, silk, silkNarrow, silkWide, siren, xmsRTA, unknownFutureValue.
+    * Codec name used to encode audio for transmission on the network. Possible values are: unknown, invalid, cn, pcma, pcmu, amrWide, g722, g7221, g7221c, g729, multiChannelAudio, muchv2, opus, satin, satinFullband, rtAudio8, rtAudio16, silk, silkNarrow, silkWide, siren, xmsRta, unknownFutureValue.
     *
     * @return AudioCodec|null The audioCodec
     */
@@ -45,7 +45,7 @@ class MediaStream extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the audioCodec
-    * Codec name used to encode audio for transmission on the network. Possible values are: unknown, invalid, cn, pcma, pcmu, amrWide, g722, g7221, g7221c, g729, multiChannelAudio, muchv2, opus, satin, satinFullband, rtAudio8, rtAudio16, silk, silkNarrow, silkWide, siren, xmsRTA, unknownFutureValue.
+    * Codec name used to encode audio for transmission on the network. Possible values are: unknown, invalid, cn, pcma, pcmu, amrWide, g722, g7221, g7221c, g729, multiChannelAudio, muchv2, opus, satin, satinFullband, rtAudio8, rtAudio16, silk, silkNarrow, silkWide, siren, xmsRta, unknownFutureValue.
     *
     * @param AudioCodec $val The value to assign to the audioCodec
     *
@@ -144,6 +144,39 @@ class MediaStream extends \Beta\Microsoft\Graph\Model\Entity
     {
         $this->_propDict["averageBandwidthEstimate"] = $val;
         return $this;
+    }
+
+    /**
+    * Gets the averageFreezeDuration
+    * Average of the received freeze duration related to the video stream.
+    *
+    * @return \DateInterval|null The averageFreezeDuration
+    */
+    public function getAverageFreezeDuration()
+    {
+        if (array_key_exists("averageFreezeDuration", $this->_propDict)) {
+            if (is_a($this->_propDict["averageFreezeDuration"], "\DateInterval") || is_null($this->_propDict["averageFreezeDuration"])) {
+                return $this->_propDict["averageFreezeDuration"];
+            } else {
+                $this->_propDict["averageFreezeDuration"] = new \DateInterval($this->_propDict["averageFreezeDuration"]);
+                return $this->_propDict["averageFreezeDuration"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the averageFreezeDuration
+    * Average of the received freeze duration related to the video stream.
+    *
+    * @param \DateInterval $val The value to assign to the averageFreezeDuration
+    *
+    * @return MediaStream The MediaStream
+    */
+    public function setAverageFreezeDuration($val)
+    {
+        $this->_propDict["averageFreezeDuration"] = $val;
+         return $this;
     }
 
     /**
@@ -413,6 +446,34 @@ class MediaStream extends \Beta\Microsoft\Graph\Model\Entity
          return $this;
     }
     /**
+    * Gets the isAudioForwardErrorCorrectionUsed
+    * Indicates whether the forward error correction (FEC) was used at some point during the session. The default value is null.
+    *
+    * @return bool|null The isAudioForwardErrorCorrectionUsed
+    */
+    public function getIsAudioForwardErrorCorrectionUsed()
+    {
+        if (array_key_exists("isAudioForwardErrorCorrectionUsed", $this->_propDict)) {
+            return $this->_propDict["isAudioForwardErrorCorrectionUsed"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the isAudioForwardErrorCorrectionUsed
+    * Indicates whether the forward error correction (FEC) was used at some point during the session. The default value is null.
+    *
+    * @param bool $val The value of the isAudioForwardErrorCorrectionUsed
+    *
+    * @return MediaStream
+    */
+    public function setIsAudioForwardErrorCorrectionUsed($val)
+    {
+        $this->_propDict["isAudioForwardErrorCorrectionUsed"] = $val;
+        return $this;
+    }
+    /**
     * Gets the lowFrameRateRatio
     * Fraction of the call where frame rate is less than 7.5 frames per second.
     *
@@ -678,6 +739,39 @@ class MediaStream extends \Beta\Microsoft\Graph\Model\Entity
     {
         $this->_propDict["postForwardErrorCorrectionPacketLossRate"] = $val;
         return $this;
+    }
+
+    /**
+    * Gets the rmsFreezeDuration
+    * Root mean square of the received freeze duration related to the video stream.
+    *
+    * @return \DateInterval|null The rmsFreezeDuration
+    */
+    public function getRmsFreezeDuration()
+    {
+        if (array_key_exists("rmsFreezeDuration", $this->_propDict)) {
+            if (is_a($this->_propDict["rmsFreezeDuration"], "\DateInterval") || is_null($this->_propDict["rmsFreezeDuration"])) {
+                return $this->_propDict["rmsFreezeDuration"];
+            } else {
+                $this->_propDict["rmsFreezeDuration"] = new \DateInterval($this->_propDict["rmsFreezeDuration"]);
+                return $this->_propDict["rmsFreezeDuration"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the rmsFreezeDuration
+    * Root mean square of the received freeze duration related to the video stream.
+    *
+    * @param \DateInterval $val The value to assign to the rmsFreezeDuration
+    *
+    * @return MediaStream The MediaStream
+    */
+    public function setRmsFreezeDuration($val)
+    {
+        $this->_propDict["rmsFreezeDuration"] = $val;
+         return $this;
     }
 
     /**

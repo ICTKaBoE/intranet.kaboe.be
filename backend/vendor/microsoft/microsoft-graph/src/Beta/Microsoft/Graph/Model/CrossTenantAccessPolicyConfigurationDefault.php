@@ -26,7 +26,7 @@ class CrossTenantAccessPolicyConfigurationDefault extends Entity
 {
     /**
     * Gets the automaticUserConsentSettings
-    * Determines the default configuration for automatic user consent settings. inboundAllowed and outboundAllowed will always be false and cannot be updated in the default configuration. Read only.
+    * Determines the default configuration for automatic user consent settings. The inboundAllowed and outboundAllowed properties are always false and cannot be updated in the default configuration. Read-only.
     *
     * @return InboundOutboundPolicyConfiguration|null The automaticUserConsentSettings
     */
@@ -45,7 +45,7 @@ class CrossTenantAccessPolicyConfigurationDefault extends Entity
 
     /**
     * Sets the automaticUserConsentSettings
-    * Determines the default configuration for automatic user consent settings. inboundAllowed and outboundAllowed will always be false and cannot be updated in the default configuration. Read only.
+    * Determines the default configuration for automatic user consent settings. The inboundAllowed and outboundAllowed properties are always false and cannot be updated in the default configuration. Read-only.
     *
     * @param InboundOutboundPolicyConfiguration $val The automaticUserConsentSettings
     *
@@ -253,6 +253,7 @@ class CrossTenantAccessPolicyConfigurationDefault extends Entity
 
     /**
     * Gets the tenantRestrictions
+    * Defines the default tenant restrictions configuration for your organization users accessing an external organization on your network or devices.
     *
     * @return CrossTenantAccessPolicyTenantRestrictions|null The tenantRestrictions
     */
@@ -271,6 +272,7 @@ class CrossTenantAccessPolicyConfigurationDefault extends Entity
 
     /**
     * Sets the tenantRestrictions
+    * Defines the default tenant restrictions configuration for your organization users accessing an external organization on your network or devices.
     *
     * @param CrossTenantAccessPolicyTenantRestrictions $val The tenantRestrictions
     *

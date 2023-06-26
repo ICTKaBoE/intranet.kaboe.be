@@ -1797,6 +1797,36 @@ class DeviceManagement extends Entity
 
 
      /**
+     * Gets the templateInsights
+    * List of setting insights in a template
+     *
+     * @return array|null The templateInsights
+     */
+    public function getTemplateInsights()
+    {
+        if (array_key_exists("templateInsights", $this->_propDict)) {
+           return $this->_propDict["templateInsights"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the templateInsights
+    * List of setting insights in a template
+    *
+    * @param DeviceManagementTemplateInsightsDefinition[] $val The templateInsights
+    *
+    * @return DeviceManagement
+    */
+    public function setTemplateInsights($val)
+    {
+        $this->_propDict["templateInsights"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the templateSettings
     * List of all TemplateSettings
      *
@@ -2649,36 +2679,6 @@ class DeviceManagement extends Entity
 
 
      /**
-     * Gets the oemWarrantyInformationOnboarding
-    * List of OEM Warranty Statuses
-     *
-     * @return array|null The oemWarrantyInformationOnboarding
-     */
-    public function getOemWarrantyInformationOnboarding()
-    {
-        if (array_key_exists("oemWarrantyInformationOnboarding", $this->_propDict)) {
-           return $this->_propDict["oemWarrantyInformationOnboarding"];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-    * Sets the oemWarrantyInformationOnboarding
-    * List of OEM Warranty Statuses
-    *
-    * @param OemWarrantyInformationOnboarding[] $val The oemWarrantyInformationOnboarding
-    *
-    * @return DeviceManagement
-    */
-    public function setOemWarrantyInformationOnboarding($val)
-    {
-        $this->_propDict["oemWarrantyInformationOnboarding"] = $val;
-        return $this;
-    }
-
-
-     /**
      * Gets the privilegeManagementElevations
     * The endpoint privilege management elevation event entity contains elevation details.
      *
@@ -2797,6 +2797,36 @@ class DeviceManagement extends Entity
     public function setUserExperienceAnalyticsAnomaly($val)
     {
         $this->_propDict["userExperienceAnalyticsAnomaly"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the userExperienceAnalyticsAnomalyCorrelationGroupOverview
+    * The user experience analytics anomaly correlation group overview entity contains the information for each correlation group of an anomaly.
+     *
+     * @return array|null The userExperienceAnalyticsAnomalyCorrelationGroupOverview
+     */
+    public function getUserExperienceAnalyticsAnomalyCorrelationGroupOverview()
+    {
+        if (array_key_exists("userExperienceAnalyticsAnomalyCorrelationGroupOverview", $this->_propDict)) {
+           return $this->_propDict["userExperienceAnalyticsAnomalyCorrelationGroupOverview"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the userExperienceAnalyticsAnomalyCorrelationGroupOverview
+    * The user experience analytics anomaly correlation group overview entity contains the information for each correlation group of an anomaly.
+    *
+    * @param UserExperienceAnalyticsAnomalyCorrelationGroupOverview[] $val The userExperienceAnalyticsAnomalyCorrelationGroupOverview
+    *
+    * @return DeviceManagement
+    */
+    public function setUserExperienceAnalyticsAnomalyCorrelationGroupOverview($val)
+    {
+        $this->_propDict["userExperienceAnalyticsAnomalyCorrelationGroupOverview"] = $val;
         return $this;
     }
 

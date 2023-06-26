@@ -26,7 +26,7 @@ class User extends DirectoryObject
 {
     /**
     * Gets the signInActivity
-    * Get the last signed-in date and request ID of the sign-in for a given user. Read-only.Returned only on $select. Supports $filter (eq, ne, not, ge, le) but not with any other filterable properties. Note:  Details for this property require an Azure AD Premium P1/P2 license and the AuditLog.Read.All permission.When you specify $select=signInActivity or $filter=signInActivity while listing users, the maximum page size is 120 users. Requests with $top set higher than 120 will fail.This property is not returned for a user who has never signed in or last signed in before April 2020.
+    * Get the last signed-in date and request ID of the sign-in for a given user. Read-only.Returned only on $select. Supports $filter (eq, ne, not, ge, le) but not with any other filterable properties. Note:  Details for this property require an Azure AD Premium P1/P2 license and the AuditLog.Read.All permission.This property is not returned for a user who has never signed in or last signed in before April 2020.
     *
     * @return SignInActivity|null The signInActivity
     */
@@ -45,7 +45,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the signInActivity
-    * Get the last signed-in date and request ID of the sign-in for a given user. Read-only.Returned only on $select. Supports $filter (eq, ne, not, ge, le) but not with any other filterable properties. Note:  Details for this property require an Azure AD Premium P1/P2 license and the AuditLog.Read.All permission.When you specify $select=signInActivity or $filter=signInActivity while listing users, the maximum page size is 120 users. Requests with $top set higher than 120 will fail.This property is not returned for a user who has never signed in or last signed in before April 2020.
+    * Get the last signed-in date and request ID of the sign-in for a given user. Read-only.Returned only on $select. Supports $filter (eq, ne, not, ge, le) but not with any other filterable properties. Note:  Details for this property require an Azure AD Premium P1/P2 license and the AuditLog.Read.All permission.This property is not returned for a user who has never signed in or last signed in before April 2020.
     *
     * @param SignInActivity $val The signInActivity
     *
@@ -896,7 +896,37 @@ class User extends DirectoryObject
     }
 
     /**
+    * Gets the isLicenseReconciliationNeeded
+    * Indicates whether the user is pending an exchange mailbox license assignment.  Read-only.  Supports $filter (eq where true only).
+    *
+    * @return bool|null The isLicenseReconciliationNeeded
+    */
+    public function getIsLicenseReconciliationNeeded()
+    {
+        if (array_key_exists("isLicenseReconciliationNeeded", $this->_propDict)) {
+            return $this->_propDict["isLicenseReconciliationNeeded"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the isLicenseReconciliationNeeded
+    * Indicates whether the user is pending an exchange mailbox license assignment.  Read-only.  Supports $filter (eq where true only).
+    *
+    * @param bool $val The isLicenseReconciliationNeeded
+    *
+    * @return User
+    */
+    public function setIsLicenseReconciliationNeeded($val)
+    {
+        $this->_propDict["isLicenseReconciliationNeeded"] = boolval($val);
+        return $this;
+    }
+
+    /**
     * Gets the isManagementRestricted
+    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.
     *
     * @return bool|null The isManagementRestricted
     */
@@ -911,6 +941,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the isManagementRestricted
+    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.
     *
     * @param bool $val The isManagementRestricted
     *
@@ -1132,7 +1163,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the mobilePhone
-    * The primary cellular telephone number for the user. Read-only for users synced from on-premises directory.  Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
+    * The primary cellular telephone number for the user. Read-only for users synced from on-premises directory.  Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values) and $search.
     *
     * @return string|null The mobilePhone
     */
@@ -1147,7 +1178,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the mobilePhone
-    * The primary cellular telephone number for the user. Read-only for users synced from on-premises directory.  Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
+    * The primary cellular telephone number for the user. Read-only for users synced from on-premises directory.  Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values) and $search.
     *
     * @param string $val The mobilePhone
     *
@@ -1783,6 +1814,36 @@ class User extends DirectoryObject
     public function setSecurityIdentifier($val)
     {
         $this->_propDict["securityIdentifier"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the serviceProvisioningErrors
+    * Errors published by a federated service describing a non-transient, service-specific error regarding the properties or link from a user object .  Supports $filter (eq, not, for isResolved and serviceInstance).
+     *
+     * @return array|null The serviceProvisioningErrors
+     */
+    public function getServiceProvisioningErrors()
+    {
+        if (array_key_exists("serviceProvisioningErrors", $this->_propDict)) {
+           return $this->_propDict["serviceProvisioningErrors"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the serviceProvisioningErrors
+    * Errors published by a federated service describing a non-transient, service-specific error regarding the properties or link from a user object .  Supports $filter (eq, not, for isResolved and serviceInstance).
+    *
+    * @param ServiceProvisioningError[] $val The serviceProvisioningErrors
+    *
+    * @return User
+    */
+    public function setServiceProvisioningErrors($val)
+    {
+        $this->_propDict["serviceProvisioningErrors"] = $val;
         return $this;
     }
 
@@ -4340,6 +4401,37 @@ class User extends DirectoryObject
     public function setTodo($val)
     {
         $this->_propDict["todo"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the employeeExperience
+    *
+    * @return EmployeeExperienceUser|null The employeeExperience
+    */
+    public function getEmployeeExperience()
+    {
+        if (array_key_exists("employeeExperience", $this->_propDict)) {
+            if (is_a($this->_propDict["employeeExperience"], "\Beta\Microsoft\Graph\Model\EmployeeExperienceUser") || is_null($this->_propDict["employeeExperience"])) {
+                return $this->_propDict["employeeExperience"];
+            } else {
+                $this->_propDict["employeeExperience"] = new EmployeeExperienceUser($this->_propDict["employeeExperience"]);
+                return $this->_propDict["employeeExperience"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the employeeExperience
+    *
+    * @param EmployeeExperienceUser $val The employeeExperience
+    *
+    * @return User
+    */
+    public function setEmployeeExperience($val)
+    {
+        $this->_propDict["employeeExperience"] = $val;
         return $this;
     }
 

@@ -14,6 +14,16 @@
 					"controller": "\\Controllers\\APP\\SelectModuleController"
 				},
 				{
+					"path": "/bike/home-work",
+					"controller": "\\Controllers\\APP\\BikeController",
+					"function": "homeWork"
+				},
+				{
+					"path": "/supervision/fill",
+					"controller": "\\Controllers\\APP\\SupervisionController",
+					"function": "fill"
+				},
+				{
 					"path": "/settings/general",
 					"controller": "\\Controllers\\APP\\SettingsController",
 					"function": "general"
@@ -97,6 +107,11 @@
 					"path": "/calendar/{prefix}/bike/home-work",
 					"controller": "\\Controllers\\API\\CalendarController",
 					"function": "homeWork"
+				},
+				{
+					"path": "/calendar/{prefix}/supervision/fill",
+					"controller": "\\Controllers\\API\\CalendarController",
+					"function": "supervision"
 				},
 				{
 					"path": "/calendar/holliday",
@@ -244,6 +259,7 @@
 					"path": [
 						"/select/{prefix}/bike/export/school",
 						"/select/{prefix}/bike/distances/{method}/{id?}/school",
+						"/select/{prefix}/supervision/export/school",
 						"/select/{prefix}/user/profile/school",
 						"/select/{prefix}/checklists/checkStudentRelationInsz/school",
 						"/select/{prefix}/notescreen/pages/school",
@@ -401,6 +417,11 @@
 					"path": "/form/{prefix}/bike/settings",
 					"controller": "\\Controllers\\API\\FormController",
 					"function": "getBikeSettings"
+				},
+				{
+					"path": "/form/{prefix}/supervision/settings",
+					"controller": "\\Controllers\\API\\FormController",
+					"function": "getSupervisionSettings"
 				},
 				{
 					"path": "/form/{prefix}/checklists/checkStudentRelationInsz/{method}/{id}",
@@ -570,6 +591,11 @@
 					"function": "post"
 				},
 				{
+					"path": "/form/{prefix}/supervision/fill",
+					"controller": "\\Controllers\\API\\SupervisionController",
+					"function": "post"
+				},
+				{
 					"path": "/form/{prefix}/bike/distances/delete/{id?}",
 					"controller": "\\Controllers\\API\\BikeController",
 					"function": "deleteDistance"
@@ -587,6 +613,16 @@
 				{
 					"path": "/form/{prefix}/bike/settings",
 					"controller": "\\Controllers\\API\\BikeController",
+					"function": "settings"
+				},
+				{
+					"path": "/form/{prefix}/supervision/export",
+					"controller": "\\Controllers\\API\\SupervisionController",
+					"function": "export"
+				},
+				{
+					"path": "/form/{prefix}/supervision/settings",
+					"controller": "\\Controllers\\API\\SupervisionController",
 					"function": "settings"
 				},
 				{

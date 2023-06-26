@@ -62,6 +62,18 @@ class FormController extends ApiController
 		$this->handle();
 	}
 
+	public function getSupervisionSettings()
+	{
+		$module = (new Module)->getByModule("supervision");
+		$settings = (new ModuleSetting)->getByModule($module->id);
+
+		$returnSettings = [];
+		foreach ($settings as $setting) $returnSettings[$setting->key] = $setting->value;
+
+		$this->appendToJson("fields", $returnSettings);
+		$this->handle();
+	}
+
 	public function getCheckStudentRelationInsz($prefix, $method, $id)
 	{
 		$check = (new CheckStudentRelationInsz)->get($id)[0];

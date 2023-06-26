@@ -42,6 +42,8 @@ class UserHomeWorkDistance extends CustomObject
 				}
 			}
 		}
+
+		$this->formatted = number_format($this->distance, 2, ",", ".");
 	}
 
 	public function link()

@@ -353,6 +353,39 @@ class Organization extends DirectoryObject
     }
 
     /**
+    * Gets the onPremisesLastPasswordSyncDateTime
+    * The last time a password sync request was received for the tenant.
+    *
+    * @return \DateTime|null The onPremisesLastPasswordSyncDateTime
+    */
+    public function getOnPremisesLastPasswordSyncDateTime()
+    {
+        if (array_key_exists("onPremisesLastPasswordSyncDateTime", $this->_propDict)) {
+            if (is_a($this->_propDict["onPremisesLastPasswordSyncDateTime"], "\DateTime") || is_null($this->_propDict["onPremisesLastPasswordSyncDateTime"])) {
+                return $this->_propDict["onPremisesLastPasswordSyncDateTime"];
+            } else {
+                $this->_propDict["onPremisesLastPasswordSyncDateTime"] = new \DateTime($this->_propDict["onPremisesLastPasswordSyncDateTime"]);
+                return $this->_propDict["onPremisesLastPasswordSyncDateTime"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the onPremisesLastPasswordSyncDateTime
+    * The last time a password sync request was received for the tenant.
+    *
+    * @param \DateTime $val The onPremisesLastPasswordSyncDateTime
+    *
+    * @return Organization
+    */
+    public function setOnPremisesLastPasswordSyncDateTime($val)
+    {
+        $this->_propDict["onPremisesLastPasswordSyncDateTime"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the onPremisesLastSyncDateTime
     * The time and date at which the tenant was last synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
@@ -865,6 +898,37 @@ class Organization extends DirectoryObject
     public function setCertificateBasedAuthConfiguration($val)
     {
         $this->_propDict["certificateBasedAuthConfiguration"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the partnerInformation
+    *
+    * @return PartnerInformation|null The partnerInformation
+    */
+    public function getPartnerInformation()
+    {
+        if (array_key_exists("partnerInformation", $this->_propDict)) {
+            if (is_a($this->_propDict["partnerInformation"], "\Beta\Microsoft\Graph\Model\PartnerInformation") || is_null($this->_propDict["partnerInformation"])) {
+                return $this->_propDict["partnerInformation"];
+            } else {
+                $this->_propDict["partnerInformation"] = new PartnerInformation($this->_propDict["partnerInformation"]);
+                return $this->_propDict["partnerInformation"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the partnerInformation
+    *
+    * @param PartnerInformation $val The partnerInformation
+    *
+    * @return Organization
+    */
+    public function setPartnerInformation($val)
+    {
+        $this->_propDict["partnerInformation"] = $val;
         return $this;
     }
 

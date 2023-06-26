@@ -26,7 +26,36 @@ class PrivilegedAccessGroup extends Entity
 {
 
      /**
+     * Gets the assignmentApprovals
+     *
+     * @return array|null The assignmentApprovals
+     */
+    public function getAssignmentApprovals()
+    {
+        if (array_key_exists("assignmentApprovals", $this->_propDict)) {
+           return $this->_propDict["assignmentApprovals"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the assignmentApprovals
+    *
+    * @param Approval[] $val The assignmentApprovals
+    *
+    * @return PrivilegedAccessGroup
+    */
+    public function setAssignmentApprovals($val)
+    {
+        $this->_propDict["assignmentApprovals"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the assignmentScheduleInstances
+    * The instances of assignment schedules to activate a just-in-time access.
      *
      * @return array|null The assignmentScheduleInstances
      */
@@ -41,6 +70,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the assignmentScheduleInstances
+    * The instances of assignment schedules to activate a just-in-time access.
     *
     * @param PrivilegedAccessGroupAssignmentScheduleInstance[] $val The assignmentScheduleInstances
     *
@@ -55,6 +85,7 @@ class PrivilegedAccessGroup extends Entity
 
      /**
      * Gets the assignmentScheduleRequests
+    * The schedule requests for operations to create, update, delete, extend, and renew an assignment.
      *
      * @return array|null The assignmentScheduleRequests
      */
@@ -69,6 +100,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the assignmentScheduleRequests
+    * The schedule requests for operations to create, update, delete, extend, and renew an assignment.
     *
     * @param PrivilegedAccessGroupAssignmentScheduleRequest[] $val The assignmentScheduleRequests
     *
@@ -83,6 +115,7 @@ class PrivilegedAccessGroup extends Entity
 
      /**
      * Gets the assignmentSchedules
+    * The assignment schedules to activate a just-in-time access.
      *
      * @return array|null The assignmentSchedules
      */
@@ -97,6 +130,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the assignmentSchedules
+    * The assignment schedules to activate a just-in-time access.
     *
     * @param PrivilegedAccessGroupAssignmentSchedule[] $val The assignmentSchedules
     *
@@ -111,6 +145,7 @@ class PrivilegedAccessGroup extends Entity
 
      /**
      * Gets the eligibilityScheduleInstances
+    * The instances of eligibility schedules to activate a just-in-time access.
      *
      * @return array|null The eligibilityScheduleInstances
      */
@@ -125,6 +160,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the eligibilityScheduleInstances
+    * The instances of eligibility schedules to activate a just-in-time access.
     *
     * @param PrivilegedAccessGroupEligibilityScheduleInstance[] $val The eligibilityScheduleInstances
     *
@@ -139,6 +175,7 @@ class PrivilegedAccessGroup extends Entity
 
      /**
      * Gets the eligibilityScheduleRequests
+    * The schedule requests for operations to create, update, delete, extend, and renew an eligibility.
      *
      * @return array|null The eligibilityScheduleRequests
      */
@@ -153,6 +190,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the eligibilityScheduleRequests
+    * The schedule requests for operations to create, update, delete, extend, and renew an eligibility.
     *
     * @param PrivilegedAccessGroupEligibilityScheduleRequest[] $val The eligibilityScheduleRequests
     *
@@ -167,6 +205,7 @@ class PrivilegedAccessGroup extends Entity
 
      /**
      * Gets the eligibilitySchedules
+    * The eligibility schedules to activate a just-in-time access.
      *
      * @return array|null The eligibilitySchedules
      */
@@ -181,6 +220,7 @@ class PrivilegedAccessGroup extends Entity
 
     /**
     * Sets the eligibilitySchedules
+    * The eligibility schedules to activate a just-in-time access.
     *
     * @param PrivilegedAccessGroupEligibilitySchedule[] $val The eligibilitySchedules
     *

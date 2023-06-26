@@ -202,6 +202,33 @@ class Participant extends Entity
     }
 
     /**
+    * Gets the preferredDisplayName
+    *
+    * @return string|null The preferredDisplayName
+    */
+    public function getPreferredDisplayName()
+    {
+        if (array_key_exists("preferredDisplayName", $this->_propDict)) {
+            return $this->_propDict["preferredDisplayName"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the preferredDisplayName
+    *
+    * @param string $val The preferredDisplayName
+    *
+    * @return Participant
+    */
+    public function setPreferredDisplayName($val)
+    {
+        $this->_propDict["preferredDisplayName"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the recordingInfo
     * Information on whether the participant has recording capability.
     *
@@ -236,6 +263,7 @@ class Participant extends Entity
 
     /**
     * Gets the removedState
+    * Indicates the reason why the participant was removed from the roster.
     *
     * @return RemovedState|null The removedState
     */
@@ -254,6 +282,7 @@ class Participant extends Entity
 
     /**
     * Sets the removedState
+    * Indicates the reason why the participant was removed from the roster.
     *
     * @param RemovedState $val The removedState
     *
@@ -300,6 +329,7 @@ class Participant extends Entity
 
     /**
     * Gets the rosterSequenceNumber
+    * Indicates the roster sequence number the participant was last updated in.
     *
     * @return int|null The rosterSequenceNumber
     */
@@ -314,6 +344,7 @@ class Participant extends Entity
 
     /**
     * Sets the rosterSequenceNumber
+    * Indicates the roster sequence number the participant was last updated in.
     *
     * @param int $val The rosterSequenceNumber
     *

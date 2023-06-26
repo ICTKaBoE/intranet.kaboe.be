@@ -26,7 +26,38 @@ class UnifiedRbacApplication extends Entity
 {
 
      /**
+     * Gets the customAppScopes
+    * Workload-specific scope object that represents the resources for which the principal has been granted access.
+     *
+     * @return array|null The customAppScopes
+     */
+    public function getCustomAppScopes()
+    {
+        if (array_key_exists("customAppScopes", $this->_propDict)) {
+           return $this->_propDict["customAppScopes"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the customAppScopes
+    * Workload-specific scope object that represents the resources for which the principal has been granted access.
+    *
+    * @param CustomAppScope[] $val The customAppScopes
+    *
+    * @return UnifiedRbacApplication
+    */
+    public function setCustomAppScopes($val)
+    {
+        $this->_propDict["customAppScopes"] = $val;
+        return $this;
+    }
+
+
+     /**
      * Gets the resourceNamespaces
+    * Resource that represents a collection of related actions.
      *
      * @return array|null The resourceNamespaces
      */
@@ -41,6 +72,7 @@ class UnifiedRbacApplication extends Entity
 
     /**
     * Sets the resourceNamespaces
+    * Resource that represents a collection of related actions.
     *
     * @param UnifiedRbacResourceNamespace[] $val The resourceNamespaces
     *
@@ -55,6 +87,7 @@ class UnifiedRbacApplication extends Entity
 
      /**
      * Gets the roleAssignments
+    * Resource to grant access to users or groups.
      *
      * @return array|null The roleAssignments
      */
@@ -69,6 +102,7 @@ class UnifiedRbacApplication extends Entity
 
     /**
     * Sets the roleAssignments
+    * Resource to grant access to users or groups.
     *
     * @param UnifiedRoleAssignment[] $val The roleAssignments
     *
@@ -83,6 +117,7 @@ class UnifiedRbacApplication extends Entity
 
      /**
      * Gets the roleDefinitions
+    * The roles allowed by RBAC providers and the permissions assigned to the roles.
      *
      * @return array|null The roleDefinitions
      */
@@ -97,6 +132,7 @@ class UnifiedRbacApplication extends Entity
 
     /**
     * Sets the roleDefinitions
+    * The roles allowed by RBAC providers and the permissions assigned to the roles.
     *
     * @param UnifiedRoleDefinition[] $val The roleDefinitions
     *
@@ -111,6 +147,7 @@ class UnifiedRbacApplication extends Entity
 
      /**
      * Gets the transitiveRoleAssignments
+    * Resource to grant access to users or groups that are transitive.
      *
      * @return array|null The transitiveRoleAssignments
      */
@@ -125,6 +162,7 @@ class UnifiedRbacApplication extends Entity
 
     /**
     * Sets the transitiveRoleAssignments
+    * Resource to grant access to users or groups that are transitive.
     *
     * @param UnifiedRoleAssignment[] $val The transitiveRoleAssignments
     *

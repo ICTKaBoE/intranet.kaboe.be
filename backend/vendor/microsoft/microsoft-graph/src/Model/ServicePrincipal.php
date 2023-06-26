@@ -702,7 +702,7 @@ class ServicePrincipal extends DirectoryObject
 
     /**
     * Gets the preferredTokenSigningKeyThumbprint
-    * Reserved for internal use only. Do not write or otherwise rely on this property. May be removed in future versions.
+    * This property can be used on SAML applications (apps that have preferredSingleSignOnMode set to saml) to control which certificate is used to sign the SAML responses. For applications that are not SAML, do not write or otherwise rely on this property.
     *
     * @return string|null The preferredTokenSigningKeyThumbprint
     */
@@ -717,7 +717,7 @@ class ServicePrincipal extends DirectoryObject
 
     /**
     * Sets the preferredTokenSigningKeyThumbprint
-    * Reserved for internal use only. Do not write or otherwise rely on this property. May be removed in future versions.
+    * This property can be used on SAML applications (apps that have preferredSingleSignOnMode set to saml) to control which certificate is used to sign the SAML responses. For applications that are not SAML, do not write or otherwise rely on this property.
     *
     * @param string $val The preferredTokenSigningKeyThumbprint
     *
@@ -881,7 +881,7 @@ class ServicePrincipal extends DirectoryObject
 
     /**
     * Gets the signInAudience
-    * Specifies the Microsoft accounts that are supported for the current application. Read-only. Supported values are:AzureADMyOrg: Users with a Microsoft work or school account in my organization’s Azure AD tenant (single-tenant).AzureADMultipleOrgs: Users with a Microsoft work or school account in any organization’s Azure AD tenant (multi-tenant).AzureADandPersonalMicrosoftAccount: Users with a personal Microsoft account, or a work or school account in any organization’s Azure AD tenant.PersonalMicrosoftAccount: Users with a personal Microsoft account only.
+    * Specifies the Microsoft accounts that are supported for the current application. Read-only. Supported values are:AzureADMyOrg: Users with a Microsoft work or school account in my organization's Azure AD tenant (single-tenant).AzureADMultipleOrgs: Users with a Microsoft work or school account in any organization's Azure AD tenant (multi-tenant).AzureADandPersonalMicrosoftAccount: Users with a personal Microsoft account, or a work or school account in any organization's Azure AD tenant.PersonalMicrosoftAccount: Users with a personal Microsoft account only.
     *
     * @return string|null The signInAudience
     */
@@ -896,7 +896,7 @@ class ServicePrincipal extends DirectoryObject
 
     /**
     * Sets the signInAudience
-    * Specifies the Microsoft accounts that are supported for the current application. Read-only. Supported values are:AzureADMyOrg: Users with a Microsoft work or school account in my organization’s Azure AD tenant (single-tenant).AzureADMultipleOrgs: Users with a Microsoft work or school account in any organization’s Azure AD tenant (multi-tenant).AzureADandPersonalMicrosoftAccount: Users with a personal Microsoft account, or a work or school account in any organization’s Azure AD tenant.PersonalMicrosoftAccount: Users with a personal Microsoft account only.
+    * Specifies the Microsoft accounts that are supported for the current application. Read-only. Supported values are:AzureADMyOrg: Users with a Microsoft work or school account in my organization's Azure AD tenant (single-tenant).AzureADMultipleOrgs: Users with a Microsoft work or school account in any organization's Azure AD tenant (multi-tenant).AzureADandPersonalMicrosoftAccount: Users with a personal Microsoft account, or a work or school account in any organization's Azure AD tenant.PersonalMicrosoftAccount: Users with a personal Microsoft account only.
     *
     * @param string $val The signInAudience
     *
@@ -1470,6 +1470,37 @@ class ServicePrincipal extends DirectoryObject
     public function setTransitiveMemberOf($val)
     {
         $this->_propDict["transitiveMemberOf"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the synchronization
+    *
+    * @return Synchronization|null The synchronization
+    */
+    public function getSynchronization()
+    {
+        if (array_key_exists("synchronization", $this->_propDict)) {
+            if (is_a($this->_propDict["synchronization"], "\Microsoft\Graph\Model\Synchronization") || is_null($this->_propDict["synchronization"])) {
+                return $this->_propDict["synchronization"];
+            } else {
+                $this->_propDict["synchronization"] = new Synchronization($this->_propDict["synchronization"]);
+                return $this->_propDict["synchronization"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the synchronization
+    *
+    * @param Synchronization $val The synchronization
+    *
+    * @return ServicePrincipal
+    */
+    public function setSynchronization($val)
+    {
+        $this->_propDict["synchronization"] = $val;
         return $this;
     }
 

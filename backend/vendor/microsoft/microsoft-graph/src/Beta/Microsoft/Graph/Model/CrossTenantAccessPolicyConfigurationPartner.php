@@ -57,7 +57,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Gets the automaticUserConsentSettings
-    * Determines the partner-specific configuration for automatic user consent settings. Unless specifically configured, the inboundAllowed and outboundAllowed properties will be null and inherit from the default settings, which is always false.
+    * Determines the partner-specific configuration for automatic user consent settings. Unless specifically configured, the inboundAllowed and outboundAllowed properties are null and inherit from the default settings, which is always false.
     *
     * @return InboundOutboundPolicyConfiguration|null The automaticUserConsentSettings
     */
@@ -76,7 +76,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Sets the automaticUserConsentSettings
-    * Determines the partner-specific configuration for automatic user consent settings. Unless specifically configured, the inboundAllowed and outboundAllowed properties will be null and inherit from the default settings, which is always false.
+    * Determines the partner-specific configuration for automatic user consent settings. Unless specifically configured, the inboundAllowed and outboundAllowed properties are null and inherit from the default settings, which is always false.
     *
     * @param InboundOutboundPolicyConfiguration $val The automaticUserConsentSettings
     *
@@ -313,6 +313,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Gets the tenantRestrictions
+    * Defines the partner-specific tenant restrictions configuration for your organization users accessing a partner organization using partner supplied idenities on your network or devices.
     *
     * @return CrossTenantAccessPolicyTenantRestrictions|null The tenantRestrictions
     */
@@ -331,6 +332,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Sets the tenantRestrictions
+    * Defines the partner-specific tenant restrictions configuration for your organization users accessing a partner organization using partner supplied idenities on your network or devices.
     *
     * @param CrossTenantAccessPolicyTenantRestrictions $val The tenantRestrictions
     *
@@ -344,7 +346,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Gets the identitySynchronization
-    * Defines the cross-tenant policy for synchronization of users from a partner tenant. Use this user synchronization policy to streamline collaboration between users in a multi-tenant organization by automating creating, updating, and deleting users from one tenant to another.
+    * Defines the cross-tenant policy for the synchronization of users from a partner tenant. Use this user synchronization policy to streamline collaboration between users in a multi-tenant organization by automating the creation, update, and deletion of users from one tenant to another.
     *
     * @return CrossTenantIdentitySyncPolicyPartner|null The identitySynchronization
     */
@@ -363,7 +365,7 @@ class CrossTenantAccessPolicyConfigurationPartner implements \JsonSerializable
 
     /**
     * Sets the identitySynchronization
-    * Defines the cross-tenant policy for synchronization of users from a partner tenant. Use this user synchronization policy to streamline collaboration between users in a multi-tenant organization by automating creating, updating, and deleting users from one tenant to another.
+    * Defines the cross-tenant policy for the synchronization of users from a partner tenant. Use this user synchronization policy to streamline collaboration between users in a multi-tenant organization by automating the creation, update, and deletion of users from one tenant to another.
     *
     * @param CrossTenantIdentitySyncPolicyPartner $val The identitySynchronization
     *
