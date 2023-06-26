@@ -19,7 +19,7 @@
 	<div class="col-md-6 mb-3">
 		<div class="card">
 			<div class="card-body">
-				<div id="cal{{page:id}}" role="calendar" data-view="timeGridWeek" data-slot-duration="00:05:00" data-source="[{{calendar:action}},{{api:url}}/calendar/holliday]" data-action="{{form:action}}" data-date-click="removeTime" data-date-select="setTime" data-range-start="{{fill:range:start}}" data-range-end="{{fill:range:end}}"></div>
+				<div id="cal{{page:id}}" role="calendar" data-view="timeGridWeek" data-slot-duration="{{module:slotDuration}}" data-slot-min-time="{{module:slotMinTime}}" data-slot-max-time="{{module:slotMaxTime}}" data-source="[{{calendar:action}},{{api:url}}/calendar/holliday]" data-action="{{form:action}}" data-date-click="removeTime" data-date-select="setTime" data-range-start="{{fill:range:start}}" data-range-end="{{fill:range:end}}"></div>
 			</div>
 		</div>
 	</div>

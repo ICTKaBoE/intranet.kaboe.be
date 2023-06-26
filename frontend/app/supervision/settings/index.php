@@ -76,6 +76,28 @@
 				</div>
 			</div>
 
+			<div class="card-body">
+				<div class="row mb-3">
+					<div class="col-4">
+						<label class="form-label" for="slotDuration">Registratie per (minuten)</label>
+						<input role="text" class="form-control" id="slotDuration" name="slotDuration" required>
+						<div class="invalid-feedback" data-feedback-input="slotDuration"></div>
+					</div>
+
+					<div class="col-4">
+						<label class="form-label" for="slotMinTime">Registratie vanaf</label>
+						<input role="text" class="form-control" id="slotMinTime" name="slotMinTime" required>
+						<div class="invalid-feedback" data-feedback-input="slotMinTime"></div>
+					</div>
+
+					<div class="col-4">
+						<label class="form-label" for="slotMaxTime">Registratie tot en met</label>
+						<input role="text" class="form-control" id="slotMaxTime" name="slotMaxTime" required>
+						<div class="invalid-feedback" data-feedback-input="slotMaxTime"></div>
+					</div>
+				</div>
+			</div>
+
 			<div class="card-footer text-end">
 				<button type="submit" class="btn btn-primary">Opslaan</button>
 			</div>

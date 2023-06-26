@@ -10,8 +10,11 @@ export default class Calendar {
 		this.source = this.element.dataset.source || false;
 		this.action = this.element.dataset.action || false;
 
+		this.weekends = this.element.hasAttribute("data-weekends");
 		this.allDaySlot = this.element.hasAttribute("data-all-day-slot");
 		this.slotDuration = this.element.dataset.slotDuration || "00:30:00";
+		this.slotMinTime = this.element.dataset.slotMinTime || false;
+		this.slotMaxTime = this.element.dataset.slotMaxTime || false;
 
 		this.range = {};
 		this.range.start = this.element.dataset.rangeStart || false;
@@ -38,6 +41,7 @@ export default class Calendar {
 	createCalendar = () => {
 		let options = {
 			initialView: this.view,
+			weekends: this.weekends,
 			locale: 'nl',
 			headerToolbar: {
 				start: 'prevYear,prev',
@@ -54,6 +58,9 @@ export default class Calendar {
 			options.editable = true;
 			options.selectable = true;
 		}
+
+		if (this.slotMinTime) options.slotMinTime = this.slotMinTime;
+		if (this.slotMaxTime) options.slotMaxTime = this.slotMaxTime;
 
 		if (this.dateClick || this.dateSelect) {
 			if (this.view === "timeGridWeek") {

@@ -20,6 +20,9 @@ INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'blo
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'blockPastAmount', '2', 0);
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'blockFutureAmount', '', 0);
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'blockPastOnLastPayDate', '1', 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'slotDuration', '00:05:00', 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'slotMinTime', '12:00:00', 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(14, 'slotMaxTime', '13:30:00', 0);
 INSERT INTO tbl_setting_override (settingId, moduleId, value, deleted) VALUES('page.default.tool', 14, 0x2F66696C6C, 0);
 
 UPDATE tbl_module SET module='helpdesk', name='Helpdesk', icon='question-mark', iconBackgroundColor='orange', `scope`='app', `order`=3, redirect=NULL, assignUserRights=1, defaultRights='1000', visible=1, deleted=0 WHERE id=3;

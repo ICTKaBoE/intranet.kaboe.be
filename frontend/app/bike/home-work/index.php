@@ -31,7 +31,7 @@
 	<div class="col-md-6 mb-3">
 		<div class="card">
 			<div class="card-body">
-				<div id="cal{{page:id}}" role="calendar" data-source="[{{calendar:action}},{{api:url}}/calendar/holliday]" data-action="{{form:action}}" data-date-click="setRide" data-range-start="{{homework:range:start}}" data-range-end="{{homework:range:end}}"></div>
+				<div id="cal{{page:id}}" role="calendar" data-source="[{{calendar:action}},{{api:url}}/calendar/holliday]" data-action="{{form:action}}" data-weekends data-date-click="setRide" data-range-start="{{homework:range:start}}" data-range-end="{{homework:range:end}}"></div>
 			</div>
 		</div>
 	</div>

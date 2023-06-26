@@ -76,7 +76,10 @@ class SupervisionController extends ApiController
 			"blockPastType" => "d",
 			"blockFutureAmount" => 0,
 			"blockFutureType" => "d",
-			"blockPastOnLastPayDate" => "true"
+			"blockPastOnLastPayDate" => "true",
+			"slotDuration" => "00:05:00",
+			"slotMinTime" => "00:00:00",
+			"slotMaxTime" => "00:00:00"
 		];
 
 		$module = (new Module)->getByModule('supervision');
