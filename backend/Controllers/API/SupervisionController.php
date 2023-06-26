@@ -183,7 +183,13 @@ class SupervisionController extends ApiController
 			$table['header'][] = [
 				"title" => "Totaal",
 				"border" => "LB",
-				"width" => 60
+				"width" => 30
+			];
+
+			$table['header'][] = [
+				"title" => "in decimalen",
+				"border" => "B",
+				"width" => 30
 			];
 
 			foreach ($groupedEvents as $user => $events) {
@@ -192,14 +198,16 @@ class SupervisionController extends ApiController
 				$table['data'][$user][] = $user;
 
 				foreach ($monthsBetweenDates as $month) {
-					$table['data'][$user][] = intdiv($events[$month]['time'], 60) . " uur " . ($events[$month]['time'] % 60) . " minuten";
+					$table['data'][$user][] = intdiv($events[$month]['time'], 60) . "u " . str_pad(($events[$month]['time'] % 60), 2, "0", STR_PAD_LEFT) . "m";
 					$userTotalMinutes += $events[$month]['time'] ?? 0;
 				}
 
 				$table['data'][$user][] = [
-					"text" => intdiv($userTotalMinutes, 60) . " uur " . ($userTotalMinutes % 60) . " minuten",
+					"text" => intdiv($userTotalMinutes, 60) . "u " . str_pad(($userTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m",
 					"border" => "L"
 				];
+
+				$table['data'][$user][] = number_format($userTotalMinutes / 60, 2, ",", ".");
 
 				$schoolTotalMinutes += $userTotalMinutes;
 			}
@@ -210,7 +218,12 @@ class SupervisionController extends ApiController
 			}
 
 			$table['data']['total'][] = [
-				"text" => intdiv($schoolTotalMinutes, 60) . " uur " . ($schoolTotalMinutes % 60) . " minuten",
+				"text" => intdiv($schoolTotalMinutes, 60) . "u " . str_pad(($schoolTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m",
+				"border" => "T"
+			];
+
+			$table['data']['total'][] = [
+				"text" => number_format($schoolTotalMinutes / 60, 2, ",", "."),
 				"border" => "T"
 			];
 
@@ -262,6 +275,8 @@ class SupervisionController extends ApiController
 		}
 
 		$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "Totaal", true, border: "bl");
+		$overviewColumn++;
+		$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "in decimalen", true, border: "b");
 
 		$overviewRow++;
 
@@ -292,6 +307,8 @@ class SupervisionController extends ApiController
 			}
 
 			$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "Totaal", true, border: "bl");
+			$schoolColumn++;
+			$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "in decimalen", true, border: "b");
 
 			$schoolRow++;
 
@@ -303,13 +320,15 @@ class SupervisionController extends ApiController
 				$schoolColumn++;
 
 				foreach ($monthsBetweenDates as $month) {
-					$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($events[$month]['time'], 60) . " uur " . ($events[$month]['time'] % 60) . " minuten");
+					$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($events[$month]['time'], 60) . "u " . str_pad(($events[$month]['time'] % 60), 2, "0", STR_PAD_LEFT) . "m");
 					$userTotalMinutes += $events[$month]['time'] ?? 0;
 					$schoolTotalMinutesPerMonth[$month] += $events[$month]['time'] ?? 0;
 					$schoolColumn++;
 				}
 
-				$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($userTotalMinutes, 60) . " uur " . ($userTotalMinutes % 60) . " minuten", border: "l");
+				$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($userTotalMinutes, 60) . "u " . str_pad(($userTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m", border: "l");
+				$schoolColumn++;
+				$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", number_format($userTotalMinutes / 60, 2, ",", "."));
 
 				$schoolTotalMinutes += $userTotalMinutes;
 
@@ -320,18 +339,22 @@ class SupervisionController extends ApiController
 			$schoolColumn++;
 			foreach ($monthsBetweenDates as $month) $schoolColumn++;
 
-			$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($schoolTotalMinutes, 60) . " uur " . ($schoolTotalMinutes % 60) . " minuten", border: "t", borderStyle: Border::BORDER_DOUBLE);
+			$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", intdiv($schoolTotalMinutes, 60) . "u " . str_pad(($schoolTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m", border: "t", borderStyle: Border::BORDER_DOUBLE);
+			$schoolColumn++;
+			$excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", number_format($schoolTotalMinutes / 60, 2, ",", "."), border: "t", borderStyle: Border::BORDER_DOUBLE);
 
 			$overviewColumn = $startColumn;
 			$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", $school->name, true, link: "sheet://'{$school->name}'!A1");
 			$overviewColumn++;
 
 			foreach ($monthsBetweenDates as $month) {
-				$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($schoolTotalDistancePerMonth[$month] ?? 0, 60) . " uur " . ($schoolTotalDistancePerMonth[$month] ?? 0 % 60) . " minuten");
+				$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($schoolTotalMinutesPerMonth[$month], 60) . "u" . str_pad(($schoolTotalMinutesPerMonth[$month] % 60), 2, "0", STR_PAD_LEFT) . "m");
 				$overviewColumn++;
 			}
 
-			$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($schoolTotalMinutes, 60) . " uur " . ($schoolTotalMinutes % 60) . " minuten", border: "l");
+			$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($schoolTotalMinutes, 60) . "u " . str_pad(($schoolTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m", border: "l");
+			$overviewColumn++;
+			$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", number_format($schoolTotalMinutes / 60, 2, ",", "."));
 
 			$overviewTotalMinutes += $schoolTotalMinutes;
 
@@ -342,7 +365,9 @@ class SupervisionController extends ApiController
 		$overviewColumn++;
 		foreach ($monthsBetweenDates as $month) $overviewColumn++;
 
-		$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($overviewTotalMinutes, 60) . " uur " . ($overviewTotalMinutes % 60) . " minuten", border: "t", borderStyle: Border::BORDER_DOUBLE);
+		$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", intdiv($overviewTotalMinutes, 60) . "u " . str_pad(($overviewTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m", border: "t", borderStyle: Border::BORDER_DOUBLE);
+		$overviewColumn++;
+		$excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", number_format($overviewTotalMinutes / 60, 2, ",", "."), border: "t", borderStyle: Border::BORDER_DOUBLE);
 
 		$excel->save();
 		if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
@@ -382,10 +407,11 @@ class SupervisionController extends ApiController
 			$pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
 
 			$table = [];
-			$table['header'][] = ["title" => "Datum"];
-			$table['header'][] = ["title" => "Start"];
+			$table['header'][] = ["title" => "Datum", "width" => 30];
+			$table['header'][] = ["title" => "Start", "width" => 20];
 			$table['header'][] = ["title" => "Einde"];
-			$table['header'][] = ["title" => "Minuten"];
+			$table['header'][] = ["title" => "Minuten", "width" => 20];
+			$table['header'][] = ["title" => "in decimalen", "width" => 30];
 
 			foreach ($monthsBetweenDates as $month) {
 				$monthTotal = 0;
@@ -396,10 +422,11 @@ class SupervisionController extends ApiController
 				];
 
 				foreach ($events[$month] as $index => $event) {
-					$table['data'][$index + 1][] = Clock::at($event->start)->format("d/m/Y");
-					$table['data'][$index + 1][] = Clock::at($event->start)->format("H:i");
-					$table['data'][$index + 1][] = Clock::at($event->end)->format("H:i");
-					$table['data'][$index + 1][] = intdiv($event->diffInMinutes, 60) . " uur " . ($event->diffInMinutes % 60) . " minuten";
+					$table['data'][$event->start][] = Clock::at($event->start)->format("d/m/Y");
+					$table['data'][$event->start][] = Clock::at($event->start)->format("H:i");
+					$table['data'][$event->start][] = Clock::at($event->end)->format("H:i");
+					$table['data'][$event->start][] = intdiv($event->diffInMinutes, 60) . "u " . str_pad(($event->diffInMinutes % 60), 2, "0", STR_PAD_LEFT) . "m";
+					$table['data'][$event->start][] = number_format(($event->diffInMinutes / 60), 2, ",", ".");
 
 					$monthTotal += $event->diffInMinutes;
 				}
@@ -424,7 +451,13 @@ class SupervisionController extends ApiController
 
 				$table['data'][$month][] =
 					[
-						"text" => intdiv($monthTotal, 60) . " uur " . ($monthTotal % 60) . " minuten",
+						"text" => intdiv($monthTotal, 60) . "u " . str_pad(($monthTotal % 60), 2, "0", STR_PAD_LEFT) . "m",
+						"border" => 'T'
+					];
+
+				$table['data'][$month][] =
+					[
+						"text" => number_format(($monthTotal / 60), 2, ",", "."),
 						"border" => 'T'
 					];
 
@@ -437,7 +470,8 @@ class SupervisionController extends ApiController
 			$table2['header'][] = ["title" => "Totaal"];
 			$table2['header'][] = ["title" => ""];
 			$table2['header'][] = ["title" => ""];
-			$table2['header'][] = ["title" => intdiv($userTotal, 60) . " uur " . ($userTotal % 60) . " minuten"];
+			$table2['header'][] = ["title" => intdiv($userTotal, 60) . "u " . str_pad(($userTotal % 60), 2, "0", STR_PAD_LEFT) . "m"];
+			$table2['header'][] = ["title" => number_format(($userTotal / 60), 2, ",", ".")];
 
 			$pdf->Ln(10);
 			$pdf->table($table);
@@ -503,6 +537,8 @@ class SupervisionController extends ApiController
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "Einde", true);
 			$userColumn++;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "Minuten", true);
+			$userColumn++;
+			$excel->setCellValue($index, "{$userColumn}{$userRow}", "in decimalen", true);
 			$userRow++;
 
 			foreach ($monthsBetweenDates as $month) {
@@ -520,7 +556,9 @@ class SupervisionController extends ApiController
 					$eventColumn++;
 					$excel->setCellValue($index, "{$eventColumn}{$userRow}", Clock::at($event->end)->format("H:i"));
 					$eventColumn++;
-					$excel->setCellValue($index, "{$eventColumn}{$userRow}", intdiv($event->diffInMinutes, 60) . " uur " . ($event->diffInMinutes % 60) . " minuten");
+					$excel->setCellValue($index, "{$eventColumn}{$userRow}", intdiv($event->diffInMinutes, 60) . "u " . str_pad(($event->diffInMinutes % 60), 2, "0", STR_PAD_LEFT) . "m");
+					$eventColumn++;
+					$excel->setCellValue($index, "{$eventColumn}{$userRow}", number_format(($event->diffInMinutes / 60), 2, ",", "."));
 
 					$userRow++;
 
@@ -528,13 +566,15 @@ class SupervisionController extends ApiController
 				}
 
 				$monthColumn = $startColumn;
-				$excel->setCellValue($index, "{$monthColumn}{$userRow}", count($events[$month] ?? []) . " rit(ten)", border: 't', borderStyle: Border::BORDER_DOUBLE);
+				$excel->setCellValue($index, "{$monthColumn}{$userRow}", count($events[$month] ?? []) . " toezicht(ten)", border: 't', borderStyle: Border::BORDER_DOUBLE);
 				$monthColumn++;
 				$excel->setCellValue($index, "{$monthColumn}{$userRow}", "", border: 't', borderStyle: Border::BORDER_DOUBLE);
 				$monthColumn++;
 				$excel->setCellValue($index, "{$monthColumn}{$userRow}", "", border: 't', borderStyle: Border::BORDER_DOUBLE);
 				$monthColumn++;
-				$excel->setCellValue($index, "{$monthColumn}{$userRow}", intdiv($monthTotal, 60) . " uur " . ($monthTotal % 60) . " minuten", border: 't', borderStyle: Border::BORDER_DOUBLE);
+				$excel->setCellValue($index, "{$monthColumn}{$userRow}", intdiv($monthTotal, 60) . "u " . str_pad(($monthTotal % 60), 2, "0", STR_PAD_LEFT) . "m", border: 't', borderStyle: Border::BORDER_DOUBLE);
+				$monthColumn++;
+				$excel->setCellValue($index, "{$monthColumn}{$userRow}", number_format(($monthTotal / 60), 2, ",", "."), border: 't', borderStyle: Border::BORDER_DOUBLE);
 
 				$userRow++;
 				$userRow++;
@@ -549,7 +589,9 @@ class SupervisionController extends ApiController
 			$userColumn++;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "", true);
 			$userColumn++;
-			$excel->setCellValue($index, "{$userColumn}{$userRow}", intdiv($userTotal, 60) . " uur " . ($userTotal % 60) . " minuten");
+			$excel->setCellValue($index, "{$userColumn}{$userRow}", intdiv($userTotal, 60) . "u " . str_pad(($userTotal % 60), 2, "0", STR_PAD_LEFT) . "m");
+			$userColumn++;
+			$excel->setCellValue($index, "{$userColumn}{$userRow}", number_format(($userTotal / 60), 2, ",", "."));
 		}
 
 		$excel->save();
