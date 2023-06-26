@@ -23,13 +23,6 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
 				"href": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.css",
 				"rel": "stylesheet"
 			}
@@ -88,13 +81,7 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/locales-all.min.js"
+				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/dist/index.global.min.js"
 			}
 		},
 		{
