@@ -5,11 +5,9 @@
 				<h4 class="card-title">Legenda</h4>
 			</div>
 
+			<div class="card-body">{{fill:legenda}}</div>
+
 			<div class="card-body">
-				<div class="row mb-1">
-					<div class="col-2 bg-green"></div>
-					<div class="col">Geregistreerde toezicht</div>
-				</div>
 				<div class="row">
 					<div class="col-2 bg-blue"></div>
 					<div class="col">Feestdag / Schoolvakantie</div>

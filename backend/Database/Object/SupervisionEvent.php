@@ -5,6 +5,7 @@ namespace Database\Object;
 use Ouzo\Utilities\Clock;
 use Database\Repository\LocalUser;
 use Database\Interface\CustomObject;
+use Database\Repository\School;
 
 class SupervisionEvent extends CustomObject
 {
@@ -29,6 +30,7 @@ class SupervisionEvent extends CustomObject
 	public function link()
 	{
 		$this->user = (new LocalUser)->get($this->userId)[0];
+		$this->userMainSchool = (new School)->get($this->userMainSchoolId)[0];
 		return $this;
 	}
 }

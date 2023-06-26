@@ -87,6 +87,12 @@
 		{
 			"tag": "script",
 			"attributes": {
+				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/locales-all.global.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
 				"src": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.min.js"
 			}
 		},

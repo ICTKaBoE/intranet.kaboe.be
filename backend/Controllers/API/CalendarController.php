@@ -58,6 +58,7 @@ class CalendarController extends ApiController
 		$user = User::getLoggedInUser();
 		$events = (new SupervisionEvent)->getByUserId($user->id);
 		$events = Arrays::filter($events, fn ($e) => !(is_null($e->start) && is_null($e->end)));
+		Arrays::each($events, fn ($e) => $e->link());
 
 		foreach ($events as $event) {
 			$event->link();
@@ -65,8 +66,9 @@ class CalendarController extends ApiController
 				"id" => $event->id,
 				"start" => $event->start,
 				"end" => $event->end,
+				"backgroundColor" => $event->userMainSchool->color,
+				"borderColor" => $event->userMainSchool->color,
 				"classNames" => [
-					"bg-green",
 					"text-white"
 				],
 			]);

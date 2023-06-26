@@ -9,16 +9,36 @@ use Ouzo\Utilities\Arrays;
 use Database\Repository\Module;
 use Controllers\DefaultController;
 use Database\Repository\ModuleSetting;
+use Database\Repository\School;
 use Database\Repository\UserHomeWorkDistance;
 
 class SupervisionController extends DefaultController
 {
+	const TEMPLATE_LEGENDA = 	'<div class="row mb-1">
+									<div class="col-2" style="background-color: {{school:color}}"></div>
+									<div class="col">{{school:name}}</div>
+								</div>{{fill:legenda}}';
+
 	public function fill()
 	{
 		$this->write();
+		$this->writeLegenda();
 		$this->writeCalendarRanges();
 		$this->cleanUp();
 		return $this->getLayout();
+	}
+
+	private function writeLegenda()
+	{
+		$schools = (new School)->get();
+
+		foreach ($schools as $school) {
+			$template = self::TEMPLATE_LEGENDA;
+
+			foreach ($school as $key => $value) $template = str_replace("{{school:{$key}}}", $value, $template);
+
+			$this->layout = str_replace("{{fill:legenda}}", $template, $this->layout);
+		}
 	}
 
 	private function writeCalendarRanges()
@@ -57,5 +77,6 @@ class SupervisionController extends DefaultController
 
 	private function cleanUp()
 	{
+		$this->layout = str_replace("{{fill:legenda}}", "", $this->layout);
 	}
 }
