@@ -32,10 +32,9 @@ if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
 	define("DB_CHARSET", "utf8mb4");
 }
 
-define("ROUTER_DEFAULT_PREFIX", "/app");
+define("ROUTER_DEFAULT_PREFIX", "/public");
 define("ROUTER_DEFAULT_MIDDLEWARE", "\\Router\\Middleware\\DefaultMiddleware");
-define("ROUTER_DEFAULT_NAMESPACE", "\\Controllers");
-define("ROUTER_DEFAULT_CONTROLLER", "DefaultController");
+define("ROUTER_DEFAULT_CONTROLLER", "\\Controllers\\DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");

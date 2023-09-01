@@ -10,7 +10,7 @@ class Router extends SimpleRouter
 	public static function start($debug = false): void
 	{
 		self::createRoutes();
-		parent::setDefaultNamespace(ROUTER_DEFAULT_NAMESPACE);
+		// parent::setDefaultNamespace(ROUTER_DEFAULT_NAMESPACE);
 
 		try {
 			if ($debug) {
@@ -24,29 +24,43 @@ class Router extends SimpleRouter
 
 	private static function createRoutes(): void
 	{
-		$json = json_decode(file_get_contents(__DIR__ . "/../config/routes.json"), true);
+		// Default Middleware
+		SimpleRouter::group(['middleware' => ROUTER_DEFAULT_MIDDLEWARE], function () {
 
-		foreach ($json as $group) {
-			$prefix = Arrays::getValue($group, 'prefix', ROUTER_DEFAULT_PREFIX);
-			$middleware = Arrays::getValue($group, 'middleware', ROUTER_DEFAULT_MIDDLEWARE);
-
-			SimpleRouter::group(['prefix' => $prefix, 'middleware' => $middleware], function () use ($group) {
-				foreach ($group['methods'] as $method => $routes) {
-					foreach ($routes as $route) {
-						$path = is_string($route) ? $route : Arrays::getValue($route, 'path', "");
-						$controller = is_string($route) ? ROUTER_DEFAULT_CONTROLLER : Arrays::getValue($route, 'controller', ROUTER_DEFAULT_CONTROLLER);
-						$function = is_string($route) ? ROUTER_DEFAULT_FUNCTION : Arrays::getValue($route, 'function', ROUTER_DEFAULT_FUNCTION);
-
-						if (is_array($path)) {
-							foreach ($path as $p) self::registerRoute($method, $p, $controller, $function);
-						} else self::registerRoute($method, $path, $controller, $function);
-					}
-				}
+			// Default route
+			SimpleRouter::group(['prefix' => "/"], function () {
 			});
-		}
+
+			// Error Group
+			SimpleRouter::group(['prefix' => '/error'], function () {
+				// Code route
+				self::registerRoute('GET', "/{code}", \Controllers\ERROR\ErrorController::class);
+			});
+
+			// Public
+			SimpleRouter::group(['prefix' => '/public'], function () {
+				self::registerRoute('GET', "/{module?}/{page?}/{id?}");
+			});
+
+			// App
+			SimpleRouter::group(['prefix' => '/app'], function () {
+				self::registerRoute('GET', "/{module?}/{page?}/{method?}/{id?}");
+			});
+		});
+
+		// API Middleware - API
+		// SimpleRouter::group(['prefix' => '/api/v1.0', 'middleware' => \Router\Middleware\ApiMiddleware::class], function () {
+		// 	SimpleRouter::group(['prefix' => "/cron"], function () {
+		// 		// GET
+		// 		self::registerRoute('GET', '/user/o365/callback', \Controllers\API\UserController::class, 'O365Callback');
+
+		// 		// POST
+		// 		self::registerRoute('POST', '/user/login', \Controllers\API\UserController::class, 'login', true);
+		// 	});
+		// });
 	}
 
-	private static function registerRoute($method, $path, $controller, $function)
+	private static function registerRoute($method, $path = ROUTER_DEFAULT_PREFIX, $controller = ROUTER_DEFAULT_CONTROLLER, $function = ROUTER_DEFAULT_FUNCTION, $noAuth = false)
 	{
 		switch (strtoupper($method)) {
 			case "GET":

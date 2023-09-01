@@ -44,13 +44,13 @@ class DefaultController
 		$this->loadOthers();
 		$this->loadUrlParams();
 		$this->loadSettings();
-		$this->loadModuleSettings();
+		// $this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
 	protected function getLayout()
 	{
-		return $this->layout;
+		return preg_replace('/\{\{.*?\}\}/', "", $this->layout);
 	}
 
 	private function createGlobalVariables()
@@ -68,10 +68,12 @@ class DefaultController
 	private function storeLayout()
 	{
 		$overrides = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layoutOverride.json"), true);
+		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		$route = rtrim(Helpers::url()->getRelativeUrl(false), "/");
 
 		$file = false;
 		foreach ($overrides as $key => $paths) {
-			if (Arrays::contains($paths, Helpers::getPageFolder())) {
+			if (Arrays::contains($paths, $url) || Arrays::contains($paths, $route)) {
 				$file = $key;
 				break;
 			}
@@ -108,13 +110,13 @@ class DefaultController
 
 	private function loadActions()
 	{
-		$this->layout = str_replace("{{form:action}}", "{{api:url}}/form" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{calendar:action}}", "{{api:url}}/calendar" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard" . Helpers::getApiPath(), $this->layout);
+		$this->layout = str_replace("{{form:action}}", "{{api:url}}/form", $this->layout);
+		$this->layout = str_replace("{{calendar:action}}", "{{api:url}}/calendar", $this->layout);
+		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table", $this->layout);
+		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select", $this->layout);
+		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart", $this->layout);
+		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen", $this->layout);
+		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard", $this->layout);
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);

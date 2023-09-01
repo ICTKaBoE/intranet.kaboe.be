@@ -1,4 +1,5 @@
 **/downloads
 **/logs
 **/powershell
+**/*.old
 info.php

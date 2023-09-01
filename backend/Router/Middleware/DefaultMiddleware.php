@@ -21,10 +21,10 @@ class DefaultMiddleware implements IMiddleware
 
 	public function handle(Request $request): void
 	{
-		if ($this->routeIsAccessable()) {
-			$this->checkUserCanAccess();
-			$this->checkFileExistance();
-		}
+		// if ($this->routeIsAccessable()) {
+		$this->checkUserCanAccess();
+		$this->checkFileExistance();
+		// }
 	}
 
 	static private function routeIsAccessable()
@@ -40,14 +40,14 @@ class DefaultMiddleware implements IMiddleware
 	{
 		$folder = Helpers::getPageFolder();
 
-		$loginPage = (new Setting)->get(id: "page.login")[0]->value;
+		// $loginPage = (new Setting)->get(id: "page.login")[0]->value;
 		$defaultPage = (new Setting)->get(id: (Helpers::isPublicPage() ? "page.default.public" : "page.default.afterLogin"))[0]->value;
 
 		if (Helpers::isPublicPage()) {
 			if (Strings::isBlank($folder) || Strings::equal($folder, Helpers::getPrefix())) Helpers::redirect($defaultPage);
 		} else {
-			if (!User::isSignedIn() && !Strings::equal($folder, $loginPage)) Helpers::redirect($loginPage);
-			else if (User::isSignedIn() && (Strings::isBlank($folder) || Strings::equal($folder, $loginPage) || Strings::equal($folder, Helpers::getPrefix()))) Helpers::redirect($defaultPage);
+			if (!User::isSignedIn() && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
+			// else if (User::isSignedIn() && (Strings::isBlank($folder) || Strings::equal($folder, $defaultPage) || Strings::equal($folder, Helpers::getPrefix()))) Helpers::redirect($defaultPage);
 		}
 	}
 
@@ -55,6 +55,6 @@ class DefaultMiddleware implements IMiddleware
 	{
 		$folder = Helpers::getPageFolder();
 
-		if (!file_exists(LOCATION_FRONTEND . $folder)) Helpers::redirect(Helpers::getPrefix() . "/error/404", 404);
+		if (!file_exists(LOCATION_FRONTEND . $folder)) Helpers::redirect("error/404", 404);
 	}
 }

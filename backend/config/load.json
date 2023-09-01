@@ -58,7 +58,14 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/custom/main.css",
+				"href": "{{site:url}}/frontend/shared/ui/icons/tabler-icons.min.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/default/css/main.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -81,13 +88,13 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/dist/index.global.min.js"
+				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/dist/index.global.min.js"
 			}
 		},
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/locales-all.global.min.js"
+				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/packages/core/locales-all.global.min.js"
 			}
 		},
 		{
@@ -124,7 +131,7 @@
 			"tag": "script",
 			"attributes": {
 				"type": "module",
-				"src": "{{site:url}}/frontend/shared/ui/js/custom/main.js"
+				"src": "{{site:url}}/frontend/shared/default/js/main.js"
 			}
 		}
 	]

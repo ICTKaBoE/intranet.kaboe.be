@@ -4,13 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
+class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -38,7 +38,6 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
         ),
         'M' => 
         array (
-            'MyCLabs\\Enum\\' => 13,
             'Microsoft\\Graph\\' => 16,
             'Matrix\\' => 7,
         ),
@@ -101,10 +100,6 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
         array (
             0 => __DIR__ . '/..' . '/letsdrink/ouzo-goodies',
         ),
-        'MyCLabs\\Enum\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
-        ),
         'Microsoft\\Graph\\' => 
         array (
             0 => __DIR__ . '/..' . '/microsoft/microsoft-graph/src',
@@ -154,7 +149,6 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
-        'Stringable' => __DIR__ . '/..' . '/myclabs/php-enum/stubs/Stringable.php',
         'TCPDF' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf.php',
         'TCPDF2DBarcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_barcodes_2d.php',
         'TCPDFBarcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_barcodes_1d.php',
@@ -171,10 +165,10 @@ class ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit9db489ce4f9303f8fc16d68007ed1b12::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29::$classMap;
 
         }, null, ClassLoader::class);
     }

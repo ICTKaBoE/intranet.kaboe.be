@@ -109,9 +109,4 @@ abstract class Helpers
 	{
 		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/form") : ""));
 	}
-
-	static function getApiPath()
-	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/" . self::getMethod()) : "") . (self::getId() ? "/" . self::getId() : ""));
-	}
 }
