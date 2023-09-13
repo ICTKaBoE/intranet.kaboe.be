@@ -4,7 +4,7 @@ namespace Controllers;
 
 class ComponentController
 {
-	public $layout = "";
+	protected $layout = "";
 
 	public function __construct($componentName)
 	{
@@ -13,11 +13,6 @@ class ComponentController
 	}
 
 	public function write()
-	{
-		return $this->getLayout();
-	}
-
-	private function getLayout()
 	{
 		return $this->layout;
 	}

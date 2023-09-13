@@ -32,8 +32,7 @@ class Module extends CustomObject
 	{
 		$this->icon = is_null($this->icon) ? false : $this->icon;
 
-		$this->link = Strings::isBlank($this->redirect) ? (Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . Helpers::getPrefix() . "/{$this->module}") : $this->redirect;
+		$this->link = Strings::isBlank($this->redirect) ? (Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . "/" . Helpers::getPrefix() . "/{$this->module}") : $this->redirect;
 		$this->target = Strings::isBlank($this->redirect) ? "_self" : "_blank";
-		$this->iconData = $this->icon ? Icon::load($this->icon) : false;
 	}
 }

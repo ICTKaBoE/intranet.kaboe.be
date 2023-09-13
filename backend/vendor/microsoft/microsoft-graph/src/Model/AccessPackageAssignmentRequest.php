@@ -120,6 +120,36 @@ class AccessPackageAssignmentRequest extends Entity
         return $this;
     }
 
+
+     /**
+     * Gets the customExtensionCalloutInstances
+    * Information about all the custom extension calls that were made during the access package assignment workflow.
+     *
+     * @return array|null The customExtensionCalloutInstances
+     */
+    public function getCustomExtensionCalloutInstances()
+    {
+        if (array_key_exists("customExtensionCalloutInstances", $this->_propDict)) {
+           return $this->_propDict["customExtensionCalloutInstances"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the customExtensionCalloutInstances
+    * Information about all the custom extension calls that were made during the access package assignment workflow.
+    *
+    * @param CustomExtensionCalloutInstance[] $val The customExtensionCalloutInstances
+    *
+    * @return AccessPackageAssignmentRequest
+    */
+    public function setCustomExtensionCalloutInstances($val)
+    {
+        $this->_propDict["customExtensionCalloutInstances"] = $val;
+        return $this;
+    }
+
     /**
     * Gets the requestType
     * The type of the request. The possible values are: notSpecified, userAdd, UserExtend, userUpdate, userRemove, adminAdd, adminUpdate, adminRemove, systemAdd, systemUpdate, systemRemove, onBehalfAdd (not supported), unknownFutureValue. A request from the user themselves would have requestType of userAdd, userUpdate or userRemove. This property cannot be changed once set.

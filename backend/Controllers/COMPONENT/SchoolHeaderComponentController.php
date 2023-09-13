@@ -21,6 +21,6 @@ class SchoolHeaderComponentController extends ComponentController
 	{
 		$details = (new School)->get(Helpers::request()->getLoadedRoute()->getParameters()['id'])[0];
 
-		foreach ($details as $key => $value) $this->layout = str_replace("{{school:" . $key . "}}", $value, $this->layout);
+		foreach ($details->toArray() as $key => $value) $this->layout = str_replace("{{school:" . $key . "}}", $value, $this->layout);
 	}
 }

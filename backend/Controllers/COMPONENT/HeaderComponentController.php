@@ -19,7 +19,7 @@ class HeaderComponentController extends ComponentController
 	{
 		$details = $this->getUserDetails();
 
-		foreach ($details as $key => $value) $this->layout = str_replace("{{user:" . $key . "}}", $value, $this->layout);
+		foreach ($details->toArray() as $key => $value) $this->layout = str_replace("{{user:" . $key . "}}", $value, $this->layout);
 	}
 
 	// Getters

@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Middleware\ApiMiddleware;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
@@ -16,6 +17,11 @@ class ApiController
 	private $reload = false;
 
 	private $json = [];
+
+	public function __construct()
+	{
+		ApiMiddleware::handle();
+	}
 
 	public function handle()
 	{

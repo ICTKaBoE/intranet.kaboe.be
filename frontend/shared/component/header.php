@@ -9,33 +9,11 @@ use Helpers\Icon;
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-			<a href="{{site:url}}"><?= Icon::load("home"); ?> {{site.title}}</a>
+			<img src="{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
+			<a href="{{site:url}}"><i class="ti ti-home"></i> {{site.title}}</a>
 		</h1>
 		<div class="navbar-nav flex-row order-md-last">
-			<div role="notification" id="notification" data-no-notification-text="Geen updates">
-				<!-- <div class="nav-item dropdown d-none d-md-flex me-3"> -->
-
-				<!-- <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card"> -->
-				<!-- <div class="card"> -->
-				<!-- <div class="card-header">
-					<h3 class="card-title">Geen updates</h3>
-				</div> -->
-				<!-- <div class="list-group list-group-flush list-group-hoverable">
-					<div class="list-group-item">
-						<div class="row align-items-center">
-							<div class="col text-truncate">
-								<a href="#" class="text-body d-block">Example 1</a>
-								<div class="d-block text-muted text-truncate mt-n1">
-									Change deprecated html tags to text decoration classes (#29604)
-								</div>
-							</div>
-						</div>
-					</div>
-				</div> -->
-				<!-- </div> -->
-				<!-- </div> -->
-				<!-- </div> -->
-			</div>
+			<div role="notification" id="notification" data-no-notification-text="Geen updates"></div>
 			<div class="nav-item dropdown">
 				<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
 					<span class="avatar avatar-sm">{{user:initials}}</span>

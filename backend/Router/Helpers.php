@@ -9,9 +9,12 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Strings;
 use Pecee\SimpleRouter\SimpleRouter;
+use Security\FileSystem;
 
 abstract class Helpers
 {
+	static $noAuthRoutes = [];
+
 	static function url(?string $name = null, $parameters = null, ?array $getParams = null): Url
 	{
 		return SimpleRouter::getUrl($name, $parameters, $getParams);
@@ -55,58 +58,57 @@ abstract class Helpers
 		return null;
 	}
 
+	static function getReletiveUrl()
+	{
+		return rtrim(self::url()->getRelativeUrl(false), "/");
+	}
+
 	static function getPrefix()
 	{
-		if (!is_null(self::request()->getLoadedRoute())) return self::request()->getLoadedRoute()->getGroup()->getPrefix();
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return "/" . explode("/", $url)[0];
+		return (self::isErrorPage() ? "error" : (self::isPublicPage() ? "public" : "app"));
 	}
 
 	static function getModule()
 	{
 		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "module")) return self::request()->getLoadedRoute()->getParameters()['module'];
 
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[1] ?? false;
+		$route = explode("/", ltrim(self::getReletiveUrl(), "/"));
+		return $route[1];
 	}
 
 	static function getPage()
 	{
 		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "page")) return self::request()->getLoadedRoute()->getParameters()['page'];
 
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[2] ?? false;
-	}
-
-	static function getMethod()
-	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "method")) return self::request()->getLoadedRoute()->getParameters()['method'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[3] ?? false;
-	}
-
-	static function getId()
-	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "id")) return self::request()->getLoadedRoute()->getParameters()['id'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[4] ?? false;
+		$route = explode("/", ltrim(self::getReletiveUrl(), "/"));
+		return $route[2];
 	}
 
 	static function isPublicPage()
 	{
-		return Strings::equal(self::getPrefix(), "/public");
+		return Strings::startsWith(self::getReletiveUrl(), "/public");
 	}
 
 	static function isErrorPage()
 	{
-		return Strings::equal(self::getModule(), 'error');
+		return Strings::startsWith(self::getReletiveUrl(), "/error");
 	}
 
-	static function getPageFolder()
+	static function registerNoAuthRoute($method, $route)
 	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/form") : ""));
+		$noAuthRoutes = json_decode(file_get_contents(LOCATION_BACKEND . "/config/noAuthRoutes.json"), true);
+		if (Arrays::contains($noAuthRoutes[$method], $route)) return;
+
+		$noAuthRoutes[$method][] = $route;
+		file_put_contents(LOCATION_BACKEND . "/config/noAuthRoutes.json", json_encode($noAuthRoutes));
+	}
+
+	static function registerStopRedirectionRoute($method, $route)
+	{
+		$stopRedirectionRoutes = json_decode(file_get_contents(LOCATION_BACKEND . "/config/stopRedirectionRoutes.json"), true);
+		if (Arrays::contains($stopRedirectionRoutes[$method], $route)) return;
+
+		$stopRedirectionRoutes[$method][] = $route;
+		file_put_contents(LOCATION_BACKEND . "/config/stopRedirectionRoutes.json", json_encode($stopRedirectionRoutes));
 	}
 }

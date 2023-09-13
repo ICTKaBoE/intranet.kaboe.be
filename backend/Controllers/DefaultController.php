@@ -6,6 +6,7 @@ use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
 use Database\Repository\Setting;
 use Database\Repository\UserProfile;
+use Middleware\DefaultMiddleware;
 use O365\AuthenticationManager;
 use Router\Helpers;
 use Ouzo\Utilities\Path;
@@ -15,7 +16,7 @@ use Security\User;
 
 class DefaultController
 {
-	public $layout = "";
+	protected $layout = "";
 
 	const SHORT_TAG = ["meta", "link"];
 	const COMPONENTS = [
@@ -24,8 +25,13 @@ class DefaultController
 		"schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
-		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class
+		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
 	];
+
+	public function __construct()
+	{
+		DefaultMiddleware::handle();
+	}
 
 	public function index()
 	{
@@ -50,17 +56,13 @@ class DefaultController
 
 	protected function getLayout()
 	{
-		return preg_replace('/\{\{.*?\}\}/', "", $this->layout);
+		return preg_replace("/{{.*?}}/", "", $this->layout);
 	}
 
 	private function createGlobalVariables()
 	{
-		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getPageFolder()));
+		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getReletiveUrl()));
 		$this->pageAction = "";
-
-		if (Strings::equal(Helpers::getMethod(), "add")) $this->pageAction = "toevoegen";
-		else if (Strings::equal(Helpers::getMethod(), "edit")) $this->pageAction = "bewerken";
-		else if (Strings::equal(Helpers::getMethod(), "delete")) $this->pageAction = "verwijderen";
 
 		$this->siteUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost();
 	}
@@ -69,7 +71,7 @@ class DefaultController
 	{
 		$overrides = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layoutOverride.json"), true);
 		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
-		$route = rtrim(Helpers::url()->getRelativeUrl(false), "/");
+		$route = Helpers::getReletiveUrl();
 
 		$file = false;
 		foreach ($overrides as $key => $paths) {
@@ -119,7 +121,7 @@ class DefaultController
 		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard", $this->layout);
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
-		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);
+		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{api.version}}", $this->layout);
 	}
 
 	private function loadOthers()
@@ -213,9 +215,9 @@ class DefaultController
 
 	private function getContentPage()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/index.php")) {
+		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php")) {
 			ob_start();
-			require_once LOCATION_FRONTEND . Helpers::getPageFolder() . "/index.php";
+			require_once LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php";
 			return ob_get_clean();
 		}
 
@@ -224,8 +226,8 @@ class DefaultController
 
 	private function getContentPageCss()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/style.css")) {
-			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend" . Helpers::getPageFolder() . "/style.css\" />";
+		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/style.css")) {
+			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend" . Helpers::getReletiveUrl() . "/style.css\" />";
 		}
 
 		return "";
@@ -233,8 +235,8 @@ class DefaultController
 
 	private function getContentPageJs()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/functions.js")) {
-			return "<script type=\"module\" src=\"{{site:url}}/frontend" . Helpers::getPageFolder() . "/functions.js\"></script>";
+		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/functions.js")) {
+			return "<script type=\"module\" src=\"{{site:url}}/frontend" . Helpers::getReletiveUrl() . "/functions.js\"></script>";
 		}
 
 		return "";

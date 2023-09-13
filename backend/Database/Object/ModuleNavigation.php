@@ -29,9 +29,7 @@ class ModuleNavigation extends CustomObject
 	{
 		$this->link();
 
-		$this->link = Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . Helpers::getPrefix() . "/{$this->module->module}/{$this->page}";
-		$this->iconData = $this->icon ? Icon::load($this->icon) : false;
-
+		$this->link = Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . "/" . Helpers::getPrefix() . "/{$this->module->module}/{$this->page}";
 		$this->isActive = Strings::equal(Helpers::getPage(), $this->page);
 	}
 

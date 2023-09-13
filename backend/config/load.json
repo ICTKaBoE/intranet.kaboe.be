@@ -23,6 +23,14 @@
 		{
 			"tag": "link",
 			"attributes": {
+				"rel": "icon",
+				"type": "image/png",
+				"href": "{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
 				"href": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.css",
 				"rel": "stylesheet"
 			}

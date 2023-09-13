@@ -10,6 +10,11 @@
 <body>
 	{{content:page}}
 	{{component:modal}}
+
+	<script>
+		let pageId = "{{page:id}}";
+	</script>
+
 	{{content:page:js}}
 	{{load:body}}
 </body>

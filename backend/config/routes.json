@@ -1,349 +1,38 @@
-[
-	{
-		"prefix": "/",
-		"methods": {
-			"get": []
+{
+	"GET": [
+		{
+			"path": "/",
+			"auth": false
+		},
+		{
+			"path": "/error/{code}",
+			"auth": false,
+			"stopRedirect": true
+		},
+		{
+			"path": "/public/{module?}/{page?}",
+			"auth": false
+		},
+		{
+			"path": "/app/index",
+			"controller": "\\Controllers\\PAGE\\APP\\IndexController"
+		},
+		{
+			"path": "/app/{module?}/{page?}"
+		},
+		{
+			"path": "/api/v2/user/o365/callback",
+			"controller": "\\Controllers\\API\\UserController",
+			"function": "O365Callback",
+			"auth": false
 		}
-	},
-	{
-		"prefix": "/public",
-		"methods": {
-			"get": [
-				{
-					"path": "/selectModule",
-					"controller": "\\Controllers\\PUBLIC\\SelectModuleController"
-				},
-				{
-					"path": "/notescreen/pages",
-					"controller": "\\Controllers\\PUBLIC\\SelectSchoolController"
-				},
-				"/{module?}/{page?}/{id?}"
-			]
+	],
+	"POST": [
+		{
+			"path": "/api/v2/user/login",
+			"controller": "\\Controllers\\API\\UserController",
+			"function": "login",
+			"auth": false
 		}
-	},
-	{
-		"prefix": "/app",
-		"methods": {
-			"get": [
-				{
-					"path": "/selectModule",
-					"controller": "\\Controllers\\APP\\SelectModuleController"
-				},
-				{
-					"path": "/bike/home-work",
-					"controller": "\\Controllers\\APP\\BikeController",
-					"function": "homeWork"
-				},
-				{
-					"path": "/supervision/fill",
-					"controller": "\\Controllers\\APP\\SupervisionController",
-					"function": "fill"
-				},
-				{
-					"path": "/settings/general",
-					"controller": "\\Controllers\\APP\\SettingsController",
-					"function": "general"
-				},
-				{
-					"path": "/helpdesk/details",
-					"controller": "\\Controllers\\APP\\HelpdeskController",
-					"function": "details"
-				},
-				"/{module?}/{page?}/{method?}/{id?}"
-			]
-		}
-	},
-	{
-		"prefix": "/api/v1.0",
-		"middleware": "\\Router\\Middleware\\ApiMiddleware",
-		"methods": {
-			"get": [
-				{
-					"path": "/clean",
-					"controller": "\\Controllers\\API\\CleanController",
-					"function": "start",
-					"authentication": false
-				},
-				{
-					"path": "/update/database/{vMajor}/{vMinor}",
-					"controller": "\\Controllers\\API\\UpdateController",
-					"function": "database"
-				},
-				{
-					"path": "/user/o365/callback",
-					"controller": "\\Controllers\\API\\UserController",
-					"function": "O365Callback",
-					"authentication": false
-				},
-				{
-					"path": "/viewscreen/{schoolId}",
-					"controller": "\\Controllers\\API\\NoteScreenController",
-					"function": "viewscreen"
-				},
-				{
-					"path": "/notifications",
-					"controller": "\\Controllers\\API\\NotificationController",
-					"function": "get"
-				},
-				{
-					"path": "/check/student/relation",
-					"controller": "\\Controllers\\API\\CheckController",
-					"function": "studentRelation",
-					"authentication": false
-				},
-				{
-					"prefix": "/sync",
-					"controller": "\\Controllers\\API\\SyncConroller",
-					"group": [
-						{
-							"path": "/ad/user",
-							"function": "adUser",
-							"authentication": false
-						},
-						{
-							"path": "/informat",
-							"function": "informat",
-							"authentication": false
-						},
-						{
-							"path": "/student",
-							"function": "student"
-						},
-						{
-							"path": "/teacher",
-							"function": "teacher"
-						}
-					]
-				},
-				{
-					"prefix": "/calendar",
-					"controller": "\\Controllers\\API\\CalendarController",
-					"group": [
-						{
-							"path": "/bike/home-work",
-							"function": "bike_homeWork"
-						},
-						{
-							"path": "/supervision/fill",
-							"function": "supervision_fill"
-						},
-						{
-							"path": "/holliday",
-							"function": "holliday"
-						}
-					]
-				},
-				{
-					"prefix": "/chart",
-					"controller": "\\Controllers\\API\\ChartController",
-					"group": [
-						{
-							"path": "/checklists/dashboard/checkStudentRelationInsz/{school?}",
-							"function": "checklists_checkStudentRelationInsz"
-						}
-					]
-				},
-				{
-					"prefix": "/table",
-					"controller": "\\Controllers\\API\\TableController",
-					"group": [
-						{
-							"path": "/user/{function}",
-							"function": "user"
-						},
-						{
-							"path": "/settings/rights",
-							"function": "settings_rights"
-						},
-						{
-							"path": "/bike/distances",
-							"function": "bike_distances"
-						},
-						{
-							"path": "/checklists/checkStudentRelationInsz/{school?}/{class?}",
-							"function": "checklists_checkStudentRelationInsz"
-						},
-						{
-							"path": "/notescreen/{function}",
-							"function": "notescreen"
-						},
-						{
-							"path": "/helpdesk/{type}",
-							"function": "helpdesk"
-						},
-						{
-							"path": "/management/{type}",
-							"function": "management"
-						},
-						{
-							"path": "/orders/{function}",
-							"function": "orders"
-						},
-						{
-							"path": "/orders/overview/{id}",
-							"function": "orders_overviewLine"
-						},
-						{
-							"path": "/synchronisation/student",
-							"function": "synchronisation_student"
-						}
-					]
-				},
-				{
-					"prefix": "/select",
-					"controller": "\\Controllers\\API\\SelectController",
-					"group": [
-						{
-							"path": "/modules",
-							"function": "modules"
-						},
-						{
-							"path": "/users",
-							"function": "users"
-						},
-						{
-							"path": "/school",
-							"function": "school"
-						},
-						{
-							"path": "/months",
-							"function": "months"
-						},
-						{
-							"path": "/user/start/type",
-							"function": "user_startType"
-						},
-						{
-							"path": "/checklists/checkStudentRelationInsz/class",
-							"function": "checklists_checkStudentRelationInszClass"
-						},
-						{
-							"path": "/synchronisation/student/class",
-							"function": "synchronisation_studentClass"
-						},
-						{
-							"path": "/bike/distances/userAddress",
-							"function": "bike_distancesUserAddress"
-						},
-						{
-							"path": "/notescreen/pages",
-							"function": "notescreen_pages"
-						},
-						{
-							"path": "/helpdesk/users/assignable",
-							"function": "helpdesk_usersAssignable"
-						},
-						{
-							"path": "/helpdesk/{function}",
-							"function": "helpdesk"
-						},
-						{
-							"path": "/management/{type}",
-							"function": "management"
-						},
-						{
-							"path": "/orders/supplier",
-							"function": "orders_suppliers"
-						}
-					]
-				},
-				{
-					"prefix": "/form",
-					"controller": "\\Controllers\\API\\FormController",
-					"group": [
-						{
-							"path": "/settings/{function}/{id?}",
-							"function": "settings"
-						},
-						{
-							"path": "/user/{function}/{id?}",
-							"function": "user"
-						},
-						{
-							"path": "/bike/{function}/{id}",
-							"function": "bike"
-						},
-						{
-							"path": "/supervision/settings",
-							"function": "supervision_settings"
-						},
-						{
-							"path": "/checklists/checkStudentRelationInsz/{id}",
-							"function": "checklists_checkStudentRelationInsz"
-						},
-						{
-							"path": "/notescreen/{function}/{id}",
-							"function": "notescreen"
-						},
-						{
-							"path": "/helpdesk/{function}/{id?}",
-							"function": "helpdesk"
-						},
-						{
-							"path": "/management/{function}/{id?}",
-							"function": "management"
-						},
-						{
-							"path": "/orders/{function}/{id?}",
-							"function": "orders"
-						},
-						{
-							"path": "/synchronisation/{function}/{id?}",
-							"function": "synchronisation"
-						}
-					]
-				},
-				{
-					"prefix": "/informat",
-					"controller": "\\Controllers\\API\\InformatController",
-					"group": [
-						{
-							"path": "/student/{id?}",
-							"function": "student"
-						},
-						{
-							"path": "/studentByRRN/{institute?}/{id?}",
-							"function": "studentByInstituteByRRN"
-						}
-					]
-				}
-			],
-			"post": [
-				{
-					"path": "/synchronisation/student/{id}/resetPassword/{random}",
-					"controller": "\\Controllers\\API\\SyncConroller",
-					"function": "studentResetPassword"
-				},
-				{
-					"prefix": "/sync",
-					"controller": "\\Controllers\\API\\SyncConroller",
-					"group": [
-						{
-							"path": "/ad/management/computer",
-							"function": "ad_managementComputer"
-						},
-						{
-							"path": "/student/time",
-							"function": "student_time"
-						},
-						{
-							"path": "/student/{id}",
-							"function": "student_update"
-						}
-					]
-				},
-				{
-					"prefix": "/form",
-					"group": [
-						{
-							"path": "/user/login",
-							"controller": "\\Controllers\\API\\UserController",
-							"function": "login",
-							"authentication": false
-						}
-					]
-				}
-			]
-		}
-	}
-]
+	]
+}

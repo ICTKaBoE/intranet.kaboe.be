@@ -267,6 +267,39 @@ class User extends DirectoryObject
     }
 
     /**
+    * Gets the cloudRealtimeCommunicationInfo
+    * Microsoft realtime communication information related to the user.  Supports $filter (eq, ne,not).
+    *
+    * @return CloudRealtimeCommunicationInfo|null The cloudRealtimeCommunicationInfo
+    */
+    public function getCloudRealtimeCommunicationInfo()
+    {
+        if (array_key_exists("cloudRealtimeCommunicationInfo", $this->_propDict)) {
+            if (is_a($this->_propDict["cloudRealtimeCommunicationInfo"], "\Beta\Microsoft\Graph\Model\CloudRealtimeCommunicationInfo") || is_null($this->_propDict["cloudRealtimeCommunicationInfo"])) {
+                return $this->_propDict["cloudRealtimeCommunicationInfo"];
+            } else {
+                $this->_propDict["cloudRealtimeCommunicationInfo"] = new CloudRealtimeCommunicationInfo($this->_propDict["cloudRealtimeCommunicationInfo"]);
+                return $this->_propDict["cloudRealtimeCommunicationInfo"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the cloudRealtimeCommunicationInfo
+    * Microsoft realtime communication information related to the user.  Supports $filter (eq, ne,not).
+    *
+    * @param CloudRealtimeCommunicationInfo $val The cloudRealtimeCommunicationInfo
+    *
+    * @return User
+    */
+    public function setCloudRealtimeCommunicationInfo($val)
+    {
+        $this->_propDict["cloudRealtimeCommunicationInfo"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the companyName
     * The company name which the user is associated. This property can be useful for describing the company that an external user comes from. The maximum length is 64 characters.Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
     *
@@ -926,7 +959,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the isManagementRestricted
-    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.
+    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.  To manage a user who is a member of a restricted administrative unit, the calling app must be assigned the Directory.Write.Restricted permission. For delegated scenarios, the administrators must also be explicitly assigned supported roles at the restricted administrative unit scope.
     *
     * @return bool|null The isManagementRestricted
     */
@@ -941,7 +974,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the isManagementRestricted
-    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.
+    * true if the user is a member of a restricted management administrative unit, in which case it requires a role scoped to the restricted administrative unit to manage. Default value is false. Read-only.  To manage a user who is a member of a restricted administrative unit, the calling app must be assigned the Directory.Write.Restricted permission. For delegated scenarios, the administrators must also be explicitly assigned supported roles at the restricted administrative unit scope.
     *
     * @param bool $val The isManagementRestricted
     *
@@ -1457,6 +1490,39 @@ class User extends DirectoryObject
     public function setOnPremisesSecurityIdentifier($val)
     {
         $this->_propDict["onPremisesSecurityIdentifier"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the onPremisesSipInfo
+    * Contains all on-premises Session Initiation Protocol (SIP) information related to the user. Read-only.
+    *
+    * @return OnPremisesSipInfo|null The onPremisesSipInfo
+    */
+    public function getOnPremisesSipInfo()
+    {
+        if (array_key_exists("onPremisesSipInfo", $this->_propDict)) {
+            if (is_a($this->_propDict["onPremisesSipInfo"], "\Beta\Microsoft\Graph\Model\OnPremisesSipInfo") || is_null($this->_propDict["onPremisesSipInfo"])) {
+                return $this->_propDict["onPremisesSipInfo"];
+            } else {
+                $this->_propDict["onPremisesSipInfo"] = new OnPremisesSipInfo($this->_propDict["onPremisesSipInfo"]);
+                return $this->_propDict["onPremisesSipInfo"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the onPremisesSipInfo
+    * Contains all on-premises Session Initiation Protocol (SIP) information related to the user. Read-only.
+    *
+    * @param OnPremisesSipInfo $val The onPremisesSipInfo
+    *
+    * @return User
+    */
+    public function setOnPremisesSipInfo($val)
+    {
+        $this->_propDict["onPremisesSipInfo"] = $val;
         return $this;
     }
 
@@ -2864,7 +2930,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the ownedObjects
-    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
+    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand, $select nested in $expand, and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
      *
      * @return array|null The ownedObjects
      */
@@ -2879,7 +2945,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the ownedObjects
-    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
+    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand, $select nested in $expand, and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
     *
     * @param DirectoryObject[] $val The ownedObjects
     *
@@ -2948,6 +3014,36 @@ class User extends DirectoryObject
     public function setScopedRoleMemberOf($val)
     {
         $this->_propDict["scopedRoleMemberOf"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the sponsors
+    * The users and groups that are responsible for this guest user's privileges in the tenant and keep the guest user's information and access updated. (HTTP Methods: GET, POST, DELETE.). Supports $expand.
+     *
+     * @return array|null The sponsors
+     */
+    public function getSponsors()
+    {
+        if (array_key_exists("sponsors", $this->_propDict)) {
+           return $this->_propDict["sponsors"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the sponsors
+    * The users and groups that are responsible for this guest user's privileges in the tenant and keep the guest user's information and access updated. (HTTP Methods: GET, POST, DELETE.). Supports $expand.
+    *
+    * @param DirectoryObject[] $val The sponsors
+    *
+    * @return User
+    */
+    public function setSponsors($val)
+    {
+        $this->_propDict["sponsors"] = $val;
         return $this;
     }
 
@@ -4137,6 +4233,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the activities
+    * The user's activities across devices. Read-only. Nullable.
      *
      * @return array|null The activities
      */
@@ -4151,6 +4248,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the activities
+    * The user's activities across devices. Read-only. Nullable.
     *
     * @param UserActivity[] $val The activities
     *
@@ -4193,6 +4291,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the onlineMeetings
+    * Information about a meeting, including the URL used to join a meeting, the attendees' list, and the description.
      *
      * @return array|null The onlineMeetings
      */
@@ -4207,6 +4306,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the onlineMeetings
+    * Information about a meeting, including the URL used to join a meeting, the attendees' list, and the description.
     *
     * @param OnlineMeeting[] $val The onlineMeetings
     *
@@ -4251,6 +4351,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the authentication
+    * The authentication methods that are supported for the user.
     *
     * @return Authentication|null The authentication
     */
@@ -4269,6 +4370,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the authentication
+    * The authentication methods that are supported for the user.
     *
     * @param Authentication $val The authentication
     *
@@ -4335,6 +4437,36 @@ class User extends DirectoryObject
     public function setJoinedTeams($val)
     {
         $this->_propDict["joinedTeams"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the permissionGrants
+    * List all resource-specific permission grants of a user.
+     *
+     * @return array|null The permissionGrants
+     */
+    public function getPermissionGrants()
+    {
+        if (array_key_exists("permissionGrants", $this->_propDict)) {
+           return $this->_propDict["permissionGrants"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the permissionGrants
+    * List all resource-specific permission grants of a user.
+    *
+    * @param ResourceSpecificPermissionGrant[] $val The permissionGrants
+    *
+    * @return User
+    */
+    public function setPermissionGrants($val)
+    {
+        $this->_propDict["permissionGrants"] = $val;
         return $this;
     }
 

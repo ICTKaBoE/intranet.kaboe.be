@@ -414,6 +414,39 @@ class User extends DirectoryObject
     }
 
     /**
+    * Gets the customSecurityAttributes
+    * An open complex type that holds the value of a custom security attribute that is assigned to a directory object. Nullable. Returned only on $select. Supports $filter (eq, ne, not, startsWith). Filter value is case sensitive.
+    *
+    * @return CustomSecurityAttributeValue|null The customSecurityAttributes
+    */
+    public function getCustomSecurityAttributes()
+    {
+        if (array_key_exists("customSecurityAttributes", $this->_propDict)) {
+            if (is_a($this->_propDict["customSecurityAttributes"], "\Microsoft\Graph\Model\CustomSecurityAttributeValue") || is_null($this->_propDict["customSecurityAttributes"])) {
+                return $this->_propDict["customSecurityAttributes"];
+            } else {
+                $this->_propDict["customSecurityAttributes"] = new CustomSecurityAttributeValue($this->_propDict["customSecurityAttributes"]);
+                return $this->_propDict["customSecurityAttributes"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the customSecurityAttributes
+    * An open complex type that holds the value of a custom security attribute that is assigned to a directory object. Nullable. Returned only on $select. Supports $filter (eq, ne, not, startsWith). Filter value is case sensitive.
+    *
+    * @param CustomSecurityAttributeValue $val The customSecurityAttributes
+    *
+    * @return User
+    */
+    public function setCustomSecurityAttributes($val)
+    {
+        $this->_propDict["customSecurityAttributes"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the department
     * The name for the department in which the user works. Maximum length is 64 characters. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in, and eq on null values).
     *
@@ -1432,7 +1465,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the passwordProfile
-    * Specifies the password profile for the user. The profile contains the user’s password. This property is required when a user is created. The password in the profile must satisfy minimum requirements as specified by the passwordPolicies property. By default, a strong password is required. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
+    * Specifies the password profile for the user. The profile contains the user's password. This property is required when a user is created. The password in the profile must satisfy minimum requirements as specified by the passwordPolicies property. By default, a strong password is required. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
     *
     * @return PasswordProfile|null The passwordProfile
     */
@@ -1451,7 +1484,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the passwordProfile
-    * Specifies the password profile for the user. The profile contains the user’s password. This property is required when a user is created. The password in the profile must satisfy minimum requirements as specified by the passwordPolicies property. By default, a strong password is required. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
+    * Specifies the password profile for the user. The profile contains the user's password. This property is required when a user is created. The password in the profile must satisfy minimum requirements as specified by the passwordPolicies property. By default, a strong password is required. Returned only on $select. Supports $filter (eq, ne, not, in, and eq on null values).
     *
     * @param PasswordProfile $val The passwordProfile
     *
@@ -1635,6 +1668,34 @@ class User extends DirectoryObject
     public function setSecurityIdentifier($val)
     {
         $this->_propDict["securityIdentifier"] = $val;
+        return $this;
+    }
+
+
+     /**
+     * Gets the serviceProvisioningErrors
+     *
+     * @return array|null The serviceProvisioningErrors
+     */
+    public function getServiceProvisioningErrors()
+    {
+        if (array_key_exists("serviceProvisioningErrors", $this->_propDict)) {
+           return $this->_propDict["serviceProvisioningErrors"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the serviceProvisioningErrors
+    *
+    * @param ServiceProvisioningError[] $val The serviceProvisioningErrors
+    *
+    * @return User
+    */
+    public function setServiceProvisioningErrors($val)
+    {
+        $this->_propDict["serviceProvisioningErrors"] = $val;
         return $this;
     }
 
@@ -1933,6 +1994,37 @@ class User extends DirectoryObject
     public function setDeviceEnrollmentLimit($val)
     {
         $this->_propDict["deviceEnrollmentLimit"] = intval($val);
+        return $this;
+    }
+
+    /**
+    * Gets the print
+    *
+    * @return UserPrint|null The print
+    */
+    public function getPrint()
+    {
+        if (array_key_exists("print", $this->_propDict)) {
+            if (is_a($this->_propDict["print"], "\Microsoft\Graph\Model\UserPrint") || is_null($this->_propDict["print"])) {
+                return $this->_propDict["print"];
+            } else {
+                $this->_propDict["print"] = new UserPrint($this->_propDict["print"]);
+                return $this->_propDict["print"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the print
+    *
+    * @param UserPrint $val The print
+    *
+    * @return User
+    */
+    public function setPrint($val)
+    {
+        $this->_propDict["print"] = $val;
         return $this;
     }
 
@@ -2478,7 +2570,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the ownedObjects
-    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand.
+    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand, $select nested in $expand, and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
      *
      * @return array|null The ownedObjects
      */
@@ -2493,7 +2585,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the ownedObjects
-    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand.
+    * Directory objects that are owned by the user. Read-only. Nullable. Supports $expand, $select nested in $expand, and $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1).
     *
     * @param DirectoryObject[] $val The ownedObjects
     *
@@ -3421,6 +3513,7 @@ class User extends DirectoryObject
 
      /**
      * Gets the onlineMeetings
+    * Information about a meeting, including the URL used to join a meeting, the attendees' list, and the description.
      *
      * @return array|null The onlineMeetings
      */
@@ -3435,6 +3528,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the onlineMeetings
+    * Information about a meeting, including the URL used to join a meeting, the attendees' list, and the description.
     *
     * @param OnlineMeeting[] $val The onlineMeetings
     *
@@ -3568,6 +3662,7 @@ class User extends DirectoryObject
 
     /**
     * Gets the teamwork
+    * A container for Microsoft Teams features available for the user. Read-only. Nullable.
     *
     * @return UserTeamwork|null The teamwork
     */
@@ -3586,6 +3681,7 @@ class User extends DirectoryObject
 
     /**
     * Sets the teamwork
+    * A container for Microsoft Teams features available for the user. Read-only. Nullable.
     *
     * @param UserTeamwork $val The teamwork
     *
@@ -3627,6 +3723,37 @@ class User extends DirectoryObject
     public function setTodo($val)
     {
         $this->_propDict["todo"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the employeeExperience
+    *
+    * @return EmployeeExperienceUser|null The employeeExperience
+    */
+    public function getEmployeeExperience()
+    {
+        if (array_key_exists("employeeExperience", $this->_propDict)) {
+            if (is_a($this->_propDict["employeeExperience"], "\Microsoft\Graph\Model\EmployeeExperienceUser") || is_null($this->_propDict["employeeExperience"])) {
+                return $this->_propDict["employeeExperience"];
+            } else {
+                $this->_propDict["employeeExperience"] = new EmployeeExperienceUser($this->_propDict["employeeExperience"]);
+                return $this->_propDict["employeeExperience"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the employeeExperience
+    *
+    * @param EmployeeExperienceUser $val The employeeExperience
+    *
+    * @return User
+    */
+    public function setEmployeeExperience($val)
+    {
+        $this->_propDict["employeeExperience"] = $val;
         return $this;
     }
 

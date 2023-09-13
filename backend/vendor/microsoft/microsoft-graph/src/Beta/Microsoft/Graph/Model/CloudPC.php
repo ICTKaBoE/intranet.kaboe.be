@@ -54,6 +54,37 @@ class CloudPC extends Entity
     }
 
     /**
+    * Gets the connectionSettings
+    *
+    * @return CloudPcConnectionSettings|null The connectionSettings
+    */
+    public function getConnectionSettings()
+    {
+        if (array_key_exists("connectionSettings", $this->_propDict)) {
+            if (is_a($this->_propDict["connectionSettings"], "\Beta\Microsoft\Graph\Model\CloudPcConnectionSettings") || is_null($this->_propDict["connectionSettings"])) {
+                return $this->_propDict["connectionSettings"];
+            } else {
+                $this->_propDict["connectionSettings"] = new CloudPcConnectionSettings($this->_propDict["connectionSettings"]);
+                return $this->_propDict["connectionSettings"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the connectionSettings
+    *
+    * @param CloudPcConnectionSettings $val The connectionSettings
+    *
+    * @return CloudPC
+    */
+    public function setConnectionSettings($val)
+    {
+        $this->_propDict["connectionSettings"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the connectivityResult
     * The connectivity health check result of a Cloud PC, including the updated timestamp and whether the Cloud PC can be connected.
     *
@@ -461,6 +492,7 @@ class CloudPC extends Entity
 
     /**
     * Gets the powerState
+    * The power state of a Cloud PC. The possible values are: running, poweredOff and unknown. This property only supports shift work Cloud PCs.
     *
     * @return CloudPcPowerState|null The powerState
     */
@@ -479,6 +511,7 @@ class CloudPC extends Entity
 
     /**
     * Sets the powerState
+    * The power state of a Cloud PC. The possible values are: running, poweredOff and unknown. This property only supports shift work Cloud PCs.
     *
     * @param CloudPcPowerState $val The powerState
     *

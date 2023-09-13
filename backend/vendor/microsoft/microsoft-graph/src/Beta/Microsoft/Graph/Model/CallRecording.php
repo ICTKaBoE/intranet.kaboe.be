@@ -26,6 +26,7 @@ class CallRecording extends Entity
 {
     /**
     * Gets the content
+    * The content of the recording. Read-only.
     *
     * @return \GuzzleHttp\Psr7\Stream|null The content
     */
@@ -44,6 +45,7 @@ class CallRecording extends Entity
 
     /**
     * Sets the content
+    * The content of the recording. Read-only.
     *
     * @param \GuzzleHttp\Psr7\Stream $val The content
     *
@@ -57,6 +59,7 @@ class CallRecording extends Entity
 
     /**
     * Gets the createdDateTime
+    * Date and time at which the recording was created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
     *
     * @return \DateTime|null The createdDateTime
     */
@@ -75,6 +78,7 @@ class CallRecording extends Entity
 
     /**
     * Sets the createdDateTime
+    * Date and time at which the recording was created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
     *
     * @param \DateTime $val The createdDateTime
     *
@@ -83,6 +87,93 @@ class CallRecording extends Entity
     public function setCreatedDateTime($val)
     {
         $this->_propDict["createdDateTime"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the meetingId
+    * The unique identifier of the onlineMeeting related to this recording. Read-only.
+    *
+    * @return string|null The meetingId
+    */
+    public function getMeetingId()
+    {
+        if (array_key_exists("meetingId", $this->_propDict)) {
+            return $this->_propDict["meetingId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the meetingId
+    * The unique identifier of the onlineMeeting related to this recording. Read-only.
+    *
+    * @param string $val The meetingId
+    *
+    * @return CallRecording
+    */
+    public function setMeetingId($val)
+    {
+        $this->_propDict["meetingId"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the meetingOrganizerId
+    * The unique identifier of the organizer of the onlineMeeting related to this recording. Read-only.
+    *
+    * @return string|null The meetingOrganizerId
+    */
+    public function getMeetingOrganizerId()
+    {
+        if (array_key_exists("meetingOrganizerId", $this->_propDict)) {
+            return $this->_propDict["meetingOrganizerId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the meetingOrganizerId
+    * The unique identifier of the organizer of the onlineMeeting related to this recording. Read-only.
+    *
+    * @param string $val The meetingOrganizerId
+    *
+    * @return CallRecording
+    */
+    public function setMeetingOrganizerId($val)
+    {
+        $this->_propDict["meetingOrganizerId"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the recordingContentUrl
+    * The URL which can be used to access the content of the recording. Read-only.
+    *
+    * @return string|null The recordingContentUrl
+    */
+    public function getRecordingContentUrl()
+    {
+        if (array_key_exists("recordingContentUrl", $this->_propDict)) {
+            return $this->_propDict["recordingContentUrl"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the recordingContentUrl
+    * The URL which can be used to access the content of the recording. Read-only.
+    *
+    * @param string $val The recordingContentUrl
+    *
+    * @return CallRecording
+    */
+    public function setRecordingContentUrl($val)
+    {
+        $this->_propDict["recordingContentUrl"] = $val;
         return $this;
     }
 

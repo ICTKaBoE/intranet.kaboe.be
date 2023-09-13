@@ -25,7 +25,37 @@ namespace Beta\Microsoft\Graph\Model;
 class CompanySubscription extends Entity
 {
     /**
+    * Gets the commerceSubscriptionId
+    * The ID of this subscription in the commerce system. Alternate key.
+    *
+    * @return string|null The commerceSubscriptionId
+    */
+    public function getCommerceSubscriptionId()
+    {
+        if (array_key_exists("commerceSubscriptionId", $this->_propDict)) {
+            return $this->_propDict["commerceSubscriptionId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the commerceSubscriptionId
+    * The ID of this subscription in the commerce system. Alternate key.
+    *
+    * @param string $val The commerceSubscriptionId
+    *
+    * @return CompanySubscription
+    */
+    public function setCommerceSubscriptionId($val)
+    {
+        $this->_propDict["commerceSubscriptionId"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the createdDateTime
+    * The date and time when this subscription was created. The DateTimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @return \DateTime|null The createdDateTime
     */
@@ -44,6 +74,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the createdDateTime
+    * The date and time when this subscription was created. The DateTimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @param \DateTime $val The createdDateTime
     *
@@ -57,6 +88,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the isTrial
+    * Whether the subscription is a free trial or purchased.
     *
     * @return bool|null The isTrial
     */
@@ -71,6 +103,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the isTrial
+    * Whether the subscription is a free trial or purchased.
     *
     * @param bool $val The isTrial
     *
@@ -84,6 +117,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the nextLifecycleDateTime
+    * The date and time when the subscription will move to the next state (as defined by the status property) if not renewed by the tenant. The DateTimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @return \DateTime|null The nextLifecycleDateTime
     */
@@ -102,6 +136,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the nextLifecycleDateTime
+    * The date and time when the subscription will move to the next state (as defined by the status property) if not renewed by the tenant. The DateTimeOffset type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @param \DateTime $val The nextLifecycleDateTime
     *
@@ -140,9 +175,97 @@ class CompanySubscription extends Entity
         return $this;
     }
 
+    /**
+    * Gets the ownerId
+    * The object ID of the account admin.
+    *
+    * @return string|null The ownerId
+    */
+    public function getOwnerId()
+    {
+        if (array_key_exists("ownerId", $this->_propDict)) {
+            return $this->_propDict["ownerId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the ownerId
+    * The object ID of the account admin.
+    *
+    * @param string $val The ownerId
+    *
+    * @return CompanySubscription
+    */
+    public function setOwnerId($val)
+    {
+        $this->_propDict["ownerId"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the ownerTenantId
+    * The unique identifier for the Microsoft partner tenant that created the subscription on a customer tenant.
+    *
+    * @return string|null The ownerTenantId
+    */
+    public function getOwnerTenantId()
+    {
+        if (array_key_exists("ownerTenantId", $this->_propDict)) {
+            return $this->_propDict["ownerTenantId"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the ownerTenantId
+    * The unique identifier for the Microsoft partner tenant that created the subscription on a customer tenant.
+    *
+    * @param string $val The ownerTenantId
+    *
+    * @return CompanySubscription
+    */
+    public function setOwnerTenantId($val)
+    {
+        $this->_propDict["ownerTenantId"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the ownerType
+    * Indicates the entity that ownerId belongs to, for example, 'User'.
+    *
+    * @return string|null The ownerType
+    */
+    public function getOwnerType()
+    {
+        if (array_key_exists("ownerType", $this->_propDict)) {
+            return $this->_propDict["ownerType"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the ownerType
+    * Indicates the entity that ownerId belongs to, for example, 'User'.
+    *
+    * @param string $val The ownerType
+    *
+    * @return CompanySubscription
+    */
+    public function setOwnerType($val)
+    {
+        $this->_propDict["ownerType"] = $val;
+        return $this;
+    }
+
 
      /**
      * Gets the serviceStatus
+    * The provisioning status of each service that's included in this subscription.
      *
      * @return array|null The serviceStatus
      */
@@ -157,6 +280,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the serviceStatus
+    * The provisioning status of each service that's included in this subscription.
     *
     * @param ServicePlanInfo[] $val The serviceStatus
     *
@@ -170,6 +294,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the skuId
+    * The object ID of the SKU associated with this subscription.
     *
     * @return string|null The skuId
     */
@@ -184,6 +309,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the skuId
+    * The object ID of the SKU associated with this subscription.
     *
     * @param string $val The skuId
     *
@@ -197,6 +323,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the skuPartNumber
+    * The SKU associated with this subscription.
     *
     * @return string|null The skuPartNumber
     */
@@ -211,6 +338,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the skuPartNumber
+    * The SKU associated with this subscription.
     *
     * @param string $val The skuPartNumber
     *
@@ -224,6 +352,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the status
+    * The status of this subscription. Possible values are: Enabled, Expired, Suspended, Warning, LockedOut.
     *
     * @return string|null The status
     */
@@ -238,6 +367,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the status
+    * The status of this subscription. Possible values are: Enabled, Expired, Suspended, Warning, LockedOut.
     *
     * @param string $val The status
     *
@@ -251,6 +381,7 @@ class CompanySubscription extends Entity
 
     /**
     * Gets the totalLicenses
+    * The number of seats included in this subscription.
     *
     * @return int|null The totalLicenses
     */
@@ -265,6 +396,7 @@ class CompanySubscription extends Entity
 
     /**
     * Sets the totalLicenses
+    * The number of seats included in this subscription.
     *
     * @param int $val The totalLicenses
     *

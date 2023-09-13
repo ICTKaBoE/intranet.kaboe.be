@@ -1,0 +1,1 @@
+{"GET":["\/","\/public\/{module?}\/{page?}\/{id?}","\/api\/v2\/user\/o365\/callback","\/error\/{code}","\/public\/{module?}\/{page?}"],"POST":["\/api\/v2\/user\/login"],"PATCH":[],"DELETE":[],"ANY":[]}

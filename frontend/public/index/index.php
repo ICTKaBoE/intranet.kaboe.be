@@ -8,7 +8,7 @@
 				<h3 class="card-title">Aanmelden met je COLTD-adres</h3>
 			</div>
 
-			<form action="{{form:action}}" method="post" autocomplete="off" id="frm{{page:id}}">
+			<form action="{{api:url}}/user/login" method="post" autocomplete="off" id="frm{{page:id}}">
 				<div class="card-body">
 					<div class="mb-3">
 						<label class="form-label" for="username">Email</label>
@@ -23,20 +23,20 @@
 					</div>
 
 					<div class="form-footer">
-						<button type="submit" class="btn btn-primary w-100">Aanmelden</button>
-					</div>
-				</div>
-
-				<div class="hr-text">of</div>
-
-				<div class="card-body">
-					<div class="row">
-						<div class="col-12">
-							<a href="{{o365:connect}}" class="btn btn-secondary w-100">Aanmelden via Office 365</a>
-						</div>
+						<button type="submit" id="btn-submit" class="btn btn-primary w-100">Aanmelden</button>
 					</div>
 				</div>
 			</form>
+
+			<div class="hr-text">of</div>
+
+			<div class="card-body">
+				<div class="row">
+					<div class="col-12">
+						<a href="{{o365:connect}}" class="btn btn-secondary w-100">Aanmelden via Office 365</a>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="position-absolute bottom-0 end-0 p-3">

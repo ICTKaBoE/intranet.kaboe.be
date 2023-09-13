@@ -300,6 +300,7 @@ class OnlineMeeting extends Entity
 
      /**
      * Gets the anonymizeIdentityForRoles
+    * Specifies whose identity will be anonymized in the meeting. Possible values are: attendee. The attendee value cannot be removed through a PATCH operation once added.
      *
      * @return array|null The anonymizeIdentityForRoles
      */
@@ -314,6 +315,7 @@ class OnlineMeeting extends Entity
 
     /**
     * Sets the anonymizeIdentityForRoles
+    * Specifies whose identity will be anonymized in the meeting. Possible values are: attendee. The attendee value cannot be removed through a PATCH operation once added.
     *
     * @param OnlineMeetingRole[] $val The anonymizeIdentityForRoles
     *
@@ -513,6 +515,37 @@ class OnlineMeeting extends Entity
     public function setChatInfo($val)
     {
         $this->_propDict["chatInfo"] = $val;
+        return $this;
+    }
+
+    /**
+    * Gets the chatRestrictions
+    *
+    * @return ChatRestrictions|null The chatRestrictions
+    */
+    public function getChatRestrictions()
+    {
+        if (array_key_exists("chatRestrictions", $this->_propDict)) {
+            if (is_a($this->_propDict["chatRestrictions"], "\Beta\Microsoft\Graph\Model\ChatRestrictions") || is_null($this->_propDict["chatRestrictions"])) {
+                return $this->_propDict["chatRestrictions"];
+            } else {
+                $this->_propDict["chatRestrictions"] = new ChatRestrictions($this->_propDict["chatRestrictions"]);
+                return $this->_propDict["chatRestrictions"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the chatRestrictions
+    *
+    * @param ChatRestrictions $val The chatRestrictions
+    *
+    * @return OnlineMeeting
+    */
+    public function setChatRestrictions($val)
+    {
+        $this->_propDict["chatRestrictions"] = $val;
         return $this;
     }
 
@@ -1076,37 +1109,6 @@ class OnlineMeeting extends Entity
         return $this;
     }
 
-    /**
-    * Gets the virtualAppointment
-    *
-    * @return VirtualAppointment|null The virtualAppointment
-    */
-    public function getVirtualAppointment()
-    {
-        if (array_key_exists("virtualAppointment", $this->_propDict)) {
-            if (is_a($this->_propDict["virtualAppointment"], "\Beta\Microsoft\Graph\Model\VirtualAppointment") || is_null($this->_propDict["virtualAppointment"])) {
-                return $this->_propDict["virtualAppointment"];
-            } else {
-                $this->_propDict["virtualAppointment"] = new VirtualAppointment($this->_propDict["virtualAppointment"]);
-                return $this->_propDict["virtualAppointment"];
-            }
-        }
-        return null;
-    }
-
-    /**
-    * Sets the virtualAppointment
-    *
-    * @param VirtualAppointment $val The virtualAppointment
-    *
-    * @return OnlineMeeting
-    */
-    public function setVirtualAppointment($val)
-    {
-        $this->_propDict["virtualAppointment"] = $val;
-        return $this;
-    }
-
 
      /**
      * Gets the attendanceReports
@@ -1204,6 +1206,7 @@ class OnlineMeeting extends Entity
 
      /**
      * Gets the recordings
+    * The recordings of an online meeting. Read-only.
      *
      * @return array|null The recordings
      */
@@ -1218,6 +1221,7 @@ class OnlineMeeting extends Entity
 
     /**
     * Sets the recordings
+    * The recordings of an online meeting. Read-only.
     *
     * @param CallRecording[] $val The recordings
     *

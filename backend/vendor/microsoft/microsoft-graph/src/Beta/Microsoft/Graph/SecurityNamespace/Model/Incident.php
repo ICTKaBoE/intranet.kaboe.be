@@ -297,6 +297,33 @@ class Incident extends \Beta\Microsoft\Graph\Model\Entity
     }
 
     /**
+    * Gets the lastModifiedBy
+    *
+    * @return string|null The lastModifiedBy
+    */
+    public function getLastModifiedBy()
+    {
+        if (array_key_exists("lastModifiedBy", $this->_propDict)) {
+            return $this->_propDict["lastModifiedBy"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the lastModifiedBy
+    *
+    * @param string $val The lastModifiedBy
+    *
+    * @return Incident
+    */
+    public function setLastModifiedBy($val)
+    {
+        $this->_propDict["lastModifiedBy"] = $val;
+        return $this;
+    }
+
+    /**
     * Gets the lastUpdateDateTime
     * Time when the incident was last updated.
     *
@@ -448,7 +475,7 @@ class Incident extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the status
-    * The status of the incident. Possible values are: active, resolved, inProgress, redirected, unknownFutureValue.
+    * The status of the incident. Possible values are: active, resolved, inProgress, redirected, unknownFutureValue, and awaitingAction.
     *
     * @return IncidentStatus|null The status
     */
@@ -467,7 +494,7 @@ class Incident extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the status
-    * The status of the incident. Possible values are: active, resolved, inProgress, redirected, unknownFutureValue.
+    * The status of the incident. Possible values are: active, resolved, inProgress, redirected, unknownFutureValue, and awaitingAction.
     *
     * @param IncidentStatus $val The status
     *

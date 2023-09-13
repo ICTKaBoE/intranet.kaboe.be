@@ -53,12 +53,14 @@ class AuthenticationManager
         $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
         // Redirect the browser to the authorization endpoint. Auth endpoint is
         // https://login.microsoftonline.com/common/oauth2/authorize
-        $redirect = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.authorize")[0]->value .
-            '?response_type=code' .
-            '&client_id=' . urlencode($settingRepo->get("o365.client.id")[0]->value) .
-            '&redirect_uri=' . urlencode(str_replace('{{site:dev}}', $devmode ? 'dev.' : '', $settingRepo->get("o365.url.callback")[0]->value));
-
+        $redirect = "{{o365.url.authority}}{{o365.endpoint.authorize}}?response_type=code&client_id={{o365.client.id}}&redirect_uri={{o365.url.callback}}";
         if (!is_null($username)) $redirect .= "&login_hint=" . urlencode($username);
+
+        foreach (array_reverse((new Setting)->get()) as $setting) {
+            $redirect = str_replace('{{' . $setting->id . '}}', $setting->value, $redirect);
+        }
+        $redirect = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $redirect);
+        // $redirect = urlencode($redirect);
 
         if ($autoRedirect) {
             header("Location: {$redirect}");
@@ -78,8 +80,27 @@ class AuthenticationManager
     public static function acquireToken()
     {
         $settingRepo = new Setting;
-        $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
-        $tokenEndpoint = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.token")[0]->value;
+        // $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
+        // $tokenEndpoint = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.token")[0]->value;
+        $tokenEndpoint = "{{o365.url.authority}}{{o365.endpoint.token}}";
+        $clientId = "{{o365.client.id}}";
+        $clientSecret = "{{o365.client.secret}}";
+        $redirectUri = "{{o365.url.callback}}";
+        $resource = "{{o365.url.resource}}";
+
+        foreach (array_reverse((new Setting)->get()) as $setting) {
+            $tokenEndpoint = str_replace('{{' . $setting->id . '}}', $setting->value, $tokenEndpoint);
+            $clientId = str_replace('{{' . $setting->id . '}}', $setting->value, $clientId);
+            $clientSecret = str_replace('{{' . $setting->id . '}}', $setting->value, $clientSecret);
+            $redirectUri = str_replace('{{' . $setting->id . '}}', $setting->value, $redirectUri);
+            $resource = str_replace('{{' . $setting->id . '}}', $setting->value, $resource);
+        }
+
+        $tokenEndpoint = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $tokenEndpoint);
+        $clientId = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $clientId);
+        $clientSecret = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $clientSecret);
+        $redirectUri = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $redirectUri);
+        $resource = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $resource);
 
         // Send a POST request to the token endpoint to retrieve tokens.
         // Token endpoint is:
@@ -88,12 +109,12 @@ class AuthenticationManager
             $tokenEndpoint,
             array(),
             array(
-                'client_id' => $settingRepo->get("o365.client.id")[0]->value,
-                'client_secret' => $settingRepo->get("o365.client.secret")[0]->value,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
                 'code' => Session::get('code'),
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => str_replace('{{site:dev}}', $devmode ? 'dev.' : '', $settingRepo->get("o365.url.callback")[0]->value),
-                'resource' => $settingRepo->get("o365.url.resource")[0]->value
+                'redirect_uri' => $redirectUri,
+                'resource' => $resource
             )
         );
 
@@ -148,16 +169,28 @@ class AuthenticationManager
      */
     public static function disconnect()
     {
-        $settingRepo = new Setting;
+        // $settingRepo = new Setting;
         Session::stop();
 
-        $connectUrl = Helpers::url()->getScheme() . "://" . Helpers::url()->getHost();
+        // $connectUrl = Helpers::url()->getScheme() . "://" . Helpers::url()->getHost();
 
         // Logout endpoint is in the form
         // https://login.microsoftonline.com/common/oauth2/logout
         // ?post_logout_redirect_uri=<full_url_of_your_start_page> 
-        $redirect = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.logout")[0]->value .
-            '?post_logout_redirect_uri=' . urlencode($connectUrl);
+        $redirect = "{{o365.url.authority}}{{o365.endpoint.logout}}?post_logout_redirect_uri={{site:url}}";
+
+        foreach (array_reverse((new Setting)->get()) as $setting) {
+            $redirect = str_replace('{{' . $setting->id . '}}', $setting->value, $redirect);
+        }
+        $redirect = str_replace(
+            "{{site:url}}",
+            (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(),
+            $redirect
+        );
+
+        // $redirect = urlencode($redirect);
+        // $redirect = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.logout")[0]->value .
+        //     '?post_logout_redirect_uri=' . urlencode($connectUrl);
         header("Location: " . $redirect);
         exit();
     }

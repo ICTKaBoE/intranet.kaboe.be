@@ -10,7 +10,6 @@
 		"/public/notescreen/viewscreen"
 	],
 	"noPageTitleAndMenubar": [
-		"/app/selectModule",
-		"/public/selectModule"
+		"/app/index"
 	]
 }

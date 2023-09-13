@@ -26,6 +26,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 {
     /**
     * Gets the bandwidthCapacity
+    * Determines the maximum allowed Mbps (megabits per second) bandwidth from a branch site. The possible values are:250,500,750,1000.
     *
     * @return int|null The bandwidthCapacity
     */
@@ -40,6 +41,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the bandwidthCapacity
+    * Determines the maximum allowed Mbps (megabits per second) bandwidth from a branch site. The possible values are:250,500,750,1000.
     *
     * @param int $val The bandwidthCapacity
     *
@@ -53,6 +55,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the connectivityState
+    * Determines the branch site status. The possible values are: pending, connected, inactive, error.
     *
     * @return ConnectivityState|null The connectivityState
     */
@@ -71,6 +74,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the connectivityState
+    * Determines the branch site status. The possible values are: pending, connected, inactive, error.
     *
     * @param ConnectivityState $val The connectivityState
     *
@@ -84,6 +88,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the country
+    * The branch site is created in the specified country.
     *
     * @return string|null The country
     */
@@ -98,6 +103,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the country
+    * The branch site is created in the specified country.
     *
     * @param string $val The country
     *
@@ -111,6 +117,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the lastModifiedDateTime
+    * last modified time.
     *
     * @return \DateTime|null The lastModifiedDateTime
     */
@@ -129,6 +136,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the lastModifiedDateTime
+    * last modified time.
     *
     * @param \DateTime $val The lastModifiedDateTime
     *
@@ -142,6 +150,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the name
+    * Name.
     *
     * @return string|null The name
     */
@@ -156,6 +165,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the name
+    * Name.
     *
     * @param string $val The name
     *
@@ -169,6 +179,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the region
+    * The branch site is created in the specified location.
     *
     * @return Region|null The region
     */
@@ -187,6 +198,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the region
+    * The branch site is created in the specified location.
     *
     * @param Region $val The region
     *
@@ -200,6 +212,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Gets the version
+    * The branch version.
     *
     * @return string|null The version
     */
@@ -214,6 +227,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the version
+    * The branch version.
     *
     * @param string $val The version
     *
@@ -225,9 +239,41 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
         return $this;
     }
 
+    /**
+    * Gets the connectivityConfiguration
+    *
+    * @return BranchConnectivityConfiguration|null The connectivityConfiguration
+    */
+    public function getConnectivityConfiguration()
+    {
+        if (array_key_exists("connectivityConfiguration", $this->_propDict)) {
+            if (is_a($this->_propDict["connectivityConfiguration"], "\Beta\Microsoft\Graph\Networkaccess\Model\BranchConnectivityConfiguration") || is_null($this->_propDict["connectivityConfiguration"])) {
+                return $this->_propDict["connectivityConfiguration"];
+            } else {
+                $this->_propDict["connectivityConfiguration"] = new BranchConnectivityConfiguration($this->_propDict["connectivityConfiguration"]);
+                return $this->_propDict["connectivityConfiguration"];
+            }
+        }
+        return null;
+    }
+
+    /**
+    * Sets the connectivityConfiguration
+    *
+    * @param BranchConnectivityConfiguration $val The connectivityConfiguration
+    *
+    * @return BranchSite
+    */
+    public function setConnectivityConfiguration($val)
+    {
+        $this->_propDict["connectivityConfiguration"] = $val;
+        return $this;
+    }
+
 
      /**
      * Gets the deviceLinks
+    * Each unique CPE device associated with a branch is specified. Supports $expand.
      *
      * @return array|null The deviceLinks
      */
@@ -242,6 +288,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the deviceLinks
+    * Each unique CPE device associated with a branch is specified. Supports $expand.
     *
     * @param DeviceLink[] $val The deviceLinks
     *
@@ -256,6 +303,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
      /**
      * Gets the forwardingProfiles
+    * Each forwarding profile associated with a branch site is specified. Supports $expand.
      *
      * @return array|null The forwardingProfiles
      */
@@ -270,6 +318,7 @@ class BranchSite extends \Beta\Microsoft\Graph\Model\Entity
 
     /**
     * Sets the forwardingProfiles
+    * Each forwarding profile associated with a branch site is specified. Supports $expand.
     *
     * @param ForwardingProfile[] $val The forwardingProfiles
     *

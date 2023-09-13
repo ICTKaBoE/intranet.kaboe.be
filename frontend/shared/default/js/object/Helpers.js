@@ -10,7 +10,9 @@ export default class Helpers {
 
 	static redirect = (link) => {
 		let url = window.location.href;
-		url += link;
+
+		if (String(link).startsWith('http')) url = link;
+		else url += link;
 
 		window.location.href = url;
 	};

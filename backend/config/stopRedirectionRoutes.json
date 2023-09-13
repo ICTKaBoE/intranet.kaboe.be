@@ -1,0 +1,11 @@
+{
+	"GET": [
+		"\/error\/{code}"
+	],
+	"POST": [
+		"\/api\/v2\/user\/login"
+	],
+	"PATCH": [],
+	"DELETE": [],
+	"ANY": []
+}

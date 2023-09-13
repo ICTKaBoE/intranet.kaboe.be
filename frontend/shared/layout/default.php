@@ -25,12 +25,13 @@
 	</div>
 
 	{{component:modal}}
-	{{content:page:js}}
-	{{load:body}}
 
 	<script>
 		let pageId = "{{page:id}}";
 	</script>
+
+	{{content:page:js}}
+	{{load:body}}
 </body>
 
 </html>
