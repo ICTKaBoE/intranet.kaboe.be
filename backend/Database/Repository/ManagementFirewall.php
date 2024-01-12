@@ -8,7 +8,15 @@ class ManagementFirewall extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_firewall", \Database\Object\ManagementFirewall::class, orderField: 'hostname');
+		parent::__construct("tbl_management_firewall", \Database\Object\ManagementFirewall::class, orderField: 'schoolId');
+	}
+
+	public function getBySchool($schoolId)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where("schoolId", $schoolId);
+
+		return $this->executeSelect($statement);
 	}
 
 	public function checkAlreadyExist($schoolId, $buildingId, $roomId, $cabinetId, $hostname, $id = null)

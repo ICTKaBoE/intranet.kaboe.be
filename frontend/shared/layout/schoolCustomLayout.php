@@ -7,7 +7,7 @@
 	{{content:page:css}}
 </head>
 
-<body class="theme-light">
+<body>
 	<div class="page">
 		<div class="sticky-top">
 			{{component:schoolheader}}
@@ -23,6 +23,7 @@
 	</div>
 
 	{{component:modal}}
+	{{component:toast}}
 
 	<script>
 		let pageId = "{{page:id}}";

@@ -8,7 +8,7 @@ class ManagementRoom extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_room", \Database\Object\ManagementRoom::class, orderField: 'floor');
+		parent::__construct("tbl_management_room", \Database\Object\ManagementRoom::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

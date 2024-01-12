@@ -47,9 +47,6 @@ class Helpdesk extends CustomObject
 		$this->statusColor = Mapping::get("helpdesk/status/{$this->status}/color");
 
 		$this->number = $numberFormat;
-		if (!(Strings::equal($this->type, 'O') || Strings::equal($this->type, 'B') || Strings::equal($this->type, 'P')) && Strings::contains($this->number, "ST")) $this->number = str_replace("ST", $this->subtype, $this->number);
-		else $this->number = str_replace("-ST", "", $this->number);
-		if (Strings::contains($this->number, "T")) $this->number = str_replace("T", $this->type, $this->number);
 		if (Strings::contains($this->number, "#")) {
 			$count = substr_count($this->number, "#");
 			$hashes = "";
@@ -57,8 +54,14 @@ class Helpdesk extends CustomObject
 			$this->number = str_replace($hashes, str_pad($this->id, $count, 0, STR_PAD_LEFT), $this->number);
 		}
 
+		if (Strings::contains($this->number, "Y")) {
+			$count = substr_count($this->number, "Y");
+			$hashes = "";
+			for ($i = 0; $i < $count; $i++) $hashes .= "Y";
+			$this->number = str_replace($hashes, Clock::at($this->creationDateTime)->format($hashes), $this->number);
+		}
+
 		$this->subject = (Strings::isNotBlank($this->deviceName) ? "{$this->deviceName} - " : "") . $this->typeFull . (Strings::equal($this->type, "O") ? "" : " - {$this->subtypeFull}");
-		$this->lastAction = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s");
 
 		$age = Clock::at($this->creationDateTime)->toDateTime()->diff(Clock::now()->toDateTime());
 		if ($age->y == 0 && $age->m == 0 && $age->d == 0 && $age->h == 0 && $age->i == 0) $this->age = $age->s . " seconden";
@@ -67,6 +70,14 @@ class Helpdesk extends CustomObject
 		else if ($age->y == 0 && $age->m == 0) $this->age = $age->d . " dagen";
 		else if ($age->y == 0) $this->age = $age->m . " maanden";
 		else $this->age = $age->y . " jaren";
+
+		$laage = Clock::at($this->lastActionDateTime)->toDateTime()->diff(Clock::now()->toDateTime());
+		if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0 && $laage->h == 0 && $laage->i == 0) $this->laage = $laage->s . " seconden";
+		else if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0 && $laage->h == 0) $this->laage = $laage->i . " minuten";
+		else if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0) $this->laage = $laage->h . " uren";
+		else if ($laage->y == 0 && $laage->m == 0) $this->laage = $laage->d . " dagen";
+		else if ($laage->y == 0) $this->laage = $laage->m . " maanden";
+		$this->lastAction = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s") . " ({$this->laage} geleden)";
 
 		$this->formLocked = (($this->creatorId == User::getLoggedInUser()->id && $this->assignedToId != User::getLoggedInUser()->id) || Strings::equal($this->status, 'C'));
 	}

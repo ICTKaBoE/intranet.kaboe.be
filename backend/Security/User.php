@@ -4,8 +4,10 @@ namespace Security;
 
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Database\Repository\Module;
 use Database\Repository\LocalUser;
 use Database\Repository\UserSecurity;
+use Database\Repository\ModuleSetting;
 
 abstract class User
 {
@@ -27,6 +29,8 @@ abstract class User
     static public function getLoggedInUser()
     {
         $method = self::signInMethod();
+        if (is_null($method)) return false;
+
         $id = self::signInId();
 
         if (Strings::equal($method, SECURITY_SESSION_SIGNINMETHOD_LOCAL)) return (new LocalUser)->get($id)[0];
@@ -72,5 +76,18 @@ abstract class User
                 return $hasPermission;
             }
         }
+    }
+
+    static public function generatePassword()
+    {
+        $module = (new Module)->getByModule('synchronisation');
+        $moduleSettingRepo = new ModuleSetting;
+        $dictionary = $moduleSettingRepo->getByModuleAndKey($module->id, "dictionary")->value;
+        $words = explode(PHP_EOL, $dictionary);
+
+        $password = Arrays::randElement($words);
+        $password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
+
+        return $password;
     }
 }

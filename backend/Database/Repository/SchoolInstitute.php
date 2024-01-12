@@ -20,4 +20,12 @@ class SchoolInstitute extends Repository
 
 		return $this->executeSelect($statement);
 	}
+
+	public function getByInstituteNumber($number)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where('instituteNumber', $number);
+
+		return $this->executeSelect($statement);
+	}
 }

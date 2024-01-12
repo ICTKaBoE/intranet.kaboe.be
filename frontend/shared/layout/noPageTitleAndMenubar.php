@@ -7,12 +7,13 @@
 	{{content:page:css}}
 </head>
 
-<body class="theme-light">
+<body>
 	<div class="page">
 		<div class="sticky-top">
 			{{component:header}}
 		</div>
 		<div class="page-wrapper">
+			{{component:generalMessage}}
 			<div class="page-body">
 				<div class="container-fluid">
 					{{content:page}}
@@ -23,6 +24,7 @@
 	</div>
 
 	{{component:modal}}
+	{{component:toast}}
 
 	<script>
 		let pageId = "{{page:id}}";

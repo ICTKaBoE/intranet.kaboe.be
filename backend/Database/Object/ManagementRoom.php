@@ -27,6 +27,7 @@ class ManagementRoom extends CustomObject
 	public function init()
 	{
 		$this->fullNumber = "{$this->floor}." . sprintf("%02d", $this->number);
-		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->floor}-{$this->number}";
+		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->fullNumber}";
+		$this->fullNumberBuilding = "{$this->building->name} - {$this->fullNumber}";
 	}
 }

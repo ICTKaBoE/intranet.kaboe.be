@@ -26,7 +26,7 @@ class CloudPC extends Entity
 {
     /**
     * Gets the aadDeviceId
-    * The Azure Active Directory (Azure AD) device ID of the Cloud PC.
+    * The Microsoft Entra device ID of the Cloud PC.
     *
     * @return string|null The aadDeviceId
     */
@@ -41,7 +41,7 @@ class CloudPC extends Entity
 
     /**
     * Sets the aadDeviceId
-    * The Azure Active Directory (Azure AD) device ID of the Cloud PC.
+    * The Microsoft Entra device ID of the Cloud PC.
     *
     * @param string $val The aadDeviceId
     *
@@ -181,7 +181,7 @@ class CloudPC extends Entity
 
     /**
     * Gets the gracePeriodEndDateTime
-    * The date and time when the grace period ends and reprovisioning/deprovisioning happens. Required only if the status is inGracePeriod. The timestamp is shown in ISO 8601 format and Coordinated Universal Time (UTC). For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+    * The date and time when the grace period ends and reprovisioning or deprovisioning happen. Required only if the status is inGracePeriod. The timestamp is shown in ISO 8601 format and Coordinated Universal Time (UTC). For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @return \DateTime|null The gracePeriodEndDateTime
     */
@@ -200,7 +200,7 @@ class CloudPC extends Entity
 
     /**
     * Sets the gracePeriodEndDateTime
-    * The date and time when the grace period ends and reprovisioning/deprovisioning happens. Required only if the status is inGracePeriod. The timestamp is shown in ISO 8601 format and Coordinated Universal Time (UTC). For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+    * The date and time when the grace period ends and reprovisioning or deprovisioning happen. Required only if the status is inGracePeriod. The timestamp is shown in ISO 8601 format and Coordinated Universal Time (UTC). For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
     *
     * @param \DateTime $val The gracePeriodEndDateTime
     *

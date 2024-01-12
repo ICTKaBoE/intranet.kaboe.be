@@ -3,10 +3,7 @@
 namespace Database\Object;
 
 use Database\Interface\CustomObject;
-use Database\Repository\School;
 use Database\Repository\SchoolInstitute;
-use Ouzo\Utilities\Strings;
-use Security\Input;
 
 class SyncStudent extends CustomObject
 {
@@ -30,17 +27,19 @@ class SyncStudent extends CustomObject
 		"lastAdSyncSuccessAction",
 		"lastAdSyncTime",
 		"lastAdSyncError",
+		'active',
 		"deleted"
 	];
 
 	public function init()
 	{
+		$this->displayNameReversed = "{$this->name} {$this->firstName}";
 		$this->_orderfield = "{$this->class}-{$this->name}-{$this->firstName}";
 	}
 
 	public function link()
 	{
-		$this->institute = (new SchoolInstitute)->get($this->instituteId)[0];
+		$this->institute = (new SchoolInstitute)->getByInstituteNumber($this->instituteId)[0];
 		$this->institute->link();
 	}
 }

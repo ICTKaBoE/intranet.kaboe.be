@@ -55,7 +55,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Gets the isMfaCapable
-    * Indicates whether the user has registered a strong authentication method for multi-factor authentication. The method must be allowed by the authentication methods policy. Supports $filter (eq).
+    * Indicates whether the user has registered a strong authentication method for multifactor authentication. The method must be allowed by the authentication methods policy. Supports $filter (eq).
     *
     * @return bool|null The isMfaCapable
     */
@@ -70,7 +70,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Sets the isMfaCapable
-    * Indicates whether the user has registered a strong authentication method for multi-factor authentication. The method must be allowed by the authentication methods policy. Supports $filter (eq).
+    * Indicates whether the user has registered a strong authentication method for multifactor authentication. The method must be allowed by the authentication methods policy. Supports $filter (eq).
     *
     * @param bool $val The isMfaCapable
     *
@@ -84,7 +84,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Gets the isMfaRegistered
-    * Indicates whether the user has registered a strong authentication method for multi-factor authentication. The method may not necessarily be allowed by the authentication methods policy. Supports $filter (eq).
+    * Indicates whether the user has registered a strong authentication method for multifactor authentication. The method may not necessarily be allowed by the authentication methods policy. Supports $filter (eq).
     *
     * @return bool|null The isMfaRegistered
     */
@@ -99,7 +99,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Sets the isMfaRegistered
-    * Indicates whether the user has registered a strong authentication method for multi-factor authentication. The method may not necessarily be allowed by the authentication methods policy. Supports $filter (eq).
+    * Indicates whether the user has registered a strong authentication method for multifactor authentication. The method may not necessarily be allowed by the authentication methods policy. Supports $filter (eq).
     *
     * @param bool $val The isMfaRegistered
     *
@@ -349,7 +349,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Gets the userDisplayName
-    * The user display name, such as Adele Vance. Supports $filter (eq, startsWith) and $orderBy.
+    * The user display name, such as Adele Vance. Supports $filter (eq, startsWith) and $orderby.
     *
     * @return string|null The userDisplayName
     */
@@ -364,7 +364,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Sets the userDisplayName
-    * The user display name, such as Adele Vance. Supports $filter (eq, startsWith) and $orderBy.
+    * The user display name, such as Adele Vance. Supports $filter (eq, startsWith) and $orderby.
     *
     * @param string $val The userDisplayName
     *
@@ -378,7 +378,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Gets the userPreferredMethodForSecondaryAuthentication
-    * The method the user selected as the default second-factor for performing multi-factor authentication. Possible values are: push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none, unknownFutureValue. This property is used as preferred MFA method when isSystemPreferredAuthenticationMethodEnabled is false. Supports $filter (any with eq).
+    * The method the user selected as the default second-factor for performing multifactor authentication. Possible values are: push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none, unknownFutureValue. This property is used as preferred MFA method when isSystemPreferredAuthenticationMethodEnabled is false. Supports $filter (any with eq).
     *
     * @return UserDefaultAuthenticationMethod|null The userPreferredMethodForSecondaryAuthentication
     */
@@ -397,7 +397,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Sets the userPreferredMethodForSecondaryAuthentication
-    * The method the user selected as the default second-factor for performing multi-factor authentication. Possible values are: push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none, unknownFutureValue. This property is used as preferred MFA method when isSystemPreferredAuthenticationMethodEnabled is false. Supports $filter (any with eq).
+    * The method the user selected as the default second-factor for performing multifactor authentication. Possible values are: push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none, unknownFutureValue. This property is used as preferred MFA method when isSystemPreferredAuthenticationMethodEnabled is false. Supports $filter (any with eq).
     *
     * @param UserDefaultAuthenticationMethod $val The userPreferredMethodForSecondaryAuthentication
     *
@@ -411,7 +411,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Gets the userPrincipalName
-    * The user principal name, such as AdeleV@contoso.com. Supports $filter (eq, startsWith) and $orderBy.
+    * The user principal name, such as AdeleV@contoso.com. Supports $filter (eq, startsWith) and $orderby.
     *
     * @return string|null The userPrincipalName
     */
@@ -426,7 +426,7 @@ class UserRegistrationDetails extends Entity
 
     /**
     * Sets the userPrincipalName
-    * The user principal name, such as AdeleV@contoso.com. Supports $filter (eq, startsWith) and $orderBy.
+    * The user principal name, such as AdeleV@contoso.com. Supports $filter (eq, startsWith) and $orderby.
     *
     * @param string $val The userPrincipalName
     *

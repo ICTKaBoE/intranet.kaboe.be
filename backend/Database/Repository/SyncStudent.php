@@ -27,7 +27,20 @@ class SyncStudent extends Repository
 		$institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
 
 		$statement = $this->prepareSelect();
-		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->id));
+		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->instituteNumber));
+
+		return $this->executeSelect($statement);
+	}
+
+	public function getBySchoolAndClass($schoolId, $class, $active = false)
+	{
+		$institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
+		$class = (new SchoolClass)->get($class)[0]->name;
+
+		$statement = $this->prepareSelect();
+		$statement->where('active', $active);
+		$statement->where("class", $class);
+		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->instituteNumber));
 
 		return $this->executeSelect($statement);
 	}
@@ -37,7 +50,7 @@ class SyncStudent extends Repository
 		$institutes = (new SchoolInstitute)->getBySchoolId($school);
 
 		$statement = $this->prepareSelect();
-		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->id));
+		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->instituteNumber));
 
 		$items = $this->executeSelect($statement);
 		$classes = Arrays::map($items, fn ($i) => $i->class);

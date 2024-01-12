@@ -8,7 +8,7 @@ class ManagementComputer extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_computer", \Database\Object\ManagementComputer::class, orderField: 'name');
+		parent::__construct("tbl_management_computer", \Database\Object\ManagementComputer::class, orderField: 'schoolId');
 	}
 
 	public function getBySchoolAndName($schoolId, $name)
@@ -36,11 +36,28 @@ class ManagementComputer extends Repository
 		return $this->executeSelect($statement);
 	}
 
+	public function getByCart($cartId)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where('cartId', $cartId);
+
+		return $this->executeSelect($statement);
+	}
+
 	public function getBySchoolAndType($schoolId, $type)
 	{
 		$statement = $this->prepareSelect();
 		$statement->where('schoolId', $schoolId);
 		$statement->where('type', $type);
+
+		return $this->executeSelect($statement);
+	}
+
+	public function getBySchoolAndCart($schoolId, $cartId)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where("schoolId", $schoolId);
+		$statement->where("cartId", $cartId);
 
 		return $this->executeSelect($statement);
 	}

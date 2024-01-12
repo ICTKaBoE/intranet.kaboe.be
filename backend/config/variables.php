@@ -39,6 +39,7 @@ define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");
 define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
+// define("INFORMAT_CURRENT_SCHOOLYEAR", "2022-23");
 
 define("EMAIL_SUFFIX", "coltd.be");
 
@@ -56,13 +57,41 @@ define("CLEAN_DATES", [
 	]
 ]);
 
-define("MANAGEMENT_DEFAULT_PASS", "@KaBoE123");
-if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
-	define("MANAGEMENT_URL", "dev.helpdesk.kaboe.be");
-	define("MANAGEMENT_USER_TOKEN", "WY5HzMHFOcAFY3aGmE9kAgZcqFRztFOUc9L8khlc");
-	define("MANAGEMENT_APP_TOKEN", "npTH2S1Vzs8leop72qZyumbx4qNGTPsQuDSsBzse");
-} else {
-	define("MANAGEMENT_URL", "beheer.kaboe.be");
-	define("MANAGEMENT_USER_TOKEN", "9WgXSR6zayV1dmxNE2dZqFWpfhISJ7J4RTc27FXc");
-	define("MANAGEMENT_APP_TOKEN", "PDUDL265pDsqvR8y0N779JNMQgog8DVOVd8Mrcr6");
-}
+define("DEFAULT_SETTINGS", [
+	"bike" => [
+		"lastPayDate" => "1970-01-01",
+		"blockPast" => "false",
+		"blockFuture" => "false",
+		"blockPastAmount" => 0,
+		"blockPastType" => "d",
+		"blockFutureAmount" => 0,
+		"blockFutureType" => "d",
+		"blockPastOnLastPayDate" => "true"
+	],
+	"supervision" => [
+		"lastPayDate" => "1970-01-01",
+		"blockPast" => "false",
+		"blockFuture" => "false",
+		"blockPastAmount" => 0,
+		"blockPastType" => "d",
+		"blockFutureAmount" => 0,
+		"blockFutureType" => "d",
+		"blockPastOnLastPayDate" => "true",
+		"slotDuration" => "00:05:00",
+		"slotMinTime" => "00:00:00",
+		"slotMaxTime" => "00:00:00"
+	],
+	"helpdesk" => [
+		"assignToIds" => "",
+		"informNewToIds" => "",
+		"format" => "#"
+	],
+	"orders" => [
+		"format" => "#",
+		"acceptorIds" => ""
+	],
+	"synchronisation" => [
+		"syncToAdFrom" => 1,
+		"dictionary" => ""
+	]
+]);

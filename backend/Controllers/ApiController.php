@@ -15,6 +15,7 @@ class ApiController
 	private $httpCode = 200;
 	private $validation = [];
 	private $reload = false;
+	private $toast = [];
 
 	private $json = [];
 
@@ -32,6 +33,11 @@ class ApiController
 		if ($this->error) Arrays::setNestedValue($this->json, ['error'], $this->error);
 		if ($this->toast) Arrays::setNestedValue($this->json, ['toast'], $this->toast);
 		if ($this->reload) Arrays::setNestedValue($this->json, ['reload'], $this->reload);
+		if ($this->closeModal) Arrays::setNestedValue($this->json, ['closeModal'], $this->closeModal);
+		if ($this->reloadTable) Arrays::setNestedValue($this->json, ['reloadTable'], $this->reloadTable);
+		if ($this->reloadCalendar) Arrays::setNestedValue($this->json, ['reloadCalendar'], $this->reloadCalendar);
+		if ($this->resetForm) Arrays::setNestedValue($this->json, ['resetForm'], $this->resetForm);
+		if ($this->returnToStep) Arrays::setNestedValue($this->json, ['returnToStep'], $this->returnToStep);
 
 		Helpers::response()->json($this->json);
 	}
@@ -52,9 +58,10 @@ class ApiController
 		$this->error = $error;
 	}
 
-	protected function setToast($message, $type = self::VALIDATION_STATE_VALID)
+	protected function setToast($title, $message, $type = self::VALIDATION_STATE_VALID)
 	{
-		$this->toast = [
+		$this->toast[] = [
+			"title" => $title,
 			"type" => $type,
 			"message" => $message
 		];
@@ -73,6 +80,31 @@ class ApiController
 	protected function setReload()
 	{
 		$this->reload = true;
+	}
+
+	protected function setCloseModal($id = null)
+	{
+		$this->closeModal = $id ?? true;
+	}
+
+	protected function setReloadTable($id = null)
+	{
+		$this->reloadTable = $id ?? true;
+	}
+
+	protected function setReloadCalendar($id = null)
+	{
+		$this->reloadCalendar = $id ?? true;
+	}
+
+	protected function setResetForm()
+	{
+		$this->resetForm = true;
+	}
+
+	protected function setReturnToStep()
+	{
+		$this->returnToStep = true;
 	}
 
 	protected function appendToJson($key = [], $data = false)

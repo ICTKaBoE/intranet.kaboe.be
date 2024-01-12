@@ -8,6 +8,7 @@
         "nelexa/zip": "^4.0",
         "pecee/simple-router": "4.3.7.2",
         "guzzlehttp/guzzle": "^7.5",
-        "phpmailer/phpmailer": "^6.8"
+        "phpmailer/phpmailer": "^6.8",
+        "spatie/async": "^1.6"
     }
 }

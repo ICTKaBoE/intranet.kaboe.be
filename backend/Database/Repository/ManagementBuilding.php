@@ -8,7 +8,7 @@ class ManagementBuilding extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_building", \Database\Object\ManagementBuilding::class, orderField: 'name');
+		parent::__construct("tbl_management_building", \Database\Object\ManagementBuilding::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

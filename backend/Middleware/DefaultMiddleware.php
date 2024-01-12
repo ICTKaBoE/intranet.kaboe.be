@@ -39,7 +39,6 @@ abstract class DefaultMiddleware
 
 		if (Helpers::isPublicPage()) {
 			if (Strings::isBlank($folder) || Arrays::contains(["/error", "/public", "/app"], $folder)) Helpers::redirect($defaultPage);
-			if (User::isSignedIn()) Helpers::redirect($defaultPage);
 		} else {
 			if (!User::isSignedIn() && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
 			else if (User::isSignedIn() && (Strings::isBlank($folder) || Arrays::contains(["/error", "/public", "/app"], $folder))) Helpers::redirect($defaultPage);

@@ -12,6 +12,14 @@ class InformatStaffAssignment extends Repository
 		parent::__construct("tbl_informat_staff_assignment", \Database\Object\InformatStaffAssignment::class, orderField: 'start');
 	}
 
+	public function getByInstituteId($instituteNumber)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where('instituteNumber', $instituteNumber);
+
+		return $this->executeSelect($statement);
+	}
+
 	public function getByInformatUID($informatUID)
 	{
 		$statement = $this->prepareSelect();

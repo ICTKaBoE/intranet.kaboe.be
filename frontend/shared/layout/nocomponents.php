@@ -8,8 +8,10 @@
 </head>
 
 <body>
+	{{component:generalMessage}}
 	{{content:page}}
 	{{component:modal}}
+	{{component:toast}}
 
 	<script>
 		let pageId = "{{page:id}}";

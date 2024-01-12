@@ -26,6 +26,9 @@ class DefaultController
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
+		"floatingButtons" => \Controllers\COMPONENT\FloatingButtonsComponentController::class,
+		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
+		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
 	];
 
 	public function __construct()
@@ -48,9 +51,10 @@ class DefaultController
 		$this->loadContent();
 		$this->loadActions();
 		$this->loadOthers();
+		$this->loadUrlParts();
 		$this->loadUrlParams();
 		$this->loadSettings();
-		// $this->loadModuleSettings();
+		$this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
@@ -112,13 +116,22 @@ class DefaultController
 
 	private function loadActions()
 	{
-		$this->layout = str_replace("{{form:action}}", "{{api:url}}/form", $this->layout);
-		$this->layout = str_replace("{{calendar:action}}", "{{api:url}}/calendar", $this->layout);
-		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table", $this->layout);
-		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select", $this->layout);
-		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart", $this->layout);
-		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen", $this->layout);
-		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard", $this->layout);
+		$this->layout = str_replace("{{form:url:short}}", "{{api:url}}/form", $this->layout);
+		$this->layout = str_replace("{{calendar:url:short}}", "{{api:url}}/calendar", $this->layout);
+		$this->layout = str_replace("{{table:url:short}}", "{{api:url}}/table", $this->layout);
+		$this->layout = str_replace("{{select:url:short}}", "{{api:url}}/select", $this->layout);
+		$this->layout = str_replace("{{chart:url:short}}", "{{api:url}}/chart", $this->layout);
+		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
+		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
+
+		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{table:url:full}}", "{{api:url}}/table/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{select:url:full}}", "{{api:url}}/select/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part:module}}/{{url:part:page}}", $this->layout);
+
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{api.version}}", $this->layout);
@@ -143,6 +156,12 @@ class DefaultController
 		foreach ($this->getModuleSettings() as $setting) {
 			$this->layout = str_replace('{{module:' . $setting->key . '}}', $setting->value, $this->layout);
 		}
+	}
+
+	private function loadUrlParts()
+	{
+		$this->layout = str_replace("{{url:part:module}}", Helpers::getModule(), $this->layout);
+		$this->layout = str_replace("{{url:part:page}}", Helpers::getPage(), $this->layout);
 	}
 
 	private function loadUrlParams()
@@ -215,13 +234,21 @@ class DefaultController
 
 	private function getContentPage()
 	{
+		$content = "";
+
 		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php")) {
 			ob_start();
 			require_once LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php";
-			return ob_get_clean();
+			$content = ob_get_clean();
 		}
 
-		return "";
+		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/modal.php")) {
+			ob_start();
+			require_once LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/modal.php";
+			$content .= ob_get_clean();
+		}
+
+		return $content;
 	}
 
 	private function getContentPageCss()

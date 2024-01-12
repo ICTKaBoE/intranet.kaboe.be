@@ -4,7 +4,6 @@ namespace Middleware;
 
 use Controllers\API\UserController;
 use Ouzo\Utilities\Arrays;
-use Pecee\Http\Request;
 use Router\Helpers;
 use Security\User;
 
@@ -20,7 +19,7 @@ abstract class ApiMiddleware
 
 		if (!Arrays::contains($noAuthRoutes, $route)) {
 			if (!User::isSignedIn()) {
-				if (!(new UserController)->login(prefix: null, apiLogin: true)) {
+				if (!UserController::apiLogin()) {
 					Helpers::response()->httpCode(401);
 					Helpers::response()->json(["error" => "You are not authorized!"]);
 				}

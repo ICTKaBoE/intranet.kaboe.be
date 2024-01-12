@@ -8,7 +8,7 @@ class ManagementCabinet extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_cabinet", \Database\Object\ManagementCabinet::class, orderField: 'name');
+		parent::__construct("tbl_management_cabinet", \Database\Object\ManagementCabinet::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

@@ -1,8 +1,3 @@
-<?php
-
-use Helpers\Icon;
-
-?>
 <header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
 	<div class="container-fluid">
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
@@ -12,8 +7,9 @@ use Helpers\Icon;
 			<img src="{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
 			<a href="{{site:url}}"><i class="ti ti-home"></i> {{site.title}}</a>
 		</h1>
-		<div class="navbar-nav flex-row order-md-last">
+		<div class="navbar-nav flex-row order-md-last {{is:public:display}}">
 			<div role="notification" id="notification" data-no-notification-text="Geen updates"></div>
+
 			<div class="nav-item dropdown">
 				<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
 					<span class="avatar avatar-sm">{{user:initials}}</span>

@@ -8,7 +8,7 @@ class HelpdeskThread extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_helpdesk_thread", \Database\Object\HelpdeskThread::class, orderField: 'creationDateTime');
+		parent::__construct("tbl_helpdesk_thread", \Database\Object\HelpdeskThread::class, orderField: 'creationDateTime', orderDirection: 'DESC');
 	}
 
 	public function getByHelpdeskId($helpdeskId)

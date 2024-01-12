@@ -7,6 +7,7 @@ use Database\Repository\ManagementBeamer;
 use Database\Repository\ManagementComputer;
 use Database\Repository\ManagementPrinter;
 use Database\Repository\Order;
+use Helpers\CString;
 use Helpers\Icon;
 use Helpers\Mapping;
 use Ouzo\Utilities\Strings;
@@ -24,6 +25,7 @@ class OrderLine extends CustomObject
 		"amount",
 		"quotationPrice",
 		"quotationVatIncluded",
+		"warenty",
 		"accepted",
 		"deleted"
 	];
@@ -31,14 +33,16 @@ class OrderLine extends CustomObject
 	public function init()
 	{
 		$this->forDescription = Mapping::get("order/line/for/{$this->for}");
+		$this->quotationVatIncluded = Input::convertToBool($this->quotationVatIncluded);
+		$this->warenty = Input::convertToBool($this->warenty);
 		$this->accepted = Input::convertToBool($this->accepted);
 
-		$this->quotationVatIncludedIcon = Icon::load($this->quotationVatIncluded ? "check" : "x");
+		$this->quotationVatIncludedText = ($this->warenty ? "Garantiewissel" : CString::formatCurrency($this->quotationPrice) . ($this->quotationVatIncluded ? " (incl. btw)" : ""));
 	}
 
-	public function link()
+	public function link($noParent = false)
 	{
-		$this->order = (new Order)->get($this->id)[0];
+		if (!$noParent) $this->order = (new Order)->get($this->id)[0];
 		$this->asset = null;
 
 		if (Strings::equal($this->for, "L") || Strings::equal($this->for, "D")) $this->asset = (new ManagementComputer)->get($this->assetId)[0];

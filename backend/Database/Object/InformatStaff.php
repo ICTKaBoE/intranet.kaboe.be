@@ -40,6 +40,7 @@ class InformatStaff extends CustomObject
 	{
 		$name = Input::clean($this->name);
 		$firstName = Input::clean($this->firstName);
+		$this->fullName = "{$this->firstName} {$this->name}";
 
 		$email = $firstName . "." . $name . "@" . EMAIL_SUFFIX;
 

@@ -32,7 +32,7 @@ class ManagementSwitch extends CustomObject
 
 	public function init()
 	{
-		$this->_orderfield = "{$this->schoolId}-{$this->buildingId}-{$this->roomId}-{$this->cabinetId}-{$this->name}";
+		$this->_orderfield = "{$this->schoolId}-{$this->name}";
 	}
 
 	public function link()

@@ -300,6 +300,36 @@ class Host extends Artifact
         return $this;
     }
 
+
+     /**
+     * Gets the ports
+    * The hostPorts associated with a host.
+     *
+     * @return array|null The ports
+     */
+    public function getPorts()
+    {
+        if (array_key_exists("ports", $this->_propDict)) {
+           return $this->_propDict["ports"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+    * Sets the ports
+    * The hostPorts associated with a host.
+    *
+    * @param HostPort[] $val The ports
+    *
+    * @return Host
+    */
+    public function setPorts($val)
+    {
+        $this->_propDict["ports"] = $val;
+        return $this;
+    }
+
     /**
     * Gets the reputation
     * Represents a calculated reputation of this host.
@@ -336,6 +366,7 @@ class Host extends Artifact
 
      /**
      * Gets the sslCertificates
+    * The hostSslCertificates that are associated with this host.
      *
      * @return array|null The sslCertificates
      */
@@ -350,6 +381,7 @@ class Host extends Artifact
 
     /**
     * Sets the sslCertificates
+    * The hostSslCertificates that are associated with this host.
     *
     * @param HostSslCertificate[] $val The sslCertificates
     *
@@ -423,6 +455,7 @@ class Host extends Artifact
 
     /**
     * Gets the whois
+    * The most recent whoisRecord for this host.
     *
     * @return WhoisRecord|null The whois
     */
@@ -441,6 +474,7 @@ class Host extends Artifact
 
     /**
     * Sets the whois
+    * The most recent whoisRecord for this host.
     *
     * @param WhoisRecord $val The whois
     *

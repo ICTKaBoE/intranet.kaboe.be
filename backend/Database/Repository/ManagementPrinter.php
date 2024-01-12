@@ -8,7 +8,7 @@ class ManagementPrinter extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_printer", \Database\Object\ManagementPrinter::class, orderField: 'name');
+		parent::__construct("tbl_management_printer", \Database\Object\ManagementPrinter::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

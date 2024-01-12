@@ -5,8 +5,10 @@ namespace Database\Interface;
 use Database\Database;
 use Ouzo\Utilities\Arrays;
 use Database\Interface\CustomObject;
+use Router\Helpers;
+use stdClass;
 
-class Repository
+class Repository extends stdClass
 {
     public function __construct($table, $object, $idField = 'id', $orderField = 'order', $orderDirection = 'ASC', $deletedField = 'deleted')
     {
@@ -36,6 +38,7 @@ class Repository
 
     protected function prepareSelect($id = null, $order = true, $deleted = false)
     {
+
         $statement = $this->repoTable->select();
         if (!is_null($id)) $statement->where($this->idField, $id);
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");

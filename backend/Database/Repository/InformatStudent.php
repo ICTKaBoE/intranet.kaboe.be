@@ -19,4 +19,12 @@ class InformatStudent extends Repository
 
 		return Arrays::firstOrNull($this->executeSelect($statement));
 	}
+
+	public function getByInstitute($instituteId)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where('instituteId', $instituteId);
+
+		return $this->executeSelect($statement);
+	}
 }

@@ -5,8 +5,9 @@ namespace Database\Interface;
 use Ouzo\Utilities\Arrays;
 use ReflectionObject;
 use ReflectionProperty;
+use stdClass;
 
-class CustomObject
+class CustomObject extends stdClass
 {
     protected $objectAttributes = [];
     protected $encodeAttributes = [];
@@ -26,7 +27,7 @@ class CustomObject
 
     public function encode()
     {
-        foreach ($this->encodeAttributes as $encode) $this->$encode = utf8_encode($this->$encode);
+        foreach ($this->encodeAttributes as $encode) $this->$encode = mb_convert_encoding($this->$encode, 'UTF-8', mb_list_encodings());
     }
 
     public function nl2br()

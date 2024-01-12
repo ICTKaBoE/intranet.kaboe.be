@@ -11,6 +11,7 @@ class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '7dd996d98a91d095f100c75e0b9e2391' => __DIR__ . '/..' . '/spatie/async/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -20,7 +21,9 @@ class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
         ),
         'S' => 
         array (
+            'Symfony\\Component\\Process\\' => 26,
             'Symfony\\Component\\Finder\\' => 25,
+            'Spatie\\Async\\' => 13,
         ),
         'P' => 
         array (
@@ -40,6 +43,10 @@ class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
         array (
             'Microsoft\\Graph\\' => 16,
             'Matrix\\' => 7,
+        ),
+        'L' => 
+        array (
+            'Laravel\\SerializableClosure\\' => 28,
         ),
         'G' => 
         array (
@@ -63,9 +70,17 @@ class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
         array (
             0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
         ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
+        ),
         'Symfony\\Component\\Finder\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Spatie\\Async\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/async/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -107,6 +122,10 @@ class ComposerStaticInit3e48d8eb5982e9f80b0262ec4543af29
         'Matrix\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
+        ),
+        'Laravel\\SerializableClosure\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laravel/serializable-closure/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (

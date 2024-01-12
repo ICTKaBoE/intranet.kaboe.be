@@ -15,4 +15,9 @@ class InformatStudent extends CustomObject
 		"insz",
 		"deleted"
 	];
+
+	public function init()
+	{
+		$this->fullName = "{$this->firstName} {$this->name}";
+	}
 }

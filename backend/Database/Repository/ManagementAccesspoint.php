@@ -8,7 +8,7 @@ class ManagementAccesspoint extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_accesspoint", \Database\Object\ManagementAccesspoint::class, orderField: 'name');
+		parent::__construct("tbl_management_accesspoint", \Database\Object\ManagementAccesspoint::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

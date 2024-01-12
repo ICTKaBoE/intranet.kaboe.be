@@ -8,7 +8,7 @@ class ManagementSwitch extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_switch", \Database\Object\ManagementSwitch::class, orderField: 'name');
+		parent::__construct("tbl_management_switch", \Database\Object\ManagementSwitch::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

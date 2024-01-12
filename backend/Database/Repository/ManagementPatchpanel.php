@@ -8,7 +8,7 @@ class ManagementPatchpanel extends Repository
 {
 	public function __construct()
 	{
-		parent::__construct("tbl_management_patchpanel", \Database\Object\ManagementPatchpanel::class, orderField: 'name');
+		parent::__construct("tbl_management_patchpanel", \Database\Object\ManagementPatchpanel::class, orderField: 'schoolId');
 	}
 
 	public function getBySchool($schoolId)

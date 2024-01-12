@@ -30,12 +30,13 @@ class SupervisionEvent extends Repository
 		return $this->executeSelect($statement);
 	}
 
-	public function detectOverlap($start, $end, $currentId = null)
+	public function detectOverlap($start, $end, $userId, $currentId = null)
 	{
 		$start = Clock::at($start);
 		$end = Clock::at($end);
 
 		$statement = $this->prepareSelect();
+		$statement->where('userId', $userId);
 		if (!is_null($currentId)) $statement->where('id', "!=", $currentId);
 
 		$items = $this->executeSelect($statement);
