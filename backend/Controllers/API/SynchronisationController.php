@@ -14,6 +14,7 @@ use Database\Repository\SyncStudent;
 use Database\Repository\ModuleSetting;
 use Database\Repository\SupplierContact;
 use Database\Object\ModuleSetting as ObjectModuleSetting;
+use Security\User;
 
 class SynchronisationController extends ApiController
 {
@@ -151,7 +152,7 @@ class SynchronisationController extends ApiController
 			$password = $student->password;
 
 			if (Strings::equal($random, "on")) {
-				$password = $this->generatePassword();
+				$password = User::generatePassword();
 			}
 
 			$student->password = $password;
@@ -162,18 +163,5 @@ class SynchronisationController extends ApiController
 		$this->setReloadTable();
 		$this->setCloseModal();
 		$this->handle();
-	}
-
-	private function generatePassword()
-	{
-		$module = (new Module)->getByModule('synchronisation');
-		$moduleSettingRepo = new ModuleSetting;
-		$dictionary = $moduleSettingRepo->getByModuleAndKey($module->id, "dictionary")->value;
-		$words = explode(PHP_EOL, $dictionary);
-
-		$password = Arrays::randElement($words);
-		$password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
-
-		return $password;
 	}
 }

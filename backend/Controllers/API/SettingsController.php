@@ -71,8 +71,6 @@ class SettingsController extends ApiController
 
 			$this->appendToJson('columns', $columns);
 			$this->appendToJson('rows', $users);
-		} else if ($view == "form") {
-			$this->appendToJson('fields', Arrays::firstOrNull((new UserSecurity)->get($id)));
 		}
 
 		$this->handle();
@@ -143,7 +141,6 @@ class SettingsController extends ApiController
 
 	public function postRights($view, $userId = null)
 	{
-		// $userId = Helpers::input()->post('userId')->getValue();
 		$moduleIds = Helpers::input()->post('moduleIds')?->getValue();
 		$view = Helpers::input()->post('_view')->getValue();
 		$edit = Helpers::input()->post('_edit')->getValue();

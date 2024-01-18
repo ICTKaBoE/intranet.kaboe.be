@@ -38,6 +38,7 @@ define("ROUTER_DEFAULT_CONTROLLER", "\\Controllers\\DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");
+define("SELECT_OTHER_VALUE", "Andere");
 define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
 // define("INFORMAT_CURRENT_SCHOOLYEAR", "2022-23");
 
@@ -93,5 +94,11 @@ define("DEFAULT_SETTINGS", [
 	"synchronisation" => [
 		"syncToAdFrom" => 1,
 		"dictionary" => ""
+	],
+	"temperatureregistration" => [
+		"names1" => "",
+		"names2" => "",
+		"names3" => "",
+		"names4" => ""
 	]
 ]);

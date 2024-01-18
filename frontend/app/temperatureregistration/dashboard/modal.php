@@ -10,7 +10,7 @@
 				<div class="row">
 					<div class="col-12 mb-3">
 						<label class="form-label" for="filterSchool">School</label>
-						<select name="filterSchool" id="filterSchool" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
+						<select name="filterSchool" id="filterSchool" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required data-default-value="{{user:profile:mainSchoolId}}"></select>
 					</div>
 				</div>
 				<div class="row">

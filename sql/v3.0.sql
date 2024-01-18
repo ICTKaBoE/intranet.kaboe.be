@@ -262,6 +262,10 @@ INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(17, 'blo
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(17, 'blockFutureType', 0x6D, 0);
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(17, 'blockPastAmount', 0x30, 0);
 INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(17, 'blockFutureAmount', 0x32, 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(19, 'names1', 0x, 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(19, 'names2', 0x, 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(19, 'names3', 0x, 0);
+INSERT INTO tbl_module_setting (moduleId, `key`, value, deleted) VALUES(19, 'names4', 0x, 0);
 
 ALTER TABLE tbl_management_computer ADD COLUMN `cartId` int(11) DEFAULT 0 AFTER `systemDrive`;
 ALTER TABLE tbl_sync_student ADD COLUMN `active` tinyint(1) DEFAULT 1 AFTER `deleted`;

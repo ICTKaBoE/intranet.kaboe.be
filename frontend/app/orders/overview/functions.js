@@ -131,6 +131,19 @@ window.requestAccept = () => {
     Helpers.toggleModal("order-request-accept");
 };
 
+window.postOrder = () => {
+    let values = Table.INSTANCES[`tbl${pageId}`].getSelectedValue();
+
+    if (values.length === 0) {
+        alert("Gelieve 1 of meerdere bestellingen te selecteren!");
+        return;
+    }
+
+    Form.GetInstance(`frm${pageId}PostOrder`).reset();
+    Form.GetInstance(`frm${pageId}PostOrder`).setField("poids", values);
+    Helpers.toggleModal("order-post");
+};
+
 window.check = () => {
     let _for = Select.GetInstance("for").getValue();
     let _schoolId = Select.GetInstance("schoolId").getValue();
@@ -194,6 +207,14 @@ let btnRequestAccept = new Button(null, {
     onclick: "requestAccept"
 });
 
+let btnPostOrder = new Button(null, {
+    type: "icon",
+    title: "Bestelling plaatsen",
+    icon: "receipt-euro",
+    bgColor: "lime",
+    onclick: "postOrder"
+});
+
 let btnDelete = new Button(null, {
     type: "icon",
     title: "Verwijderen",
@@ -226,7 +247,7 @@ let btnDeleteLine = new Button(null, {
     onclick: "deleteLine",
 });
 
-Helpers.addFloatingButton(btnFilter, btnAdd, btnEdit, btnRequestQuote, btnRequestAccept, btnDelete);
+Helpers.addFloatingButton(btnFilter, btnAdd, btnEdit, btnRequestQuote, btnRequestAccept, btnPostOrder, btnDelete);
 
 document
     .getElementById(`tbl${pageId}LineButtons`)
@@ -242,6 +263,7 @@ $(document).ready(() => {
     Table.GetInstance(`tbl${pageId}`).attachButton(btnEdit, "==1");
     Table.GetInstance(`tbl${pageId}`).attachButton(btnRequestQuote, ">0");
     Table.GetInstance(`tbl${pageId}`).attachButton(btnRequestAccept, ">0");
+    Table.GetInstance(`tbl${pageId}`).attachButton(btnPostOrder, ">0");
     Table.GetInstance(`tbl${pageId}`).attachButton(btnDelete, ">0");
 
     Table.GetInstance(`tbl${pageId}Line`).attachButton(btnEditLine, "==1");

@@ -14,7 +14,7 @@
 					<div class="row mb-3">
 						<div class="col">
 							<label for="person" class="form-label">Uw naam</label>
-							<input type="text" name="person" id="person" class="form-control" required />
+							<select name="person" id="person" data-load-source="{{select:url:short}}/{{url:part:page}}/person" data-load-value="name" data-load-label="name" data-parent-select="schoolId" required></select>
 							<div class="invalid-feedback" data-feedback-input="person"></div>
 						</div>
 					</div>

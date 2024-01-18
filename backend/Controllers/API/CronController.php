@@ -2,14 +2,15 @@
 
 namespace Controllers\API;
 
+use Cron\CronAD;
+use Cron\CronJamf;
+use Cron\CronMail;
+use Cron\CronLocal;
+use Cron\CronPrepare;
+use Cron\CronInformat;
+use Spatie\Async\Pool;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Cron\CronInformat;
-use Cron\CronJamf;
-use Cron\CronLocal;
-use Cron\CronMail;
-use Cron\CronPrepare;
-use Spatie\Async\Pool;
 
 class CronController extends ApiController
 {
@@ -22,6 +23,7 @@ class CronController extends ApiController
 
 		foreach ($action as $a) {
 			if (Strings::equalsIgnoreCase($a, "sendMail")) $pool->add(fn () => CronMail::SendMail());
+			else if (Strings::equalsIgnoreCase($a, "adSync")) $pool->add(fn () => CronAD::Sync());
 			else if (Strings::equalsIgnoreCase($a, "informatSync")) $pool->add(fn () => CronInformat::Sync());
 			else if (Strings::equalsIgnoreCase($a, "jamfSync")) $pool->add(fn () => CronJamf::Sync());
 			else if (Strings::equalsIgnoreCase($a, "prepareSync")) $pool->add(fn () => CronPrepare::Sync());

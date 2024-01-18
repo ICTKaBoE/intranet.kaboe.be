@@ -3,8 +3,7 @@
         <div class="card">
             <div class="card-body">
                 <label for="schoolId" class="form-label">Kies jouw school</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-on-change="check"></select>
-                <!-- data-default-value="{{user:profile:mainSchoolId}}" disabled -->
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-on-change="check" data-default-value="{{user:profile:mainSchoolId}}"></select>
                 <div class="invalid-feedback" data-feedback-input="schoolId"></div>
             </div>
             <div class="card-body">

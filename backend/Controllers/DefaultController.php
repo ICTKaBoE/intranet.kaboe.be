@@ -79,7 +79,7 @@ class DefaultController
 
 		$file = false;
 		foreach ($overrides as $key => $paths) {
-			if (Arrays::contains($paths, $url) || Arrays::contains($paths, $route)) {
+			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $url)) {
 				$file = $key;
 				break;
 			}

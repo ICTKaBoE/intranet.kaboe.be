@@ -246,6 +246,8 @@ export default class Form {
 
                 if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.clear();
             });
+
+        if (this.prefillWithUrl) this.prefillFormWithUrl();
     };
 
     disable = () => {

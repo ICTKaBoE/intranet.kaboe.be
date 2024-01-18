@@ -18,6 +18,8 @@ window.edit = () => {
 
 	Form.GetInstance(`frm${pageId}`).reset();
 	Form.GetInstance(`frm${pageId}`).prefillForm(values);
+	Form.GetInstance(`frm${pageId}`).setField("userId", values);
+
 	Helpers.toggleModal("rights");
 };
 

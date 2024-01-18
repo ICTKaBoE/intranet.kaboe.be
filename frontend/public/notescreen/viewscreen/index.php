@@ -1,0 +1,1 @@
+<div role="notescreen" id="nsc{{page:id}}" data-source="{{notescreen:url:full}}?schoolId={{url:param:schoolId}}" class="row" data-background-color="{{school:color}}"></div>

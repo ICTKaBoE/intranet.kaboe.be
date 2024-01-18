@@ -2,6 +2,8 @@
 
 namespace Helpers;
 
+use Ouzo\Utilities\Strings;
+
 abstract class CString
 {
 	public static function formatBankAccount($bankaccount, $defaultValue = null)
@@ -24,5 +26,14 @@ abstract class CString
 	public static function noHtml($value)
 	{
 		return strip_tags($value);
+	}
+
+	public static function firstLetterOfEachWord($value)
+	{
+		$floew = "";
+
+		foreach (explode(" ", Strings::trimToNull($value)) as $v) $floew .= substr($v, 0, 1);
+
+		return $floew;
 	}
 }

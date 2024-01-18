@@ -9,7 +9,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col-md-6 mb-lg-4">
-						<label class="form-label" for="userId">School</label>
+						<label class="form-label" for="userId">Gebruiker</label>
 						<select name="userId" id="userId" data-load-source="{{select:url:short}}/users" data-load-value="id" data-load-label="fullName" disabled required></select>
 						<div class="invalid-feedback" data-feedback-input="userId"></div>
 					</div>

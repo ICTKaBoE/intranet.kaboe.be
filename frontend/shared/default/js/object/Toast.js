@@ -18,7 +18,10 @@ export default class Toast {
 	};
 
 	show = (toasts) => {
+		console.log(toasts);
+
 		if (!Array.isArray(toasts)) toasts = [toasts];
+
 
 		for (const toast of toasts) {
 			this._show(toast.title, toast.message, toast.type);

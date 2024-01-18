@@ -475,6 +475,7 @@ class SupervisionController extends ApiController
 			$pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
 
 			$table = [];
+			$table['header'][] = ["title" => "School", "width" => 50];
 			$table['header'][] = ["title" => "Datum", "width" => 30];
 			$table['header'][] = ["title" => "Start", "width" => 20];
 			$table['header'][] = ["title" => "Einde"];
@@ -490,6 +491,7 @@ class SupervisionController extends ApiController
 				];
 
 				foreach ($events[$month] as $index => $event) {
+					$table['data'][$event->start][] = $event->userMainSchool->name;
 					$table['data'][$event->start][] = Clock::at($event->start)->format("d/m/Y");
 					$table['data'][$event->start][] = Clock::at($event->start)->format("H:i");
 					$table['data'][$event->start][] = Clock::at($event->end)->format("H:i");
@@ -502,6 +504,12 @@ class SupervisionController extends ApiController
 				$table['data'][$month][] =
 					[
 						"text" => count($events[$month] ?? []) . " toezicht(ten)",
+						"border" => 'T'
+					];
+
+				$table['data'][$month][] =
+					[
+						"text" => "",
 						"border" => 'T'
 					];
 
@@ -536,6 +544,7 @@ class SupervisionController extends ApiController
 
 			$table2 = [];
 			$table2['header'][] = ["title" => "Totaal"];
+			$table2['header'][] = ["title" => ""];
 			$table2['header'][] = ["title" => ""];
 			$table2['header'][] = ["title" => ""];
 			$table2['header'][] = ["title" => intdiv($userTotal, 60) . "u " . str_pad(($userTotal % 60), 2, "0", STR_PAD_LEFT) . "m"];
@@ -598,6 +607,8 @@ class SupervisionController extends ApiController
 			$excel->setCellValue($index, "A7", "Laatste uitbetalingsdatum");
 			$excel->setCellValue($index, "B7:E7", Clock::at($lastPayDate)->format("d/m/Y"));
 
+			$excel->setCellValue($index, "{$userColumn}{$userRow}", "School", true);
+			$userColumn++;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "Datum", true);
 			$userColumn++;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "Start", true);
@@ -618,6 +629,8 @@ class SupervisionController extends ApiController
 
 				foreach ($events[$month] as $event) {
 					$eventColumn = $startColumn;
+					$excel->setCellValue($index, "{$eventColumn}{$userRow}", $event->userMainSchool->name);
+					$eventColumn++;
 					$excel->setCellValue($index, "{$eventColumn}{$userRow}", Clock::at($event->start)->format("d/m/Y"));
 					$eventColumn++;
 					$excel->setCellValue($index, "{$eventColumn}{$userRow}", Clock::at($event->start)->format("H:i"));
@@ -640,6 +653,8 @@ class SupervisionController extends ApiController
 				$monthColumn++;
 				$excel->setCellValue($index, "{$monthColumn}{$userRow}", "", border: 't', borderStyle: Border::BORDER_DOUBLE);
 				$monthColumn++;
+				$excel->setCellValue($index, "{$monthColumn}{$userRow}", "", border: 't', borderStyle: Border::BORDER_DOUBLE);
+				$monthColumn++;
 				$excel->setCellValue($index, "{$monthColumn}{$userRow}", intdiv($monthTotal, 60) . "u " . str_pad(($monthTotal % 60), 2, "0", STR_PAD_LEFT) . "m", border: 't', borderStyle: Border::BORDER_DOUBLE);
 				$monthColumn++;
 				$excel->setCellValue($index, "{$monthColumn}{$userRow}", number_format(($monthTotal / 60), 2, ",", "."), border: 't', borderStyle: Border::BORDER_DOUBLE);
@@ -652,6 +667,8 @@ class SupervisionController extends ApiController
 
 			$userColumn = $startColumn;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "Totaal", true);
+			$userColumn++;
+			$excel->setCellValue($index, "{$userColumn}{$userRow}", "", true);
 			$userColumn++;
 			$excel->setCellValue($index, "{$userColumn}{$userRow}", "", true);
 			$userColumn++;
@@ -721,6 +738,7 @@ class SupervisionController extends ApiController
 
 			$events = Arrays::filter($events, fn ($e) => Clock::at($e->start)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->end)->isBeforeOrEqualTo(Clock::at($end)));
 			$events = Arrays::orderBy($events, "start");
+			Arrays::each($events, fn ($e) => $e->link());
 
 			foreach ($events as $event) $eventsGrouped[$user->username]['events'][Clock::at($event->start)->format("F Y")][] = $event;
 		}

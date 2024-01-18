@@ -229,3 +229,24 @@
 		</form>
 	</div>
 </div>
+
+<div class="modal modal-blur fade" id="modal-order-post" tabindex="-1" style="display: none;" aria-hidden="true" role="dialog">
+	<div class="modal-dialog modal modal-dialog-centered modal-dialog-scrollable" role="document">
+		<form action="{{form:url:full}}/request/post" method="post" class="modal-content" autocomplete="off" id="frm{{page:id}}PostOrder">
+			<div class="modal-header">
+				<h5 class="modal-title">Bestelling plaatsen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+
+			<div class="modal-body">
+				<input type="hidden" name="poids" id="poids" />
+				<h1>Wenst u voor deze bestelling(en) een bestelling te plaatsen?</h1>
+			</div>
+
+			<div class="modal-footer" data-form-type="delete">
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Nee</button>
+				<button type="submit" class="btn btn-success">Ja</button>
+			</div>
+		</form>
+	</div>
+</div>

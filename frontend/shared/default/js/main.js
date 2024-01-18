@@ -8,6 +8,8 @@ import Calendar from "./object/Calendar.js";
 import DatePicker from "./object/DatePicker.js";
 import TinyMCE from "./object/TinyMCE.js";
 import Chart from "./object/Chart.js";
+import Clock from "./object/Clock.js";
+import NoteScreen from "./object/NoteScreen.js";
 
 Toast.Create();
 Button.ScanAndCreate();
@@ -20,6 +22,9 @@ Chart.ScanAndCreate();
 
 window.checkAllLoadedCallback = () => {
     Form.ScanAndCreate();
+
+    Clock.ScanAndCreate();
+    NoteScreen.ScanAndCreate();
 };
 
 Helpers.CheckAllLoaded(window.checkAllLoadedCallback);

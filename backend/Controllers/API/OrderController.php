@@ -31,16 +31,16 @@ class OrderController extends ApiController
 			$orderRepo = new Order;
 			$allstatus = Mapping::get("order/status");
 
-			$this->appendToJson(["xaxis", "categories"], Arrays::map($schoolRepo->get(), fn ($s) => $s->name));			
+			$this->appendToJson(["xaxis", "categories"], Arrays::map($schoolRepo->get(), fn ($s) => $s->name));
 			$series = [];
 
-			foreach($allstatus as $status) {
+			foreach ($allstatus as $status) {
 				$myarray = array("name" => array_values($status)[0]);
 				array_push($series, $myarray);
 			}
 
 			foreach ($schoolRepo->get() as $idx => $school) {
-				for($i = 0; $i < count($allstatus); $i++) {
+				for ($i = 0; $i < count($allstatus); $i++) {
 					$series[$i]["data"][$idx] = count($orderRepo->getBySchoolByStatus($school->id, array_keys($allstatus)[$i]));
 				}
 			}
@@ -387,6 +387,7 @@ class OrderController extends ApiController
 	{
 		if ($what == "quote") $this->postRequestQuote();
 		else if ($what == "accept") $this->postRequestAccept();
+		else if ($what == "post") $this->postThisOrder();
 
 		$this->setCloseModal();
 		$this->setReloadTable();
@@ -436,6 +437,30 @@ class OrderController extends ApiController
 
 			$orderMail->sendAcceptMail($order);
 			$order->status = "W";
+			$orderRepo->set($order);
+		}
+	}
+
+	public function postThisOrder()
+	{
+		$ids = Helpers::input()->post('poids')->getValue();
+
+		$orderRepo = new Order;
+		$orderLineRepo = new OrderLine;
+		$orderMail = new OrderMail;
+
+		foreach (explode("-", $ids) as $id) {
+			$order = Arrays::firstOrNull($orderRepo->get($id));
+			if (is_null($order)) continue;
+
+			$orderLines = $orderLineRepo->getByOrder($id);
+			if (empty($orderLines)) continue;
+
+			Arrays::each($orderLines, fn ($ol) => $ol->link(true));
+			$order->link();
+
+			$orderMail->sendPostMail($order, $orderLines);
+			$order->status = "O";
 			$orderRepo->set($order);
 		}
 	}

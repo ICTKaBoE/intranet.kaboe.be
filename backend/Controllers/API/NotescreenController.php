@@ -5,11 +5,13 @@ namespace Controllers\API;
 use Router\Helpers;
 use Security\Input;
 use Ouzo\Utilities\Arrays;
-use Controllers\ApiController;
-use Database\Object\NoteScreenPage as ObjectNoteScreenPage;
 use Database\Repository\log;
-use Database\Repository\NoteScreenArticle;
+use Controllers\ApiController;
+use Database\Object\NoteScreenArticle as ObjectNoteScreenArticle;
+use Database\Repository\School;
 use Database\Repository\NoteScreenPage;
+use Database\Repository\NoteScreenArticle;
+use Database\Object\NoteScreenPage as ObjectNoteScreenPage;
 
 class NotescreenController extends ApiController
 {
@@ -75,6 +77,15 @@ class NotescreenController extends ApiController
         $this->handle();
     }
 
+    public function getViewScreen($view)
+    {
+        $schoolId = Helpers::url()->getParam("schoolId");
+        $this->appendToJson("settings", (new School)->get($schoolId)[0]);
+        $this->appendToJson("pages", array_values((new NoteScreenPage)->getBySchoolId($schoolId)));
+        $this->appendToJson("articles", array_values((new NoteScreenArticle)->getBySchoolId($schoolId)));
+        $this->handle();
+    }
+
     // POST
     public function postPages($view, $id = null)
     {
@@ -88,11 +99,11 @@ class NotescreenController extends ApiController
             if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
             if ($this->validationIsAllGood()) {
-				$page = is_null($id) ? new ObjectNoteScreenPage() : $notescreenPageRepo->get($id)[0];
+                $page = is_null($id) ? new ObjectNoteScreenPage() : $notescreenPageRepo->get($id)[0];
 
                 $page->schoolId = $schoolId;
                 $page->name = $name;
-                $notescreenPageRepo->set($page);                
+                $notescreenPageRepo->set($page);
             }
         } else {
             $ids = Helpers::input()->post('ids')->getValue();
@@ -137,7 +148,7 @@ class NotescreenController extends ApiController
             if (!Input::check($displayTime) || Input::empty($displayTime)) $this->setValidation("displayTime", "Toon tijd moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
             if ($this->validationIsAllGood()) {
-                $notescreenArticleObject = Arrays::firstOrNull($notescreenArticleRepo->get($id)) ?? new ObjectNoteScreenPage;
+                $notescreenArticleObject = is_null($id) ? new ObjectNoteScreenArticle : Arrays::firstOrNull($notescreenArticleRepo->get($id));
 
                 $notescreenArticleObject->schoolId = $schoolId;
                 $notescreenArticleObject->title = $title;
@@ -160,7 +171,7 @@ class NotescreenController extends ApiController
                 }
             }
         }
-        
+
         if (!$this->validationIsAllGood()) $this->setHttpCode(400);
         else {
             $this->setCloseModal();

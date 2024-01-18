@@ -5,8 +5,7 @@
                 <div class="card-body" id="tbl{{page:id}}">
                     <div class="mb-3">
                         <label for="schoolId" class="form-label">Kies jouw school</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
-                        <!-- data-default-value="{{user:profile:mainSchoolId}}" -->
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required data-default-value="{{user:profile:mainSchoolId}}"></select>
                         <div class="invalid-feedback" data-feedback-input="schoolId"></div>
                     </div>
 

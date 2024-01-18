@@ -27,6 +27,22 @@
 				</div>
 
 				<div class="mb-3">
+					<label class="form-label" for="showNamesAs">Namen weergeven</label>
+					<div>
+						<label class="form-check">
+							<input class="form-check-input" type="radio" name="showNamesAs" checked value="initials" required>
+							<span class="form-check-label">Initialen</span>
+						</label>
+
+						<label class="form-check">
+							<input class="form-check-input" type="radio" name="showNamesAs" value="full" required>
+							<span class="form-check-label">Volledige naam</span>
+						</label>
+					</div>
+					<div class="invalid-feedback" data-feedback-input="showNamesAs"></div>
+				</div>
+
+				<div class="mb-3">
 					<label class="form-label" for="exportAs">Exporteren als</label>
 					<div>
 						<label class="form-check">

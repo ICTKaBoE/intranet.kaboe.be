@@ -6,10 +6,10 @@
 	"minimal": [
 		"/public/{module?}/{page?}/{id?}"
 	],
-	"schoolCustomLayout": [
-		"/public/notescreen/viewscreen"
-	],
 	"noPageTitleAndMenubar": [
 		"/app/index"
+	],
+	"schoolCustomLayout": [
+		"/public/notescreen/viewscreen"
 	]
 }

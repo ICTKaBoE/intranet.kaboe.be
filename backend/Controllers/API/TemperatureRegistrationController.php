@@ -14,11 +14,10 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Log;
 use Controllers\ApiController;
+use Database\Object\ModuleSetting as ObjectModuleSetting;
 use Database\Repository\Module;
 use Database\Repository\School;
-use Database\Repository\LocalUser;
 use Database\Repository\ModuleSetting;
-use PhpOffice\PhpSpreadsheet\Style\Border;
 use Database\Repository\TemperatureRegistration;
 
 class TemperatureRegistrationController extends ApiController
@@ -44,43 +43,51 @@ class TemperatureRegistrationController extends ApiController
 					],
 					[
 						"title" => "Dag",
-						"data" => "day"
+						"data" => "day",
+						"width" => 100
 					],
 					[
 						"title" => "Datum",
-						"data" => "date"
+						"data" => "date",
+						"width" => 150
 					],
 					[
 						"title" => "Uur",
-						"data" => "time"
+						"data" => "time",
+						"width" => 100
 					],
 					[
 						"title" => "Naam",
-						"data" => "person"
+						"data" => "personWithInitials",
+						"width" => 300
 					],
 					[
 						"type" => "badge",
-						"title" => "Temperatuur soep (°C)",
+						"title" => "Soep (°C)",
 						"data" => "soupTemp",
-						"backgroundColorCustom" => "soupTempColor"
+						"backgroundColorCustom" => "soupTempColor",
+						"width" => 100
 					],
 					[
 						"type" => "badge",
-						"title" => "Temperatuur Aardappel/Pasta/Rijst (°C)",
+						"title" => "Aardappel/Pasta/Rijst (°C)",
 						"data" => "potatoRicePastaTemp",
-						"backgroundColorCustom" => "potatoRicePastaTempColor"
+						"backgroundColorCustom" => "potatoRicePastaTempColor",
+						"width" => 100
 					],
 					[
 						"type" => "badge",
-						"title" => "Temperatuur Groente (°C)",
+						"title" => "Groente (°C)",
 						"data" => "vegetablesTemp",
-						"backgroundColorCustom" => "vegetablesTempColor"
+						"backgroundColorCustom" => "vegetablesTempColor",
+						"width" => 100
 					],
 					[
 						"type" => "badge",
-						"title" => "Temperatuur Vlees/vis (°C)",
+						"title" => "Vlees/vis (°C)",
 						"data" => "meatFishTemp",
-						"backgroundColorCustom" => "meatFishTempColor"
+						"backgroundColorCustom" => "meatFishTempColor",
+						"width" => 100
 					],
 					[
 						"title" => "Opmerkingen",
@@ -90,15 +97,84 @@ class TemperatureRegistrationController extends ApiController
 			);
 
 			if (!is_null($schoolId)) {
-					$rows = (new TemperatureRegistration)->getBySchoolAndDate($schoolId, $start, $end);
-					Arrays::each($rows, fn ($row) => $row->link());
-					$this->appendToJson("rows", $rows);
+				$rows = (new TemperatureRegistration)->getBySchoolAndDate($schoolId, $start, $end);
+				Arrays::each($rows, fn ($row) => $row->link());
+				$this->appendToJson("rows", $rows);
 			} else $this->appendToJson('noRowsText', "Gelieve eerst te filteren");
 		}
 		$this->handle();
 	}
 
+	public function getPerson($view)
+	{
+		$schoolId = Helpers::input()->get('parentValue');
+
+		if (!is_null($schoolId)) {
+			$module = (new Module)->getByModule("temperatureregistration");
+			$names = ((new ModuleSetting)->getByModuleAndKey($module->id, "names{$schoolId}"))->value;
+			$names = json_decode($names, true) ?? $names;
+			if (!is_array($names)) $names = [$names];
+
+			$names = Arrays::map($names, fn ($n) => ["name" => $n]);
+			$names = [
+				["name" => SELECT_OTHER_VALUE],
+				$names
+			];
+			$this->appendToJson("items", $names);
+		}
+
+		$this->handle();
+	}
+
+	public function getSettings($view)
+	{
+		$module = (new Module)->getByModule("temperatureregistration");
+		$settings = (new ModuleSetting)->getByModule($module->id);
+
+		$returnSettings = [];
+		foreach ($settings as $setting) {
+			$returnSettings[$setting->key] = json_decode($setting->value, true) ?? $setting->value;
+			if (is_array($returnSettings[$setting->key])) $returnSettings[$setting->key] = implode(PHP_EOL, $returnSettings[$setting->key]);
+		}
+
+		$this->appendToJson("fields", $returnSettings);
+		$this->handle();
+	}
+
 	//POST
+	public function postSettings($view)
+	{
+		$module = (new Module)->getByModule('temperatureregistration');
+		$moduleSettingRepo = new ModuleSetting;
+
+		foreach (DEFAULT_SETTINGS["temperatureregistration"] as $setting => $defaultValue) {
+			$moduleSetting = $moduleSettingRepo->getByModuleAndKey($module->id, $setting);
+			$value = isset($_POST[$setting]) ? Helpers::input()->post($setting)->getValue() : $defaultValue;
+			if (Strings::contains($value, PHP_EOL)) $value = json_encode(explode(PHP_EOL, $value));
+
+			if (is_null($moduleSetting)) {
+				$moduleSetting = new ObjectModuleSetting([
+					'moduleId' => $module->id,
+					'key' => $setting,
+					'value' => Input::convertToBool($value)
+				]);
+			} else {
+				$moduleSetting->value = Input::convertToBool($value);
+			}
+
+			$moduleSettingRepo->set($moduleSetting);
+		}
+
+		Log::write(description: "Changed settings for temperatureregistration");
+
+		if (!$this->validationIsAllGood()) {
+			$this->setHttpCode(400);
+		} else {
+			$this->setToast("Synchronisatie - Instellingen", "De instellingen zijn opgeslagen!");
+		}
+		$this->handle();
+	}
+
 	public function postExport()
 	{
 		$school = Helpers::input()->post('school');
@@ -114,6 +190,7 @@ class TemperatureRegistrationController extends ApiController
 		} else $school = [$school];
 		$start = Helpers::input()->post('start')->getValue();
 		$end = Helpers::input()->post('end')->getValue();
+		$showNamesAs = Helpers::input()->post('showNamesAs')->getValue();
 		$exportAs = Helpers::input()->post('exportAs')->getValue();
 
 		if (Input::empty($school[0])) {
@@ -137,8 +214,8 @@ class TemperatureRegistrationController extends ApiController
 			}
 
 			if ($this->validationIsAllGood()) {
-				if (Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end);
-				else if (Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end);
+				if (Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end, $showNamesAs);
+				else if (Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end, $showNamesAs);
 				$this->setValidation("start", "", self::VALIDATION_STATE_VALID);
 				$this->setValidation("end", "", self::VALIDATION_STATE_VALID);
 
@@ -150,7 +227,7 @@ class TemperatureRegistrationController extends ApiController
 		$this->handle();
 	}
 
-	private function exportPerSchoolAsPdf($schoolIds, $start, $end)
+	private function exportPerSchoolAsPdf($schoolIds, $start, $end, $showNamesAs)
 	{
 		$schoolRepo = new School();
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
@@ -158,7 +235,7 @@ class TemperatureRegistrationController extends ApiController
 		$monthsBetweenDates = Date::monthsBetweenDates($start, $end, "M Y");
 
 		foreach ($schoolIds as $index => $schoolId) {
-			$groupedEvents = $this->getEventsGroupedByDateBySchoolId($schoolId, $start, $end);
+			$groupedEvents = $this->getEventsGroupedByDateBySchoolId($schoolId, $start, $end, $showNamesAs);
 
 			$school = $schoolRepo->get($schoolId)[0];
 			$pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Temperatuurregistratie warme/koude maaltijd - Overzicht: {$school->name}");
@@ -212,7 +289,7 @@ class TemperatureRegistrationController extends ApiController
 				];
 
 				$table['header'][] = [
-					"title" => "Naam",
+					"title" => "Naam" . ($showNamesAs == "initials" ? " (initialen)" : ""),
 					"border" => "LB",
 					"width" => 40
 				];
@@ -291,7 +368,7 @@ class TemperatureRegistrationController extends ApiController
 		if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
 	}
 
-	private function exportPerSchoolAsXlsx($schoolIds, $start, $end)
+	private function exportPerSchoolAsXlsx($schoolIds, $start, $end, $showNamesAs)
 	{
 		$schoolRepo = new School();
 		$folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
@@ -303,7 +380,7 @@ class TemperatureRegistrationController extends ApiController
 
 		$excel = new Excel("{$folder}/{$filename}");
 		foreach ($schoolIds as $index => $schoolId) {
-			$groupedEvents = $this->getEventsGroupedByDateBySchoolId($schoolId, $start, $end);
+			$groupedEvents = $this->getEventsGroupedByDateBySchoolId($schoolId, $start, $end, $showNamesAs);
 
 			$school = $schoolRepo->get($schoolId)[0];
 			$excel->createSheet($index, $school->name);
@@ -343,7 +420,7 @@ class TemperatureRegistrationController extends ApiController
 							$schoolColumn++;
 							$excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Vlees/vis", true, border: "b");
 							$schoolColumn++;
-							$excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Naam", true, border: "b");
+							$excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Naam" . ($showNamesAs == "initials" ? " (initialen)" : ""), true, border: "b");
 							$schoolColumn++;
 							$excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Opmerkingen", true, border: "b");
 
@@ -381,7 +458,7 @@ class TemperatureRegistrationController extends ApiController
 		if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
 	}
 
-	private function getEventsGroupedByDateBySchoolId($schoolId, $start, $end)
+	private function getEventsGroupedByDateBySchoolId($schoolId, $start, $end, $showNamesAs)
 	{
 		$eventRepo = new TemperatureRegistration;
 		$eventsGrouped = [];
@@ -397,7 +474,7 @@ class TemperatureRegistrationController extends ApiController
 			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['potatoRicePastaTemp'] = $event->potatoRicePastaTemp;
 			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['vegetablesTemp'] = $event->vegetablesTemp;
 			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['meatFishTemp'] = $event->meatFishTemp;
-			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['name'] = $event->person;
+			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['name'] = ($showNamesAs == "initials" ? $event->personInitials : $event->person);
 			$eventsGrouped[$event->id][Clock::at($event->date)->format("M Y")]['description'] = $event->description;
 		}
 

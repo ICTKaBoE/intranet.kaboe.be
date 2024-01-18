@@ -252,6 +252,11 @@
             "function": "getArticles"
         },
         {
+            "path": "api/v2/{view}/notescreen/viewscreen",
+            "controller": "\\Controllers\\API\\NotescreenController",
+            "function": "getViewScreen"
+        },
+        {
             "path": "api/v2/{view}/management/dashboard",
             "controller": "\\Controllers\\API\\ManagementController",
             "function": "getDashboard"
@@ -396,6 +401,23 @@
             "path": "api/v2/{view}/temperatureregistration/dashboard",
             "controller": "\\Controllers\\API\\TemperatureRegistrationController",
             "function": "getDashboard"
+        },
+        {
+            "path": "api/v2/{view}/temperatureregistration/settings",
+            "controller": "\\Controllers\\API\\TemperatureRegistrationController",
+            "function": "getSettings"
+        },
+        {
+            "path": "api/v2/{view}/temperatureregistration/person",
+            "controller": "\\Controllers\\API\\TemperatureRegistrationController",
+            "function": "getPerson",
+            "auth": false
+        },
+        {
+            "path": "api/v2/{view}/temperatureRegistration/person",
+            "controller": "\\Controllers\\API\\TemperatureRegistrationController",
+            "function": "getPerson",
+            "auth": false
         }
     ],
     "POST": [
@@ -629,6 +651,11 @@
             "path": "/api/v2/form/temperatureregistration/export",
             "controller": "\\Controllers\\API\\TemperatureRegistrationController",
             "function": "postExport"
+        },
+        {
+            "path": "api/v2/{view}/temperatureregistration/settings",
+            "controller": "\\Controllers\\API\\TemperatureRegistrationController",
+            "function": "postSettings"
         }
     ]
 }
