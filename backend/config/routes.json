@@ -42,6 +42,12 @@
             "auth": false
         },
         {
+            "path": "/api/v2/update/database/{vMajor}/{vMinor}",
+            "controller": "\\Controllers\\API\\UpdateController",
+            "function": "database",
+            "auth": false
+        },
+        {
             "path": "/api/v2/sync/student",
             "controller": "\\Controllers\\API\\SyncController",
             "function": "getStudents"
