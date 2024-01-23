@@ -42,7 +42,7 @@
             "auth": false
         },
         {
-            "path": "/api/v2/update/database/{vMajor}/{vMinor}",
+            "path": "/api/v2/update/database/{vMajor}/{vMinor}/{vSubMinor}",
             "controller": "\\Controllers\\API\\UpdateController",
             "function": "database",
             "auth": false

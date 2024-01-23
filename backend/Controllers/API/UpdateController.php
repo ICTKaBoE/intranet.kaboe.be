@@ -9,9 +9,9 @@ use Controllers\ApiController;
 
 class UpdateController extends ApiController
 {
-	public function database($vMajor, $vMinor)
+	public function database($vMajor, $vMinor, $vSubMinor)
 	{
-		$version = "v{$vMajor}.{$vMinor}";
+		$version = "v{$vMajor}.{$vMinor}.{$vSubMinor}";
 		$file = LOCATION_SQL . "/{$version}.sql";
 
 		$content = file_get_contents($file);
