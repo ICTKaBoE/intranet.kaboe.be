@@ -103,7 +103,7 @@ class UserController extends ApiController
 
 			if (!$correctUser->api) return false;
 
-			Log::write(userId: $correctUser->id, description: "User '{$correctUser->fullName}' logged in via api credentials!");
+			// Log::write(userId: $correctUser->id, description: "User '{$correctUser->fullName}' logged in via api credentials!");
 			return true;
 		}
 	}

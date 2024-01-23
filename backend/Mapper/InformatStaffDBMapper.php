@@ -44,7 +44,7 @@ class InformatStaffDBMapper extends MInterface
 		if ($obj2->Actief == "J") $obj2->Actief = 1;
 		else $obj2->Actief = 0;
 
-		$obj2->Landcode = Mapping::get("sync/informatStaff/country/{$obj2->Landcode}");
+		// $obj2->Landcode = Mapping::get("sync/informatStaff/country/{$obj2->Landcode}");
 
 		$obj2->Iban = CString::formatBankAccount($obj2->Iban);
 		$obj2->Bic = CString::formatBankId($obj2->Bic);

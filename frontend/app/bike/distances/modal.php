@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="col-lg-3 col-12 mb-3">
-						<label class="form-label" for="endSchoolId">School</label>
+						<label class="form-label" for="endSchoolId">Bestemming</label>
 						<select name="endSchoolId" id="endSchoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
 						<div class="invalid-feedback" data-feedback-input="endSchoolId"></div>
 					</div>

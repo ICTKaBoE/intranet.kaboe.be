@@ -80,17 +80,8 @@ let btnView = new Button(null, {
     onclick: "view",
 });
 
-let btnBulkUpdate = new Button(null, {
-    type: "icon",
-    title: "Bulkbewerkingen",
-    icon: "edit",
-    bgColor: "warning",
-    onclick: "bulkEdit",
-});
-
-Helpers.addFloatingButton(btnFilter, btnView, btnBulkUpdate);
+Helpers.addFloatingButton(btnFilter, btnView);
 
 $(document).ready(() => {
     Table.GetInstance(`tbl${pageId}`).attachButton(btnView, "==1");
-    Table.GetInstance(`tbl${pageId}`).attachButton(btnBulkUpdate, ">0");
 });

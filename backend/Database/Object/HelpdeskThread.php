@@ -25,7 +25,7 @@ class HelpdeskThread extends CustomObject
 	public function link()
 	{
 		$localUserRepo = new LocalUser;
-		$this->creator = $localUserRepo->get(id: $this->creatorId)[0];
+		$this->creator = $localUserRepo->get($this->creatorId)[0];
 
 		return $this;
 	}

@@ -45,7 +45,7 @@ class SettingsController extends ApiController
 				],
 				[
 					"title" => "Naam",
-					"data" => "fullName"
+					"data" => "fullNameReversed"
 				],
 			];
 
@@ -70,7 +70,7 @@ class SettingsController extends ApiController
 			}
 
 			$this->appendToJson('columns', $columns);
-			$this->appendToJson('rows', $users);
+			$this->appendToJson('rows', Arrays::orderBy($users, 'fullNameReversed'));
 		}
 
 		$this->handle();
@@ -98,7 +98,7 @@ class SettingsController extends ApiController
 				[
 					"title" => "Route",
 					"data" => "route",
-					"width" => 200
+					"width" => 250
 				],
 				[
 					"title" => "Gebruiker",

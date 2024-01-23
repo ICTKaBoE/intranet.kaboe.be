@@ -30,9 +30,9 @@ class ManagementIpad extends CustomObject
 	{
 		$this->osDescription = "{$this->osPrefix} {$this->osVersion}";
 
-		$this->batteryLevel = floatval($this->batteryLevel);
-		$this->totalCapacity = floatval($this->totalCapacity);
-		$this->availableCapacity = floatval($this->availableCapacity);
+		$this->batteryLevel = floatval($this->batteryLevel ?? 0);
+		$this->totalCapacity = floatval($this->totalCapacity ?? 0);
+		$this->availableCapacity = floatval($this->availableCapacity ?? 0);
 		$this->availablePercentage = ($this->availableCapacity / $this->totalCapacity) * 100;
 
 		$this->batteryLevelPercentage = ($this->batteryLevel * 100) . "%";

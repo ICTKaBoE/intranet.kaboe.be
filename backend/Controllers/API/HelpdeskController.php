@@ -56,14 +56,14 @@ class HelpdeskController extends ApiController
 			$this->appendToJson(["xaxis", "categories"], Arrays::map($schoolRepo->get(), fn ($s) => $s->name));
 
 			$series = [];
-			
-			foreach($allstatus as $status) {
+
+			foreach ($allstatus as $status) {
 				$myarray = array("name" => array_values($status)[0]);
 				array_push($series, $myarray);
 			}
 
 			foreach ($schoolRepo->get() as $idx => $school) {
-				for($i = 0; $i < count($allstatus); $i++) {
+				for ($i = 0; $i < count($allstatus); $i++) {
 					$series[$i]["data"][$idx] = count($helpdeskRepo->getBySchoolByStatus($school->id, array_keys($allstatus)[$i]));
 				}
 			}
@@ -82,14 +82,14 @@ class HelpdeskController extends ApiController
 			$this->appendToJson(["xaxis", "categories"], Arrays::map($schoolRepo->get(), fn ($s) => $s->name));
 
 			$series = [];
-			
-			foreach($allpriority as $priority) {
+
+			foreach ($allpriority as $priority) {
 				$myarray = array("name" => array_values($priority)[0]);
 				array_push($series, $myarray);
 			}
 
 			foreach ($schoolRepo->get() as $idx => $school) {
-				for($i = 0; $i < count($allpriority); $i++) {
+				for ($i = 0; $i < count($allpriority); $i++) {
 					$series[$i]["data"][$idx] = count($helpdeskRepo->getBySchoolByPriorityByNotStatus($school->id, array_keys($allpriority)[$i], "C"));
 				}
 			}
@@ -194,11 +194,11 @@ class HelpdeskController extends ApiController
 				$template = self::TEMPLATE_THREAD;
 
 				foreach ($thread->toArray() as $key => $value) $template = str_replace("{{thread:{$key}}}", $value, $template);
-				foreach ($thread->creator->toArray() as $key => $value) $template = str_replace("{{thread:creator:{$key}}}", $value, $template);
+				if (!is_null($thread->creator)) foreach ($thread->creator->toArray() as $key => $value) $template = str_replace("{{thread:creator:{$key}}}", $value, $template);
 				$html .= $template;
 			}
 
-			$this->appendToJson(["html"], $html);
+			$this->appendToJson("html", preg_replace("/{{.*?}}/", "", $html));
 		}
 
 		$this->handle();
@@ -218,7 +218,7 @@ class HelpdeskController extends ApiController
 				$html .= $template;
 			}
 
-			$this->appendToJson(["html"], $html);
+			$this->appendToJson(["html"], preg_replace("/{{.*?}}/", "", $html));
 		}
 
 		$this->handle();

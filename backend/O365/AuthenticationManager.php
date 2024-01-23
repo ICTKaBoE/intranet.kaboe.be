@@ -80,7 +80,7 @@ class AuthenticationManager
     public static function acquireToken()
     {
         $settingRepo = new Setting;
-        // $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
+        $devmode = $settingRepo->get("site.mode")[0]->value == "DEV";
         // $tokenEndpoint = $settingRepo->get("o365.url.authority")[0]->value . $settingRepo->get("o365.endpoint.token")[0]->value;
         $tokenEndpoint = "{{o365.url.authority}}{{o365.endpoint.token}}";
         $clientId = "{{o365.client.id}}";

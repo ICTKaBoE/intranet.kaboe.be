@@ -2,4 +2,5 @@
 **/logs
 **/powershell
 **/*.old
+**/*.bak
 info.php

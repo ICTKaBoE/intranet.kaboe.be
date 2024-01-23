@@ -126,7 +126,7 @@
 
 					<div class="col-lg-7 mb-lg-3 mb-3">
 						<label class="form-label" for="assetId">Toestel</label>
-						<select name="assetId" id="assetId" data-load-source="[computer@{{select:url:short}}/management/computer;printer@{{select:url:short}}/management/printer;beamer@{{select:url:short}}/management/beamer]" data-load-value="id" data-load-label="[computer@name;printer@name;beamer@shortDescription]" required></select>
+						<select name="assetId" id="assetId" data-load-source="[computer@{{select:url:short}}/management/computer;printer@{{select:url:short}}/management/printer;beamer@{{select:url:short}}/management/beamer]" data-load-value="id" data-load-label="[computer@name;printer@name;beamer@shortDescription]" data-search required></select>
 						<div class="invalid-feedback" data-feedback-input="assetId"></div>
 					</div>
 				</div>

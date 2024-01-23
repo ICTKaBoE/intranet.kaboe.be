@@ -20,7 +20,7 @@ abstract class CString
 
 	public static function formatCurrency($value, $round = 2)
 	{
-		return "€ " . number_format((int)$value, $round, ",", ".");
+		return "€ " . number_format($value, $round, ",", ".");
 	}
 
 	public static function noHtml($value)

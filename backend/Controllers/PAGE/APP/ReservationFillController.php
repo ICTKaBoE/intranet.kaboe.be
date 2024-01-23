@@ -9,6 +9,7 @@ use Database\Repository\Module;
 use Database\Repository\School;
 use Controllers\DefaultController;
 use Database\Repository\ModuleSetting;
+use Security\Code;
 
 class ReservationFillController extends DefaultController
 {
@@ -17,13 +18,13 @@ class ReservationFillController extends DefaultController
 									<div class="col">{{typeName.description}}</div>
 								</div>{{fillcalendar:legenda}}';
 
-    public function index()
-    {
+	public function index($type = null)
+	{
 		$this->write();
 		$this->writeLegenda();
-        $this->writeCalendarRanges();
-        return $this->getLayout();
-    }
+		$this->writeCalendarRanges();
+		return $this->getLayout();
+	}
 
 	private function writeLegenda()
 	{
@@ -40,10 +41,10 @@ class ReservationFillController extends DefaultController
 	}
 
 
-    private function writeCalendarRanges()
-    {
-        $moduleSettingRepo = new ModuleSetting;
-        $moduleId = (new Module)->getByModule(Helpers::getModule())->id;
+	private function writeCalendarRanges()
+	{
+		$moduleSettingRepo = new ModuleSetting;
+		$moduleId = (new Module)->getByModule('reservation')->id;
 
 		$blockFuture = $moduleSettingRepo->getByModuleAndKey($moduleId, "blockFuture")->value == "on";
 		$blockFutureAmount = (int)$moduleSettingRepo->getByModuleAndKey($moduleId, "blockFutureAmount")->value;
@@ -52,7 +53,7 @@ class ReservationFillController extends DefaultController
 		$blockPastAmount = (int)$moduleSettingRepo->getByModuleAndKey($moduleId, "blockPastAmount")->value;
 		$blockPastType = $moduleSettingRepo->getByModuleAndKey($moduleId, "blockPastType")->value;
 
-        $blockFutureDate = Clock::now();
+		$blockFutureDate = Clock::now();
 		if ($blockFutureType == "d") $blockFutureDate = $blockFutureDate->plusDays($blockFutureAmount);
 		else if ($blockFutureType == "w") $blockFutureDate = $blockFutureDate->plusDays($blockFutureAmount * 7);
 		else if ($blockFutureType == "m") $blockFutureDate = $blockFutureDate->plusMonths($blockFutureAmount);
@@ -64,7 +65,7 @@ class ReservationFillController extends DefaultController
 		else if ($blockPastType == "m") $blockPastDate = $blockPastDate->minusMonths($blockPastAmount);
 		else if ($blockPastType == "y") $blockPastDate = $blockPastDate->minusYears($blockPastAmount);
 
-        $this->layout = str_replace("{{fillcalendar:range:start}}", ($blockPast ? $blockPastDate->format("Y-m-d") : ""), $this->layout);
+		$this->layout = str_replace("{{fillcalendar:range:start}}", ($blockPast ? $blockPastDate->format("Y-m-d") : ""), $this->layout);
 		$this->layout = str_replace("{{fillcalendar:range:end}}", ($blockFuture ? $blockFutureDate->format("Y-m-d") : ""), $this->layout);
-    }
+	}
 }

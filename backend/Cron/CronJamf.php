@@ -14,7 +14,7 @@ abstract class CronJamf
 		$ipadRepo = new ManagementIpad;
 
 		foreach ($items as $device) {
-			$ipad = $ipadRepo->getByUDID($device->UDID) ?? new ObjectManagementIpad;
+			$ipad = $ipadRepo->getByUDID($device->UDID) ?? (new ObjectManagementIpad);
 			$ipad->udId = $device->UDID;
 			$ipad->serialNumber = $device->serialNumber;
 			$ipad->modelName = $device->model['name'];

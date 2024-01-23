@@ -41,7 +41,7 @@ let btnAdd = new Button(null, {
     type: "icon",
     title: "Toevoegen",
     icon: "plus",
-    bgColor: "primary",
+    bgColor: "green",
     onclick: "add",
 });
 

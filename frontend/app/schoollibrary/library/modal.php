@@ -10,8 +10,7 @@
 				<div class="row mb-3">
 					<div class="col-md-6">
 						<label class="form-label" for="schoolId">School</label>
-						<select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
-						<!--data-default-value="{{user:profile:mainSchoolId}}"-->
+						<select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:profile:mainSchoolId}}" required></select>
 						<div class="invalid-feedback" data-feedback-input="schoolId"></div>
 					</div>
 

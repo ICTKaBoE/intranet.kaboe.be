@@ -180,7 +180,7 @@ let btnAdd = new Button(null, {
     title: "Toevoegen",
     icon: "plus",
     bgColor: "primary",
-    onclick: "add",
+    onclick: "green",
 });
 
 let btnEdit = new Button(null, {
@@ -227,7 +227,7 @@ let btnAddLine = new Button(null, {
     type: "icon",
     title: "Toevoegen",
     icon: "plus",
-    bgColor: "primary",
+    bgColor: "green",
     onclick: "addLine",
 });
 

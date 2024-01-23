@@ -26,6 +26,7 @@
 
 	<script>
 		let pageId = "{{page:id}}";
+		let siteVersion = ("{{site.version}}").replaceAll(".", "");
 	</script>
 
 	{{content:page:js}}

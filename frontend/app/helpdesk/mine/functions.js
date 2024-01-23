@@ -22,7 +22,7 @@ window.view = () => {
     Form.GetInstance(`${pageId}Details`).prefillForm(values);
     fetch(
         document.getElementById("modal-helpdesk-ticket-view").dataset.source +
-            `/thread/${values}`
+        `/thread/${values}`
     )
         .then((res) => res.json())
         .then((json) => {
@@ -32,7 +32,7 @@ window.view = () => {
 
     fetch(
         document.getElementById("modal-helpdesk-ticket-view").dataset.source +
-            `/action/${values}`
+        `/action/${values}`
     )
         .then((res) => res.json())
         .then((json) => {
@@ -111,7 +111,7 @@ let btnAdd = new Button(null, {
     type: "icon",
     title: "Toevoegen",
     icon: "plus",
-    bgColor: "primary",
+    bgColor: "green",
     onclick: "add",
 });
 

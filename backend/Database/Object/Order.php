@@ -55,7 +55,7 @@ class Order extends CustomObject
 		$this->descriptionNoHtml = CString::noHtml($this->description);
 
 		$this->_formLocked = 	($this->acceptorId == User::getLoggedInUser()->id && Arrays::contains(["A", "O", "S", "PR", "R"], $this->status)) ||
-			$this->creatorId != User::getLoggedInUser()->id ||
+			($this->acceptorId != User::getLoggedInUser()->id && $this->creatorId != User::getLoggedInUser()->id) ||
 			Arrays::contains(["C"], $this->status);
 	}
 
