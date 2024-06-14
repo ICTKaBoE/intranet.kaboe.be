@@ -5,7 +5,6 @@ namespace Database\Repository;
 use Ouzo\Utilities\Arrays;
 use Database\Interface\Repository;
 use Database\Repository\SchoolInstitute;
-use Ouzo\Utilities\Strings;
 
 class SyncStudent extends Repository
 {
@@ -32,15 +31,15 @@ class SyncStudent extends Repository
 		return $this->executeSelect($statement);
 	}
 
-	public function getBySchoolAndClass($schoolId, $class, $active = false)
+	public function getBySchoolAndClass($schoolId, $classId, $active = false)
 	{
 		$institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
-		$class = (new SchoolClass)->get($class)[0]->name;
+		$class = (new SchoolClass)->get($classId)[0]->name;
 
 		$statement = $this->prepareSelect();
-		$statement->where('active', $active);
+		$statement->where('active', $active ? 1 : 0);
 		$statement->where("class", $class);
-		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->instituteNumber));
+		$statement->whereIn("instituteId", Arrays::map($institutes, fn ($i) => $i->id));
 
 		return $this->executeSelect($statement);
 	}

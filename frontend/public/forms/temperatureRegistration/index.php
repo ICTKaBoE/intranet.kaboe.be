@@ -6,7 +6,7 @@
 					<div class="row mb-3">
 						<div class="col">
 							<label for="schoolId" class="form-label">Kies de school</label>
-							<select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required disabled></select>
+							<select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
 							<div class="invalid-feedback" data-feedback-input="schoolId"></div>
 						</div>
 					</div>

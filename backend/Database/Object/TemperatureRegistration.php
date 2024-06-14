@@ -37,7 +37,7 @@ class TemperatureRegistration extends CustomObject
         $this->vegetablesTempColor = !empty($this->vegetablesTemp) ? ($this->vegetablesTemp < 6 || $this->vegetablesTemp > 64 ? 'green' : ($this->vegetablesTemp < 8 || $this->vegetablesTemp > 59 ? 'orange' : 'red')) : 'transparent';
         $this->meatFishTempColor = !empty($this->meatFishTemp) ? ($this->meatFishTemp > 64 ? 'green' : ($this->meatFishTemp > 59 ? 'orange' : 'red')) : "transparent";
 
-        $this->_orderfield = "{$this->schoolId}-{$this->creationDateTime}";
+        $this->_orderfield = $this->creationDateTime;
     }
 
     public function link()

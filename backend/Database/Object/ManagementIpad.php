@@ -33,7 +33,7 @@ class ManagementIpad extends CustomObject
 		$this->batteryLevel = floatval($this->batteryLevel ?? 0);
 		$this->totalCapacity = floatval($this->totalCapacity ?? 0);
 		$this->availableCapacity = floatval($this->availableCapacity ?? 0);
-		$this->availablePercentage = ($this->availableCapacity / $this->totalCapacity) * 100;
+		$this->availablePercentage = ($this->availableCapacity == 0 || $this->totalCapacity == 0) ? 0 : ($this->availableCapacity / $this->totalCapacity) * 100;
 
 		$this->batteryLevelPercentage = ($this->batteryLevel * 100) . "%";
 		$this->batteryLevelColor = ($this->batteryLevel > 0.5 ? 'green' : ($this->batteryLevel > 0.2 ? 'orange' : 'red'));

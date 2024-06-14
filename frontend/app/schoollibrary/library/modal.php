@@ -1,3 +1,29 @@
+<div class="modal modal-blur fade" id="modal-schoollibrary-library-filter" tabindex="-1" style="display: none;" aria-hidden="true" role="dialog">
+	<div class="modal-dialog modal modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Filteren</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12 mb-3">
+						<label class="form-label" for="filterCategory">Prioriteit</label>
+						<select name="filterCategory" id="filterCategory" data-load-source="{{select:url:short}}/{{url:part:module}}/category" data-load-value="id" data-load-label="description"></select>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Annuleren</button>
+				<button type="button" onclick="emptyFilter()" class="btn btn-primary">Filter Legen</button>
+				<button type="button" onclick="applyFilter()" class="btn btn-primary">Filteren</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="modal modal-blur fade" id="modal-library" tabindex="-1" style="display: none;" aria-hidden="true" role="dialog">
 	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 		<form action="{{form:url:full}}" method="post" id="frm{{page:id}}" class="modal-content" data-action-field="faction">

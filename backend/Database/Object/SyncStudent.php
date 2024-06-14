@@ -39,7 +39,7 @@ class SyncStudent extends CustomObject
 
 	public function link()
 	{
-		$this->institute = (new SchoolInstitute)->getByInstituteNumber($this->instituteId)[0];
+		$this->institute = (new SchoolInstitute)->get($this->instituteId)[0];
 		$this->institute->link();
 	}
 }

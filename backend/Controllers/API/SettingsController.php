@@ -78,7 +78,9 @@ class SettingsController extends ApiController
 
 	public function getLogs($view)
 	{
+		set_time_limit(0);
 		$logs = (new Log)->get();
+		// $logs = array_slice($logs, 0, 100);
 		Arrays::each($logs, fn ($l) => $l->link());
 
 		if ($view == "table") {

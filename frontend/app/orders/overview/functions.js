@@ -179,8 +179,8 @@ let btnAdd = new Button(null, {
     type: "icon",
     title: "Toevoegen",
     icon: "plus",
-    bgColor: "primary",
-    onclick: "green",
+    bgColor: "green",
+    onclick: "add",
 });
 
 let btnEdit = new Button(null, {

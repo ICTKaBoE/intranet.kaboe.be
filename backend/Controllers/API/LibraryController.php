@@ -66,6 +66,7 @@ class LibraryController extends ApiController
             $this->appendToJson("items", (new Library)->getBySchoolId($schoolId));
         } else if ($view == "table") {
             $schoolId = Helpers::url()->getParam("schoolId");
+            $category = Helpers::url()->getParam("category");
 
             $this->appendToJson(
                 'columns',
@@ -125,7 +126,8 @@ class LibraryController extends ApiController
                     ]
                 ]
             );
-            $rows = (is_null($id) ? (new Library)->getBySchoolId($schoolId) : Arrays::firstOrNull((new Library)->get($id)));
+
+            $rows = (is_null($id) ? (is_null($category) ? (new Library)->getBySchoolId($schoolId) : (new Library)->getBySchoolIdAndCategory($schoolId, $category)) : Arrays::firstOrNull((new Library)->get($id)));
             Arrays::each($rows, fn ($row) => $row->link());
             $this->appendToJson("rows", Arrays::orderBy($rows, "_orderfield"));
         } else if ($view == "form") $this->appendToJson(['fields'], Arrays::firstOrNull((new Library)->get($id)));
@@ -198,10 +200,10 @@ class LibraryController extends ApiController
                 $this->setValidation("titel", "Titel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
                 Log::write(type: Log::TYPE_ERROR, description: "Title is not filled in");
             }
-            if (!Input::check($isdn) || Input::empty($isdn)) {
+            /*if (!Input::check($isdn) || Input::empty($isdn)) {
                 $this->setValidation("isdn", "ISDN moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
                 Log::write(type: Log::TYPE_ERROR, description: "Isdn is not filled in");
-            }
+            }*/
             if (!Input::check($category) || Input::empty($category)) {
                 $this->setValidation("categorie", "Categorie moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
                 Log::write(type: Log::TYPE_ERROR, description: "Category is not filled in");

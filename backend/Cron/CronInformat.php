@@ -167,7 +167,7 @@ abstract class CronInformat
 			$studentExtras = $iStudentExtraRepo->get();
 
 			foreach ($studentExtras as $se) {
-				$studentExtraObject = $informatStudentExtraRepo->getByInformatUID($se->p_persoon) ?? (new ObjectInformatStudentExtra);
+				$studentExtraObject = $informatStudentExtraRepo->getByInformatUID($se->pointer) ?? (new ObjectInformatStudentExtra);
 				$studentExtraObject = (new InformatStudentExtraDBMapper)->map($studentExtraObject, $se);
 				$studentExtraObject->instituteId = $institute->instituteNumber;
 				$informatStudentExtraRepo->set($studentExtraObject);

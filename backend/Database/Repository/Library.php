@@ -35,6 +35,15 @@ class Library extends Repository
 		return $this->executeSelect($statement);
 	}
 
+	public function getBySchoolIdAndCategory($schoolId, $category)
+	{
+		$statement = $this->prepareSelect();
+		$statement->where('schoolId', $schoolId);
+		$statement->where('category', $category);
+
+		return $this->executeSelect($statement);
+	}
+
 	public function getByLend()
 	{
 		$statement = $this->prepareSelect();

@@ -44,7 +44,10 @@ class Order extends Repository
 				$statement->where($key, $value);
 			}
 
-			if (Strings::equal($type, 'mine')) $statement->where('acceptorId', User::getLoggedInUser()->id);
+			if (Strings::equal($type, 'mine')) {
+				$statement->where('acceptorId', User::getLoggedInUser()->id);
+				$statement->whereIn('status', ['W', 'A', 'D', 'O', 'S', 'PR', 'R', 'C']);
+			}
 
 			return $this->executeSelect($statement);
 		} catch (\Exception $e) {

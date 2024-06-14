@@ -99,7 +99,7 @@ class TemperatureRegistrationController extends ApiController
 			if (!is_null($schoolId)) {
 				$rows = (new TemperatureRegistration)->getBySchoolAndDate($schoolId, $start, $end);
 				Arrays::each($rows, fn ($row) => $row->link());
-				$this->appendToJson("rows", $rows);
+				$this->appendToJson('rows', array_reverse(Arrays::orderBy($rows, "creationDateTime")));
 			} else $this->appendToJson('noRowsText', "Gelieve eerst te filteren");
 		}
 		$this->handle();

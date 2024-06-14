@@ -11,26 +11,30 @@ use Cron\CronInformat;
 use Spatie\Async\Pool;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
+use Security\Code;
+use Throwable;
 
 class CronController extends ApiController
 {
 	public function index($action)
 	{
-		set_time_limit(0);
-		$action = explode("-", strtolower($action));
+		try {
+			// Code::showErrors();
+			set_time_limit(0);
+			$action = explode("-", strtolower($action));
 
-		$pool = Pool::create();
-
-		foreach ($action as $a) {
-			if (Strings::equalsIgnoreCase($a, "sendMail")) $pool->add(fn () => CronMail::SendMail());
-			else if (Strings::equalsIgnoreCase($a, "adSync")) $pool->add(fn () => CronAD::Sync());
-			else if (Strings::equalsIgnoreCase($a, "informatSync")) $pool->add(fn () => CronInformat::Sync());
-			else if (Strings::equalsIgnoreCase($a, "jamfSync")) $pool->add(fn () => CronJamf::Sync());
-			else if (Strings::equalsIgnoreCase($a, "prepareSync")) $pool->add(fn () => CronPrepare::Sync());
-			else if (Strings::equalsIgnoreCase($a, "localUserSync")) $pool->add(fn () => CronLocal::UserSync());
+			foreach ($action as $a) {
+				if (Strings::equalsIgnoreCase($a, "sendMail")) CronMail::SendMail();
+				else if (Strings::equalsIgnoreCase($a, "adSync")) CronAD::Sync();
+				else if (Strings::equalsIgnoreCase($a, "informatSync")) CronInformat::Sync();
+				else if (Strings::equalsIgnoreCase($a, "jamfSync")) CronJamf::Sync();
+				else if (Strings::equalsIgnoreCase($a, "prepareSync")) CronPrepare::Sync();
+				else if (Strings::equalsIgnoreCase($a, "localUserSync")) CronLocal::UserSync();
+			}
+		} catch (\Exception $e) {
+			die(var_dump($e->getMessage()));
 		}
 
-		$pool->wait();
 		$this->handle();
 	}
 }

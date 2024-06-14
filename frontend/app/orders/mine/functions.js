@@ -24,12 +24,16 @@ window.view = () => {
 
 window.accept = () => {
     Select.GetInstance("status").setValue("A");
-    Form.GetInstance(`frm${pageId}`).submit();
+    setTimeout(() => {
+        Form.GetInstance(`frm${pageId}`).submit();
+    }, 150);
 };
 
 window.deny = () => {
     Select.GetInstance("status").setValue("D");
-    Form.GetInstance(`frm${pageId}`).submit();
+    setTimeout(() => {
+        Form.GetInstance(`frm${pageId}`).submit();
+    }, 150);
 };
 
 let btnView = new Button(null, {

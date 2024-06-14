@@ -131,7 +131,8 @@
     },
     "schoollibrary": {
         "category": {
-            "S": "Strip",
+            "ST": "Strip",
+            "SP": "Sprookjesboek",
             "I": "Informatief boek",
             "D": "Doeboek",
             "PO": "Poëzieboek",
@@ -139,7 +140,14 @@
             "LE": "Leesboek",
             "PR": "Prentenboek",
             "V": "Voorleesboek",
-            "T": "Tijdschrift"
+            "TI": "Tijdschrift",
+            "PE": "Peuterboek",
+            "Z": "Zoekboek",
+            "WV": "Werk en vrije tijd",
+            "WE": "Weetboek",
+            "G": "Godsdienstboek",
+            "TE": "Tekenboek",
+            "K": "Kookboek"
         }
     },
     "order": {

@@ -9,6 +9,27 @@ window.loadTable = (value) => {
     Table.INSTANCES[`tbl${pageId}`].reload();
 };
 
+window.filter = () => {
+    Helpers.toggleModal("schoollibrary-library-filter");
+};
+
+window.applyFilter = () => {
+    let category = Select.INSTANCES["filterCategory"].getValue();
+
+    Table.GetInstance(pageId).addExtraData("category", category);
+    Table.GetInstance(pageId).reload();
+    Helpers.toggleModal("schoollibrary-library-filter");
+};
+
+window.emptyFilter = () => {
+    Select.INSTANCES["filterCategory"].reload();
+
+    Table.GetInstance(pageId).removeExtraData("category");
+    Table.GetInstance(pageId).reload();
+    Helpers.toggleModal("schoollibrary-library-filter");
+};
+
+
 window.add = () => {
     Form.GetInstance(`frm${pageId}`).reset();
     Form.GetInstance(`frm${pageId}`).setActiveType("create");
@@ -62,6 +83,14 @@ window.showHistory = () => {
 
     Helpers.toggleModal("library-history");
 };
+let btnFilter = new Button(null, {
+    type: "icon",
+    title: "Filteren",
+    icon: "filter",
+    bgColor: "primary",
+    onclick: "filter",
+});
+
 
 let btnAdd = new Button(null, {
     type: "icon",
@@ -95,7 +124,7 @@ let btnHistory = new Button(null, {
     onclick: "showHistory",
 });
 
-Helpers.addFloatingButton(btnAdd, btnEdit, btnHistory, btnDelete);
+Helpers.addFloatingButton(btnFilter, btnAdd, btnEdit, btnHistory, btnDelete);
 
 $(document).ready(() => {
     Table.GetInstance(`tbl${pageId}`).attachButton(btnEdit, "==1");
