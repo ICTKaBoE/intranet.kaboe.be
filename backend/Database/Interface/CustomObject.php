@@ -2,6 +2,7 @@
 
 namespace Database\Interface;
 
+use Helpers\General;
 use Ouzo\Utilities\Arrays;
 use ReflectionObject;
 use ReflectionProperty;
@@ -11,17 +12,18 @@ class CustomObject extends stdClass
 {
     protected $objectAttributes = [];
     protected $encodeAttributes = [];
-    protected $nl2br = [];
-    protected $linkObjects = true;
+    protected $linkedAttributes = [];
 
-    public function __construct($attributes = [], $encode = false, $nl2br = true)
+    public function __construct($attributes = [])
     {
-        foreach ($this->objectAttributes as $objAtt) {
-            $this->$objAtt = Arrays::getValue($attributes, $objAtt, null);
+        foreach ($this->objectAttributes as $objKey => $objType) {
+            $objValue = Arrays::getValue($attributes, $objKey, null);
+            $objValue = General::convert($objValue, $objType);
+            $this->$objKey = $objValue;
         }
 
         $this->encode();
-        if ($nl2br) $this->nl2br();
+        $this->link();
         $this->init();
     }
 
@@ -30,18 +32,19 @@ class CustomObject extends stdClass
         foreach ($this->encodeAttributes as $encode) $this->$encode = mb_convert_encoding($this->$encode, 'UTF-8', mb_list_encodings());
     }
 
-    public function nl2br()
+    public function link()
     {
-        foreach ($this->nl2br as $nl) $this->$nl = nl2br($this->$nl);
+        if (!count($this->linkedAttributes)) return;
+
+        foreach ($this->linkedAttributes as $la => $prop) {
+            $attribute = key($prop);
+            $repo = $prop[$attribute];
+            $this->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
+        }
     }
 
     public function init()
     {
-    }
-
-    public function link()
-    {
-        return $this;
     }
 
     public function toArray()
@@ -59,7 +62,7 @@ class CustomObject extends stdClass
     public function toSqlArray()
     {
         $array = [];
-        foreach ($this->objectAttributes as $objAtt) {
+        foreach ($this->objectAttributes as $objAtt => $objExtra) {
             $array[$objAtt] = $this->$objAtt;
         }
 

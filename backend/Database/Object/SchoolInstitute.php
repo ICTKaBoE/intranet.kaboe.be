@@ -3,24 +3,24 @@
 namespace Database\Object;
 
 use Database\Interface\CustomObject;
-use Database\Repository\School;
 
 class SchoolInstitute extends CustomObject
 {
-	protected $objectAttributes = [
-		"id",
-		"schoolId",
-		"instituteNumber",
-		"deleted"
-	];
+    protected $objectAttributes = [
+        "id" => "int",
+        "schoolId" => "int",
+        "number" => "string",
+        "deleted" => "boolean"
+    ];
 
-	public function init()
-	{
-		if (strlen($this->instituteNumber) == 5) $this->instituteNumber = "0{$this->instituteNumber}";
-	}
+    protected $linkedAttributes = [
+        "school" => [
+            "schoolId" => \Database\Repository\School::class
+        ]
+    ];
 
-	public function link()
-	{
-		$this->school = (new School)->get($this->schoolId)[0];
-	}
+    public function init()
+    {
+        $this->numberNewFormat = (strlen($this->number) == 5 ? "0" : "") . $this->number;
+    }
 }

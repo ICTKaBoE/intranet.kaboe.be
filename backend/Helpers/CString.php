@@ -28,6 +28,13 @@ abstract class CString
 		return strip_tags($value);
 	}
 
+	public static function noLines($value, $spacer)
+	{
+		$value = self::noHtml($value);
+		$value = explode(PHP_EOL, $value);
+		return implode($spacer, $value);
+	}
+
 	public static function firstLetterOfEachWord($value)
 	{
 		$floew = "";

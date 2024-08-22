@@ -1,15 +1,10 @@
-<header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
+<header class="navbar navbar-expand-md d-none d-lg-flex d-print-none">
 	<div class="container-fluid">
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-			<img src="{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
-			<a href="{{site:url}}"><i class="ti ti-home"></i> {{site.title}}</a>
-		</h1>
-		<div class="navbar-nav flex-row order-md-last {{is:public:display}}">
-			<div role="notification" id="notification" data-no-notification-text="Geen updates"></div>
 
+		<div class="navbar-nav ms-auto">
 			<div class="nav-item dropdown">
 				<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
 					<span class="avatar avatar-sm">{{user:initials}}</span>

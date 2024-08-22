@@ -2,12 +2,12 @@
 
 namespace Controllers;
 
-use Middleware\ApiMiddleware;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
+use stdClass;
 
-class ApiController
+class ApiController extends stdClass
 {
 	const VALIDATION_STATE_VALID = "valid";
 	const VALIDATION_STATE_INVALID = "invalid";
@@ -18,11 +18,6 @@ class ApiController
 	private $toast = [];
 
 	private $json = [];
-
-	public function __construct()
-	{
-		ApiMiddleware::handle();
-	}
 
 	public function handle()
 	{

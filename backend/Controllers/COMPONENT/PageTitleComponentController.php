@@ -3,9 +3,9 @@
 namespace Controllers\COMPONENT;
 
 use Router\Helpers;
-use Database\Repository\Module;
 use Controllers\ComponentController;
-use Database\Repository\ModuleNavigation;
+use Database\Repository\Navigation;
+use Ouzo\Utilities\Arrays;
 
 class PageTitleComponentController extends ComponentController
 {
@@ -17,9 +17,14 @@ class PageTitleComponentController extends ComponentController
 
 	private function writePageTitle()
 	{
-		$module = (new Module)->getByModule(Helpers::getModule());
-		$page = (new ModuleNavigation)->getByModuleAndPage($module->id, Helpers::getPage());
+		$module = Helpers::getModule();
+		$page = Helpers::getPage();
 
-		$this->layout = str_replace("{{page:title}}", $module->name . (is_null($page) ? '' : " - " . $page->name), $this->layout);
+		$navigationRepo = new Navigation;
+		$moduleNavigation = Arrays::first($navigationRepo->getByLink($module));
+		$pageNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page));
+
+		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);
+		$this->layout = str_replace("{{page:title}}", $pagetitle, $this->layout);
 	}
 }

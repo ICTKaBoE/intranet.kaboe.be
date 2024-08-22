@@ -5,9 +5,10 @@ namespace Security;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Module;
-use Database\Repository\LocalUser;
-use Database\Repository\UserSecurity;
 use Database\Repository\ModuleSetting;
+use Database\Repository\SecurityGroup;
+use Database\Repository\SecurityGroupUser;
+use Database\Repository\User as RepositoryUser;
 
 abstract class User
 {
@@ -18,12 +19,12 @@ abstract class User
 
     static public function signInMethod()
     {
-        return Session::get(SECURITY_SESSION_ISSIGNEDIN)['method'];
+        return Session::get(SECURITY_SESSION_ISSIGNEDIN)['method'] ?? null;
     }
 
     static public function signInId()
     {
-        return Session::get(SECURITY_SESSION_ISSIGNEDIN)['id'];
+        return Session::get(SECURITY_SESSION_ISSIGNEDIN)['id'] ?? null;
     }
 
     static public function getLoggedInUser()
@@ -33,49 +34,24 @@ abstract class User
 
         $id = self::signInId();
 
-        if (Strings::equal($method, SECURITY_SESSION_SIGNINMETHOD_LOCAL)) return (new LocalUser)->get($id)[0];
-        else if (Strings::equal($method, SECURITY_SESSION_SIGNINMETHOD_O365)) return (new LocalUser)->getByO365Id($id);
+        if (Strings::equal($method, SECURITY_SESSION_SIGNINMETHOD_LOCAL)) return (new RepositoryUser)->get($id)[0];
+        else if (Strings::equal($method, SECURITY_SESSION_SIGNINMETHOD_M365)) return (new RepositoryUser)->getByEntraId($id);
 
         return false;
     }
 
-    static public function hasPermissionToEnter($moduleId, $userId)
+    static public function canAccess($minimumRights)
     {
-        $repo = new UserSecurity;
-        $items = $repo->getByUserAndModule($userId, 0);
-        if ($items->view) return true;
+        $user = self::getLoggedInUser();
+        $userSecurityGroup = Arrays::firstOrNull((new SecurityGroupUser)->getByUserId($user->id));
+        if (!$userSecurityGroup) return false;
 
-        $items = $repo->getByUserAndModule($userId, $moduleId);
-        if (!is_null($items) && $items->view) return true;
+        $securityGroup = Arrays::firstOrNull((new SecurityGroup)->get($userSecurityGroup->securityGroupId));
+        if (!$securityGroup) return false;
 
-        return false;
-    }
+        $firstIsTrue = Arrays::findKeyByValue($minimumRights, 1);
 
-    static public function hasPermissionToEnterSub($navItem, $moduleId, $userId)
-    {
-        $repo = new UserSecurity;
-        $items = $repo->getByUserAndModule($userId, 0);
-
-        if ($items->view) return true;
-        else {
-            $permissions = $repo->getByUserAndModule($userId, $moduleId);
-
-            if (is_null($permissions)) return false;
-            else {
-                $hasPermission = false;
-
-                foreach (UserSecurity::$rightsOrder as $index => $value) {
-                    if (Strings::equalsIgnoreCase($navItem->minimumRights, $value)) {
-                        if ($permissions->$value) {
-                            $hasPermission = true;
-                            break;
-                        }
-                    }
-                }
-
-                return $hasPermission;
-            }
-        }
+        return Strings::equal($securityGroup->permission[$firstIsTrue], 1);
     }
 
     static public function generatePassword()

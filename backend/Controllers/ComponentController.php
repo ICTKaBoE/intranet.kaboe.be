@@ -2,7 +2,9 @@
 
 namespace Controllers;
 
-class ComponentController
+use stdClass;
+
+class ComponentController extends stdClass
 {
 	protected $layout = "";
 

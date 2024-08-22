@@ -6,15 +6,15 @@ use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
 use Database\Repository\Setting;
 use Database\Repository\UserProfile;
-use Middleware\DefaultMiddleware;
 use O365\AuthenticationManager;
 use Router\Helpers;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Security\User;
+use stdClass;
 
-class DefaultController
+class DefaultController extends stdClass
 {
 	protected $layout = "";
 
@@ -22,7 +22,7 @@ class DefaultController
 	const COMPONENTS = [
 		"footer" => \Controllers\COMPONENT\FooterComponentController::class,
 		"header" => \Controllers\COMPONENT\HeaderComponentController::class,
-		"schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
+		// "schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
@@ -30,11 +30,6 @@ class DefaultController
 		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
 		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
 	];
-
-	public function __construct()
-	{
-		DefaultMiddleware::handle();
-	}
 
 	public function index()
 	{
@@ -54,7 +49,7 @@ class DefaultController
 		$this->loadUrlParts();
 		$this->loadUrlParams();
 		$this->loadSettings();
-		$this->loadModuleSettings();
+		// $this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
@@ -124,17 +119,17 @@ class DefaultController
 		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
 
-		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{table:url:full}}", "{{api:url}}/table/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{select:url:full}}", "{{api:url}}/select/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part:module}}/{{url:part:page}}", $this->layout);
-		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part:module}}/{{url:part:page}}", $this->layout);
+		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{table:url:full}}", "{{api:url}}/table/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{select:url:full}}", "{{api:url}}/select/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
 
-		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
+		// $this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
-		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{api.version}}", $this->layout);
+		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{setting:api.version}}", $this->layout);
 	}
 
 	private function loadOthers()
@@ -146,8 +141,8 @@ class DefaultController
 
 	private function loadSettings()
 	{
-		foreach ($this->getSettings() as $setting) {
-			$this->layout = str_replace('{{' . $setting->id . '}}', $setting->value, $this->layout);
+		foreach ((new Setting)->get(order: false) as $setting) {
+			$this->layout = str_replace('{{setting:' . $setting->id . '}}', $setting->value, $this->layout);
 		}
 	}
 
@@ -160,14 +155,14 @@ class DefaultController
 
 	private function loadUrlParts()
 	{
-		$this->layout = str_replace("{{url:part:module}}", Helpers::getModule(), $this->layout);
-		$this->layout = str_replace("{{url:part:page}}", Helpers::getPage(), $this->layout);
+		$this->layout = str_replace("{{url:part.module}}", Helpers::getModule() ?? "", $this->layout);
+		$this->layout = str_replace("{{url:part.page}}", Helpers::getPage() ?? "", $this->layout);
 	}
 
 	private function loadUrlParams()
 	{
 		foreach (Helpers::url()->getParams() as $key => $value) {
-			$this->layout = str_replace("{{url:param:{$key}}}", $value, $this->layout);
+			$this->layout = str_replace("{{url:param.{$key}}}", $value, $this->layout);
 		}
 	}
 
@@ -176,15 +171,17 @@ class DefaultController
 		$user = User::getLoggedInUser();
 		if (!$user) return;
 
-		$profile = (new UserProfile)->getByUserId($user->id);
-
 		foreach ($user as $key => $value) {
-			$this->layout = str_replace("{{user:{$key}}}", $value, $this->layout);
+			$this->layout = str_replace("{{user:{$key}}}", $value ?? "", $this->layout);
 		}
 
-		foreach ($profile as $key => $value) {
-			$this->layout = str_replace("{{user:profile:{$key}}}", $value, $this->layout);
-		}
+		// $profile = (new UserProfile)->getByUserId($user->id);
+
+
+
+		// foreach ($profile as $key => $value) {
+		// 	$this->layout = str_replace("{{user:profile.{$key}}}", $value, $this->layout);
+		// }
 	}
 
 	// Getters
@@ -217,7 +214,7 @@ class DefaultController
 				$html .= "<{$line['tag']}";
 
 				foreach ($line['attributes'] as $key => $value) {
-					if (Arrays::contains($fileTags, $key)) {
+					if (Arrays::contains($fileTags, $key) && !Strings::startsWith($value, "http")) {
 						$value .= "?" . filemtime(str_replace("{{site:url}}", LOCATION_ROOT, $value));
 					}
 
@@ -236,15 +233,15 @@ class DefaultController
 	{
 		$content = "";
 
-		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php")) {
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/index.php")) {
 			ob_start();
-			require_once LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/index.php";
+			require_once LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/index.php";
 			$content = ob_get_clean();
 		}
 
-		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/modal.php")) {
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/modal.php")) {
 			ob_start();
-			require_once LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/modal.php";
+			require_once LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/modal.php";
 			$content .= ob_get_clean();
 		}
 
@@ -253,8 +250,8 @@ class DefaultController
 
 	private function getContentPageCss()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/style.css")) {
-			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend" . Helpers::getReletiveUrl() . "/style.css\" />";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/style.css")) {
+			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend/pages" . Helpers::getReletiveUrl() . "/style.css\" />";
 		}
 
 		return "";
@@ -262,8 +259,8 @@ class DefaultController
 
 	private function getContentPageJs()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getReletiveUrl() . "/functions.js")) {
-			return "<script type=\"module\" src=\"{{site:url}}/frontend" . Helpers::getReletiveUrl() . "/functions.js\"></script>";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/functions.js")) {
+			return "<script type=\"module\" src=\"{{site:url}}/frontend/pages" . Helpers::getReletiveUrl() . "/functions.js\"></script>";
 		}
 
 		return "";
@@ -272,11 +269,6 @@ class DefaultController
 	private function isShortTag($tag)
 	{
 		return Arrays::keyExists(self::SHORT_TAG, $tag);
-	}
-
-	private function getSettings()
-	{
-		return (new Setting)->get(order: false);
 	}
 
 	private function getModuleSettings()

@@ -6,10 +6,24 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AllowDynamicProperties' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/AllowDynamicProperties.php',
+    'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+    'CURLStringFile' => $vendorDir . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Datamatrix' => $vendorDir . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
     'PDF417' => $vendorDir . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
+    'PhpToken' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
     'QRcode' => $vendorDir . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
+    'Random\\BrokenRandomEngineError' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/BrokenRandomEngineError.php',
+    'Random\\CryptoSafeEngine' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/CryptoSafeEngine.php',
+    'Random\\Engine' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/Engine.php',
+    'Random\\Engine\\Secure' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/Engine/Secure.php',
+    'Random\\RandomError' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/RandomError.php',
+    'Random\\RandomException' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/Random/RandomException.php',
+    'ReturnTypeWillChange' => $vendorDir . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
+    'SensitiveParameter' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/SensitiveParameter.php',
+    'SensitiveParameterValue' => $vendorDir . '/symfony/polyfill-php82/Resources/stubs/SensitiveParameterValue.php',
+    'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
     'TCPDF' => $vendorDir . '/tecnickcom/tcpdf/tcpdf.php',
     'TCPDF2DBarcode' => $vendorDir . '/tecnickcom/tcpdf/tcpdf_barcodes_2d.php',
     'TCPDFBarcode' => $vendorDir . '/tecnickcom/tcpdf/tcpdf_barcodes_1d.php',
@@ -21,4 +35,6 @@ return array(
     'TCPDF_IMPORT' => $vendorDir . '/tecnickcom/tcpdf/tcpdf_import.php',
     'TCPDF_PARSER' => $vendorDir . '/tecnickcom/tcpdf/tcpdf_parser.php',
     'TCPDF_STATIC' => $vendorDir . '/tecnickcom/tcpdf/include/tcpdf_static.php',
+    'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+    'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
 );

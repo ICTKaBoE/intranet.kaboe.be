@@ -14,11 +14,11 @@ export default class NoteScreen {
 		this.activePage = 0;
 		this.activeArticle = 0;
 
-		$.ajaxSetup({
-			headers: {
-				Authentication: 'Basic ' + btoa('viewscreen:viewscreen')
-			}
-		});
+		// $.ajaxSetup({
+		// 	headers: {
+		// 		Authentication: "Basic " + btoa("viewscreen:viewscreen"),
+		// 	},
+		// });
 
 		this.init();
 	}
@@ -62,7 +62,7 @@ export default class NoteScreen {
 	getData = () => {
 		if (!this.source) return;
 
-		return $.get(this.source).done(data => {
+		return $.get(this.source).done((data) => {
 			this.data = data;
 		});
 	};
@@ -75,7 +75,7 @@ export default class NoteScreen {
 		this.pagesContainer.innerHTML = "";
 		this.articleContainer.innerHTML = "";
 
-		this.data.pages.forEach(element => {
+		this.data.pages.forEach((element) => {
 			this.pages[`page_${element.id}`] = {
 				id: element.id,
 				articles: [],
@@ -85,10 +85,10 @@ export default class NoteScreen {
 			this.createPage(element);
 		});
 
-		this.data.articles.forEach(element => {
+		this.data.articles.forEach((element) => {
 			this.pages[`page_${element.notescreenPageId}`].articles.push({
 				id: element.id,
-				timeout: element.displayTime
+				timeout: element.displayTime,
 			});
 
 			this.createArticle(element);
@@ -132,7 +132,9 @@ export default class NoteScreen {
 		else {
 			let page = this.pages[this.pageKeys[this.activePage]];
 			let pageTimeout = 10;
-			page.articles.map(a => a.timeout).forEach(t => pageTimeout += t);
+			page.articles
+				.map((a) => a.timeout)
+				.forEach((t) => (pageTimeout += t));
 
 			this.activeArticle = 0;
 			this.activatePage(page.id);
@@ -146,7 +148,10 @@ export default class NoteScreen {
 	};
 
 	loopArticles = (page) => {
-		if (page.articles.length === 0 || this.activeArticle === page.articles.length) {
+		if (
+			page.articles.length === 0 ||
+			this.activeArticle === page.articles.length
+		) {
 			return;
 		}
 

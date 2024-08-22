@@ -1,15 +1,12 @@
 {
 	"nocomponents": [
 		"/error/{code}",
-		"/public/index"
+		"/index"
 	],
 	"minimal": [
-		"/public/{module?}/{page?}/{id?}"
-	],
-	"noPageTitleAndMenubar": [
-		"/app/index"
+		"/{module?}/{page?}/{id?}"
 	],
 	"schoolCustomLayout": [
-		"/public/notescreen/viewscreen"
+		"/notescreen/viewscreen"
 	]
 }

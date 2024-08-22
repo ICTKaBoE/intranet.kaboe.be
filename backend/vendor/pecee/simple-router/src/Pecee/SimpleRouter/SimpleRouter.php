@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------
  * Router helper class
@@ -83,7 +84,6 @@ class SimpleRouter
             static::router()->setDebugEnabled(true)->start();
             $routerOutput = ob_get_clean();
         } catch (Exception $e) {
-
         }
 
         // Try to parse library version
@@ -533,5 +533,4 @@ class SimpleRouter
     {
         return static::$defaultNamespace;
     }
-
 }

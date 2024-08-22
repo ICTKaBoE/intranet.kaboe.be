@@ -3,9 +3,8 @@
 namespace Database\Interface;
 
 use Database\Database;
-use Ouzo\Utilities\Arrays;
 use Database\Interface\CustomObject;
-use Router\Helpers;
+use Ouzo\Utilities\Arrays;
 use stdClass;
 
 class Repository extends stdClass
@@ -23,22 +22,8 @@ class Repository extends stdClass
         $this->repoTable = $this->db->getBuilder()->table($this->table);
     }
 
-    protected function convertRowsToObject($rows)
-    {
-        $objects = [];
-        foreach ($rows as $row) $objects[] = $this->convertRowToObject($row);
-
-        return $objects;
-    }
-
-    protected function convertRowToObject($row)
-    {
-        return new $this->object($row);
-    }
-
     protected function prepareSelect($id = null, $order = true, $deleted = false)
     {
-
         $statement = $this->repoTable->select();
         if (!is_null($id)) $statement->where($this->idField, $id);
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
@@ -47,20 +32,20 @@ class Repository extends stdClass
         return $statement;
     }
 
-    protected function executeSelect($statement, $nl2br = true)
+    protected function executeSelect($statement)
     {
         $objects = [];
         $rows = $statement->get();
 
-        foreach ($rows as $row) $objects[] = new $this->object($row, nl2br: $nl2br);
+        foreach ($rows as $row) $objects[] = new $this->object($row);
 
         return $objects;
     }
 
-    public function get($id = null, $order = true, $deleted = false, $nl2br = true)
+    public function get($id = null, $order = true, $deleted = false)
     {
         $statement = $this->prepareSelect($id, $order, $deleted);
-        return $this->executeSelect($statement, $nl2br);
+        return $this->executeSelect($statement);
     }
 
     public function set(CustomObject $object)

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{site.language}}" dir="{{site.direction}}">
+<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}">
 
 <head>
 	{{load:head}}
-	<title>{{site.title}}</title>
+	<title>{{setting:site.title}}</title>
 	{{content:page:css}}
 </head>
 
@@ -26,7 +26,7 @@
 
 	<script>
 		let pageId = "{{page:id}}";
-		let siteVersion = ("{{site.version}}").replaceAll(".", "");
+		let siteVersion = ("{{setting:site.version}}").replaceAll(".", "");
 	</script>
 
 	{{content:page:js}}

@@ -1,14 +1,18 @@
 {
-    "require": {
-        "letsdrink/ouzo-goodies": "^1.8",
-        "microsoft/microsoft-graph": "^1.8",
-        "clancats/hydrahon": "^1.1",
-        "phpoffice/phpspreadsheet": "^1.22",
-        "tecnickcom/tcpdf": "^6.4",
-        "nelexa/zip": "^4.0",
-        "pecee/simple-router": "4.3.7.2",
-        "guzzlehttp/guzzle": "^7.5",
-        "phpmailer/phpmailer": "^6.8",
-        "spatie/async": "^1.6"
-    }
+	"require": {
+		"letsdrink/ouzo-goodies": "^1.8",
+		"microsoft/microsoft-graph": "^2.12.0",
+		"clancats/hydrahon": "^1.1",
+		"phpoffice/phpspreadsheet": "^1.22",
+		"tecnickcom/tcpdf": "^6.4",
+		"nelexa/zip": "^4.0",
+		"pecee/simple-router": "4.3.7.2",
+		"guzzlehttp/guzzle": "^7.8",
+		"phpmailer/phpmailer": "^6.8"
+	},
+	"config": {
+		"allow-plugins": {
+			"php-http/discovery": true
+		}
+	}
 }

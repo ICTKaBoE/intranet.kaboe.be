@@ -70,18 +70,12 @@ abstract class Helpers
 
 	static function getModule()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "module")) return self::request()->getLoadedRoute()->getParameters()['module'];
-
-		$route = explode("/", ltrim(self::getReletiveUrl(), "/"));
-		return $route[1];
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "module");
 	}
 
 	static function getPage()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "page")) return self::request()->getLoadedRoute()->getParameters()['page'];
-
-		$route = explode("/", ltrim(self::getReletiveUrl(), "/"));
-		return $route[2];
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "page");
 	}
 
 	static function isPublicPage()
