@@ -1,9 +1,12 @@
 import Helpers from "./Helpers.js";
 
 export default class Button {
+	static TYPE_ICON = "icon";
+	static TYPE_ICON_TEXT = "icon-text";
+	static TYPE_TEXT = "text";
 	static INSTANCES = {};
 
-	constructor(element = null, options = {}) {
+	constructor({ element = null, options = {} }) {
 		this.options = options;
 		if (element !== null) this.element = element;
 		else {
@@ -18,7 +21,9 @@ export default class Button {
 	static ScanAndCreate = () => {
 		$("button,.btn*").each((ids, el) => {
 			if (!Button.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Button.INSTANCES[el.getAttribute("id")] = new Button(el);
+				Button.INSTANCES[el.getAttribute("id")] = new Button({
+					element: el,
+				});
 		});
 	};
 
@@ -40,14 +45,20 @@ export default class Button {
 		}
 
 		if (this.options.onclick || false)
-			this.element.onclick = () => {
+			this.element.addEventListener("click", () => {
 				if (this.options.onclick instanceof Function)
 					this.options.onclick();
 				else window[this.options.onclick]();
-			};
+			});
 
-		switch (this.options.type || "text") {
-			case "icon":
+		if (this.options.modal || false)
+			this.element.addEventListener("click", () => {
+				Helpers.closeAllModals();
+				Helpers.toggleModal(this.options.modal);
+			});
+
+		switch (this.options.type || Button.TYPE_TEXT) {
+			case Button.TYPE_ICON:
 				{
 					let icon = document.createElement("i");
 					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
@@ -57,7 +68,7 @@ export default class Button {
 				}
 				break;
 
-			case "icon-text":
+			case Button.TYPE_ICON_TEXT:
 				{
 					let icon = document.createElement("i");
 					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
@@ -74,9 +85,9 @@ export default class Button {
 	};
 
 	setOnClick = (funcName) => {
-		this.element.onclick = () => {
+		this.element.addEventListener("click", () => {
 			window[funcName]();
-		};
+		});
 	};
 
 	write = () => {

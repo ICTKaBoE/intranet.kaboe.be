@@ -8,6 +8,6 @@ class SchoolInstitute extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_school_institute", \Database\Object\SchoolInstitute::class, orderField: false);
+        parent::__construct("tbl_school_institute", \Database\Object\SchoolInstitute::class, orderField: false, guidField: false);
     }
 }

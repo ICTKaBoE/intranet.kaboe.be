@@ -21,8 +21,8 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="/app/user/profile" class="dropdown-item">Profiel</a>
-                    <a href="/app/user/logout" class="dropdown-item">Afmelden</a>
+                    <a href="/user/profile" class="dropdown-item">Profiel</a>
+                    <a href="/user/logout" class="dropdown-item">Afmelden</a>
                 </div>
             </div>
         </div>

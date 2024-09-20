@@ -22,7 +22,7 @@ define("SECURITY_SESSION_SIGNINMETHOD_M365", "m365");
 
 if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
 	define("DB_SERVER", "localhost");
-	define("DB_DATABASE", "db_intranet2");
+	define("DB_DATABASE", "db_intranet_v4");
 	define("DB_USERNAME", "root");
 	define("DB_PASSWORD", "");
 	define("DB_CHARSET", "utf8mb4");

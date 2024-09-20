@@ -2,10 +2,8 @@ import Button from "./Button.js";
 import Helpers from "./Helpers.js";
 import Select from "./Select.js";
 import Table from "./Table.js";
-import Toast from "./Toast.js";
 import DatePicker from "./DatePicker.js";
 import TinyMCE from "./TinyMCE.js";
-import Calendar from "./Calendar.js";
 
 export default class Form {
 	static INSTANCES = {};
@@ -14,13 +12,13 @@ export default class Form {
 		this.element = element;
 
 		this.id = this.element.getAttribute("id") || false;
-		this.method = this.element.method || "POST";
+		this.method = (
+			this.element.getAttribute("method") || "POST"
+		).toUpperCase();
 		this.action = this.element.action || false;
 		this.autocomplete = this.element.autocomplete || false;
 		this.prefill = this.element.hasAttribute("data-prefill");
-		this.prefillWithUrl = this.element.hasAttribute(
-			"data-prefill-with-url"
-		);
+		this.prefillId = this.element.dataset.prefillId || false;
 		this.source = this.element.dataset.source || this.action;
 		this.afterSubmit = this.element.dataset.afterSubmit || false;
 		this.lockedValue = this.element.dataset.lockedValue || false;
@@ -31,8 +29,7 @@ export default class Form {
 		this.defaultStates = {};
 		this.buttons = {};
 		this.activeStep = 0;
-		if (this.method !== "GET" || this.method !== "POST")
-			this.method = "POST";
+		this.lastLoadedId = null;
 
 		this.init();
 	}
@@ -50,7 +47,7 @@ export default class Form {
 	};
 
 	init = () => {
-		this.createActionField();
+		// this.createActionField();
 		this.checkDefaultStates();
 		this.disableAutocomplete();
 		this.disableValidation();
@@ -58,8 +55,8 @@ export default class Form {
 		this.createSteps();
 		this.attachDefaultEvents();
 
-		if (this.prefill) this.prefillForm();
-		if (this.prefillWithUrl) this.prefillFormWithUrl();
+		if (this.prefillId) this.prefillForm(this.prefillId);
+		else if (this.prefill) this.prefillForm();
 	};
 
 	createActionField = () => {
@@ -248,8 +245,6 @@ export default class Form {
 
 				if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.clear();
 			});
-
-		if (this.prefillWithUrl) this.prefillFormWithUrl();
 	};
 
 	disable = () => {
@@ -307,11 +302,12 @@ export default class Form {
 					} else if (el.role === "tinymce")
 						data[el.name] = TinyMCE.INSTANCES[el.id].getValue();
 					else if (el.type === "radio" || el.type === "checkbox") {
-						data[el.name] = $(this.element)
-							.find(
-								`[type='${el.type}'][name='${el.name}']:checked`
-							)
-							.val();
+						let element = $(this.element).find(
+							`[type='${el.type}'][name='${el.name}']:checked`
+						);
+						let value = element.val();
+						let checked = element.is(":checked");
+						data[el.name] = value == "on" ? checked : value;
 					} else data[el.name] = el.value;
 				}
 			});
@@ -345,19 +341,10 @@ export default class Form {
 				returnData.responseText || JSON.stringify(returnData)
 			);
 
+			Helpers.processRequestResponse(data);
 			if (data.validation) this.processValidation(data.validation);
-			if (data.redirect) Helpers.redirect(data.redirect);
-			if (data.toast) Toast.INSTANCE.show(data.toast);
-			if (data.closeModal)
-				typeof data.closeModal == "boolean"
-					? Helpers.closeAllModals()
-					: Helpers.toggleModal(data.closeModal);
-			if (data.reload) location.reload();
-			if (data.reloadTable) Table.ReloadAll();
-			if (data.reloadCalendar) Calendar.ReloadAll();
 			if (data.returnToStep) this.setActiveStep(this.activeStep - 1);
 			if (data.resetForm) this.reset();
-			if (data.download) this.precessDownload(data.download);
 			if (data.setId) this.prefillForm(data.setId);
 
 			if (this.afterSubmit) {
@@ -374,7 +361,7 @@ export default class Form {
 		return Helpers.request({
 			url:
 				this.action +
-				(this.lastLoadedId == null ? "" : `/${this.lastLoadedId}`) +
+				(this.lastLoadedId ? `/${this.lastLoadedId}` : "") +
 				(stepCheck ? "?stepCheck" : ""),
 			method: this.method,
 			data: data,
@@ -408,15 +395,6 @@ export default class Form {
 		});
 	};
 
-	precessDownload = (link) => {
-		let a = document.createElement("a");
-		a.type = "download";
-		a.href = link;
-		a.click();
-
-		a = null;
-	};
-
 	prefillForm = (id = null) => {
 		this.lastLoadedId = id;
 
@@ -428,14 +406,6 @@ export default class Form {
 			.then((json) => {
 				this.prefillFields(json.fields);
 			});
-	};
-
-	prefillFormWithUrl = () => {
-		let params = new URLSearchParams(document.location.search);
-
-		for (let p of params) {
-			this.setField(p[0], p[1]);
-		}
 	};
 
 	prefillFields = (fields) => {
@@ -519,5 +489,9 @@ export default class Form {
 						el.classList.add("d-none");
 				}
 			});
+	};
+
+	setLastLoadedId = (id) => {
+		this.lastLoadedId = id;
 	};
 }

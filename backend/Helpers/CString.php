@@ -18,9 +18,14 @@ abstract class CString
 		return substr($bankId, 0, 4) . " " . substr($bankId, 4, 2) . " " . substr($bankId, 6, 2);
 	}
 
-	public static function formatCurrency($value, $round = 2)
+	public static function formatCurrency($value, $round = 2, $prefix = "€")
 	{
-		return "€ " . number_format($value, $round, ",", ".");
+		return "{$prefix} " . self::formatNumber($value, $round);
+	}
+
+	public static function formatNumber($value, $round, $decimal = ",", $thousands = ".")
+	{
+		return number_format($value, $round, $decimal, $thousands);
 	}
 
 	public static function noHtml($value)

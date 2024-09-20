@@ -11,18 +11,22 @@
 	<div class="page">
 		<div class="page-wrapper">
 			{{component:generalMessage}}
+
 			{{component:pagetitle}}
+
 			<div class="page-body">
 				<div class="container-fluid">
 					{{content:page}}
 				</div>
 			</div>
 			{{component:footer}}
+
 		</div>
 	</div>
 
 	{{component:modal}}
 	{{component:toast}}
+
 
 	<script>
 		let pageId = "{{page:id}}";

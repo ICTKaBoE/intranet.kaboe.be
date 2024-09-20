@@ -1,4 +1,7 @@
 import Select from "./Select.js";
+import Toast from "./Toast.js";
+import Table from "./Table.js";
+import Calendar from "./Calendar.js";
 
 export default class Helpers {
 	static toggleWait = () => {
@@ -25,10 +28,10 @@ export default class Helpers {
 		window.location.href = url;
 	};
 
-	static addFloatingButton = (...buttons) => {
+	static addActionButton = (...buttons) => {
 		for (let button of buttons)
 			document
-				.getElementById("floating-buttons")
+				.getElementById("action-buttons")
 				.appendChild(button.write());
 	};
 
@@ -160,6 +163,20 @@ export default class Helpers {
 			});
 	};
 
+	static processRequestResponse = (data) => {
+		if (data.redirect) Helpers.redirect(data.redirect);
+		if (data.return) window.history.back();
+		if (data.toast) Toast.INSTANCE.show(data.toast);
+		if (data.closeModal)
+			typeof data.closeModal == "boolean"
+				? Helpers.closeAllModals()
+				: Helpers.toggleModal(data.closeModal);
+		if (data.reload) location.reload();
+		if (data.reloadTable) Table.ReloadAll();
+		if (data.reloadCalendar) Calendar.ReloadAll();
+		if (data.download) Helpers.precessDownload(data.download);
+	};
+
 	static cleanRowIndexes = (rows) => {
 		let result = [];
 
@@ -183,6 +200,15 @@ export default class Helpers {
 		do {
 			currentDate = Date.now();
 		} while (currentDate - date < ms);
+	};
+
+	static precessDownload = (link) => {
+		let a = document.createElement("a");
+		a.type = "download";
+		a.href = link;
+		a.click();
+
+		a = null;
 	};
 
 	static CheckAllLoaded = (callback) => {

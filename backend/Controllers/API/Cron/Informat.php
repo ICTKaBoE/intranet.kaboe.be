@@ -22,15 +22,15 @@ use Ouzo\Utilities\Strings;
 
 abstract class Informat
 {
-    static public function import()
+    static public function Import()
     {
-        $employee = self::employee();
-        $students = self::students();
+        $employee = self::Employee();
+        $students = self::Students();
 
         return ($employee && $students);
     }
 
-    static public function employee()
+    static public function Employee()
     {
         $informatEmployeeRepo = new Employee;
         $informatEmployeeOwnfieldRepo = new EmployeeOwnfield;
@@ -64,7 +64,7 @@ abstract class Informat
                     $dbInformatEmployeeNumberRepo->set($dbInformatEmployeeNumber);
                 }
 
-                $_employeeOwnfields = Arrays::filter($employeeOwnfields, fn ($eof) => Strings::equal($eof->personId, $employee->personId));
+                $_employeeOwnfields = Arrays::filter($employeeOwnfields, fn($eof) => Strings::equal($eof->personId, $employee->personId));
                 foreach ($_employeeOwnfields as $eof) {
                     $dbInformatEmployeeOwnfield = $dbInformatEmployeeOwnfieldRepo->getByInformatIdAndInformatEmployeeId($eof->vvId, $dbInformatEmployee->id) ?? (new ObjectInformatEmployeeOwnfield);
                     $dbInformatEmployeeOwnfield->informatEmployeeId = $dbInformatEmployee->id;
@@ -77,7 +77,7 @@ abstract class Informat
         return true;
     }
 
-    static public function students()
+    static public function Students()
     {
         return true;
     }

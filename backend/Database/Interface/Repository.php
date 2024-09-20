@@ -9,7 +9,7 @@ use stdClass;
 
 class Repository extends stdClass
 {
-    public function __construct($table, $object, $idField = 'id', $orderField = 'order', $orderDirection = 'ASC', $deletedField = 'deleted')
+    public function __construct($table, $object, $idField = 'id', $orderField = 'order', $orderDirection = 'ASC', $deletedField = 'deleted', $guidField = 'guid')
     {
         $this->db = Database::getInstance();
         $this->table = $table;
@@ -18,6 +18,7 @@ class Repository extends stdClass
         $this->orderField = $orderField;
         $this->orderDirection = $orderDirection;
         $this->deletedField = $deletedField;
+        $this->guidField = $guidField;
 
         $this->repoTable = $this->db->getBuilder()->table($this->table);
     }
@@ -25,7 +26,10 @@ class Repository extends stdClass
     protected function prepareSelect($id = null, $order = true, $deleted = false)
     {
         $statement = $this->repoTable->select();
-        if (!is_null($id)) $statement->where($this->idField, $id);
+        if (!is_null($id)) {
+            $statement->where($this->idField, $id);
+            if ($this->guidField) $statement->orWhere($this->guidField, $id);
+        }
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
         if ($order && $this->orderField) $statement->orderBy($this->orderField, $this->orderDirection);
 
@@ -48,23 +52,28 @@ class Repository extends stdClass
         return $this->executeSelect($statement);
     }
 
-    public function set(CustomObject $object)
+    public function set(CustomObject $object, $only = [])
     {
         try {
-            $object->init();
             $object = $object->toSqlArray();
 
             if (is_null($object[$this->idField])) return $this->insert($object);
-            else return $this->update($object);
+            else return $this->update($object, $only);
         } catch (\Exception $e) {
             die(var_dump("Repository:set - " . $e->getMessage()));
         }
     }
 
-    public function update($object)
+    public function update($object, $only = [])
     {
         $id = $object[$this->idField];
         unset($object[$this->idField]);
+
+        if (count($only)) {
+            foreach ($object as $key => $value) {
+                if (!in_array($key, $only)) unset($object[$key]);
+            }
+        }
 
         $statement = $this->repoTable->update($object)->where($this->idField, $id);
         return $statement->execute();

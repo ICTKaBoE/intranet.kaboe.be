@@ -14,38 +14,48 @@ class CustomObject extends stdClass
     protected $encodeAttributes = [];
     protected $linkedAttributes = [];
 
+    public $mapped = null;
+    public $linked = null;
+    public $formatted = null;
+
     public function __construct($attributes = [])
+    {
+        $this->mapped = new stdClass;
+        $this->linked = new stdClass;
+        $this->formatted = new stdClass;
+
+        $this->createAttributes($attributes);
+        $this->encode();
+        $this->link();
+        $this->init();
+    }
+
+    protected function createAttributes($attributes = [])
     {
         foreach ($this->objectAttributes as $objKey => $objType) {
             $objValue = Arrays::getValue($attributes, $objKey, null);
             $objValue = General::convert($objValue, $objType);
             $this->$objKey = $objValue;
         }
-
-        $this->encode();
-        $this->link();
-        $this->init();
     }
 
-    public function encode()
+    protected function encode()
     {
         foreach ($this->encodeAttributes as $encode) $this->$encode = mb_convert_encoding($this->$encode, 'UTF-8', mb_list_encodings());
     }
 
-    public function link()
+    protected function link()
     {
         if (!count($this->linkedAttributes)) return;
 
         foreach ($this->linkedAttributes as $la => $prop) {
             $attribute = key($prop);
             $repo = $prop[$attribute];
-            $this->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
+            $this->linked->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
         }
     }
 
-    public function init()
-    {
-    }
+    public function init() {}
 
     public function toArray()
     {

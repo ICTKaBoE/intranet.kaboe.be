@@ -2,17 +2,35 @@
 
 namespace Controllers\API;
 
-use Controllers\ApiController;
-use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
-use Database\Repository\Setting;
-use Database\Repository\User;
-use Database\Repository\UserLoginHistory;
 use Router\Helpers;
 use Security\Input;
 use Security\Session;
+use Database\Repository\User;
+use Controllers\ApiController;
+use Database\Repository\Setting;
+use Security\User as SecurityUser;
+use Database\Repository\UserAddress;
+use Database\Repository\UserLoginHistory;
+use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
+use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 
 class UserController extends ApiController
 {
+    public function get($view, $what = null, $id = null)
+    {
+        if (Strings::equal($what, "address")) $this->getAddress($view, $id);
+
+        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
+        $this->handle();
+    }
+
+    public function post($what, $id = null)
+    {
+        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
+        $this->handle();
+    }
+
     public function login()
     {
         $username = Helpers::input()->post("username")->getValue();
@@ -62,4 +80,21 @@ class UserController extends ApiController
         if (!$this->validationIsAllGood()) $this->setHttpCode(400);
         $this->handle();
     }
+
+    // Get Functions
+    private function getAddress($view, $id)
+    {
+        $repo = new UserAddress;
+        $currentUserId = SecurityUser::getLoggedInUser()->id;
+
+        if (Strings::equal($view, "table")) {
+        } else if (Strings::equal($view, "select")) {
+            $address = $repo->getByUserId($currentUserId);
+            Arrays::each($address, fn($a) => $a->address = $a->formatted->address);
+            $this->appendToJson('items', $address);
+        } else if (Strings::equal($view, "form")) {
+        }
+    }
+
+    // Post Functions
 }

@@ -154,4 +154,13 @@ abstract class Input
 
 		return preg_replace(array_keys($utf8), array_values($utf8), $input);
 	}
+
+	static public function createEmail($format, $firstName, $name, $suffix)
+	{
+		$firstName = self::clean($firstName);
+		$name = self::clean($name);
+
+		if (Strings::equal($format, "FN.LN@SUFFIX")) return strtolower("{$firstName}.{$name}@{$suffix}");
+		else if (Strings::equal($format, "LN.FN@SUFFIX")) return strtolower("{$name}.{$firstName}@{$suffix}");
+	}
 }

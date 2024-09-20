@@ -2,17 +2,19 @@
 
 namespace Controllers;
 
-use Database\Repository\Module;
-use Database\Repository\ModuleSetting;
-use Database\Repository\Setting;
-use Database\Repository\UserProfile;
-use O365\AuthenticationManager;
+use stdClass;
+use Security\User;
 use Router\Helpers;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Security\User;
-use stdClass;
+use Database\Repository\Module;
+use O365\AuthenticationManager;
+use Database\Repository\Setting;
+use Database\Repository\Navigation;
+use Database\Repository\UserProfile;
+use Database\Repository\ModuleSetting;
+use Security\Session;
 
 class DefaultController extends stdClass
 {
@@ -26,7 +28,8 @@ class DefaultController extends stdClass
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
-		"floatingButtons" => \Controllers\COMPONENT\FloatingButtonsComponentController::class,
+		"actionButtons" => \Controllers\COMPONENT\ActionButtonsComponentController::class,
+		"searchField" => \Controllers\COMPONENT\SearchFieldComponentController::class,
 		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
 		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
 	];
@@ -42,14 +45,14 @@ class DefaultController extends stdClass
 		$this->createGlobalVariables();
 		$this->storeLayout();
 		$this->loadLoad();
-		$this->loadComponents();
 		$this->loadContent();
+		$this->loadComponents();
 		$this->loadActions();
 		$this->loadOthers();
 		$this->loadUrlParts();
 		$this->loadUrlParams();
 		$this->loadSettings();
-		// $this->loadModuleSettings();
+		$this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
@@ -60,7 +63,8 @@ class DefaultController extends stdClass
 
 	private function createGlobalVariables()
 	{
-		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getReletiveUrl()));
+		// $this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getReletiveUrl()));
+		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getDirectory()));
 		$this->pageAction = "";
 
 		$this->siteUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost();
@@ -118,6 +122,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{chart:url:short}}", "{{api:url}}/chart", $this->layout);
 		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
+		$this->layout = str_replace("{{legenda:url:short}}", "{{api:url}}/legenda", $this->layout);
 
 		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
@@ -126,6 +131,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{legenda:url:full}}", "{{api:url}}/legenda/{{url:part.module}}/{{url:part.page}}", $this->layout);
 
 		// $this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
 
@@ -148,8 +154,10 @@ class DefaultController extends stdClass
 
 	private function loadModuleSettings()
 	{
-		foreach ($this->getModuleSettings() as $setting) {
-			$this->layout = str_replace('{{module:' . $setting->key . '}}', $setting->value, $this->layout);
+		$settings = $this->getModuleSettings();
+
+		foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) {
+			$this->layout = str_replace('{{module:' . $key . '}}', $value, $this->layout);
 		}
 	}
 
@@ -157,6 +165,7 @@ class DefaultController extends stdClass
 	{
 		$this->layout = str_replace("{{url:part.module}}", Helpers::getModule() ?? "", $this->layout);
 		$this->layout = str_replace("{{url:part.page}}", Helpers::getPage() ?? "", $this->layout);
+		$this->layout = str_replace("{{url:part.id}}", Helpers::getId() ?? "", $this->layout);
 	}
 
 	private function loadUrlParams()
@@ -171,7 +180,7 @@ class DefaultController extends stdClass
 		$user = User::getLoggedInUser();
 		if (!$user) return;
 
-		foreach ($user as $key => $value) {
+		foreach ($user->toArray() as $key => $value) {
 			$this->layout = str_replace("{{user:{$key}}}", $value ?? "", $this->layout);
 		}
 
@@ -233,16 +242,20 @@ class DefaultController extends stdClass
 	{
 		$content = "";
 
-		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/index.php")) {
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/index.php")) {
 			ob_start();
-			require_once LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/index.php";
+			require_once LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/index.php";
 			$content = ob_get_clean();
 		}
 
-		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/modal.php")) {
-			ob_start();
-			require_once LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/modal.php";
-			$content .= ob_get_clean();
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal")) {
+			$modals = array_diff(scandir(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal"), [".", ".."]);
+
+			foreach ($modals as $modal) {
+				ob_start();
+				require_once LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal/{$modal}";
+				$content .= ob_get_clean();
+			}
 		}
 
 		return $content;
@@ -250,8 +263,8 @@ class DefaultController extends stdClass
 
 	private function getContentPageCss()
 	{
-		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/style.css")) {
-			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend/pages" . Helpers::getReletiveUrl() . "/style.css\" />";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/style.css")) {
+			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend/pages" . Helpers::getDirectory() . "/style.css\" />";
 		}
 
 		return "";
@@ -259,8 +272,8 @@ class DefaultController extends stdClass
 
 	private function getContentPageJs()
 	{
-		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getReletiveUrl() . "/functions.js")) {
-			return "<script type=\"module\" src=\"{{site:url}}/frontend/pages" . Helpers::getReletiveUrl() . "/functions.js\"></script>";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/functions.js")) {
+			return "<script type=\"module\" src=\"{{site:url}}/frontend/pages" . Helpers::getDirectory() . "/functions.js\"></script>";
 		}
 
 		return "";
@@ -273,6 +286,13 @@ class DefaultController extends stdClass
 
 	private function getModuleSettings()
 	{
-		return (new ModuleSetting)->getByModule((new Module)->getByModule(Helpers::getModule())->id);
+		$repo = new Navigation;
+		$module = Arrays::first($repo->getByParentIdAndLink(0, Helpers::getModule()));
+
+		Session::set("moduleSettingsId", $module->id);
+
+		if ($module->settings !== null) $settings = $module->settings;
+
+		return $settings;
 	}
 }

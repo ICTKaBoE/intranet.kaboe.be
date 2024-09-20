@@ -8,6 +8,6 @@ class Setting extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_setting", \Database\Object\Setting::class);
+        parent::__construct("tbl_setting", \Database\Object\Setting::class, guidField: false);
     }
 }

@@ -1,1 +1,0 @@
-<div class="position-fixed bottom-0 end-0 p-3 pb-lg-6 pb-7 btn-list" id="floating-buttons"></div>

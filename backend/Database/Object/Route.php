@@ -15,4 +15,8 @@ class Route extends CustomObject
         "callback" => "string",
         "deleted" => "boolean"
     ];
+
+    protected $linkedAttributes = [
+        "routeGroup" => ['routeGroupId' => \Database\Repository\RouteGroup::class]
+    ];
 }

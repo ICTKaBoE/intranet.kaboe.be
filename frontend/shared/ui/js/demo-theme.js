@@ -1,35 +1,28 @@
-/*!
-* Tabler v1.0.0-beta20 (https://tabler.io)
-* @version 1.0.0-beta20
-* @link https://tabler.io
-* Copyright 2018-2023 The Tabler Authors
-* Copyright 2018-2023 codecalm.net Paweł Kuna
-* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
-*/
-(function (factory) {
-	typeof define === 'function' && define.amd ? define(factory) :
-	factory();
-})((function () { 'use strict';
+/**
+ * demo-theme is specifically loaded right after the body and not deferred
+ * to ensure we switch to the chosen dark/light theme as fast as possible.
+ * This will prevent any flashes of the light theme (default) before switching.
+ */
 
-	var themeStorageKey = "tablerTheme";
-	var defaultTheme = "light";
-	var selectedTheme;
-	var params = new Proxy(new URLSearchParams(window.location.search), {
-	  get: function get(searchParams, prop) {
-	    return searchParams.get(prop);
-	  }
-	});
-	if (!!params.theme) {
-	  localStorage.setItem(themeStorageKey, params.theme);
-	  selectedTheme = params.theme;
-	} else {
-	  var storedTheme = localStorage.getItem(themeStorageKey);
-	  selectedTheme = storedTheme ? storedTheme : defaultTheme;
-	}
-	if (selectedTheme === 'dark') {
-	  document.body.setAttribute("data-bs-theme", selectedTheme);
-	} else {
-	  document.body.removeAttribute("data-bs-theme");
-	}
+const themeStorageKey = "tablerTheme"
+const defaultTheme = "light"
+let selectedTheme
 
-}));
+// https://stackoverflow.com/a/901144
+const params = new Proxy(new URLSearchParams(window.location.search), {
+	get: (searchParams, prop) => searchParams.get(prop),
+})
+
+if (!!params.theme) {
+	localStorage.setItem(themeStorageKey, params.theme)
+	selectedTheme = params.theme
+} else {
+	const storedTheme = localStorage.getItem(themeStorageKey)
+	selectedTheme = storedTheme ? storedTheme : defaultTheme
+}
+
+if (selectedTheme === 'dark') {
+	document.body.setAttribute("data-bs-theme", selectedTheme)
+} else {
+	document.body.removeAttribute("data-bs-theme")
+}

@@ -25,6 +25,7 @@ class ApiController extends stdClass
 
 		if ($this->validation) Arrays::setNestedValue($this->json, ['validation'], $this->validation);
 		if ($this->redirect) Arrays::setNestedValue($this->json, ['redirect'], $this->redirect);
+		if ($this->return) Arrays::setNestedValue($this->json, ['return'], $this->return);
 		if ($this->error) Arrays::setNestedValue($this->json, ['error'], $this->error);
 		if ($this->toast) Arrays::setNestedValue($this->json, ['toast'], $this->toast);
 		if ($this->reload) Arrays::setNestedValue($this->json, ['reload'], $this->reload);
@@ -53,10 +54,9 @@ class ApiController extends stdClass
 		$this->error = $error;
 	}
 
-	protected function setToast($title, $message, $type = self::VALIDATION_STATE_VALID)
+	protected function setToast($message, $type = self::VALIDATION_STATE_VALID)
 	{
 		$this->toast[] = [
-			"title" => $title,
 			"type" => $type,
 			"message" => $message
 		];
@@ -70,6 +70,11 @@ class ApiController extends stdClass
 	protected function setRedirect($url)
 	{
 		$this->redirect = $url;
+	}
+
+	protected function setReturn()
+	{
+		$this->return = true;
 	}
 
 	protected function setReload()
@@ -114,7 +119,10 @@ class ApiController extends stdClass
 
 	protected function validationIsAllGood()
 	{
-		return count($this->validation) == Arrays::count($this->validation, fn ($v) => Strings::equal($v['state'], self::VALIDATION_STATE_VALID));
+		$validation = count($this->validation) == Arrays::count($this->validation, fn($v) => Strings::equal($v['state'], self::VALIDATION_STATE_VALID));
+		$toast = count($this->toast) == Arrays::count($this->toast, fn($t) => Strings::equal($t['type'], self::VALIDATION_STATE_VALID));
+
+		return ($validation && $toast);
 	}
 
 	protected function getValidation()

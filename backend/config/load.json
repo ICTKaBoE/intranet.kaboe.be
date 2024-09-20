@@ -31,6 +31,13 @@
 		{
 			"tag": "link",
 			"attributes": {
+				"href": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
 				"href": "{{site:url}}/frontend/shared/ui/libs/apexcharts/dist/apexcharts.css",
 				"rel": "stylesheet"
 			}
@@ -87,6 +94,12 @@
 		}
 	],
 	"body": [
+		{
+			"tag": "script",
+			"attributes": {
+				"src": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.js"
+			}
+		},
 		{
 			"tag": "script",
 			"attributes": {

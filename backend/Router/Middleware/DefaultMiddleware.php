@@ -19,7 +19,8 @@ class DefaultMiddleware implements IMiddleware
 
     private function checkUserCanAccess()
     {
-        $folder = Helpers::getReletiveUrl();
+        // $folder = Helpers::getReletiveUrl();
+        $folder = Helpers::getDirectory();
         $defaultPage = (new Setting)->get(id: (User::isSignedIn() ? "page.default.afterLogin" : "page.default.public"))[0]->value;
 
         if (User::isSignedIn()) {
@@ -31,7 +32,7 @@ class DefaultMiddleware implements IMiddleware
 
     static private function checkFileExistance()
     {
-        $folder = Helpers::getReletiveUrl();
+        $folder = Helpers::getDirectory();
         if (!file_exists(LOCATION_FRONTEND_PAGES . $folder)) Helpers::redirect("/error/404", 404);
     }
 }

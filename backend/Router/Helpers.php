@@ -58,14 +58,9 @@ abstract class Helpers
 		return null;
 	}
 
-	static function getReletiveUrl()
+	static function getReletiveUrl($params = false)
 	{
-		return rtrim(self::url()->getRelativeUrl(false), "/");
-	}
-
-	static function getPrefix()
-	{
-		return (self::isErrorPage() ? "error" : (self::isPublicPage() ? "public" : "app"));
+		return rtrim(self::url()->getRelativeUrl($params), "/");
 	}
 
 	static function getModule()
@@ -78,31 +73,14 @@ abstract class Helpers
 		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "page");
 	}
 
-	static function isPublicPage()
+	static function getId()
 	{
-		return Strings::startsWith(self::getReletiveUrl(), "/public");
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "id");
 	}
 
-	static function isErrorPage()
+	static function getDirectory()
 	{
-		return Strings::startsWith(self::getReletiveUrl(), "/error");
-	}
-
-	static function registerNoAuthRoute($method, $route)
-	{
-		$noAuthRoutes = json_decode(file_get_contents(LOCATION_BACKEND . "/config/noAuthRoutes.json"), true);
-		if (Arrays::contains($noAuthRoutes[$method], $route)) return;
-
-		$noAuthRoutes[$method][] = $route;
-		file_put_contents(LOCATION_BACKEND . "/config/noAuthRoutes.json", json_encode($noAuthRoutes));
-	}
-
-	static function registerStopRedirectionRoute($method, $route)
-	{
-		$stopRedirectionRoutes = json_decode(file_get_contents(LOCATION_BACKEND . "/config/stopRedirectionRoutes.json"), true);
-		if (Arrays::contains($stopRedirectionRoutes[$method], $route)) return;
-
-		$stopRedirectionRoutes[$method][] = $route;
-		file_put_contents(LOCATION_BACKEND . "/config/stopRedirectionRoutes.json", json_encode($stopRedirectionRoutes));
+		if (!self::getModule()) return self::getReletiveUrl();
+		else return "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getId() ? "/form" : "");
 	}
 }

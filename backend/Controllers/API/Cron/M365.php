@@ -6,7 +6,5 @@ use M365\GraphHelper;
 
 abstract class M365
 {
-    static public function import()
-    {
-    }
+    static public function Import() {}
 }

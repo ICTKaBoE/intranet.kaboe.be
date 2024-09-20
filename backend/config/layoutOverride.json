@@ -1,12 +1,4 @@
 {
-	"nocomponents": [
-		"/error/{code}",
-		"/index"
-	],
-	"minimal": [
-		"/{module?}/{page?}/{id?}"
-	],
-	"schoolCustomLayout": [
-		"/notescreen/viewscreen"
-	]
+	"nocomponents": ["/error/{code}", "/index"],
+	"schoolCustomLayout": ["/notescreen/viewscreen"]
 }

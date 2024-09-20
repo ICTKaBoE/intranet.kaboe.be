@@ -10,32 +10,36 @@ import TinyMCE from "./object/TinyMCE.js";
 import Chart from "./object/Chart.js";
 import Clock from "./object/Clock.js";
 import NoteScreen from "./object/NoteScreen.js";
+import ColorInput from "./object/ColorInput.js";
+import SearchField from "./object/SearchField.js";
+import Legenda from "./object/Legenda.js";
 
 Toast.Create();
 Button.ScanAndCreate();
+SearchField.ScanAndCreate();
 Select.ScanAndCreate();
 Table.ScanAndCreate();
 Calendar.ScanAndCreate();
 DatePicker.ScanAndCreate();
 TinyMCE.ScanAndCreate();
 Chart.ScanAndCreate();
+Legenda.ScanAndCreate();
 
 window.checkAllLoadedCallback = () => {
-    Form.ScanAndCreate();
+	Form.ScanAndCreate();
+	ColorInput.ScanAndCreate();
 
-    Clock.ScanAndCreate();
-    NoteScreen.ScanAndCreate();
+	Clock.ScanAndCreate();
+	NoteScreen.ScanAndCreate();
 };
 
 Helpers.CheckAllLoaded(window.checkAllLoadedCallback);
 
 $(document).ready(() => {
-    $("*[data-bs-dismiss='modal']").on('click', (e) => {
-        try {
-            let parentId = $(e.target).parents().filter(".modal.show")[0].id;
-            Helpers.toggleModal(parentId.replace('modal-', ''));
-        } catch {
-
-        }
-    });
+	$("*[data-bs-dismiss='modal']").on("click", (e) => {
+		try {
+			let parentId = $(e.target).parents().filter(".modal.show")[0].id;
+			Helpers.toggleModal(parentId.replace("modal-", ""));
+		} catch {}
+	});
 });

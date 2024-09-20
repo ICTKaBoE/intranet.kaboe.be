@@ -8,7 +8,7 @@ class Navigation extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_navigation", \Database\Object\Navigation::class);
+        parent::__construct("tbl_navigation", \Database\Object\Navigation::class, guidField: false);
     }
 
     public function getByParentId($parentId)

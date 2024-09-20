@@ -19,11 +19,7 @@ export default class Calendar {
 		this.slotMinTime = this.element.dataset.slotMinTime || false;
 		this.slotMaxTime = this.element.dataset.slotMaxTime || false;
 
-		this.range = {};
-		this.range.start = this.element.dataset.rangeStart || false;
-		this.range.end = this.element.dataset.rangeEnd || false;
-
-		if (String(this.source).charAt(0) == '[') {
+		if (String(this.source).charAt(0) == "[") {
 			this.source = String(this.source).replace("[", "").replace("]", "");
 			this.source = String(this.source).split(",");
 		}
@@ -33,9 +29,15 @@ export default class Calendar {
 
 	static ScanAndCreate() {
 		$("div[role='calendar']").each((ids, el) => {
-			if (!Calendar.INSTANCES.hasOwnProperty(el.getAttribute("id"))) Calendar.INSTANCES[el.getAttribute("id")] = new Calendar(el);
+			if (!Calendar.INSTANCES.hasOwnProperty(el.getAttribute("id")))
+				Calendar.INSTANCES[el.getAttribute("id")] = new Calendar(el);
 		});
 	}
+
+	static GetInstance = (id) => {
+		if (!id.startsWith("cal")) id = `cal${id}`;
+		return Calendar.INSTANCES[id] || false;
+	};
 
 	static ReloadAll = () => {
 		for (const cal in Calendar.INSTANCES) {
@@ -51,11 +53,11 @@ export default class Calendar {
 		let options = {
 			initialView: this.view,
 			weekends: this.weekends,
-			locale: 'nl',
+			locale: "nl",
 			headerToolbar: {
-				start: 'prevYear,prev',
-				center: 'title',
-				end: 'today next,nextYear'
+				start: "prevYear,prev",
+				center: "title",
+				end: "today next,nextYear",
 			},
 		};
 
@@ -63,7 +65,7 @@ export default class Calendar {
 			options.allDaySlot = this.allDaySlot;
 			options.slotDuration = this.slotDuration;
 			options.nowIndicator = true;
-			options.scrollTime = (new Date()).getHours() - 1 + ":00:00";
+			options.scrollTime = new Date().getHours() - 1 + ":00:00";
 			options.editable = this.editable;
 			options.selectable = true;
 			options.expandRows = true;
@@ -75,35 +77,14 @@ export default class Calendar {
 		if (this.dateClick || this.dateSelect) {
 			if (this.view === "timeGridWeek") {
 				options.select = (info) => {
-					if (this.range.start || this.range.end) {
-						if (Date.parse(info.startStr.split("T")[0]) < Date.parse(this.range.start) ||
-							Date.parse(info.endStr.split("T")[0]) > Date.parse(this.range.end)) return;
-					}
-
 					window[this.dateSelect](info);
 				};
 
 				options.eventDrop = (info) => {
-					if (this.range.start || this.range.end) {
-						if (Date.parse(info.event.startStr.split("T")[0]) < Date.parse(this.range.start) ||
-							Date.parse(info.event.endStr.split("T")[0]) > Date.parse(this.range.end)) {
-							info.revert();
-							return;
-						};
-					}
-
 					window[this.dateSelect](info);
 				};
 
 				options.eventResize = (info) => {
-					if (this.range.start || this.range.end) {
-						if (Date.parse(info.event.startStr.split("T")[0]) < Date.parse(this.range.start) ||
-							Date.parse(info.event.endStr.split("T")[0]) > Date.parse(this.range.end)) {
-							info.revert();
-							return;
-						};
-					}
-
 					window[this.dateSelect](info);
 				};
 
@@ -112,15 +93,10 @@ export default class Calendar {
 				};
 			} else {
 				options.dateClick = (info) => {
-					if (this.range.start || this.range.end) {
-						if (Date.parse(info.dateStr.split("T")[0]) < Date.parse(this.range.start)) return;
-						if (Date.parse(info.dateStr.split("T")[0]) > Date.parse(this.range.end)) return;
-					}
-
 					window[this.dateClick](info);
 				};
 			}
-		};
+		}
 
 		if (this.source) {
 			if (Array.isArray(this.source)) {
@@ -129,16 +105,16 @@ export default class Calendar {
 				for (const source of this.source) {
 					sources.push({
 						url: source,
-						extraParams: this.extraData
+						extraParams: this.extraData,
 					});
 				}
 
 				options.eventSources = this.source;
-			}
-			else options.events = {
-				url: this.source,
-				extraParams: this.extraData
-			};
+			} else
+				options.events = {
+					url: this.source,
+					extraParams: this.extraData,
+				};
 		}
 
 		this.elementObject = new FullCalendar.Calendar(this.element, options);
@@ -154,14 +130,14 @@ export default class Calendar {
 				for (const s of this.source) {
 					this.elementObject.addEventSource({
 						url: s,
-						extraParams: this.extraData
+						extraParams: this.extraData,
 					});
 				}
-			}
-			else this.elementObject.addEventSource({
-				url: this.source,
-				extraParams: this.extraData
-			});
+			} else
+				this.elementObject.addEventSource({
+					url: this.source,
+					extraParams: this.extraData,
+				});
 
 			this.elementObject.refetchEvents();
 		}

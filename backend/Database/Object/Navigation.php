@@ -18,6 +18,7 @@ class Navigation extends CustomObject
         "name" => "string",
         "icon" => "string",
         "minimumRights" => "binary",
+        "settings" => "json",
         "deleted" => "boolean"
     ];
 
@@ -29,7 +30,7 @@ class Navigation extends CustomObject
 
     public function init()
     {
-        $this->link = $this->redirect ? $this->link : Path::normalize("/" . ($this->parent ? $this->parent->link . "/" : "") . $this->link);
+        $this->link = $this->redirect ? $this->link : Path::normalize("/" . ($this->linked->parent ? $this->linked->parent->link . "/" : "") . $this->link);
         $this->active = Strings::contains(Helpers::getReletiveUrl(), $this->link);
         $this->target = $this->redirect ? "_blank" : "_self";
 

@@ -8,6 +8,6 @@ class SettingTab extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_setting_tab", \Database\Object\SettingTab::class);
+        parent::__construct("tbl_setting_tab", \Database\Object\SettingTab::class, guidField: false);
     }
 }

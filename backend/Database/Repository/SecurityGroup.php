@@ -8,6 +8,6 @@ class SecurityGroup extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_security_group", \Database\Object\SecurityGroup::class, orderField: 'name', deletedField: false);
+        parent::__construct("tbl_security_group", \Database\Object\SecurityGroup::class, orderField: 'name', deletedField: false, guidField: false);
     }
 }

@@ -10,10 +10,7 @@
 <body>
 	<div class="page">
 		{{component:navbar}}
-
-		<div class="sticky-top">
-			{{component:header}}
-		</div>
+		{{component:header}}
 
 		<div class="page-wrapper">
 			{{component:generalMessage}}
@@ -25,14 +22,14 @@
 					{{content:page}}
 				</div>
 			</div>
-
 			{{component:footer}}
+
 		</div>
 	</div>
 
 	{{component:modal}}
-	{{component:floatingButtons}}
 	{{component:toast}}
+
 
 	<script>
 		let pageId = "{{page:id}}";

@@ -16,4 +16,10 @@ class Setting extends CustomObject
         "order" => "int",
         "deleted" => "boolean"
     ];
+
+    protected $linkedAttributes = [
+        "settingTab" => [
+            "settingTabId" => \Database\Repository\SettingTab::class
+        ]
+    ];
 }

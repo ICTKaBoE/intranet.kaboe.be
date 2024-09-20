@@ -8,7 +8,7 @@ class SecurityGroupUser extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_security_group_user", \Database\Object\SecurityGroupUser::class, orderField: false, deletedField: false);
+        parent::__construct("tbl_security_group_user", \Database\Object\SecurityGroupUser::class, orderField: false, deletedField: false, guidField: false);
     }
 
     public function getByUserId($userId)

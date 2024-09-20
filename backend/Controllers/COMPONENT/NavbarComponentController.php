@@ -51,6 +51,7 @@ class NavbarComponentController extends ComponentController
 		$topLevelItems = $navigationRepo->getByParentId(0);
 
 		foreach ($topLevelItems as $tli) {
+			if ($tli->order < 0) continue;
 			if (!User::canAccess($tli->minimumRights)) continue;
 
 			$subLevelItems = $navigationRepo->getByParentId($tli->id);
