@@ -68,7 +68,7 @@
                 <div class="col-12">
                     <label class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="block.future.enabled" name="block.future.enabled">
-                        <span class="form-check-label">Blokkeer registraties in het verleden</span>
+                        <span class="form-check-label">Blokkeer registraties in de toekomst</span>
                     </label>
                 </div>
 

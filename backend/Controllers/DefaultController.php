@@ -156,6 +156,7 @@ class DefaultController extends stdClass
 	{
 		$settings = $this->getModuleSettings();
 
+		if (!$settings) return;
 		foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) {
 			$this->layout = str_replace('{{module:' . $key . '}}', $value, $this->layout);
 		}
@@ -183,14 +184,6 @@ class DefaultController extends stdClass
 		foreach ($user->toArray() as $key => $value) {
 			$this->layout = str_replace("{{user:{$key}}}", $value ?? "", $this->layout);
 		}
-
-		// $profile = (new UserProfile)->getByUserId($user->id);
-
-
-
-		// foreach ($profile as $key => $value) {
-		// 	$this->layout = str_replace("{{user:profile.{$key}}}", $value, $this->layout);
-		// }
 	}
 
 	// Getters
@@ -287,10 +280,10 @@ class DefaultController extends stdClass
 	private function getModuleSettings()
 	{
 		$repo = new Navigation;
-		$module = Arrays::first($repo->getByParentIdAndLink(0, Helpers::getModule()));
+		$module = Arrays::firstOrNull($repo->getByParentIdAndLink(0, Helpers::getModule()));
+		if (!$module) return [];
 
 		Session::set("moduleSettingsId", $module->id);
-
 		if ($module->settings !== null) $settings = $module->settings;
 
 		return $settings;

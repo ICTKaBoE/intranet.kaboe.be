@@ -6,6 +6,7 @@ use Router\Helpers;
 use Pecee\Http\Request;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Setting;
+use Ouzo\Utilities\Arrays;
 use Pecee\Http\Middleware\IMiddleware;
 use Security\User;
 
@@ -19,9 +20,8 @@ class DefaultMiddleware implements IMiddleware
 
     private function checkUserCanAccess()
     {
-        // $folder = Helpers::getReletiveUrl();
         $folder = Helpers::getDirectory();
-        $defaultPage = (new Setting)->get(id: (User::isSignedIn() ? "page.default.afterLogin" : "page.default.public"))[0]->value;
+        $defaultPage = Arrays::first((new Setting)->get(id: (User::isSignedIn() ? "page.default.afterLogin" : "page.default.public")))->value;
 
         if (User::isSignedIn()) {
             if (Strings::isBlank($folder) && !Strings::startsWith($folder, "/error") && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
