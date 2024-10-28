@@ -9,7 +9,7 @@ class User extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_user", \Database\Object\User::class, orderField: "name", guidField: false);
+        parent::__construct("tbl_user", \Database\Object\User::class, orderField: "name");
     }
 
     public function getByUsername($username)
@@ -28,10 +28,18 @@ class User extends Repository
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
-    public function getByInformatEmployeeId($informatEmployeeId)
+    public function getByInformatId($informatId)
     {
         $statement = $this->prepareSelect();
-        $statement->where('informatEmployeeId', $informatEmployeeId);
+        $statement->where('informatId', $informatId);
+
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
+    public function getByEmployeeId($employeeId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('employeeId', $employeeId);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

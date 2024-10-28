@@ -40,9 +40,10 @@ define("ROUTER_DEFAULT_CONTROLLER", "\\Controllers\\DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");
+define("SELECT_OTHER_ID", "O");
 define("SELECT_OTHER_VALUE", "Andere");
 
 define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
-// define("INFORMAT_CURRENT_SCHOOLYEAR", "2024-25");
+// define("INFORMAT_CURRENT_SCHOOLYEAR", "2022-23");
 
 define("EMAIL_SUFFIX", "coltd.be");

@@ -17,13 +17,24 @@ class CronController extends ApiController
             else $this->appendToJson('importInformat', 'failed');
         }
 
-        if (Strings::equalsIgnoreCase($action, "importM365")) {
-            \Controllers\API\Cron\M365::Import();
+        if (Strings::equalsIgnoreCase($action, "importM365Users")) {
+            if (\Controllers\API\Cron\M365::ImportUsers()) $this->appendToJson('importM365Users', 'passed');
+            else $this->appendToJson('importM365Users', 'failed');
+        }
+
+        if (Strings::equalsIgnoreCase($action, "importM365Computers")) {
+            if (\Controllers\API\Cron\M365::ImportComputers()) $this->appendToJson('importM365Computers', 'passed');
+            else $this->appendToJson('importM365Computers', 'failed');
         }
 
         if (Strings::equalsIgnoreCase($action, "local")) {
             if (\Controllers\API\Cron\Local::Prepare()) $this->appendToJson('local', 'passed');
             else $this->appendToJson('local', 'failed');
+        }
+
+        if (Strings::equalsIgnoreCase($action, "importJamfIpads")) {
+            if (\Controllers\API\Cron\JAMF::ImportIPads()) $this->appendToJson('importJamfIpads', 'passed');
+            else $this->appendToJson('importJamfIpads', 'failed');
         }
 
         $this->handle();

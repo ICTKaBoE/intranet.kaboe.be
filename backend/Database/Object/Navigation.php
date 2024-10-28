@@ -30,12 +30,12 @@ class Navigation extends CustomObject
 
     public function init()
     {
-        $this->link = $this->redirect ? $this->link : Path::normalize("/" . ($this->linked->parent ? $this->linked->parent->link . "/" : "") . $this->link);
-        $this->active = Strings::contains(Helpers::getReletiveUrl(), $this->link);
-        $this->target = $this->redirect ? "_blank" : "_self";
+        $this->formatted->link = $this->redirect ? $this->link : Path::normalize("/" . ($this->linked->parent ? $this->linked->parent->formatted->link . "/" : "") . $this->link);
+        $this->formatted->active = Strings::contains(Helpers::getReletiveUrl(), $this->formatted->link);
+        $this->formatted->target = $this->redirect ? "_blank" : "_self";
 
-        $this->isActive = $this->active ? 'active' : '';
-        $this->isShow = $this->active ? 'show' : '';
-        $this->isAriaExpanded = $this->active ? 'true' : 'false';
+        $this->formatted->isActive = $this->formatted->active ? 'active' : '';
+        $this->formatted->isShow = $this->formatted->active ? 'show' : '';
+        $this->formatted->isAriaExpanded = $this->formatted->active ? 'true' : 'false';
     }
 }

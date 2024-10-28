@@ -53,3 +53,7 @@ div.dt-search {
 div.dt-paging .pagination {
   justify-content: end !important;
 }
+
+td:first-child {
+  white-space: nowrap;
+}

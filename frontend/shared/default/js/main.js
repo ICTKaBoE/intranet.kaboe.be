@@ -12,7 +12,7 @@ import Clock from "./object/Clock.js";
 import NoteScreen from "./object/NoteScreen.js";
 import ColorInput from "./object/ColorInput.js";
 import SearchField from "./object/SearchField.js";
-import Legenda from "./object/Legenda.js";
+import List from "./object/List.js";
 
 Toast.Create();
 Button.ScanAndCreate();
@@ -23,7 +23,7 @@ Calendar.ScanAndCreate();
 DatePicker.ScanAndCreate();
 TinyMCE.ScanAndCreate();
 Chart.ScanAndCreate();
-Legenda.ScanAndCreate();
+List.ScanAndCreate();
 
 window.checkAllLoadedCallback = () => {
 	Form.ScanAndCreate();

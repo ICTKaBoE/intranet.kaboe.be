@@ -3,14 +3,12 @@
 namespace Controllers\API\Cron;
 
 use Database\Object\User as ObjectUser;
-use Database\Object\UserAddress as ObjectUserAddress;
+use Database\Repository\Informat\Teacher;
+use Database\Repository\Informat\TeacherFreefield;
 use Database\Repository\School;
-use Database\Repository\SchoolInstitute;
 use Database\Repository\Setting;
 use Database\Repository\User;
-use Database\Repository\UserAddress;
-use Informat\Repository\Employee;
-use Informat\Repository\EmployeeOwnfield;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Security\Input;
 
@@ -18,61 +16,41 @@ abstract class Local
 {
     public static function Prepare()
     {
-        $informatToUser = self::InformatEmployeeToUser();
+        $informatToUser = self::InformatTeacherToUser();
 
         return ($informatToUser);
     }
 
-    private static function InformatEmployeeToUser()
+    private static function InformatTeacherToUser()
     {
-        $schoolRepo = new School;
-        $institutes = (new SchoolInstitute)->get();
+        $informatTeacherRepo = new Teacher;
+        $informatTeacherFreefields = new TeacherFreefield;
         $userRepo = new User;
-        $userAddressRepo = new UserAddress;
-        $informatEmployeeRepo = new Employee;
-        $informatEmployeeOwnfieldRepo = new EmployeeOwnfield;
-        $emailFormat = (new Setting)->get("sync.email.format")[0]->value;
+        $settingRepo = new Setting;
+        $schools = (new School)->get();
+        $mainSchoolField = $settingRepo->get("informat.ownfieldname.mainSchool")[0]->value;
+        $statusField = $settingRepo->get("informat.ownfieldname.status")[0]->value;
+        $emailFormat = $settingRepo->get("sync.email.format")[0]->value;
 
-        foreach ($institutes as $institute) {
-            $employees = $informatEmployeeRepo->get($institute->numberNewFormat);
+        $teachers = $informatTeacherRepo->get();
 
-            foreach ($employees as $employee) {
-                $employeeOwnfields = $informatEmployeeOwnfieldRepo->get($institute->numberNewFormat, $employee->personId);
+        foreach ($teachers as $teacher) {
+            $user = $userRepo->getByInformatId($teacher->informatId) ?? new ObjectUser;
+            if (!$user->id && !$teacher->active) continue;
 
-                $user = $userRepo->getByInformatEmployeeId($employee->pPersoon) ?? (new ObjectUser);
-                $user->informatEmployeeId = $employee->pPersoon;
-                $user->name = $employee->naam;
-                $user->firstName = $employee->voornaam;
-                $user->username = Input::createEmail($emailFormat, $user->firstName, $user->name, EMAIL_SUFFIX);
-                $user->mainSchoolId = $institute->schoolId;
-                $user->bankAccount = $employee->bank->iban;
-                $user->active = $employee->isActive;
+            $mainSchool = $informatTeacherFreefields->getByInformatTeacherIdSesionAndDescription($teacher->informatId, "Tewerkstelling", $mainSchoolField);
+            $status = $informatTeacherFreefields->getByInformatTeacherIdSesionAndDescription($teacher->informatId, "Tewerkstelling", $statusField);
 
-                foreach ($employeeOwnfields as $of) {
-                    if (Strings::equal($of->naam, "pedagogische school 1")) {
-                        $user->mainSchoolId = $schoolRepo->getByName($of->waarde)->id;
-                        break;
-                    }
-                }
+            $user->informatId = $teacher->informatId;
+            $user->mainSchoolId = Arrays::firstOrNull(Arrays::filter($schools, fn($s) => Strings::equal($s->name, $mainSchool->value)))->id;
+            $user->username = Input::createEmail($emailFormat, $teacher->firstName, $teacher->name, EMAIL_SUFFIX);
+            $user->name = $teacher->name;
+            $user->firstName = $teacher->firstName;
+            $user->bankAccount = $teacher->bankAccount;
+            $user->active = $teacher->active;
+            if ($status) $user->active = Strings::equal($status->value, "IN DIENST");
 
-                $newId = $userRepo->set($user);
-                if (!$user->id) $user->id = $newId;
-
-                foreach ($employee->adressen as $address) {
-                    $userAddress = $userAddressRepo->getByInformatId($address->id) ?? (new ObjectUserAddress);
-                    $userAddress->userId = $user->id;
-                    $userAddress->informatId = $address->id;
-                    $userAddress->street = $address->straat;
-                    $userAddress->number = $address->nummer;
-                    $userAddress->bus = $address->bus;
-                    $userAddress->zipcode = $address->postcode;
-                    $userAddress->city = $address->gemeente;
-                    $userAddress->country = $address->landCode;
-                    $userAddress->current = $address->isDomicilie;
-
-                    $userAddressRepo->set($userAddress);
-                }
-            }
+            $userRepo->set($user);
         }
 
         return true;

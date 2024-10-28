@@ -3,7 +3,8 @@
 		<div class="col">
 			<div class="row">
 				<div class="d-none d-lg-flex col-2">{{component:searchField}}</div>
-				<div class="col">{{component:actionButtons}}</div>
+				<div class="col-auto">{{component:actionButtons}}</div>
+				<div class="d-none d-lg-flex col-auto">{{component:extraPageInfo}}</div>
 			</div>
 		</div>
 
@@ -14,7 +15,6 @@
 						<span class="avatar avatar-sm">{{user:initials}}</span>
 						<div class="d-none d-xl-block ps-2">
 							<div>{{user:fullName}}</div>
-							<div class="mt-1 small text-muted">{{user:jobTitle}} ({{user:companyName}})</div>
 						</div>
 					</a>
 					<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">

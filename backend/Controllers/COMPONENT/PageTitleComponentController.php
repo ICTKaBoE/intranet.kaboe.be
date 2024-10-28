@@ -20,13 +20,12 @@ class PageTitleComponentController extends ComponentController
 	{
 		$module = Helpers::getModule();
 		$page = Helpers::getPage();
-		$id = Helpers::getId();
 
 		$navigationRepo = new Navigation;
 		$moduleNavigation = Arrays::first($navigationRepo->getByParentIdAndLink(0, $module));
 		$pageNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page));
 
-		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name) . (is_null($id) ? '' : (Strings::equal($id, "add") ? " - Toevoegen" : " - Bewerken"));
+		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);
 		$this->layout = str_replace("{{page:title}}", $pagetitle, $this->layout);
 	}
 }

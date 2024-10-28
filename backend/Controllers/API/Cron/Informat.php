@@ -2,21 +2,13 @@
 
 namespace Controllers\API\Cron;
 
-use Informat\Repository\Employee;
+use Database\Object\Informat\Teacher as InformatTeacher;
+use Database\Object\Informat\TeacherFreefield as InformatTeacherFreefield;
+use Database\Repository\Informat\Teacher;
+use Database\Repository\Informat\TeacherFreefield;
 use Database\Repository\SchoolInstitute;
-use Database\Repository\InformatEmployee;
-use Database\Repository\InformatEmployeeNumber;
-use Database\Repository\InformatEmployeeAddress;
-use Mapper\InformatEmployeeToDatabaseInformatEmployee;
-use Database\Object\InformatEmployee as ObjectInformatEmployee;
-use Mapper\InformatEmployeeNumberToDatabaseInformatEmployeeNumber;
-use Mapper\InformatEmployeeAddressToDatabaseInformatEmployeeAddress;
-use Database\Object\InformatEmployeeNumber as ObjectInformatEmployeeNumber;
-use Database\Object\InformatEmployeeAddress as ObjectInformatEmployeeAddress;
-use Database\Object\InformatEmployeeOwnfield as ObjectInformatEmployeeOwnfield;
-use Database\Repository\InformatEmployeeOwnfield;
-use Informat\Repository\EmployeeOwnfield;
-use Mapper\InformatEmployeeOwnfieldToDatabaseInformatEmployeeOwnfield;
+use Informat\SOAP\Repository\Leerkrachten;
+use Informat\SOAP\Repository\LeerkrachtenVrijevelden;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 
@@ -24,53 +16,57 @@ abstract class Informat
 {
     static public function Import()
     {
-        $employee = self::Employee();
+        $employee = self::Teacher();
         $students = self::Students();
 
         return ($employee && $students);
     }
 
-    static public function Employee()
+    static public function Teacher()
     {
-        $informatEmployeeRepo = new Employee;
-        $informatEmployeeOwnfieldRepo = new EmployeeOwnfield;
-        $dbInformatEmployeeRepo = new InformatEmployee;
-        $dbInformatEmployeeAddressRepo = new InformatEmployeeAddress;
-        $dbInformatEmployeeNumberRepo = new InformatEmployeeNumber;
-        $dbInformatEmployeeOwnfieldRepo = new InformatEmployeeOwnfield;
+        $informatLeerkrachtenRepo = new Leerkrachten;
+        $informatLeerkrachtVrijeveldenRepo = new LeerkrachtenVrijevelden;
+        $schoolInstitutes = (new SchoolInstitute)->get();
 
-        foreach ((new SchoolInstitute)->get() as $institute) {
-            $employees = $informatEmployeeRepo->get($institute->numberNewFormat);
-            $employeeOwnfields = $informatEmployeeOwnfieldRepo->get($institute->numberNewFormat);
+        foreach ($schoolInstitutes as $institute) {
+            $informatLeerkrachtenRepo->setInstituteNumber($institute->numberNewFormat);
+            $informatLeerkrachtVrijeveldenRepo->setInstituteNumber($institute->numberNewFormat);
 
-            foreach ($employees as $employee) {
-                $dbInformatEmployee = $dbInformatEmployeeRepo->getByInformatId($employee->pPersoon) ?? (new ObjectInformatEmployee);
-                $dbInformatEmployee = (new InformatEmployeeToDatabaseInformatEmployee)->map($employee, $dbInformatEmployee);
-                $newId = $dbInformatEmployeeRepo->set($dbInformatEmployee);
+            $leerkrachten = $informatLeerkrachtenRepo->get();
+            $vrijeVelden = $informatLeerkrachtVrijeveldenRepo->get();
 
-                if (!$dbInformatEmployee->id) $dbInformatEmployee->id = $newId;
+            $teacherRepo = new Teacher;
+            foreach ($leerkrachten as $leerkracht) {
+                $teacher = $teacherRepo->getByInformatId($leerkracht->p_persoon) ?? new InformatTeacher;
+                $teacher->informatId = $leerkracht->p_persoon;
+                $teacher->basenumber = $leerkracht->Stamnummer;
+                $teacher->name = $leerkracht->Naam;
+                $teacher->firstName = $leerkracht->Voornaam;
+                $teacher->schoolyear = $leerkracht->Schooljaar;
+                $teacher->homePhone = $leerkracht->Thuistelefoon;
+                $teacher->mobilePhone = $leerkracht->Gsm;
+                $teacher->email = $leerkracht->Prive_email;
+                $teacher->street = $leerkracht->Straat;
+                $teacher->number = $leerkracht->Nr;
+                $teacher->bus = $leerkracht->Bus;
+                $teacher->zipcode = $leerkracht->Dlpostnr;
+                $teacher->city = $leerkracht->Dlgem;
+                $teacher->countryCode = $leerkracht->Landcode;
+                $teacher->active = Strings::equal($leerkracht->Actief, "J");
+                $teacher->bankAccount = $leerkracht->Iban;
 
-                foreach ($employee->adressen as $address) {
-                    $dbInformatEmployeeAddress = $dbInformatEmployeeAddressRepo->getByInformatId($address->id) ?? (new ObjectInformatEmployeeAddress);
-                    $dbInformatEmployeeAddress->informatEmployeeId = $dbInformatEmployee->id;
-                    $dbInformatEmployeeAddress = (new InformatEmployeeAddressToDatabaseInformatEmployeeAddress)->map($address, $dbInformatEmployeeAddress);
-                    $dbInformatEmployeeAddressRepo->set($dbInformatEmployeeAddress);
-                }
+                $teacherRepo->set($teacher);
+            }
 
-                foreach ($employee->comnrs as $number) {
-                    $dbInformatEmployeeNumber = $dbInformatEmployeeNumberRepo->getByInformatId($number->id) ?? (new ObjectInformatEmployeeNumber);
-                    $dbInformatEmployeeNumber->informatEmployeeId = $dbInformatEmployee->id;
-                    $dbInformatEmployeeNumber = (new InformatEmployeeNumberToDatabaseInformatEmployeeNumber)->map($number, $dbInformatEmployeeNumber);
-                    $dbInformatEmployeeNumberRepo->set($dbInformatEmployeeNumber);
-                }
+            $teacherFreefieldRepo = new TeacherFreefield;
+            foreach ($vrijeVelden as $vrijveld) {
+                $freefield = $teacherFreefieldRepo->getByInformatTeacherIdSesionAndDescription($vrijveld->pPersoon, $vrijveld->Rubriek, $vrijveld->OmschrijvingVrijVeld) ?? new InformatTeacherFreefield;
+                $freefield->informatTeacherId = $vrijveld->pPersoon;
+                $freefield->description = $vrijveld->OmschrijvingVrijVeld;
+                $freefield->value = $vrijveld->WaardeVrijVeld;
+                $freefield->section = $vrijveld->Rubriek;
 
-                $_employeeOwnfields = Arrays::filter($employeeOwnfields, fn($eof) => Strings::equal($eof->personId, $employee->personId));
-                foreach ($_employeeOwnfields as $eof) {
-                    $dbInformatEmployeeOwnfield = $dbInformatEmployeeOwnfieldRepo->getByInformatIdAndInformatEmployeeId($eof->vvId, $dbInformatEmployee->id) ?? (new ObjectInformatEmployeeOwnfield);
-                    $dbInformatEmployeeOwnfield->informatEmployeeId = $dbInformatEmployee->id;
-                    $dbInformatEmployeeOwnfield = (new InformatEmployeeOwnfieldToDatabaseInformatEmployeeOwnfield)->map($eof, $dbInformatEmployeeOwnfield);
-                    $dbInformatEmployeeOwnfieldRepo->set($dbInformatEmployeeOwnfield);
-                }
+                $teacherFreefieldRepo->set($freefield);
             }
         }
 

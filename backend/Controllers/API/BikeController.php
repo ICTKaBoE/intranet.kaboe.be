@@ -53,7 +53,7 @@ class BikeController extends ApiController
         $this->handle();
     }
 
-    public function delete($what, $id = null)
+    public function delete($view, $what, $id = null)
     {
         if (Strings::equal($what, "distance")) $this->deleteDistance($id);
 
@@ -90,7 +90,7 @@ class BikeController extends ApiController
                         "width" => "20px"
                     ],
                     [
-                        "data" => "formatted.colorBadge",
+                        "data" => "formatted.badge.color",
                         "width" => "20px",
                         "orderable" => false,
                         "searchable" => false
@@ -98,12 +98,14 @@ class BikeController extends ApiController
                     [
                         "title" => "Alias",
                         "data" => "alias",
-                        "width" => "10%"
+                        "width" => "10%",
+                        "priority" => 1
                     ],
                     [
                         "title" => "Type",
                         "data" => "mapped.type",
-                        "width" => "10%"
+                        "width" => "10%",
+                        "priority" => 2
                     ],
                     [
                         "title" => "Start Locatie",
@@ -112,13 +114,15 @@ class BikeController extends ApiController
                     [
                         "title" => "Eindbestemming",
                         "data" => "linked.endSchool.name",
-                        "width" => "10%"
+                        "width" => "10%",
+                        "priority" => 4
                     ],
                     [
                         "type" => "double",
                         "title" => "Afstand",
                         "data" => "formatted.distanceWithDouble",
-                        "width" => "10%"
+                        "width" => "10%",
+                        "priority" => 3
                     ]
                 ]
             );
@@ -133,7 +137,7 @@ class BikeController extends ApiController
             $this->appendToJson("rows", array_values($distances));
         } else if (Strings::equal($view, "select")) {
         } else if (Strings::equal($view, "form")) $this->appendToJson('fields', $repo->get($id)[0]);
-        else if (Strings::equal($view, "legenda")) {
+        else if (Strings::equal($view, "list")) {
             $type = Helpers::input()->get('type')->getValue();
             $this->appendToJson('items', $repo->getByUserIdAndType($currentUserId, $type));
         }
@@ -204,7 +208,6 @@ class BikeController extends ApiController
             if ($this->validationIsAllGood()) {
                 $item = $id ? Arrays::first($repo->get($id)) : new ObjectBikeDistance;
                 $item->userId = User::getLoggedInUser()->id;
-                $item->guid = $id ? $item->guid : GUID::create();
                 $item->alias = $alias;
                 $item->type = $type;
                 $item->startId = $startId;
@@ -298,7 +301,7 @@ class BikeController extends ApiController
 
         $repo = new Navigation;
         $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = json_encode($settings);
+        $item->settings = json_encode(array_replace_recursive($item->settings, $settings));
 
         $repo->set($item, ['settings']);
         $this->setToast("De instellingen zijn opgeslagen!");

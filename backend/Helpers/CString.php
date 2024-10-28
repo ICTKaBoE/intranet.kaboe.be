@@ -28,6 +28,29 @@ abstract class CString
 		return number_format($value, $round, $decimal, $thousands);
 	}
 
+	public static function formatMacAddress($value, $inBetween = ":")
+	{
+		return join($inBetween, str_split(str_replace([":", "-", " "], "", $value), 2));
+	}
+
+	public static function formatLink($value)
+	{
+		return "<a href='https://{$value}' target='_blank'>$value</a>";
+	}
+
+	public static function formatPassword($value)
+	{
+		$ret = "";
+		for ($i = 0; $i < strlen($value); $i++) $ret .= "*";
+
+		return $ret;
+	}
+
+	public static function leadingZeros($value, $fullLength)
+	{
+		return sprintf("%0{$fullLength}d", $value);
+	}
+
 	public static function noHtml($value)
 	{
 		return strip_tags($value);

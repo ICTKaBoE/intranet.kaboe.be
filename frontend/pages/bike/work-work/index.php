@@ -1,5 +1,5 @@
 <?php
-const LEGENDA_TEMPLATE = "  <div class='row mb-1 bg-@color@'>
+const LIST_TEMPLATE = "  <div class='row mb-1 bg-@color@'>
 								<div class='text-@textColor@'>@alias@ <i>(@formatted.distance@)</i></div>
 							</div>";
 ?>
@@ -19,7 +19,7 @@ const LEGENDA_TEMPLATE = "  <div class='row mb-1 bg-@color@'>
                 <h4 class="card-title">Legenda</h4>
             </div>
 
-            <div class="card-body" role="legenda" id="leg{{page:id}}" data-source="{{legenda:url:short}}/{{url:part.module}}/distance" data-template="<?= LEGENDA_TEMPLATE; ?>" data-extra="[type=WW]"></div>
+            <div class="card-body" role="list" id="lst{{page:id}}" data-source="{{list:url:short}}/{{url:part.module}}/distance" data-template="<?= LIST_TEMPLATE; ?>" data-extra="[type=WW]"></div>
             <div class="card-body">
                 <div class="row mb-1 bg-blue">
                     <div class="text-white">Feestdag / Schoolvakantie</div>

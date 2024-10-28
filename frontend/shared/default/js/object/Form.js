@@ -30,6 +30,7 @@ export default class Form {
 		this.buttons = {};
 		this.activeStep = 0;
 		this.lastLoadedId = null;
+		this.locked = false;
 
 		this.init();
 	}
@@ -79,6 +80,7 @@ export default class Form {
 				this.defaultStates[el.id] = {
 					readonly: el.hasAttribute("readonly"),
 					disabled: el.hasAttribute("disabled"),
+					noLock: el.hasAttribute("data-no-lock"),
 				};
 			});
 	};
@@ -252,6 +254,7 @@ export default class Form {
 			.find(":input")
 			.each((idx, el) => {
 				if (!el.id) return;
+				if (this.defaultStates[el.id]?.noLock === true) return;
 
 				if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.disable();
 				else if (el.role === "tinymce")
@@ -358,11 +361,18 @@ export default class Form {
 			}
 		};
 
+		let url = new URL(
+			this.action + (this.lastLoadedId ? `/${this.lastLoadedId}` : "")
+		);
+		if (stepCheck) url.searchParams.set("stepCheck", null);
+		if (new URL(window.location.href).searchParams.has("redirect"))
+			url.searchParams.set(
+				"redirect",
+				new URL(window.location.href).searchParams.get("redirect")
+			);
+
 		return Helpers.request({
-			url:
-				this.action +
-				(this.lastLoadedId ? `/${this.lastLoadedId}` : "") +
-				(stepCheck ? "?stepCheck" : ""),
+			url: url.toString(),
 			method: this.method,
 			data: data,
 			done: done,
@@ -416,6 +426,7 @@ export default class Form {
 		});
 
 		if (this.lockedValue) {
+			this.locked = fields[this.lockedValue];
 			if (fields[this.lockedValue] === true) this.disable();
 			else this.enable();
 		}

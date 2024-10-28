@@ -9,6 +9,8 @@
             </div>
 
             <form action="{{api:url}}/user/login" method="post" autocomplete="off" id="frm{{page:id}}">
+                <input type="hidden" name="redirect" id="redirect">
+
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label" for="username">Email</label>

@@ -5,16 +5,13 @@ namespace Controllers;
 use stdClass;
 use Security\User;
 use Router\Helpers;
+use Security\Session;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Module;
-use O365\AuthenticationManager;
+use M365\AuthenticationManager;
 use Database\Repository\Setting;
 use Database\Repository\Navigation;
-use Database\Repository\UserProfile;
-use Database\Repository\ModuleSetting;
-use Security\Session;
 
 class DefaultController extends stdClass
 {
@@ -30,6 +27,7 @@ class DefaultController extends stdClass
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
 		"actionButtons" => \Controllers\COMPONENT\ActionButtonsComponentController::class,
 		"searchField" => \Controllers\COMPONENT\SearchFieldComponentController::class,
+		"extraPageInfo" => \Controllers\COMPONENT\ExtraPageInfoComponentController::class,
 		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
 		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
 	];
@@ -122,7 +120,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{chart:url:short}}", "{{api:url}}/chart", $this->layout);
 		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
-		$this->layout = str_replace("{{legenda:url:short}}", "{{api:url}}/legenda", $this->layout);
+		$this->layout = str_replace("{{list:url:short}}", "{{api:url}}/list", $this->layout);
 
 		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
@@ -131,9 +129,9 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
-		$this->layout = str_replace("{{legenda:url:full}}", "{{api:url}}/legenda/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{list:url:full}}", "{{api:url}}/list/{{url:part.module}}/{{url:part.page}}", $this->layout);
 
-		// $this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
+		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(), $this->layout);
 
 		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{setting:api.version}}", $this->layout);
 	}
@@ -181,7 +179,7 @@ class DefaultController extends stdClass
 		$user = User::getLoggedInUser();
 		if (!$user) return;
 
-		foreach ($user->toArray() as $key => $value) {
+		foreach ($user->toArray(true) as $key => $value) {
 			$this->layout = str_replace("{{user:{$key}}}", $value ?? "", $this->layout);
 		}
 	}

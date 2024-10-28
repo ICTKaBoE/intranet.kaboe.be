@@ -109,20 +109,19 @@ class ApiController extends stdClass
 
 	protected function appendToJson($key = [], $data = false)
 	{
-		if ($data) {
-			if (!is_null($key) && !empty($key)) {
-				if (is_string($key)) $key = [$key];
-				Arrays::setNestedValue($this->json, $key, $data);
-			} else $this->json[] = $data;
-		}
+		if (!is_null($key) && !empty($key)) {
+			if (is_string($key)) $key = [$key];
+			Arrays::setNestedValue($this->json, $key, $data);
+		} else $this->json[] = $data;
 	}
 
 	protected function validationIsAllGood()
 	{
 		$validation = count($this->validation) == Arrays::count($this->validation, fn($v) => Strings::equal($v['state'], self::VALIDATION_STATE_VALID));
 		$toast = count($this->toast) == Arrays::count($this->toast, fn($t) => Strings::equal($t['type'], self::VALIDATION_STATE_VALID));
+		$error = is_null($this->error);
 
-		return ($validation && $toast);
+		return ($validation && $toast && $error);
 	}
 
 	protected function getValidation()

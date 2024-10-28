@@ -21,6 +21,10 @@ export default class Select {
 		this.search = this.element.hasAttribute("data-search");
 		this.parent = this.element.dataset.parentSelect || false;
 		this.defaultDisabled = this.element.hasAttribute("disabled") || false;
+		this.optgroupAttribute =
+			this.element.dataset.optgroupAttribute || false;
+		this.optgroupValue = this.element.dataset.optgroupValue || false;
+		this.optgroupLabel = this.element.dataset.optgroupLabel || false;
 
 		this.eventListeners = [];
 		this.selectedDetails = false;
@@ -99,11 +103,10 @@ export default class Select {
 		this.element.setAttribute("role", "select");
 		this.element.removeAttribute("disabled");
 
+		await this.getData();
 		this.createSelect();
 		this.disable();
 		if (this.parent) this.detectParentAndSetFunctions();
-		await this.loadSelect();
-		// this.setEventListeners();
 		this.setDefaultValue();
 		if (!this.defaultDisabled) this.enable();
 		this.loaded = true;
@@ -114,9 +117,8 @@ export default class Select {
 		this.disable();
 		this.clear();
 		this.destroy();
+		await this.getData();
 		this.createSelect();
-		// if (this.parent) this.detectParentAndSetFunctions();
-		await this.loadSelect();
 		this.setEventListeners();
 		this.setDefaultValue();
 		if (!this.defaultDisabled) this.enable();
@@ -132,6 +134,7 @@ export default class Select {
 		let settings = {
 			plugins: this.multiple ? ["remove_button", "checkbox_options"] : [],
 			hideSelected: false,
+			duplicates: true,
 			maxOptions: null,
 			maxItems: this.multiple ? null : 1,
 			delimiter: this.multiple ? ";" : null,
@@ -149,15 +152,24 @@ export default class Select {
 			settings.render.item = (data, escape) => {
 				return window[this.render.item](data, escape);
 			};
+
 		if (this.render.option)
 			settings.render.option = (data, escape) => {
 				return window[this.render.option](data, escape);
 			};
+
 		if (this.onChange)
 			settings.onChange = (value) => {
 				window[this.onChange](value);
 			};
+
 		if (this.search) settings.controlInput = "<input>";
+
+		if (this.optgroupAttribute) {
+			settings.optgroupField = this.optgroupAttribute;
+			settings.optgroupValueField = this.optgroupValue;
+			settings.optgroupLabelField = this.optgroupLabel;
+		}
 
 		if (this.loadSource && this.loadValue && this.loadLabel) {
 			settings.valueField =
@@ -170,35 +182,27 @@ export default class Select {
 				this.loadLabel[this.selectedDetails || this.defaultDetails] ||
 					this.loadLabel,
 			];
+		}
 
-			settings.load = (query, callback) => {
-				$.get(
-					this.loadSource[
-						this.selectedDetails || this.defaultDetails
-					] || this.loadSource,
-					this.loadParams
-				)
-					.done((data) => {
-						callback(data.items);
-					})
-					.fail(() => {
-						callback();
-					});
-			};
+		if (this.data) {
+			if (this.data?.optgroups && this.optgroupAttribute)
+				settings.optgroups = this.data.optgroups;
+
+			settings.options = this.data.items;
 		}
 
 		this.tomSelect = new TomSelect(this.element, settings);
 	};
 
-	loadSelect = () => {
+	getData = () => {
 		if (!this.loadSource) return;
 
-		return new Promise((resolve, reject) => {
-			this.tomSelect.on("load", (data) => {
-				resolve();
-			});
-
-			this.tomSelect.load();
+		return $.get(
+			this.loadSource[this.selectedDetails || this.defaultDetails] ||
+				this.loadSource,
+			this.loadParams
+		).done((data) => {
+			this.data = data;
 		});
 	};
 
@@ -254,8 +258,8 @@ export default class Select {
 		this.setDefaultValue();
 	};
 
-	enable = () => {
-		if (this.defaultDisabled) return;
+	enable = (forced = false) => {
+		if (this.defaultDisabled && !forced) return;
 
 		if (this.tomSelect != undefined) this.tomSelect.enable();
 		else this.element.disabled = false;
@@ -275,14 +279,16 @@ export default class Select {
 	};
 
 	detectParentAndSetFunctions = () => {
-		if (!this.parentSelect)
-			this.parentSelect = Select.INSTANCES[this.parent];
+		setTimeout(() => {
+			if (!this.parentSelect)
+				this.parentSelect = Select.INSTANCES[this.parent];
 
-		if (this.parentSelect) {
-			this.parentSelect.setEventListener("change", (value) => {
-				this.setExtraLoadParam("parentValue", value);
-				this.reload();
-			});
-		}
+			if (this.parentSelect) {
+				this.parentSelect.setEventListener("change", (value) => {
+					this.setExtraLoadParam(this.parentSelect.id, value);
+					this.reload();
+				});
+			}
+		}, 500);
 	};
 }

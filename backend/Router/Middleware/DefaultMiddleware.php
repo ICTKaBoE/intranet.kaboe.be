@@ -21,12 +21,13 @@ class DefaultMiddleware implements IMiddleware
     private function checkUserCanAccess()
     {
         $folder = Helpers::getDirectory();
+        $redirect = Helpers::url()->getParam("redirect");
         $defaultPage = Arrays::first((new Setting)->get(id: (User::isSignedIn() ? "page.default.afterLogin" : "page.default.public")))->value;
 
         if (User::isSignedIn()) {
-            if (Strings::isBlank($folder) && !Strings::startsWith($folder, "/error") && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
+            if (Strings::isBlank($folder) && !Strings::startsWith($folder, "/error") && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage . ($redirect ? "?redirect={$redirect}" : ""));
         } else {
-            if (!Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
+            if (!Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage . ($redirect ? "?redirect={$redirect}" : ""));
         }
     }
 

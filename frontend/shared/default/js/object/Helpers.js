@@ -28,13 +28,6 @@ export default class Helpers {
 		window.location.href = url;
 	};
 
-	static addActionButton = (...buttons) => {
-		for (let button of buttons)
-			document
-				.getElementById("action-buttons")
-				.appendChild(button.write());
-	};
-
 	static generateId = (prefix = null, length = 12) => {
 		let result = "";
 		const characters =

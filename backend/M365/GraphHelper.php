@@ -2,26 +2,27 @@
 
 namespace M365;
 
+use Database\Repository\Setting;
 use Microsoft\Graph\Core\Authentication\GraphPhpLeagueAccessTokenProvider;
-use Microsoft\Graph\Generated\Models;
-use Microsoft\Graph\Generated\Users\UsersRequestBuilderGetQueryParameters;
-use Microsoft\Graph\Generated\Users\UsersRequestBuilderGetRequestConfiguration;
 use Microsoft\Graph\GraphServiceClient;
 use Microsoft\Kiota\Authentication\Oauth\ClientCredentialContext;
+use Ouzo\Utilities\Arrays;
 
 class GraphHelper
 {
-    private static string $clientId = '904777c1-08a6-4866-ac72-30ee26dd7724';
-    private static string $clientSecret = 'vNb8Q~3QduKyCZBXAYbayU3pQGO8zwtLgNHPRbPw';
-    private static string $tenantId = '360f4fe0-2089-4e49-9c9d-df601c5edef9';
+    private static string $clientId = '';
+    private static string $clientSecret = '';
+    private static string $tenantId = '';
+
     private static ClientCredentialContext $tokenContext;
-    private static GraphServiceClient $appClient;
+    public static GraphServiceClient $appClient;
 
     public static function initializeGraphForAppOnlyAuth(): void
     {
-        // GraphHelper::$clientId = $_ENV['CLIENT_ID'];
-        // GraphHelper::$clientSecret = $_ENV['CLIENT_SECRET'];
-        // GraphHelper::$tenantId = $_ENV['TENANT_ID'];
+        $settings = new Setting;
+        GraphHelper::$clientId = Arrays::first($settings->get("m365.client.id"))->value;
+        GraphHelper::$clientSecret = Arrays::first($settings->get("m365.client.secret"))->value;
+        GraphHelper::$tenantId = Arrays::first($settings->get("m365.tenant.id"))->value;
 
         GraphHelper::$tokenContext = new ClientCredentialContext(
             GraphHelper::$tenantId,
@@ -33,5 +34,14 @@ class GraphHelper
             GraphHelper::$tokenContext,
             ['https://graph.microsoft.com/.default']
         );
+    }
+
+    public static function getAppOnlyToken(): string
+    {
+        // Create an access token provider to get the token
+        $tokenProvider = new GraphPhpLeagueAccessTokenProvider(GraphHelper::$tokenContext);
+        return $tokenProvider
+            ->getAuthorizationTokenAsync('https://graph.microsoft.com')
+            ->wait();
     }
 }

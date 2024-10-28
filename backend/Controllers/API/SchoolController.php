@@ -37,6 +37,9 @@ class SchoolController extends ApiController
             $items = $repo->get();
             $this->appendToJson('items', $items);
         } else if (Strings::equal($view, "form")) {
+        } else if (Strings::equal($view, "list")) {
+            $items = $repo->get();
+            $this->appendToJson('items', $items);
         }
     }
 
@@ -47,7 +50,7 @@ class SchoolController extends ApiController
         if (Strings::equal($view, "table")) {
         } else if (Strings::equal($view, "select")) {
             $address = $repo->get();
-            Arrays::each($address, fn($a) => $a->addressWithSchool = $a->formatted->addressWithSchool);
+            $address = Arrays::map($address, fn($a) => $a = $a->toArray(true));
             $this->appendToJson('items', $address);
         } else if (Strings::equal($view, "form")) {
         }

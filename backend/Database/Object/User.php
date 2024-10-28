@@ -9,8 +9,10 @@ class User extends CustomObject
 {
     protected $objectAttributes = [
         "id" => "int",
+        "guid" => "string",
         "entraId" => "string",
-        "informatEmployeeId" => "int",
+        "informatId" => "string",
+        "employeeId" => "int",
         "mainSchoolId" => "int",
         "username" => "string",
         "password" => "string",
@@ -18,6 +20,7 @@ class User extends CustomObject
         "firstName" => "string",
         "bankAccount" => "string",
         "active" => "boolean",
+        "api" => "boolean",
         "deleted" => "boolean"
     ];
 

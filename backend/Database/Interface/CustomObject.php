@@ -4,6 +4,7 @@ namespace Database\Interface;
 
 use Helpers\General;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 use ReflectionObject;
 use ReflectionProperty;
 use stdClass;
@@ -23,6 +24,9 @@ class CustomObject extends stdClass
         $this->mapped = new stdClass;
         $this->linked = new stdClass;
         $this->formatted = new stdClass;
+
+        $this->formatted->badge = new stdClass;
+        $this->formatted->icon = new stdClass;
 
         $this->createAttributes($attributes);
         $this->encode();
@@ -50,30 +54,33 @@ class CustomObject extends stdClass
 
         foreach ($this->linkedAttributes as $la => $prop) {
             $attribute = key($prop);
+
+            if (is_null($this->$attribute)) continue;
+
             $repo = $prop[$attribute];
-            $this->linked->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
+
+            if (Strings::contains($this->$attribute, ";")) {
+                $this->linked->$la = [];
+
+                foreach (explode(";", $this->$attribute) as $a) {
+                    $this->linked->$la[] = Arrays::firstOrNull((new $repo)->get($a));
+                }
+            } else $this->linked->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
         }
     }
 
     public function init() {}
 
-    public function toArray()
+    public function toArray($flatten = false)
     {
-        $array = [];
-        foreach ($this as $key => $value) {
-            if (is_array($value) || is_object($value)) continue;
-
-            $array[$key] = $value;
-        }
-
-        return $array;
+        return $flatten ? Arrays::flattenKeysRecursively(General::object_to_array($this)) : General::object_to_array($this);
     }
 
     public function toSqlArray()
     {
         $array = [];
-        foreach ($this->objectAttributes as $objAtt => $objExtra) {
-            $array[$objAtt] = $this->$objAtt;
+        foreach ($this->objectAttributes as $objKey => $objType) {
+            $array[$objKey] = General::deconvert($this->$objKey, $objType);
         }
 
         return $array;

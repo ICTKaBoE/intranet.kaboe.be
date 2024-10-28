@@ -13,7 +13,7 @@
  *  @link     http://GitHub.com/OfficeDev/O365-PHP-Microsoft-Graph-Connect
  */
 
-namespace O365;
+namespace M365;
 
 /** 
  *  Sends POST requests to the specified endpoint. 

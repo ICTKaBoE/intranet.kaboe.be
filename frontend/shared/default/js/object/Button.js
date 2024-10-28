@@ -84,9 +84,10 @@ export default class Button {
 		}
 	};
 
-	setOnClick = (funcName) => {
+	setOnClick = (func) => {
 		this.element.addEventListener("click", () => {
-			window[funcName]();
+			if (func instanceof Function) func();
+			else window[func]();
 		});
 	};
 

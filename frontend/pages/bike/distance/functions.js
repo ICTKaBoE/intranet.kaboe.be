@@ -3,6 +3,7 @@ import Helpers from "../../../shared/default/js/object/Helpers.js";
 import Table from "../../../shared/default/js/object/Table.js";
 import Select from "../../../shared/default/js/object/Select.js";
 import Form from "../../../shared/default/js/object/Form.js";
+import Component from "../../../shared/default/js/object/Component.js";
 
 window.changeLocationType = () => {
 	let type = Select.GetInstance("type").getValue();
@@ -28,6 +29,11 @@ window.filter = () => {
 
 	Helpers.closeAllModals();
 	Table.GetInstance(pageId).reload();
+};
+
+window.edit = () => {
+	let selected = Table.GetInstance(pageId).getSelectedRowData();
+	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
 };
 
 let btnFilter = new Button({
@@ -58,10 +64,7 @@ let btnEdit = new Button({
 		icon: "pencil",
 		title: "Bewerken",
 		bgColor: "orange",
-		onclick: () => {
-			let selected = Table.GetInstance(pageId).getSelectedRowData();
-			Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
-		},
+		onclick: "edit",
 	},
 });
 
@@ -73,7 +76,7 @@ let btnDelete = new Button({
 		bgColor: "red",
 		modal: "delete",
 		onclick: () => {
-			Form.GetInstance(pageId).setLastLoadedId(
+			Form.GetInstance(`${pageId}Delete`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
 					.map((r) => r.guid)
@@ -83,7 +86,7 @@ let btnDelete = new Button({
 	},
 });
 
-Helpers.addActionButton(btnFilter, btnAdd, btnEdit, btnDelete);
+Component.addActionButton(btnFilter, btnAdd, btnEdit, btnDelete);
 
 $(document).ready(() => {
 	Table.GetInstance(pageId).attachButton(btnEdit, "==1");

@@ -4,23 +4,24 @@ namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
 use Database\Repository\Navigation;
+use Ouzo\Utilities\Arrays;
 use Security\User;
 
 class NavbarComponentController extends ComponentController
 {
-	private const TEMPLATE_NAVBAR_ITEM = '<li class="nav-item {{navbar:item:isActive}}">
-											<a class="nav-link" href="{{navbar:item:link}}" target="{{navbar:item:target}}">
+	private const TEMPLATE_NAVBAR_ITEM = '<li class="nav-item {{navbar:item:formatted.isActive}}">
+											<a class="nav-link" href="{{navbar:item:formatted.link}}" target="{{navbar:item:formatted.target}}">
 												{{navbar:item:ifIcon}}
 												<span class="nav-link-title">{{navbar:item:name}}</span>
 											</a>
 										</li>{{navbar:items}}';
 
-	private const TEMPLATE_NAVBAR_ITEM_WITH_SUB =	'<li class="nav-item dropdown {{navbar:item:isActive}}">
-														<a class="nav-link dropdown-toggle {{navbar:item:isShow}}" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{navbar:item:isAriaExpanded}}">
+	private const TEMPLATE_NAVBAR_ITEM_WITH_SUB =	'<li class="nav-item dropdown {{navbar:item:formatted.isActive}}">
+														<a class="nav-link dropdown-toggle {{navbar:item:formatted.isShow}}" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{navbar:item:formatted.isAriaExpanded}}">
 															{{navbar:item:ifIcon}}
 															<span class="nav-link-title">{{navbar:item:name}}</span>
 														</a>
-														<div class="dropdown-menu {{navbar:item:isShow}}">
+														<div class="dropdown-menu {{navbar:item:formatted.isShow}}">
 															<div class="dropdown-menu-columns">
 																<div class="dropdown-menu-column">
 																	{{navbar:item:subitems}}
@@ -29,7 +30,7 @@ class NavbarComponentController extends ComponentController
 														</div>
 													</li>{{navbar:items}}';
 
-	private const TEMPLATE_NAVBAR_SUBITEM = '<a class="dropdown-item" href="{{navbar:subitem:link}}" target="{{navbar:subitem:target}}">{{navbar:subitem:ifIcon}}{{navbar:subitem:name}}</a>{{navbar:item:subitems}}';
+	private const TEMPLATE_NAVBAR_SUBITEM = '<a class="dropdown-item" href="{{navbar:subitem:formatted.link}}" target="{{navbar:subitem:formatted.target}}">{{navbar:subitem:ifIcon}}{{navbar:subitem:name}}</a>{{navbar:item:subitems}}';
 
 	private const TEMPLATE_NAVBAR_ITEM_ICON = 	'<span class="nav-link-icon">
 													<i class="icon ti ti-{{navbar:item:icon}}"></i>
@@ -58,7 +59,7 @@ class NavbarComponentController extends ComponentController
 
 			$template = (count($subLevelItems) ? self::TEMPLATE_NAVBAR_ITEM_WITH_SUB : self::TEMPLATE_NAVBAR_ITEM);
 			if ($tli->icon) $template = str_replace("{{navbar:item:ifIcon}}", self::TEMPLATE_NAVBAR_ITEM_ICON, $template);
-			foreach ($tli->toArray() as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?? "", $template);
+			foreach ($tli->toArray(true) as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?? "", $template);
 
 			if (count($subLevelItems)) {
 				foreach ($subLevelItems as $sli) {
@@ -66,7 +67,7 @@ class NavbarComponentController extends ComponentController
 
 					$sliTemplate = self::TEMPLATE_NAVBAR_SUBITEM;
 					if ($sli->icon) $sliTemplate = str_replace("{{navbar:subitem:ifIcon}}", self::TEMPLATE_NAVBAR_SUBITEM_ICON, $sliTemplate);
-					foreach ($sli->toArray() as $key => $value) $sliTemplate = str_replace("{{navbar:subitem:{$key}}}", $value ?? "", $sliTemplate);
+					foreach ($sli->toArray(true) as $key => $value) $sliTemplate = str_replace("{{navbar:subitem:{$key}}}", $value ?? "", $sliTemplate);
 
 					$template = str_replace("{{navbar:item:subitems}}", $sliTemplate, $template);
 				}

@@ -2,9 +2,10 @@
 
 namespace Helpers;
 
-use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Clock;
 use stdClass;
+use Ouzo\Utilities\Clock;
+use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 
 abstract class General
 {
@@ -21,6 +22,15 @@ abstract class General
         else if ($type == "date") $value = Clock::at($value)->format("Y-m-d");
         else if ($type == "datetime") $value = Clock::at($value)->format("Y-m-d H:i:s");
         else if ($type == "json") $value = json_decode($value, true);
+
+        return $value;
+    }
+
+    static public function deconvert($value, $origType)
+    {
+        if (is_null($value)) return $value;
+        else if ($origType == "list") $value = implode(PHP_EOL, $value);
+        else if ($origType == "binary") $value = implode("", $value);
 
         return $value;
     }
@@ -61,5 +71,26 @@ abstract class General
             $last = is_array($value) ? self::normalizeArray($value, $delimiter) : $value;
         }
         return $new;
+    }
+
+    static public function object_to_array($data)
+    {
+        $result = [];
+        foreach ($data as $key => $value) {
+            $result[$key] = (is_array($value) || is_object($value)) ? self::object_to_array($value) : $value;
+        }
+        return $result;
+    }
+
+    static public function filter(&$items, $filters)
+    {
+        foreach ($filters as $key => $value) {
+            if (!$value || empty($value)) continue;
+
+            if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
+            else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
+        }
+
+        // return $items;
     }
 }

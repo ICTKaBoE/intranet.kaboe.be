@@ -36,8 +36,8 @@
 		let siteVersion = ("{{setting:site.version}}").replaceAll(".", "");
 	</script>
 
-	{{content:page:js}}
 	{{load:body}}
+	{{content:page:js}}
 </body>
 
 </html>

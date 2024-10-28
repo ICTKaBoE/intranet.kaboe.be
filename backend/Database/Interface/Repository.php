@@ -5,6 +5,7 @@ namespace Database\Interface;
 use Database\Database;
 use Database\Interface\CustomObject;
 use Ouzo\Utilities\Arrays;
+use Security\GUID;
 use stdClass;
 
 class Repository extends stdClass
@@ -83,6 +84,7 @@ class Repository extends stdClass
     {
         unset($object[$this->idField]);
         unset($object[$this->deletedField]);
+        if ($this->guidField) $object[$this->guidField] = GUID::create();
 
         foreach ($object as $key => $value) {
             if (is_null($value)) unset($object[$key]);

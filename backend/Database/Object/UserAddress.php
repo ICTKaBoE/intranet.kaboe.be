@@ -29,6 +29,6 @@ class UserAddress extends CustomObject
 
     public function init()
     {
-        $this->formatted->address = "{$this->street} {$this->number}{$this->bus}, {$this->zipcode} {$this->city}";
+        $this->formatted->address = "{$this->street} {$this->number}" . ($this->bus ? "/{$this->bus}" : "") . ", {$this->zipcode} {$this->city}";
     }
 }

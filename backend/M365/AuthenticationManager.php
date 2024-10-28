@@ -17,11 +17,11 @@
     @abstract A PHP project that shows how to use the Microsoft Graph 
  */
 
-namespace O365;
+namespace M365;
 
 use Database\Repository\Setting;
 use Security\Session;
-use O365\RequestManager;
+use M365\RequestManager;
 use Router\Helpers;
 
 // We use the session to store tokens and data about the user. 
@@ -47,23 +47,18 @@ class AuthenticationManager
      *  @function connect
      *  @return   Nothing, redirects browser to authorize endpoint
      */
-    public static function connect($username = null, $autoRedirect = true)
+    public static function connect()
     {
         // Redirect the browser to the authorization endpoint. Auth endpoint is
         // https://login.microsoftonline.com/common/oauth2/authorize
-        $redirect = "{{o365.url.authority}}{{o365.endpoint.authorize}}?response_type=code&client_id={{o365.client.id}}&redirect_uri={{o365.url.callback}}";
-        if (!is_null($username)) $redirect .= "&login_hint=" . urlencode($username);
+        $redirect = "{{m365.url.authority}}{{m365.endpoint.authorize}}?response_type=code&client_id={{m365.client.id}}&redirect_uri={{m365.url.callback}}";
 
         foreach (array_reverse((new Setting)->get()) as $setting) {
             $redirect = str_replace('{{' . $setting->id . '}}', $setting->value, $redirect);
         }
-
         $redirect = str_replace("{{site:url}}", (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost(), $redirect);
 
-        if ($autoRedirect) {
-            header("Location: {$redirect}");
-            exit();
-        } else return $redirect;
+        return $redirect;
     }
 
     /**
@@ -77,11 +72,11 @@ class AuthenticationManager
      */
     public static function acquireToken()
     {
-        $tokenEndpoint = "{{o365.url.authority}}{{o365.endpoint.token}}";
-        $clientId = "{{o365.client.id}}";
-        $clientSecret = "{{o365.client.secret}}";
-        $redirectUri = "{{o365.url.callback}}";
-        $resource = "{{o365.url.resource}}";
+        $tokenEndpoint = "{{m365.url.authority}}{{m365.endpoint.token}}";
+        $clientId = "{{m365.client.id}}";
+        $clientSecret = "{{m365.client.secret}}";
+        $redirectUri = "{{m365.url.callback}}";
+        $resource = "{{m365.url.resource}}";
 
         foreach (array_reverse((new Setting)->get()) as $setting) {
             $tokenEndpoint = str_replace('{{' . $setting->id . '}}', $setting->value, $tokenEndpoint);
