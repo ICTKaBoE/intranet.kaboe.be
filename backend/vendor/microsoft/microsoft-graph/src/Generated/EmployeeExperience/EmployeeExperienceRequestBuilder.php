@@ -4,6 +4,8 @@ namespace Microsoft\Graph\Generated\EmployeeExperience;
 
 use Exception;
 use Http\Promise\Promise;
+use Microsoft\Graph\Generated\EmployeeExperience\Communities\CommunitiesRequestBuilder;
+use Microsoft\Graph\Generated\EmployeeExperience\EngagementAsyncOperations\EngagementAsyncOperationsRequestBuilder;
 use Microsoft\Graph\Generated\EmployeeExperience\LearningCourseActivities\LearningCourseActivitiesRequestBuilder;
 use Microsoft\Graph\Generated\EmployeeExperience\LearningCourseActivitiesWithExternalcourseActivityId\LearningCourseActivitiesWithExternalcourseActivityIdRequestBuilder;
 use Microsoft\Graph\Generated\EmployeeExperience\LearningProviders\LearningProvidersRequestBuilder;
@@ -19,6 +21,20 @@ use Microsoft\Kiota\Abstractions\RequestInformation;
 */
 class EmployeeExperienceRequestBuilder extends BaseRequestBuilder 
 {
+    /**
+     * Provides operations to manage the communities property of the microsoft.graph.employeeExperience entity.
+    */
+    public function communities(): CommunitiesRequestBuilder {
+        return new CommunitiesRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
+    /**
+     * Provides operations to manage the engagementAsyncOperations property of the microsoft.graph.employeeExperience entity.
+    */
+    public function engagementAsyncOperations(): EngagementAsyncOperationsRequestBuilder {
+        return new EngagementAsyncOperationsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
     /**
      * Provides operations to manage the learningCourseActivities property of the microsoft.graph.employeeExperience entity.
     */
@@ -72,7 +88,7 @@ class EmployeeExperienceRequestBuilder extends BaseRequestBuilder
 
     /**
      * Update employeeExperience
-     * @param EmployeeExperience $body The request body
+     * @param EmployeeExperience $body Represents a container that exposes navigation properties for employee experience resources.
      * @param EmployeeExperienceRequestBuilderPatchRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<EmployeeExperience|null>
      * @throws Exception
@@ -108,7 +124,7 @@ class EmployeeExperienceRequestBuilder extends BaseRequestBuilder
 
     /**
      * Update employeeExperience
-     * @param EmployeeExperience $body The request body
+     * @param EmployeeExperience $body Represents a container that exposes navigation properties for employee experience resources.
      * @param EmployeeExperienceRequestBuilderPatchRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return RequestInformation
     */

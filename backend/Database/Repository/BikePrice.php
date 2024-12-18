@@ -10,7 +10,7 @@ class BikePrice extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_bike_price", \Database\Object\BikePrice::class, orderField: 'validFrom');
+        parent::__construct("tbl_bike_price", \Database\Object\BikePrice::class, orderField: 'validFrom', guidField: false);
     }
 
     public function getBetween($date)

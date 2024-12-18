@@ -3,14 +3,13 @@
 
 <head>
 	{{load:head}}
-	<title>{{setting:site.title.withVersion}}</title>
+	<title>{{setting:site.title.default}}</title>
 	{{content:page:css}}
 </head>
 
-<body>
+<body data-bs-theme="{{layout:theme}}">
 	<div class="page">
-		{{component:navbar}}
-		{{component:header}}
+		{{component:navigation}}
 
 		<div class="page-wrapper">
 			{{component:generalMessage}}

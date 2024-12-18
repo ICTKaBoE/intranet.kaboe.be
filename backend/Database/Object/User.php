@@ -4,6 +4,7 @@ namespace Database\Object;
 
 use Database\Interface\CustomObject;
 use Helpers\CString;
+use Security\Input;
 
 class User extends CustomObject
 {
@@ -11,8 +12,7 @@ class User extends CustomObject
         "id" => "int",
         "guid" => "string",
         "entraId" => "string",
-        "informatId" => "string",
-        "employeeId" => "int",
+        "informatEmployeeId" => "string",
         "mainSchoolId" => "int",
         "username" => "string",
         "password" => "string",
@@ -21,6 +21,7 @@ class User extends CustomObject
         "bankAccount" => "string",
         "active" => "boolean",
         "api" => "boolean",
+        "system" => "boolean",
         "deleted" => "boolean"
     ];
 
@@ -32,8 +33,8 @@ class User extends CustomObject
 
     public function init()
     {
-        $this->fullName = "{$this->firstName} {$this->name}";
-        $this->fullNameReversed = "{$this->name} {$this->firstName}";
+        $this->fullName = Input::createDisplayName("{{FN}} {{LN}}", $this->firstName, $this->name);
+        $this->fullNameReversed = Input::createDisplayName("{{LN}} {{FN}}", $this->firstName, $this->name);
         $this->initials = CString::firstLetterOfEachWord($this->fullName);
 
         $this->formatted->fullName = $this->fullName;

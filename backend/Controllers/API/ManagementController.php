@@ -37,73 +37,23 @@ use Database\Object\Management\AccessPoint as ManagementAccessPoint;
 use Database\Object\Management\ComputerBattery as ManagementComputerBattery;
 use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 use Database\Object\Management\ComputerUsageOnOff as ManagementComputerUsageOnOff;
+use Database\Repository\Helpdesk\Ticket;
 use Helpers\General;
+use Helpers\HTML;
 
 class ManagementController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, "computer")) $this->getComputer($view, $id);
-        else if (Strings::equal($what, "computerBattery")) $this->getComputerBattery($view, $id);
-        else if (Strings::equal($what, "computerUsage")) $this->getComputerUsage($view, $id);
-        else if (Strings::equal($what, "laptop")) $this->getComputer($view, $id, "L");
-        else if (Strings::equal($what, "desktop")) $this->getComputer($view, $id, "D");
-        else if (Strings::equal($what, "building")) $this->getBuilding($view, $id);
-        else if (Strings::equal($what, "room")) $this->getRoom($view, $id);
-        else if (Strings::equal($what, "cabinet")) $this->getCabinet($view, $id);
-        else if (Strings::equal($what, "patchpanel")) $this->getPatchpanel($view, $id);
-        else if (Strings::equal($what, "firewall")) $this->getFirewall($view, $id);
-        else if (Strings::equal($what, "switch")) $this->getSwitch($view, $id);
-        else if (Strings::equal($what, "accesspoint")) $this->getAccessPoint($view, $id);
-        else if (Strings::equal($what, "ipad")) $this->getIpad($view, $id);
-        else if (Strings::equal($what, "beamer")) $this->getBeamer($view, $id);
-        else if (Strings::equal($what, "printer")) $this->getPrinter($view, $id);
-        else if (Strings::equal($what, "printerMode")) $this->getPrinterMode($view, $id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "computerBattery")) $this->postComputerBattery($id);
-        else if (Strings::equal($what, "computerUsage")) $this->postComputerUsage($id);
-        else if (Strings::equal($what, "building")) $this->postBuilding($id);
-        else if (Strings::equal($what, "room")) $this->postRoom($id);
-        else if (Strings::equal($what, "cabinet")) $this->postCabinet($id);
-        else if (Strings::equal($what, "patchpanel")) $this->postPatchpanel($id);
-        else if (Strings::equal($what, "firewall")) $this->postFirewall($id);
-        else if (Strings::equal($what, "switch")) $this->postSwitch($id);
-        else if (Strings::equal($what, "accesspoint")) $this->postAccessPoint($id);
-        else if (Strings::equal($what, "beamer")) $this->postBeamer($id);
-        else if (Strings::equal($what, "printer")) $this->postPrinter($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function delete($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "building")) $this->deleteBuilding($id);
-        else if (Strings::equal($what, "room")) $this->deleteRoom($id);
-        else if (Strings::equal($what, "cabinet")) $this->deleteCabinet($id);
-        else if (Strings::equal($what, "patchpanel")) $this->deletePatchpanel($id);
-        else if (Strings::equal($what, "firewall")) $this->deleteFirewall($id);
-        else if (Strings::equal($what, "switch")) $this->deleteSwitch($id);
-        else if (Strings::equal($what, "accesspoint")) $this->deleteAccessPoint($id);
-        else if (Strings::equal($what, "beamer")) $this->deleteBeamer($id);
-        else if (Strings::equal($what, "printer")) $this->deletePrinter($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        else {
-            $this->setCloseModal();
-            $this->setReloadTable();
-        }
-        $this->handle();
-    }
-
     // Get Functions
-    private function getComputer($view, $id = null, $type = "L")
+    protected function getLaptop($view, $id = null)
+    {
+        $this->getComputer($view, $id, "L");
+    }
+    protected function getDesktop($view, $id = null)
+    {
+        $this->getComputer($view, $id, "D");
+    }
+
+    protected function getComputer($view, $id = null, $type = "L")
     {
         $repo = new Computer;
         $filters = [
@@ -111,7 +61,7 @@ class ManagementController extends ApiController
             'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             unset($filters['type']);
 
             $this->appendToJson("checkbox", true);
@@ -127,11 +77,11 @@ class ManagementController extends ApiController
                         "width" => "20px"
                     ],
                     [
-                        "title" => "<i class='ti ti-devices-2'></i>",
+                        "title" => HTML::Icon("devices-2"),
                         "data" => "formatted.icon.type",
                         "orderable" => false,
                         "searchable" => false,
-                        "width" => "10px"
+                        "width" => "50px"
                     ],
                     [
                         "title" => "School",
@@ -155,15 +105,15 @@ class ManagementController extends ApiController
                         "width" => "200px"
                     ],
                     [
-                        "title" => "Intune Order ID",
-                        "data" => "orderId",
-                        "width" => "275px"
-                    ],
-                    [
-                        "title" => "Intune Enrollment Profile",
-                        "data" => "enrollmentProfileName",
+                        "title" => "Laatst gebruikt",
+                        "data" => "formatted.lastUsage",
                         "width" => "300px"
                     ],
+                    [
+                        "title" => HTML::Icon("battery-exclamation", "Batterij Capaciteit"),
+                        "data" => "formatted.badge.capacity",
+                        "width" => "10px"
+                    ]
                 ]
             );
 
@@ -171,7 +121,7 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
@@ -179,11 +129,11 @@ class ManagementController extends ApiController
         }
     }
 
-    private function getComputerBattery($view, $id = null)
+    protected function getComputerBattery($view, $id = null)
     {
         $computer = Arrays::first((new Computer)->get($id));
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[0, "asc"]]);
             $this->appendToJson(
@@ -222,11 +172,11 @@ class ManagementController extends ApiController
         }
     }
 
-    private function getComputerUsage($view, $id = null)
+    protected function getComputerUsage($view, $id = null)
     {
         $computer = Arrays::first((new Computer)->get($id));
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
             $this->appendToJson("childRows", true);
             $this->appendToJson("defaultOrder", [[1, "desc"]]);
@@ -274,14 +224,14 @@ class ManagementController extends ApiController
         }
     }
 
-    private function getBuilding($view, $id = null)
+    protected function getBuilding($view, $id = null)
     {
         $repo = new Building;
         $filters = [
             'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"]]);
             $this->appendToJson(
@@ -317,15 +267,15 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getRoom($view, $id = null)
+    protected function getRoom($view, $id = null)
     {
         $repo = new Room;
         $filters = [
@@ -333,7 +283,7 @@ class ManagementController extends ApiController
             'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"]]);
             $this->appendToJson(
@@ -379,15 +329,15 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getCabinet($view, $id = null)
+    protected function getCabinet($view, $id = null)
     {
         $repo = new Cabinet;
         $filters = [
@@ -396,7 +346,7 @@ class ManagementController extends ApiController
             'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
             $this->appendToJson(
@@ -442,19 +392,19 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getPatchpanel($view, $id = null)
+    protected function getPatchpanel($view, $id = null)
     {
         $repo = new Patchpanel;
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
                 'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
@@ -514,26 +464,20 @@ class ManagementController extends ApiController
             );
 
             $items = $repo->get();
-
-            foreach ($filters as $key => $value) {
-                if (!$value || empty($value)) continue;
-
-                if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
-                else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
-            }
+            General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $cabinetId = Helpers::url()->getParam('cabinetId');
             $items = $repo->get($id);
 
             if ($cabinetId) $items = Arrays::filter($items, fn($i) => Strings::equal($i->cabinetId, $cabinetId));
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getFirewall($view, $id = null)
+    protected function getFirewall($view, $id = null)
     {
         $repo = new Firewall;
         $filters = [
@@ -543,7 +487,7 @@ class ManagementController extends ApiController
             'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
             $this->appendToJson(
@@ -604,7 +548,7 @@ class ManagementController extends ApiController
                     ],
                     [
                         "title" => "Beheerlink",
-                        "data" => "formatted.link",
+                        "data" => "formatted.ip",
                         "width" => "150px"
                     ],
                 ]
@@ -614,15 +558,15 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getSwitch($view, $id = null)
+    protected function getSwitch($view, $id = null)
     {
         $repo = new MSwitch;
         $filters = [
@@ -632,7 +576,7 @@ class ManagementController extends ApiController
             'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
             $this->appendToJson(
@@ -708,15 +652,15 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getAccessPoint($view, $id = null)
+    protected function getAccessPoint($view, $id = null)
     {
         $repo = new AccessPoint;
         $filters = [
@@ -725,7 +669,7 @@ class ManagementController extends ApiController
             'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
             $this->appendToJson(
@@ -791,22 +735,22 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, 'form')) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    private function getIpad($view, $id = null)
+    protected function getIpad($view, $id = null)
     {
         $repo = new IPad;
         $filters = [
             'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);
             $this->appendToJson(
@@ -855,11 +799,6 @@ class ManagementController extends ApiController
                         "data" => "formatted.capacity",
                         "orderable" => false,
                         "width" => "200px"
-                    ],
-                    [
-                        "title" => "JAMF ID",
-                        "data" => "jamfId",
-                        "width" => "350px"
                     ]
                 ]
             );
@@ -868,7 +807,7 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
@@ -876,7 +815,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function getBeamer($view, $id = null)
+    protected function getBeamer($view, $id = null)
     {
         $repo = new Beamer;
         $filters = [
@@ -885,7 +824,7 @@ class ManagementController extends ApiController
             'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"]]);
             $this->appendToJson(
@@ -940,17 +879,17 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, "form")) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
         }
     }
 
-    private function getPrinter($view, $id = null)
+    protected function getPrinter($view, $id = null)
     {
         $repo = new Printer;
         $filters = [
@@ -959,7 +898,7 @@ class ManagementController extends ApiController
             'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
         ];
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
             $this->appendToJson(
@@ -1024,22 +963,22 @@ class ManagementController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "select")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, "form")) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
         }
     }
 
-    private function getPrinterMode($view, $id = null)
+    protected function getPrinterMode($view, $id = null)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $statuses = $settings['printer']['mode'];
 
-        if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_SELECT)) {
             $_statuses = [];
 
             foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
@@ -1049,7 +988,7 @@ class ManagementController extends ApiController
     }
 
     // Post functions
-    private function postComputerBattery($id = null)
+    protected function postComputerBattery($view, $id = null)
     {
         $computer = (new Computer)->getByName($id);
 
@@ -1076,7 +1015,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postComputerUsage($id = null)
+    protected function postComputerUsage($view, $id = null)
     {
         $computer = (new Computer)->getByName($id);
 
@@ -1113,7 +1052,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postBuilding($id = null)
+    protected function postBuilding($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1141,7 +1080,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postRoom($id = null)
+    protected function postRoom($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1175,7 +1114,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postCabinet($id = null)
+    protected function postCabinet($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1209,7 +1148,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postPatchpanel($id = null)
+    protected function postPatchpanel($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1248,7 +1187,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postFirewall($id = null)
+    protected function postFirewall($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1261,7 +1200,7 @@ class ManagementController extends ApiController
         $model = Helpers::input()->post('model')->getValue();
         $serialnumber = Helpers::input()->post('serialnumber')->getValue();
         $macaddress = Helpers::input()->post('macaddress')->getValue();
-        $link = Helpers::input()->post('link')->getValue();
+        $ip = Helpers::input()->post('ip')->getValue();
 
         if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
         if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
@@ -1272,7 +1211,7 @@ class ManagementController extends ApiController
         if (!Input::check($model) || Input::empty($model)) $this->setValidation("model", "Model moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
         if (!Input::check($serialnumber) || Input::empty($serialnumber)) $this->setValidation("serialnumber", "Serienummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
         if (!Input::check($macaddress) || Input::empty($macaddress)) $this->setValidation("macaddress", "MAC Adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($link) || Input::empty($link)) $this->setValidation("link", "Beheerslink moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        if (!Input::check($ip) || Input::empty($ip)) $this->setValidation("ip", "Beheerslink moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
             $repo = new Firewall;
@@ -1288,7 +1227,7 @@ class ManagementController extends ApiController
                 $item->model = $model;
                 $item->serialnumber = $serialnumber;
                 $item->macaddress = $macaddress;
-                $item->link = $link;
+                $item->ip = $ip;
 
                 $repo->set($item);
             }
@@ -1300,7 +1239,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postSwitch($id = null)
+    protected function postSwitch($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1355,7 +1294,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postAccessPoint($id = null)
+    protected function postAccessPoint($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1398,7 +1337,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postBeamer($id = null)
+    protected function postBeamer($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1435,7 +1374,7 @@ class ManagementController extends ApiController
         }
     }
 
-    private function postPrinter($id = null)
+    protected function postPrinter($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -1479,51 +1418,120 @@ class ManagementController extends ApiController
     }
 
     // Delete functions    
-    private function deleteBuilding($id = null)
+    protected function deleteBuilding($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Building;
+        $roomRepo = new Room;
+        $cabinetRepo = new Cabinet;
+        $ppRepo = new Patchpanel;
+        $fRepo = new Firewall;
+        $sRepo = new MSwitch;
+        $apRepo = new AccessPoint;
+        $bRepo = new Beamer;
+        $pRepo = new Printer;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $attachtedTo = [];
+
+            if (count($roomRepo->getByBuildingId($item->id))) $attachtedTo[] = "lokalen";
+            if (count($cabinetRepo->getByBuildingId($item->id))) $attachtedTo[] = "netwerkkasten";
+            if (count($ppRepo->getByBuildingId($item->id))) $attachtedTo[] = "patchpanelen";
+            if (count($fRepo->getByBuildingId($item->id))) $attachtedTo[] = "firewalls";
+            if (count($sRepo->getByBuildingId($item->id))) $attachtedTo[] = "switches";
+            if (count($apRepo->getByBuildingId($item->id))) $attachtedTo[] = "access points";
+            if (count($bRepo->getByBuildingId($item->id))) $attachtedTo[] = "beamers";
+            if (count($pRepo->getByBuildingId($item->id))) $attachtedTo[] = "printers";
+
+            if (count($attachtedTo)) {
+                $this->setToast("Het gebouw '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan " . join(", ", $attachtedTo) . "!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("Het gebouw '{$item->formatted->full}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteRoom($id = null)
+    protected function deleteRoom($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Room;
+        $cabinetRepo = new Cabinet;
+        $ppRepo = new Patchpanel;
+        $fRepo = new Firewall;
+        $sRepo = new MSwitch;
+        $apRepo = new AccessPoint;
+        $bRepo = new Beamer;
+        $pRepo = new Printer;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $attachtedTo = [];
+
+            if (count($cabinetRepo->getByRoomId($item->id))) $attachtedTo[] = "netwerkkasten";
+            if (count($ppRepo->getByRoomId($item->id))) $attachtedTo[] = "patchpanelen";
+            if (count($fRepo->getByRoomId($item->id))) $attachtedTo[] = "firewalls";
+            if (count($sRepo->getByRoomId($item->id))) $attachtedTo[] = "switches";
+            if (count($apRepo->getByRoomId($item->id))) $attachtedTo[] = "access points";
+            if (count($bRepo->getByRoomId($item->id))) $attachtedTo[] = "beamers";
+            if (count($pRepo->getByRoomId($item->id))) $attachtedTo[] = "printers";
+
+            if (count($attachtedTo)) {
+                $this->setToast("Het lokaal '{$item->formatted->full}' kan niet worden verwijderd!<br />Deze is gekoppeld aan " . join(", ", $attachtedTo) . "!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("Het lokaal '{$item->formatted->full}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteCabinet($id = null)
+    protected function deleteCabinet($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Cabinet;
+        $ppRepo = new Patchpanel;
+        $fRepo = new Firewall;
+        $sRepo = new MSwitch;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $attachtedTo = [];
+
+            if (count($ppRepo->getByCabinetId($item->id))) $attachtedTo[] = "patchpanelen";
+            if (count($fRepo->getByCabinetId($item->id))) $attachtedTo[] = "firewalls";
+            if (count($sRepo->getByCabinetId($item->id))) $attachtedTo[] = "switches";
+
+            if (count($attachtedTo)) {
+                $this->setToast("De netwerkkast '{$item->formatted->full}' kan niet worden verwijderd!<br />Deze is gekoppeld aan " . join(", ", $attachtedTo) . "!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De netwerkkast '{$item->formatted->full}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deletePatchpanel($id = null)
+    protected function deletePatchpanel($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Patchpanel;
 
         foreach ($id as $_id) {
@@ -1533,75 +1541,128 @@ class ManagementController extends ApiController
 
             $this->setToast("Het patchpaneel '{$item->formatted->full}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteFirewall($id = null)
+    protected function deleteFirewall($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Firewall;
+        $ticketRepo = new Ticket;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("F", $item->id))) {
+                $this->setToast("De firewall '{$item->hostname}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De firewall '{$item->hostname}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteSwitch($id = null)
+    protected function deleteSwitch($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new MSwitch;
+        $ticketRepo = new Ticket;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("S", $item->id))) {
+                $this->setToast("De switch '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De switch '{$item->name}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteAccessPoint($id = null)
+    protected function deleteAccessPoint($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new AccessPoint;
+        $ticketRepo = new Ticket;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("A", $item->id))) {
+                $this->setToast("Het access point '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("Het access point '{$item->name}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deleteBeamer($id = null)
+    protected function deleteBeamer($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Beamer;
+        $ticketRepo = new Ticket;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("B", $item->id))) {
+                $this->setToast("De beamer '{$item->serialnumber}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De beamer '{$item->serialnumber}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
-    private function deletePrinter($id = null)
+    protected function deletePrinter($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new Printer;
+        $ticketRepo = new Ticket;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("P", $item->id))) {
+                $this->setToast("De printer '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De printer '{$item->name}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 }

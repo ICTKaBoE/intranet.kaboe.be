@@ -10,4 +10,12 @@ class Setting extends Repository
     {
         parent::__construct("tbl_setting", \Database\Object\Setting::class, guidField: false);
     }
+
+    public function getBySettingTabId($settingTabId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('settingTabId', $settingTabId);
+
+        return $this->executeSelect($statement);
+    }
 }

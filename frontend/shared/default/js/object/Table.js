@@ -48,7 +48,6 @@ export default class Table {
 			},
 			pageLength: 25,
 			language: {
-				url: "//cdn.datatables.net/plug-ins/2.1.5/i18n/nl-NL.json",
 				select: {
 					cells: null,
 					columns: null,

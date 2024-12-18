@@ -44,7 +44,6 @@ class BikeEvent extends CustomObject
         $this->mapped->type = (new Mapping)->get("bike/distance/type/{$this->type}")[0]->value;
         $this->formatted->distance = CString::formatNumber($this->distance, 2) . "km";
         $this->formatted->distanceWithDouble = $this->formatted->distance . " (" . CString::formatNumber($this->distance * 2, 2) . "km)";
-        $this->formatted->colorBadge = "<span class=\"badge p-2 bg-{$this->color} rounded-circle\" style=\"margin-top: 2px\"></span>";
 
         $this->borderColor = $this->color;
         $this->textColor = "black";

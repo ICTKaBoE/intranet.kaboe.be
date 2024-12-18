@@ -8,8 +8,8 @@ use Security\User;
 
 class HeaderComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('header');
+		parent::__construct('header', $arguments);
 	}
 }

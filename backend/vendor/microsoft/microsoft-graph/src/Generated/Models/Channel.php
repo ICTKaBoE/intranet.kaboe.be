@@ -86,6 +86,7 @@ class Channel extends Entity implements Parsable
             'displayName' => fn(ParseNode $n) => $o->setDisplayName($n->getStringValue()),
             'email' => fn(ParseNode $n) => $o->setEmail($n->getStringValue()),
             'filesFolder' => fn(ParseNode $n) => $o->setFilesFolder($n->getObjectValue([DriveItem::class, 'createFromDiscriminatorValue'])),
+            'isArchived' => fn(ParseNode $n) => $o->setIsArchived($n->getBooleanValue()),
             'isFavoriteByDefault' => fn(ParseNode $n) => $o->setIsFavoriteByDefault($n->getBooleanValue()),
             'members' => fn(ParseNode $n) => $o->setMembers($n->getCollectionOfObjectValues([ConversationMember::class, 'createFromDiscriminatorValue'])),
             'membershipType' => fn(ParseNode $n) => $o->setMembershipType($n->getEnumValue(ChannelMembershipType::class)),
@@ -111,7 +112,19 @@ class Channel extends Entity implements Parsable
     }
 
     /**
-     * Gets the isFavoriteByDefault property value. Indicates whether the channel should automatically be marked 'favorite' for all members of the team. Can only be set programmatically with Create team. Default: false.
+     * Gets the isArchived property value. Indicates whether the channel is archived. Read-only.
+     * @return bool|null
+    */
+    public function getIsArchived(): ?bool {
+        $val = $this->getBackingStore()->get('isArchived');
+        if (is_null($val) || is_bool($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'isArchived'");
+    }
+
+    /**
+     * Gets the isFavoriteByDefault property value. Indicates whether the channel should be marked as recommended for all members of the team to show in their channel list. Note: All recommended channels automatically show in the channels list for education and frontline worker users. The property can only be set programmatically via the Create team method. The default value is false.
      * @return bool|null
     */
     public function getIsFavoriteByDefault(): ?bool {
@@ -237,6 +250,7 @@ class Channel extends Entity implements Parsable
         $writer->writeStringValue('displayName', $this->getDisplayName());
         $writer->writeStringValue('email', $this->getEmail());
         $writer->writeObjectValue('filesFolder', $this->getFilesFolder());
+        $writer->writeBooleanValue('isArchived', $this->getIsArchived());
         $writer->writeBooleanValue('isFavoriteByDefault', $this->getIsFavoriteByDefault());
         $writer->writeCollectionOfObjectValues('members', $this->getMembers());
         $writer->writeEnumValue('membershipType', $this->getMembershipType());
@@ -289,7 +303,15 @@ class Channel extends Entity implements Parsable
     }
 
     /**
-     * Sets the isFavoriteByDefault property value. Indicates whether the channel should automatically be marked 'favorite' for all members of the team. Can only be set programmatically with Create team. Default: false.
+     * Sets the isArchived property value. Indicates whether the channel is archived. Read-only.
+     * @param bool|null $value Value to set for the isArchived property.
+    */
+    public function setIsArchived(?bool $value): void {
+        $this->getBackingStore()->set('isArchived', $value);
+    }
+
+    /**
+     * Sets the isFavoriteByDefault property value. Indicates whether the channel should be marked as recommended for all members of the team to show in their channel list. Note: All recommended channels automatically show in the channels list for education and frontline worker users. The property can only be set programmatically via the Create team method. The default value is false.
      * @param bool|null $value Value to set for the isFavoriteByDefault property.
     */
     public function setIsFavoriteByDefault(?bool $value): void {

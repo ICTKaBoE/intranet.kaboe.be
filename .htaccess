@@ -15,3 +15,11 @@ RewriteRule ^(.*)$ index.php/$1
 
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+SetEnvIf Origin "http(s)?://(www\.)?(dev.intranet.kaboe.be|dev.extranet.kaboe.be|dev.api.kaboe.be|dev.kaboe.be|intranet.kaboe.be|extranet.kaboe.be|api.kaboe.be|kaboe.be)$" AccessControlAllowOrigin=$0
+Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+Header merge Vary Origin
+Header always set Access-Control-Allow-Methods "*"
+Header always set Access-Control-Allow-Credentials: true
+Header always set Access-Control-Allow-Headers "*"
+php_value session.cookie_domain .kaboe.be

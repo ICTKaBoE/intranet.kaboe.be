@@ -3,6 +3,7 @@
 namespace Database\Object;
 
 use Database\Interface\CustomObject;
+use Ouzo\Utilities\Path;
 
 class Route extends CustomObject
 {
@@ -23,6 +24,6 @@ class Route extends CustomObject
 
     public function init()
     {
-        $this->formatted->full = $this->linked->routeGroup->prefix . "/" . $this->route . "/";
+        $this->formatted->full = Path::normalize($this->linked->routeGroup->prefix . "/" . $this->route) . "/";
     }
 }

@@ -6,22 +6,24 @@ use stdClass;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Router\Helpers;
 
 abstract class General
 {
     static public function convert($value, $type)
     {
-        if (is_null($value)) return $value;
+        if (is_null($value) && $type !== "json") return $value;
         else if ($type == "int") $value = intval($value);
         else if ($type == "string") $value = (string)$value;
-        else if ($type == "bool" || $type == "boolean") $value = boolval($value);
+        else if ($type == "bool" || $type == "boolean") $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         else if ($type == "list") $value = explode(PHP_EOL, $value);
         else if ($type == "binary") $value = Arrays::map(str_split($value), fn($v) => intval($v));
         else if ($type == "object") $value = self::convertToObject($value);
         else if ($type == "array") $value = self::arrayToObjects($value);
         else if ($type == "date") $value = Clock::at($value)->format("Y-m-d");
         else if ($type == "datetime") $value = Clock::at($value)->format("Y-m-d H:i:s");
-        else if ($type == "json") $value = json_decode($value, true);
+        else if ($type == "json") $value = json_decode($value ?: "{}", true);
+        else if ($type == "base64") $value = base64_decode($value);
 
         return $value;
     }
@@ -84,6 +86,8 @@ abstract class General
 
     static public function filter(&$items, $filters)
     {
+        if (empty($filters)) return $items;
+
         foreach ($filters as $key => $value) {
             if (!$value || empty($value)) continue;
 
@@ -91,6 +95,25 @@ abstract class General
             else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
         }
 
-        // return $items;
+        return $items;
+    }
+
+    static public function processTemplate($items = [], $template = null, $searchPrePost = "@")
+    {
+        if (!$template) $template = Helpers::url()->getParam("template");
+        $output = "";
+
+        foreach ($items as $i) {
+            $t = $template;
+            foreach ($i as $key => $value) $t = str_replace("{$searchPrePost}{$key}{$searchPrePost}", $value, $t);
+            $output .= $t;
+        }
+
+        return preg_replace("/$searchPrePost.*?$searchPrePost/", "", $output);
+    }
+
+    static public function removeLeadingZero($string)
+    {
+        return preg_replace('/^0+/', '', $string);
     }
 }

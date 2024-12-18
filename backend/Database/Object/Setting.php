@@ -13,6 +13,7 @@ class Setting extends CustomObject
         "type" => "string",
         "options" => "list",
         "value" => "string",
+        "readonly" => "boolean",
         "order" => "int",
         "deleted" => "boolean"
     ];
@@ -22,4 +23,9 @@ class Setting extends CustomObject
             "settingTabId" => \Database\Repository\SettingTab::class
         ]
     ];
+
+    public function init()
+    {
+        $this->formatted->readonly = $this->readonly ? "readonly" : "";
+    }
 }

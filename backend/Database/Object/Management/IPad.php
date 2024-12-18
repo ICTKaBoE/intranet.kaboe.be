@@ -5,6 +5,7 @@ namespace Database\Object\Management;
 use Database\Interface\CustomObject;
 use Database\Repository\Navigation;
 use Helpers\CString;
+use Helpers\HTML;
 use Ouzo\Utilities\Arrays;
 
 class IPad extends CustomObject
@@ -50,7 +51,7 @@ class IPad extends CustomObject
         $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "management"))->settings['ipad']['batteryTreshhold'];
         $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->batteryLevel <= $s['max'] && $this->batteryLevel >= $s['min']));
 
-        $this->formatted->badge->battery = "<span class=\"badge bg-{$level['color']} text-white\">{$this->formatted->batteryLevel}</span>";
+        $this->formatted->badge->battery = HTML::Badge($this->formatted->batteryLevel, backgroundColor: $level['color']);
     }
 
     private function createCapacityBadge()
@@ -58,6 +59,6 @@ class IPad extends CustomObject
         $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "management"))->settings['ipad']['capacityTreshhold'];
         $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->capacity <= $s['max'] && $this->capacity >= $s['min']));
 
-        $this->formatted->badge->capacity = "<span class=\"badge bg-{$level['color']} text-white\">{$this->formatted->capacityPercentage}</span>";
+        $this->formatted->badge->capacity = HTML::Badge($this->formatted->capacityPercentage, backgroundColor: $level['color']);
     }
 }

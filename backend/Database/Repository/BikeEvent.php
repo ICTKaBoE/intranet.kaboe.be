@@ -9,13 +9,21 @@ class BikeEvent extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_bike_event", \Database\Object\BikeEvent::class, orderField: 'distance');
+        parent::__construct("tbl_bike_event", \Database\Object\BikeEvent::class, orderField: 'distance', guidField: false);
     }
 
     public function getByUserMainSchoolId($userMainSchoolId)
     {
         $statement = $this->prepareSelect();
         $statement->where('userMainSchoolId', $userMainSchoolId);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getByBikeDistanceId($bikeDistanceId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('bikeDistanceId', $bikeDistanceId);
 
         return $this->executeSelect($statement);
     }

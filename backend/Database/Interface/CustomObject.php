@@ -13,6 +13,7 @@ class CustomObject extends stdClass
 {
     protected $objectAttributes = [];
     protected $encodeAttributes = [];
+    protected $decodeAttributes = [];
     protected $linkedAttributes = [];
 
     public $mapped = null;
@@ -30,6 +31,14 @@ class CustomObject extends stdClass
 
         $this->createAttributes($attributes);
         $this->encode();
+        $this->decode();
+        $this->link();
+        $this->init();
+    }
+
+    public function reinit()
+    {
+        $this->encode();
         $this->link();
         $this->init();
     }
@@ -46,6 +55,11 @@ class CustomObject extends stdClass
     protected function encode()
     {
         foreach ($this->encodeAttributes as $encode) $this->$encode = mb_convert_encoding($this->$encode, 'UTF-8', mb_list_encodings());
+    }
+
+    protected function decode()
+    {
+        foreach ($this->decodeAttributes as $decode) $this->$decode = mb_convert_encoding($this->$decode, 'ISO-8859-1', 'UTF-8');
     }
 
     protected function link()
@@ -74,6 +88,15 @@ class CustomObject extends stdClass
     public function toArray($flatten = false)
     {
         return $flatten ? Arrays::flattenKeysRecursively(General::object_to_array($this)) : General::object_to_array($this);
+    }
+
+    public function toSearchArray()
+    {
+        $arr = [];
+
+        foreach ($this as $key => $value) $arr[] = $value;
+
+        return Arrays::flatten($arr);
     }
 
     public function toSqlArray()

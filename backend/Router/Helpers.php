@@ -4,12 +4,13 @@ namespace Router;
 
 use Pecee\Http\Url;
 use Pecee\Http\Request;
-use Pecee\Http\Response;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Path;
-use Ouzo\Utilities\Strings;
-use Pecee\SimpleRouter\SimpleRouter;
+use Pecee\Http\Response;
 use Security\FileSystem;
+use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
+use Database\Repository\Setting;
+use Pecee\SimpleRouter\SimpleRouter;
 
 abstract class Helpers
 {
@@ -63,6 +64,18 @@ abstract class Helpers
 		return rtrim(self::url()->getRelativeUrl($params), "/");
 	}
 
+	static function getDomainFolder()
+	{
+		$host = self::url()->getHost();
+
+		$mode = (new Setting)->get("site.mode")[0]->value;
+		$mainUrl = (new Setting)->get("site.mainUrl")[0]->value;
+
+		$host = str_replace([$mode, $mainUrl, "."], "", $host);
+
+		return $host;
+	}
+
 	static function getModule()
 	{
 		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "module");
@@ -80,7 +93,7 @@ abstract class Helpers
 
 	static function getDirectory()
 	{
-		if (!self::getModule()) return self::getReletiveUrl();
-		else return "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getId() ? "/form" : "");
+		if (!self::getModule()) return "/" . (self::getDomainFolder() ?: "public") . self::getReletiveUrl();
+		else return "/" . (self::getDomainFolder() ?: "public") . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getId() ? "/form" : "");
 	}
 }

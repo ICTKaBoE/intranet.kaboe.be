@@ -1,7 +1,6 @@
 import Button from "./Button.js";
 import Helpers from "./Helpers.js";
 import Select from "./Select.js";
-import Table from "./Table.js";
 import DatePicker from "./DatePicker.js";
 import TinyMCE from "./TinyMCE.js";
 
@@ -261,14 +260,6 @@ export default class Form {
 					TinyMCE.INSTANCES[el.id]?.disable();
 				else el.disabled = true;
 			});
-
-		$(this.element)
-			.find("table")
-			.each((idx, el) => {
-				if (!el.id) return;
-
-				if (el.tagName === "TABLE") Table.INSTANCES[el.id]?.disable();
-			});
 	};
 
 	enable = () => {
@@ -282,13 +273,6 @@ export default class Form {
 				else if (el.role === "tinymce")
 					TinyMCE.INSTANCES[el.id]?.enable();
 				else el.disabled = false;
-			});
-		$(this.element)
-			.find("table")
-			.each((idx, el) => {
-				if (!el.id) return;
-
-				if (el.tagName === "TABLE") Table.INSTANCES[el.id]?.enable();
 			});
 	};
 
@@ -306,11 +290,16 @@ export default class Form {
 						data[el.name] = TinyMCE.INSTANCES[el.id].getValue();
 					else if (el.type === "radio" || el.type === "checkbox") {
 						let element = $(this.element).find(
-							`[type='${el.type}'][name='${el.name}']:checked`
+							`[type='${el.type}'][name='${el.name}']`
 						);
 						let value = element.val();
 						let checked = element.is(":checked");
 						data[el.name] = value == "on" ? checked : value;
+					} else if (el.type === "file") {
+						// let files = [];
+						// for (let i = 0; i < el.files.length; i++)
+						// 	files.push(el.files[i]);
+						// data[el.name + (el.multiple ? "[]" : "")] = files;
 					} else data[el.name] = el.value;
 				}
 			});
@@ -345,7 +334,7 @@ export default class Form {
 			);
 
 			Helpers.processRequestResponse(data);
-			if (data.validation) this.processValidation(data.validation);
+			this.processValidation(data.validation);
 			if (data.returnToStep) this.setActiveStep(this.activeStep - 1);
 			if (data.resetForm) this.reset();
 			if (data.setId) this.prefillForm(data.setId);
@@ -385,7 +374,7 @@ export default class Form {
 
 	resetValidation = () => {
 		$(this.element)
-			.find(":input")
+			.find(".is-valid, .is-invalid")
 			.removeClass("is-valid")
 			.removeClass("is-invalid");
 
@@ -399,9 +388,16 @@ export default class Form {
 			$(this.element)
 				.find(`[name='${input}']`)
 				.addClass(`is-${validation.state}`);
+
 			$(this.element)
-				.find(`[data-feedback-input='${input}']`)
-				.html(validation.feedback);
+				.find(`[id='${input}-ts-control']`)
+				.parent()
+				.addClass(`is-${validation.state}`);
+
+			if (validation.feedback)
+				$(this.element)
+					.find(`[data-feedback-input='${input}']`)
+					.html(validation.feedback);
 		});
 	};
 
@@ -410,7 +406,10 @@ export default class Form {
 
 		fetch(
 			this.source +
-				(this.lastLoadedId == null ? "" : `/${this.lastLoadedId}`)
+				(this.lastLoadedId == null ? "" : `/${this.lastLoadedId}`),
+			{
+				credentials: "include",
+			}
 		)
 			.then((res) => res.json())
 			.then((json) => {
@@ -467,6 +466,26 @@ export default class Form {
 
 			case "tinymce":
 				TinyMCE.INSTANCES[field.id].setValue(value);
+				break;
+
+			case "file":
+				{
+					// Create a new File object
+					const myFile = new File([""], value, {
+						type: "text/plain",
+						lastModified: new Date(),
+					});
+
+					// Now let's create a FileList
+					const dataTransfer = new DataTransfer();
+					dataTransfer.items.add(myFile);
+					field.files = dataTransfer.files;
+
+					// Help Safari out
+					if (field.webkitEntries.length) {
+						field.dataset.file = `${dataTransfer.files[0].name}`;
+					}
+				}
 				break;
 
 			default:

@@ -2,57 +2,43 @@
 
 namespace Controllers\API;
 
+use Router\Helpers;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\School;
 use Database\Repository\SchoolAddress;
+use Helpers\General;
 
 class SchoolController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, null)) $this->getList($view, $id);
-        else if (Strings::equal($what, "address")) $this->getAddress($view, $id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($what, $id = null)
-    {
-        // if ($what == "distance") $this->postDistance($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
     // Get Functions
-    private function getList($view, $id)
+    protected function getList($view, $id)
     {
         $repo = new School;
 
-        if (Strings::equal($view, "table")) {
-        } else if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get();
             $this->appendToJson('items', $items);
-        } else if (Strings::equal($view, "form")) {
-        } else if (Strings::equal($view, "list")) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+        } else if (Strings::equal($view, self::VIEW_LIST)) {
             $items = $repo->get();
-            $this->appendToJson('items', $items);
+            $items = Arrays::map($items, fn($i) => $i->toArray(true));
+            $this->appendToJson('raw', General::processTemplate($items));
         }
     }
 
-    private function getAddress($view, $id = null)
+    protected function getAddress($view, $id = null)
     {
         $repo = new SchoolAddress;
 
-        if (Strings::equal($view, "table")) {
-        } else if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $address = $repo->get();
             $address = Arrays::map($address, fn($a) => $a = $a->toArray(true));
             $this->appendToJson('items', $address);
-        } else if (Strings::equal($view, "form")) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
         }
     }
 

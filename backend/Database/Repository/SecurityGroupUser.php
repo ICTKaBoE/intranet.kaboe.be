@@ -3,6 +3,7 @@
 namespace Database\Repository;
 
 use Database\Interface\Repository;
+use Ouzo\Utilities\Arrays;
 
 class SecurityGroupUser extends Repository
 {
@@ -17,5 +18,22 @@ class SecurityGroupUser extends Repository
         $statement->where('userId', $userId);
 
         return $this->executeSelect($statement);
+    }
+
+    public function getBySecurityGroupId($securityGroupId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('securityGroupId', $securityGroupId);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getBySecurityGroupIdAndUserId($securityGroupId, $userId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('securityGroupId', $securityGroupId);
+        $statement->where('userId', $userId);
+
+        return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

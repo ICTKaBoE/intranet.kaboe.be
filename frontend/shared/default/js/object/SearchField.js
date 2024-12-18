@@ -1,4 +1,5 @@
 import Table from "./Table.js";
+import List from "./List.js";
 
 export default class SearchField {
 	static INSTANCES = {};
@@ -22,10 +23,7 @@ export default class SearchField {
 	init = () => {
 		this.input = $(this.element).find("input")[0];
 
-		this.input.onkeyup = (e) => {
-			if (e.keyCode == 27) this.input.value = "";
-			Table.SearchAll(this.input.value);
-		};
+		this.input.addEventListener("input", this.debounce(this.search));
 	};
 
 	enable = () => {
@@ -34,5 +32,22 @@ export default class SearchField {
 
 	disable = () => {
 		this.input.disabled = true;
+	};
+
+	debounce = (ev, delay = 250) => {
+		let timer;
+
+		return () => {
+			clearTimeout(timer);
+
+			timer = setTimeout(() => {
+				ev.call(this);
+			}, delay);
+		};
+	};
+
+	search = () => {
+		Table.SearchAll(this.input.value);
+		List.SearchAll(this.input.value);
 	};
 }

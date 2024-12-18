@@ -26,4 +26,13 @@ class Ticket extends Repository
 
         return $this->executeSelect($statement);
     }
+
+    public function getByMainCategoryAndAssetId($mainCategory, $assetId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where("category", "LIKE", "{$mainCategory}%");
+        $statement->where("assetId", $assetId);
+
+        return $this->executeSelect($statement);
+    }
 }

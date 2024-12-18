@@ -9,6 +9,7 @@ use Ouzo\Utilities\Strings;
 use Database\Repository\Navigation;
 use Database\Interface\CustomObject;
 use Helpers\CString;
+use Helpers\HTML;
 
 class PurchaseLine extends CustomObject
 {
@@ -22,7 +23,6 @@ class PurchaseLine extends CustomObject
         "quotePrice" => "double",
         "quoteVatIncluded" => "boolean",
         "warrenty" => "boolean",
-        "accepted" => "boolean",
         "deleted" => "boolean"
     ];
 
@@ -42,11 +42,10 @@ class PurchaseLine extends CustomObject
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
 
         $this->formatted->quotePrice = ($this->warrenty ? "Garantie" : ($this->quotePrice == 0 ? "" : CString::formatCurrency($this->quotePrice) . " " . ($this->quoteVatIncluded ? 'incl.' : 'excl.') . ' btw'));
-        $this->formatted->icon->accepted = ($this->quotePrice == 0 ? "" : "<i class='ti ti-" . ($this->accepted ? 'check' : 'x') . "' title='" . ($this->accepted ? 'Goedgekeurd' : 'Afgekeurd') . "'></i>");
 
         $category = explode("-", $this->category);
-        $this->formatted->subject = $settings['category'][$category[0]]['name'];
-        if (isset($category[1])) $this->formatted->subject .= " - " . $settings['category'][$category[0]]['sub'][$category[1]];
+        $this->formatted->category = $settings['category'][$category[0]]['name'];
+        if (isset($category[1])) $this->formatted->category .= " - " . $settings['category'][$category[0]]['sub'][$category[1]];
 
         if (Strings::equal($category[0], "L") || Strings::equal($category[0], "D")) $this->formatted->asset = "{$this->linked->computer->name} ({$this->linked->computer->formatted->manModel})";
         else if (Strings::equal($category[0], "I")) $this->formatted->asset = "{$this->linked->ipad->name} ({$this->linked->ipad->model} / SN: {$this->linked->ipad->serialnumber})";

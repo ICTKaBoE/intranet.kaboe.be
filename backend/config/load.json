@@ -73,7 +73,7 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css",
+				"href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/dist/tabler-icons.min.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -109,7 +109,7 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/dist/index.global.min.js"
+				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/dist/index.global.js"
 			}
 		},
 		{

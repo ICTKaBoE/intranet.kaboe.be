@@ -7,11 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
 {
     public static $files = array (
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
         '5897ea0ac4cccf14d323035e65887801' => __DIR__ . '/..' . '/symfony/polyfill-php82/bootstrap.php',
-        '8e92226780215d0ec758aa7b73e0ede9' => __DIR__ . '/..' . '/open-telemetry/context/fiber/initialize_fiber_handler.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
+        '8e92226780215d0ec758aa7b73e0ede9' => __DIR__ . '/..' . '/open-telemetry/context/fiber/initialize_fiber_handler.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'c7b4a5d8b94d270f0f9a84f81e1dd63d' => __DIR__ . '/..' . '/open-telemetry/api/Trace/functions.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -35,10 +33,9 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'S' => 
         array (
             'Symfony\\Polyfill\\Php82\\' => 23,
-            'Symfony\\Polyfill\\Php81\\' => 23,
-            'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Component\\Finder\\' => 25,
+            'Swagger\\Client\\' => 15,
             'StdUriTemplate\\' => 15,
         ),
         'R' => 
@@ -54,7 +51,9 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
             'Psr\\Http\\Client\\' => 16,
             'Psr\\Cache\\' => 10,
             'PhpZip\\' => 7,
+            'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'PhpOffice\\Math\\' => 15,
             'Pecee\\' => 6,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -65,6 +64,11 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
             'OpenTelemetry\\SDK\\' => 18,
             'OpenTelemetry\\Context\\' => 22,
             'OpenTelemetry\\API\\' => 18,
+        ),
+        'N' => 
+        array (
+            'Nyholm\\Psr7Server\\' => 18,
+            'Nevay\\SPI\\' => 10,
         ),
         'M' => 
         array (
@@ -105,6 +109,7 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         ),
         'C' => 
         array (
+            'Composer\\Semver\\' => 16,
             'Complex\\' => 8,
             'ClanCats\\Hydrahon\\' => 18,
         ),
@@ -123,14 +128,6 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php82',
         ),
-        'Symfony\\Polyfill\\Php81\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
-        ),
-        'Symfony\\Polyfill\\Php80\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
-        ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
@@ -138,6 +135,10 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'Symfony\\Component\\Finder\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Swagger\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cloudmersive/cloudmersive_document_convert_api_client/lib',
         ),
         'StdUriTemplate\\' => 
         array (
@@ -176,9 +177,17 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         array (
             0 => __DIR__ . '/..' . '/nelexa/zip/src',
         ),
+        'PhpOffice\\PhpWord\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpoffice/phpword/src/PhpWord',
+        ),
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
+        ),
+        'PhpOffice\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpoffice/math/src/Math',
         ),
         'Pecee\\' => 
         array (
@@ -207,6 +216,14 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'OpenTelemetry\\API\\' => 
         array (
             0 => __DIR__ . '/..' . '/open-telemetry/api',
+        ),
+        'Nyholm\\Psr7Server\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nyholm/psr7-server/src',
+        ),
+        'Nevay\\SPI\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tbachert/spi/src',
         ),
         'Microsoft\\Kiota\\Serialization\\Text\\' => 
         array (
@@ -284,6 +301,10 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         array (
             0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
         ),
+        'Composer\\Semver\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/semver/src',
+        ),
         'Complex\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
@@ -310,12 +331,10 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
 
     public static $classMap = array (
         'AllowDynamicProperties' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/AllowDynamicProperties.php',
-        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
-        'CURLStringFile' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
+        'Nevay\\SPI\\GeneratedServiceProviderData' => __DIR__ . '/..' . '/composer/GeneratedServiceProviderData.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
-        'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
         'Random\\BrokenRandomEngineError' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/Random/BrokenRandomEngineError.php',
         'Random\\CryptoSafeEngine' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/Random/CryptoSafeEngine.php',
@@ -323,10 +342,8 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'Random\\Engine\\Secure' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/Random/Engine/Secure.php',
         'Random\\RandomError' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/Random/RandomError.php',
         'Random\\RandomException' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/Random/RandomException.php',
-        'ReturnTypeWillChange' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
         'SensitiveParameter' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/SensitiveParameter.php',
         'SensitiveParameterValue' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/SensitiveParameterValue.php',
-        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'TCPDF' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf.php',
         'TCPDF2DBarcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_barcodes_2d.php',
         'TCPDFBarcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_barcodes_1d.php',
@@ -338,8 +355,6 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'TCPDF_IMPORT' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_import.php',
         'TCPDF_PARSER' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_parser.php',
         'TCPDF_STATIC' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/tcpdf_static.php',
-        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
-        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

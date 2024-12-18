@@ -1,0 +1,13 @@
+{
+	"intranet": {
+		"\\Controllers\\PAGE\\INTRANET\\ConfigurationGeneralController": [
+			"/configuration/general"
+		],
+		"\\Controllers\\PAGE\\INTRANET\\ContactStaffIdController": [
+			"/contact/staff/*"
+		],
+		"\\Controllers\\PAGE\\INTRANET\\ContactStudentIdController": [
+			"/contact/student/*"
+		]
+	}
+}

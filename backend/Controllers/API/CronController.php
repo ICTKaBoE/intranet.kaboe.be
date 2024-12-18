@@ -12,6 +12,11 @@ class CronController extends ApiController
     {
         Code::noTimeLimit();
 
+        if (Strings::equalsIgnoreCase($action, "importCountries")) {
+            if (\Controllers\API\Cron\Country::Import()) $this->appendToJson('importCountries', 'passed');
+            else $this->appendToJson('importCountries', 'failed');
+        }
+
         if (Strings::equalsIgnoreCase($action, "importInformat")) {
             if (\Controllers\API\Cron\Informat::Import()) $this->appendToJson('importInformat', 'passed');
             else $this->appendToJson('importInformat', 'failed');
@@ -35,6 +40,16 @@ class CronController extends ApiController
         if (Strings::equalsIgnoreCase($action, "importJamfIpads")) {
             if (\Controllers\API\Cron\JAMF::ImportIPads()) $this->appendToJson('importJamfIpads', 'passed');
             else $this->appendToJson('importJamfIpads', 'failed');
+        }
+
+        if (Strings::equalsIgnoreCase($action, "sync")) {
+            if (\Controllers\API\Cron\Sync::Prepare()) $this->appendToJson('sync', 'passed');
+            else $this->appendToJson('sync', 'failed');
+        }
+
+        if (Strings::equalsIgnoreCase($action, "sendMails")) {
+            if (\Controllers\API\Cron\Mail::Send()) $this->appendToJson('sendMails', 'passed');
+            else $this->appendToJson('sendMails', 'failed');
         }
 
         $this->handle();

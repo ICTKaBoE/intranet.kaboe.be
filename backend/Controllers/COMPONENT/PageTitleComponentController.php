@@ -10,9 +10,9 @@ use Ouzo\Utilities\Strings;
 
 class PageTitleComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('pagetitle');
+		parent::__construct('pagetitle', $arguments);
 		$this->writePageTitle();
 	}
 
@@ -22,7 +22,7 @@ class PageTitleComponentController extends ComponentController
 		$page = Helpers::getPage();
 
 		$navigationRepo = new Navigation;
-		$moduleNavigation = Arrays::first($navigationRepo->getByParentIdAndLink(0, $module));
+		$moduleNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink(0, $module));
 		$pageNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page));
 
 		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);

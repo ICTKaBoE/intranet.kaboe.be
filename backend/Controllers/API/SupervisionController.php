@@ -27,44 +27,13 @@ use Database\Object\SupervisionEvent as ObjectSupervisionEvent;
 
 class SupervisionController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, "fill")) $this->getEvents($view, $id);
-        else if (Strings::equal($what, "settings")) $this->getSettings();
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "fill")) $this->postEvent($id);
-        else if (Strings::equal($what, "settings")) $this->postSettings();
-        else if (Strings::equal($what, "export")) $this->postExport();
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function delete($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "fill")) $this->deleteEvent($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        else {
-            $this->setCloseModal();
-            $this->setReloadCalendar();
-        }
-        $this->handle();
-    }
-
     // Get functions
-    private function getEvents($view, $id = null)
+    protected function getFill($view, $id = null)
     {
         $repo = new SupervisionEvent;
         $currentUserId = User::getLoggedInUser()->id;
 
-        if (Strings::equal($view, "calendar")) {
+        if (Strings::equal($view, self::VIEW_CALENDAR)) {
             $items = $repo->getByUserId($currentUserId);
 
             foreach ($items as $event) {
@@ -82,7 +51,7 @@ class SupervisionController extends ApiController
         }
     }
 
-    private function getSettings()
+    protected function getSettings($view, $id = null)
     {
         $repo = new Navigation;
         $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
@@ -91,7 +60,7 @@ class SupervisionController extends ApiController
     }
 
     // Post functions
-    private function postEvent($id = null)
+    protected function postFill($view, $id = null)
     {
         $schoolId = Helpers::input()->post('schoolId')?->getValue();
         $date = Helpers::input()->post('date')?->getValue();
@@ -104,34 +73,56 @@ class SupervisionController extends ApiController
             $start = $date . " " . $start;
             $end = $date . " " . $end;
 
-            $hollidayRepo = new Holliday;
-            $isHolliday = $hollidayRepo->dateContainsHolliday($start);
+            $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
 
-            $supervisionEventRepo = new SupervisionEvent;
+            if ($settings['block']['past']['enabled']) {
+                $pastDate = Clock::now()->toDateTime();
+                if ($settings['block']['past']['amount'] !== 0) $pastDate->modify("-" . $settings['block']['past']['amount']);
+                $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-            $hasOverlap = $supervisionEventRepo->detectOverlap($start, $end, User::getLoggedInUser()->id, $id);
-            $spansMoreThenOneDay = !Strings::equal(Clock::at($start)->format("Y-m-d"), Clock::at($end)->format("Y-m-d"));
+                if ($settings['lastPayDate'] && $pastDate->isBeforeOrEqualTo(Clock::at($settings['lastPayDate']))) $pastDate = Clock::at($settings['lastPayDate']);
 
-            if ($isHolliday) {
-                $this->setValidation("start", "Starttijdstip mag niet in een vakantie/feestdag liggen", self::VALIDATION_STATE_INVALID);
-                $this->setValidation("end", "Eindtijdstip mag niet in een vakantie/feestdag liggen", self::VALIDATION_STATE_INVALID);
+                if (Clock::at($date)->isBefore($pastDate)) $this->setToast("U kan geen middagtoezicht inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
+            }
+
+            if ($settings['block']['future']['enabled']) {
+                $futureDate = Clock::now()->toDateTime();
+                if ($settings['block']['future']['amount'] !== 0) $futureDate->modify("+" . $settings['block']['future']['amount']);
+                $futureDate = Clock::at($futureDate->format('Y-m-d'));
+
+                if (Clock::at($date)->isAfter($futureDate)) $this->setToast("U kan geen middagtoezicht inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
             }
 
             if ($this->validationIsAllGood()) {
-                if (!empty($hasOverlap)) $this->setToast("Je overlapt met een andere toezicht...", self::VALIDATION_STATE_INVALID);
-                else if ($spansMoreThenOneDay) $this->setToast("Een toezicht kan niet doorgaan in de nacht...", self::VALIDATION_STATE_INVALID);
-                else {
-                    $existingEvent = (!is_null($id) ? $supervisionEventRepo->get($id)[0] : new ObjectSupervisionEvent);
+                $hollidayRepo = new Holliday;
+                $isHolliday = $hollidayRepo->dateContainsHolliday($start);
 
-                    $existingEvent->userId = User::getLoggedInUser()->id;
-                    $existingEvent->schoolId = $schoolId;
+                $supervisionEventRepo = new SupervisionEvent;
 
-                    if (!is_null($start)) $existingEvent->start = Clock::at($start)->format("Y-m-d H:i:s");
-                    if (!is_null($end)) $existingEvent->end = Clock::at($end)->format("Y-m-d H:i:s");
+                $hasOverlap = $supervisionEventRepo->detectOverlap($start, $end, User::getLoggedInUser()->id, $id);
+                $spansMoreThenOneDay = !Strings::equal(Clock::at($start)->format("Y-m-d"), Clock::at($end)->format("Y-m-d"));
 
-                    $supervisionEventRepo->set($existingEvent);
+                if ($isHolliday) {
+                    $this->setValidation("start", "Starttijdstip mag niet in een vakantie/feestdag liggen", self::VALIDATION_STATE_INVALID);
+                    $this->setValidation("end", "Eindtijdstip mag niet in een vakantie/feestdag liggen", self::VALIDATION_STATE_INVALID);
+                }
 
-                    $this->setToast("Middagtoezicht op " . Clock::at($existingEvent->start)->format("d/m/Y") . " van " . Clock::at($existingEvent->start)->format("H:i") . " tot en met " . Clock::at($existingEvent->end)->format("H:i") . " geregistreerd!");
+                if ($this->validationIsAllGood()) {
+                    if (!empty($hasOverlap)) $this->setToast("Je overlapt met een andere toezicht...", self::VALIDATION_STATE_INVALID);
+                    else if ($spansMoreThenOneDay) $this->setToast("Een toezicht kan niet doorgaan in de nacht...", self::VALIDATION_STATE_INVALID);
+                    else {
+                        $existingEvent = (!is_null($id) ? $supervisionEventRepo->get($id)[0] : new ObjectSupervisionEvent);
+
+                        $existingEvent->userId = User::getLoggedInUser()->id;
+                        $existingEvent->schoolId = $schoolId;
+
+                        if (!is_null($start)) $existingEvent->start = Clock::at($start)->format("Y-m-d H:i:s");
+                        if (!is_null($end)) $existingEvent->end = Clock::at($end)->format("Y-m-d H:i:s");
+
+                        $supervisionEventRepo->set($existingEvent);
+
+                        $this->setToast("Middagtoezicht op " . Clock::at($existingEvent->start)->format("d/m/Y") . " van " . Clock::at($existingEvent->start)->format("H:i") . " tot en met " . Clock::at($existingEvent->end)->format("H:i") . " geregistreerd!");
+                    }
                 }
             }
         }
@@ -140,7 +131,7 @@ class SupervisionController extends ApiController
         $this->setReloadCalendar();
     }
 
-    private function postSettings()
+    protected function postSettings($view, $id = null)
     {
         $_settings = Helpers::input()->all();
         $settings = [];
@@ -155,7 +146,7 @@ class SupervisionController extends ApiController
         $this->setToast("De instellingen zijn opgeslagen!");
     }
 
-    private function postExport()
+    protected function postExport($view, $id = null)
     {
         $per = Helpers::input()->post('per')->getValue();
         $school = Helpers::input()->post('school');
@@ -193,9 +184,9 @@ class SupervisionController extends ApiController
     }
 
     // Delete functions
-    private function deleteEvent($id = null)
+    protected function deleteFill($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new SupervisionEvent;
 
         foreach ($id as $_id) {
@@ -208,7 +199,7 @@ class SupervisionController extends ApiController
     }
 
     // Export functions
-    private function exportPerSchoolAsXlsx($schoolIds, $start, $end)
+    protected function exportPerSchoolAsXlsx($schoolIds, $start, $end)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -343,7 +334,7 @@ class SupervisionController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    private function exportPerSchoolAsPdf($schoolIds, $start, $end)
+    protected function exportPerSchoolAsPdf($schoolIds, $start, $end)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -441,7 +432,7 @@ class SupervisionController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
     }
 
-    private function exportPerTeacherAsXlsx($schoolIds, $start, $end)
+    protected function exportPerTeacherAsXlsx($schoolIds, $start, $end)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -559,7 +550,7 @@ class SupervisionController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    private function exportPerTeacherAsPdf($schoolIds, $start, $end)
+    protected function exportPerTeacherAsPdf($schoolIds, $start, $end)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -683,7 +674,7 @@ class SupervisionController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
     }
 
-    private function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end)
+    protected function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end)
     {
         $eventRepo = new SupervisionEvent;
         $userRepo = new RepositoryUser;
@@ -700,7 +691,7 @@ class SupervisionController extends ApiController
         return $eventsGrouped;
     }
 
-    private function getEventsGroupedByMonthByTeacherBySchool($start, $end, $allowedSchoolIds)
+    protected function getEventsGroupedByMonthByTeacherBySchool($start, $end, $allowedSchoolIds)
     {
         $eventsRepo = new SupervisionEvent;
         $userRepo = new RepositoryUser;
@@ -719,10 +710,10 @@ class SupervisionController extends ApiController
             }
 
             $address = $userAddressRepo->getCurrentByUserId($user->id);
-            if (is_null($address)) {
-                unset($eventsGrouped[$user->username]);
-                continue;
-            }
+            // if (is_null($address)) {
+            //     unset($eventsGrouped[$user->username]);
+            //     continue;
+            // }
             $eventsGrouped[$user->username]['address'] = $address;
 
             $events = $eventsRepo->getByUserId($user->id);
@@ -733,7 +724,6 @@ class SupervisionController extends ApiController
 
             $events = Arrays::filter($events, fn($e) => Clock::at($e->start)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->end)->isBeforeOrEqualTo(Clock::at($end)));
             $events = Arrays::orderBy($events, "start");
-            // Arrays::each($events, fn($e) => $e->link());
 
             foreach ($events as $event) $eventsGrouped[$user->username]['events'][Clock::at($event->start)->format("F Y")][] = $event;
         }

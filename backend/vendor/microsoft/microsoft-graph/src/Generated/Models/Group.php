@@ -8,6 +8,9 @@ use Microsoft\Kiota\Abstractions\Serialization\ParseNode;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
 use Microsoft\Kiota\Abstractions\Types\TypeUtils;
 
+/**
+ * Represents a Microsoft Entra group.
+*/
 class Group extends DirectoryObject implements Parsable 
 {
     /**
@@ -28,7 +31,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the acceptedSenders property value. The list of users or groups allowed to create posts or calendar events in this group. If this list is non-empty, then only users or groups listed here are allowed to post.
+     * Gets the acceptedSenders property value. The list of users or groups allowed to create posts or calendar events in this group. If this list is nonempty, then only users or groups listed here are allowed to post.
      * @return array<DirectoryObject>|null
     */
     public function getAcceptedSenders(): ?array {
@@ -54,7 +57,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the appRoleAssignments property value. Represents the app roles a group has been granted for an application. Supports $expand.
+     * Gets the appRoleAssignments property value. Represents the app roles granted to a group for an application. Supports $expand.
      * @return array<AppRoleAssignment>|null
     */
     public function getAppRoleAssignments(): ?array {
@@ -68,7 +71,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the assignedLabels property value. The list of sensitivity label pairs (label ID, label name) associated with a Microsoft 365 group. Returned only on $select.
+     * Gets the assignedLabels property value. The list of sensitivity label pairs (label ID, label name) associated with a Microsoft 365 group. Returned only on $select. This property can be updated only in delegated scenarios where the caller requires both the Microsoft Graph permission and a supported administrator role.
      * @return array<AssignedLabel>|null
     */
     public function getAssignedLabels(): ?array {
@@ -96,7 +99,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the autoSubscribeNewMembers property value. Indicates if new members added to the group will be auto-subscribed to receive email notifications. You can set this property in a PATCH request for the group; do not set it in the initial POST request that creates the group. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Gets the autoSubscribeNewMembers property value. Indicates if new members added to the group are autosubscribed to receive email notifications. You can set this property in a PATCH request for the group; don't set it in the initial POST request that creates the group. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @return bool|null
     */
     public function getAutoSubscribeNewMembers(): ?bool {
@@ -134,7 +137,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the classification property value. Describes a classification for the group (such as low, medium or high business impact). Valid values for this property are defined by creating a ClassificationList setting value, based on the template definition.Returned by default. Supports $filter (eq, ne, not, ge, le, startsWith).
+     * Gets the classification property value. Describes a classification for the group (such as low, medium, or high business impact). Valid values for this property are defined by creating a ClassificationList setting value, based on the template definition.Returned by default. Supports $filter (eq, ne, not, ge, le, startsWith).
      * @return string|null
     */
     public function getClassification(): ?string {
@@ -160,7 +163,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the createdDateTime property value. Timestamp of when the group was created. The value cannot be modified and is automatically populated when the group is created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only.
+     * Gets the createdDateTime property value. Timestamp of when the group was created. The value can't be modified and is automatically populated when the group is created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only.
      * @return DateTime|null
     */
     public function getCreatedDateTime(): ?DateTime {
@@ -172,7 +175,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the createdOnBehalfOf property value. The user (or application) that created the group. NOTE: This is not set if the user is an administrator. Read-only.
+     * Gets the createdOnBehalfOf property value. The user (or application) that created the group. NOTE: This property isn't set if the user is an administrator. Read-only.
      * @return DirectoryObject|null
     */
     public function getCreatedOnBehalfOf(): ?DirectoryObject {
@@ -196,7 +199,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the displayName property value. The display name for the group. This property is required when a group is created and cannot be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderby.
+     * Gets the displayName property value. The display name for the group. This property is required when a group is created and can't be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderby.
      * @return string|null
     */
     public function getDisplayName(): ?string {
@@ -248,7 +251,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the expirationDateTime property value. Timestamp of when the group is set to expire. It is null for security groups, but for Microsoft 365 groups, it represents when the group is set to expire as defined in the groupLifecyclePolicy. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
+     * Gets the expirationDateTime property value. Timestamp of when the group is set to expire. It's null for security groups, but for Microsoft 365 groups, it represents when the group is set to expire as defined in the groupLifecyclePolicy. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
      * @return DateTime|null
     */
     public function getExpirationDateTime(): ?DateTime {
@@ -313,6 +316,7 @@ class Group extends DirectoryObject implements Parsable
             'hideFromOutlookClients' => fn(ParseNode $n) => $o->setHideFromOutlookClients($n->getBooleanValue()),
             'isArchived' => fn(ParseNode $n) => $o->setIsArchived($n->getBooleanValue()),
             'isAssignableToRole' => fn(ParseNode $n) => $o->setIsAssignableToRole($n->getBooleanValue()),
+            'isManagementRestricted' => fn(ParseNode $n) => $o->setIsManagementRestricted($n->getBooleanValue()),
             'isSubscribedByMail' => fn(ParseNode $n) => $o->setIsSubscribedByMail($n->getBooleanValue()),
             'licenseProcessingState' => fn(ParseNode $n) => $o->setLicenseProcessingState($n->getObjectValue([LicenseProcessingState::class, 'createFromDiscriminatorValue'])),
             'mail' => fn(ParseNode $n) => $o->setMail($n->getStringValue()),
@@ -405,7 +409,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the hideFromAddressLists property value. True if the group is not displayed in certain parts of the Outlook UI: the Address Book, address lists for selecting message recipients, and the Browse Groups dialog for searching groups; otherwise, false. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Gets the hideFromAddressLists property value. True if the group isn't displayed in certain parts of the Outlook UI: the Address Book, address lists for selecting message recipients, and the Browse Groups dialog for searching groups; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @return bool|null
     */
     public function getHideFromAddressLists(): ?bool {
@@ -417,7 +421,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the hideFromOutlookClients property value. True if the group is not displayed in Outlook clients, such as Outlook for Windows and Outlook on the web; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Gets the hideFromOutlookClients property value. True if the group isn't displayed in Outlook clients, such as Outlook for Windows and Outlook on the web; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @return bool|null
     */
     public function getHideFromOutlookClients(): ?bool {
@@ -441,7 +445,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the isAssignableToRole property value. Indicates whether this group can be assigned to a Microsoft Entra role. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true, visibility must be Hidden, and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers with at least the Privileged Role Administrator role can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Microsoft Entra role assignmentsUsing this feature requires a Microsoft Entra ID P1 license. Returned by default. Supports $filter (eq, ne, not).
+     * Gets the isAssignableToRole property value. Indicates whether this group can be assigned to a Microsoft Entra role. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true, visibility must be Hidden, and the group can't be a dynamic group (that is, groupTypes can't contain DynamicMembership). Only callers with at least the Privileged Role Administrator role can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Microsoft Entra role assignmentsUsing this feature requires a Microsoft Entra ID P1 license. Returned by default. Supports $filter (eq, ne, not).
      * @return bool|null
     */
     public function getIsAssignableToRole(): ?bool {
@@ -450,6 +454,18 @@ class Group extends DirectoryObject implements Parsable
             return $val;
         }
         throw new \UnexpectedValueException("Invalid type found in backing store for 'isAssignableToRole'");
+    }
+
+    /**
+     * Gets the isManagementRestricted property value. The isManagementRestricted property
+     * @return bool|null
+    */
+    public function getIsManagementRestricted(): ?bool {
+        $val = $this->getBackingStore()->get('isManagementRestricted');
+        if (is_null($val) || is_bool($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'isManagementRestricted'");
     }
 
     /**
@@ -501,7 +517,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the mailNickname property value. The mail alias for the group, unique for Microsoft 365 groups in the organization. Maximum length is 64 characters. This property can contain only characters in the ASCII character set 0 - 127 except the following: @ () / [] ' ; : <> , SPACE. Required. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
+     * Gets the mailNickname property value. The mail alias for the group, unique for Microsoft 365 groups in the organization. Maximum length is 64 characters. This property can contain only characters in the ASCII character set 0 - 127 except the following characters: @ () / [] ' ; : <> , SPACE. Required. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
      * @return string|null
     */
     public function getMailNickname(): ?string {
@@ -591,7 +607,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the onPremisesDomainName property value. The onPremisesDomainName property
+     * Gets the onPremisesDomainName property value. Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers synchronizing their on-premises directory to Microsoft Entra ID via Microsoft Entra Connect.Returned by default. Read-only.
      * @return string|null
     */
     public function getOnPremisesDomainName(): ?string {
@@ -603,7 +619,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the onPremisesLastSyncDateTime property value. Indicates the last time at which the group was synced with the on-premises directory.The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only. Supports $filter (eq, ne, not, ge, le, in).
+     * Gets the onPremisesLastSyncDateTime property value. Indicates the last time at which the group was synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only. Supports $filter (eq, ne, not, ge, le, in).
      * @return DateTime|null
     */
     public function getOnPremisesLastSyncDateTime(): ?DateTime {
@@ -615,7 +631,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the onPremisesNetBiosName property value. The onPremisesNetBiosName property
+     * Gets the onPremisesNetBiosName property value. Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers synchronizing their on-premises directory to Microsoft Entra ID via Microsoft Entra Connect.Returned by default. Read-only.
      * @return string|null
     */
     public function getOnPremisesNetBiosName(): ?string {
@@ -653,7 +669,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the onPremisesSecurityIdentifier property value. Contains the on-premises security identifier (SID) for the group synchronized from on-premises to the cloud. Returned by default. Supports $filter (eq including on null values). Read-only.
+     * Gets the onPremisesSecurityIdentifier property value. Contains the on-premises security identifier (SID) for the group synchronized from on-premises to the cloud. Read-only. Returned by default. Supports $filter (eq including on null values).
      * @return string|null
     */
     public function getOnPremisesSecurityIdentifier(): ?string {
@@ -665,7 +681,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the onPremisesSyncEnabled property value. true if this group is synced from an on-premises directory; false if this group was originally synced from an on-premises directory but is no longer synced; null if this object has never been synced from an on-premises directory (default). Returned by default. Read-only. Supports $filter (eq, ne, not, in, and eq on null values).
+     * Gets the onPremisesSyncEnabled property value. true if this group is synced from an on-premises directory; false if this group was originally synced from an on-premises directory but is no longer synced; null if this object has never synced from an on-premises directory (default). Returned by default. Read-only. Supports $filter (eq, ne, not, in, and eq on null values).
      * @return bool|null
     */
     public function getOnPremisesSyncEnabled(): ?bool {
@@ -677,7 +693,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the owners property value. The owners of the group. Limited to 100 owners. Nullable. If this property is not specified when creating a Microsoft 365 group, the calling user is automatically assigned as the group owner.  Supports $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1). Supports $expand including nested $select. For example, /groups?$filter=startsWith(displayName,'Role')&$select=id,displayName&$expand=owners($select=id,userPrincipalName,displayName).
+     * Gets the owners property value. The owners of the group who can be users or service principals. Limited to 100 owners. Nullable. If this property isn't specified when creating a Microsoft 365 group the calling user (admin or non-admin) is automatically assigned as the group owner. A non-admin user can't explicitly add themselves to this collection when they're creating the group. For more information, see the related known issue. For security groups, the admin user isn't automatically added to this collection. For more information, see the related known issue. Supports $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1); Supports $expand including nested $select. For example, /groups?$filter=startsWith(displayName,'Role')&$select=id,displayName&$expand=owners($select=id,userPrincipalName,displayName).
      * @return array<DirectoryObject>|null
     */
     public function getOwners(): ?array {
@@ -795,7 +811,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the renewedDateTime property value. Timestamp of when the group was last renewed. This cannot be modified directly and is only updated via the renew service action. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
+     * Gets the renewedDateTime property value. Timestamp of when the group was last renewed. This value can't be modified directly and is only updated via the renew service action. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
      * @return DateTime|null
     */
     public function getRenewedDateTime(): ?DateTime {
@@ -819,7 +835,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the securityIdentifier property value. Security identifier of the group, used in Windows scenarios. Returned by default.
+     * Gets the securityIdentifier property value. Security identifier of the group, used in Windows scenarios. Read-only. Returned by default.
      * @return string|null
     */
     public function getSecurityIdentifier(): ?string {
@@ -831,7 +847,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the serviceProvisioningErrors property value. Errors published by a federated service describing a non-transient, service-specific error regarding the properties or link from a group object .  Supports $filter (eq, not, for isResolved and serviceInstance).
+     * Gets the serviceProvisioningErrors property value. Errors published by a federated service describing a nontransient, service-specific error regarding the properties or link from a group object.  Supports $filter (eq, not, for isResolved and serviceInstance).
      * @return array<ServiceProvisioningError>|null
     */
     public function getServiceProvisioningErrors(): ?array {
@@ -845,7 +861,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the settings property value. Settings that can govern this group's behavior, like whether members can invite guest users to the group. Nullable.
+     * Gets the settings property value. Settings that can govern this group's behavior, like whether members can invite guests to the group. Nullable.
      * @return array<GroupSetting>|null
     */
     public function getSettings(): ?array {
@@ -885,7 +901,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the theme property value. Specifies a Microsoft 365 group's color theme. Possible values are Teal, Purple, Green, Blue, Pink, Orange or Red. Returned by default.
+     * Gets the theme property value. Specifies a Microsoft 365 group's color theme. Possible values are Teal, Purple, Green, Blue, Pink, Orange, or Red. Returned by default.
      * @return string|null
     */
     public function getTheme(): ?string {
@@ -951,7 +967,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the unseenCount property value. Count of conversations that have received new posts since the signed-in user last visited the group. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Gets the unseenCount property value. Count of conversations that received new posts since the signed-in user last visited the group. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @return int|null
     */
     public function getUnseenCount(): ?int {
@@ -963,7 +979,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the visibility property value. Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default, and the Microsoft 365 group is Public. Groups assignable to roles are always Private. To learn more, see group visibility options. Returned by default. Nullable.
+     * Gets the visibility property value. Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value isn't specified during group creation on Microsoft Graph, a security group is created as Private by default, and the Microsoft 365 group is Public. Groups assignable to roles are always Private. To learn more, see group visibility options. Returned by default. Nullable.
      * @return string|null
     */
     public function getVisibility(): ?string {
@@ -1006,6 +1022,7 @@ class Group extends DirectoryObject implements Parsable
         $writer->writeBooleanValue('hideFromOutlookClients', $this->getHideFromOutlookClients());
         $writer->writeBooleanValue('isArchived', $this->getIsArchived());
         $writer->writeBooleanValue('isAssignableToRole', $this->getIsAssignableToRole());
+        $writer->writeBooleanValue('isManagementRestricted', $this->getIsManagementRestricted());
         $writer->writeBooleanValue('isSubscribedByMail', $this->getIsSubscribedByMail());
         $writer->writeObjectValue('licenseProcessingState', $this->getLicenseProcessingState());
         $writer->writeStringValue('mail', $this->getMail());
@@ -1050,7 +1067,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the acceptedSenders property value. The list of users or groups allowed to create posts or calendar events in this group. If this list is non-empty, then only users or groups listed here are allowed to post.
+     * Sets the acceptedSenders property value. The list of users or groups allowed to create posts or calendar events in this group. If this list is nonempty, then only users or groups listed here are allowed to post.
      * @param array<DirectoryObject>|null $value Value to set for the acceptedSenders property.
     */
     public function setAcceptedSenders(?array $value): void {
@@ -1066,7 +1083,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the appRoleAssignments property value. Represents the app roles a group has been granted for an application. Supports $expand.
+     * Sets the appRoleAssignments property value. Represents the app roles granted to a group for an application. Supports $expand.
      * @param array<AppRoleAssignment>|null $value Value to set for the appRoleAssignments property.
     */
     public function setAppRoleAssignments(?array $value): void {
@@ -1074,7 +1091,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the assignedLabels property value. The list of sensitivity label pairs (label ID, label name) associated with a Microsoft 365 group. Returned only on $select.
+     * Sets the assignedLabels property value. The list of sensitivity label pairs (label ID, label name) associated with a Microsoft 365 group. Returned only on $select. This property can be updated only in delegated scenarios where the caller requires both the Microsoft Graph permission and a supported administrator role.
      * @param array<AssignedLabel>|null $value Value to set for the assignedLabels property.
     */
     public function setAssignedLabels(?array $value): void {
@@ -1090,7 +1107,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the autoSubscribeNewMembers property value. Indicates if new members added to the group will be auto-subscribed to receive email notifications. You can set this property in a PATCH request for the group; do not set it in the initial POST request that creates the group. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Sets the autoSubscribeNewMembers property value. Indicates if new members added to the group are autosubscribed to receive email notifications. You can set this property in a PATCH request for the group; don't set it in the initial POST request that creates the group. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @param bool|null $value Value to set for the autoSubscribeNewMembers property.
     */
     public function setAutoSubscribeNewMembers(?bool $value): void {
@@ -1114,7 +1131,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the classification property value. Describes a classification for the group (such as low, medium or high business impact). Valid values for this property are defined by creating a ClassificationList setting value, based on the template definition.Returned by default. Supports $filter (eq, ne, not, ge, le, startsWith).
+     * Sets the classification property value. Describes a classification for the group (such as low, medium, or high business impact). Valid values for this property are defined by creating a ClassificationList setting value, based on the template definition.Returned by default. Supports $filter (eq, ne, not, ge, le, startsWith).
      * @param string|null $value Value to set for the classification property.
     */
     public function setClassification(?string $value): void {
@@ -1130,7 +1147,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the createdDateTime property value. Timestamp of when the group was created. The value cannot be modified and is automatically populated when the group is created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only.
+     * Sets the createdDateTime property value. Timestamp of when the group was created. The value can't be modified and is automatically populated when the group is created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only.
      * @param DateTime|null $value Value to set for the createdDateTime property.
     */
     public function setCreatedDateTime(?DateTime $value): void {
@@ -1138,7 +1155,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the createdOnBehalfOf property value. The user (or application) that created the group. NOTE: This is not set if the user is an administrator. Read-only.
+     * Sets the createdOnBehalfOf property value. The user (or application) that created the group. NOTE: This property isn't set if the user is an administrator. Read-only.
      * @param DirectoryObject|null $value Value to set for the createdOnBehalfOf property.
     */
     public function setCreatedOnBehalfOf(?DirectoryObject $value): void {
@@ -1154,7 +1171,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the displayName property value. The display name for the group. This property is required when a group is created and cannot be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderby.
+     * Sets the displayName property value. The display name for the group. This property is required when a group is created and can't be cleared during updates. Maximum length is 256 characters. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values), $search, and $orderby.
      * @param string|null $value Value to set for the displayName property.
     */
     public function setDisplayName(?string $value): void {
@@ -1186,7 +1203,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the expirationDateTime property value. Timestamp of when the group is set to expire. It is null for security groups, but for Microsoft 365 groups, it represents when the group is set to expire as defined in the groupLifecyclePolicy. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
+     * Sets the expirationDateTime property value. Timestamp of when the group is set to expire. It's null for security groups, but for Microsoft 365 groups, it represents when the group is set to expire as defined in the groupLifecyclePolicy. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
      * @param DateTime|null $value Value to set for the expirationDateTime property.
     */
     public function setExpirationDateTime(?DateTime $value): void {
@@ -1226,7 +1243,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the hideFromAddressLists property value. True if the group is not displayed in certain parts of the Outlook UI: the Address Book, address lists for selecting message recipients, and the Browse Groups dialog for searching groups; otherwise, false. Default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Sets the hideFromAddressLists property value. True if the group isn't displayed in certain parts of the Outlook UI: the Address Book, address lists for selecting message recipients, and the Browse Groups dialog for searching groups; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @param bool|null $value Value to set for the hideFromAddressLists property.
     */
     public function setHideFromAddressLists(?bool $value): void {
@@ -1234,7 +1251,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the hideFromOutlookClients property value. True if the group is not displayed in Outlook clients, such as Outlook for Windows and Outlook on the web; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Sets the hideFromOutlookClients property value. True if the group isn't displayed in Outlook clients, such as Outlook for Windows and Outlook on the web; otherwise, false. The default value is false. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @param bool|null $value Value to set for the hideFromOutlookClients property.
     */
     public function setHideFromOutlookClients(?bool $value): void {
@@ -1250,11 +1267,19 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the isAssignableToRole property value. Indicates whether this group can be assigned to a Microsoft Entra role. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true, visibility must be Hidden, and the group cannot be a dynamic group (that is, groupTypes cannot contain DynamicMembership). Only callers with at least the Privileged Role Administrator role can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Microsoft Entra role assignmentsUsing this feature requires a Microsoft Entra ID P1 license. Returned by default. Supports $filter (eq, ne, not).
+     * Sets the isAssignableToRole property value. Indicates whether this group can be assigned to a Microsoft Entra role. Optional. This property can only be set while creating the group and is immutable. If set to true, the securityEnabled property must also be set to true, visibility must be Hidden, and the group can't be a dynamic group (that is, groupTypes can't contain DynamicMembership). Only callers with at least the Privileged Role Administrator role can set this property. The caller must also be assigned the RoleManagement.ReadWrite.Directory permission to set this property or update the membership of such groups. For more, see Using a group to manage Microsoft Entra role assignmentsUsing this feature requires a Microsoft Entra ID P1 license. Returned by default. Supports $filter (eq, ne, not).
      * @param bool|null $value Value to set for the isAssignableToRole property.
     */
     public function setIsAssignableToRole(?bool $value): void {
         $this->getBackingStore()->set('isAssignableToRole', $value);
+    }
+
+    /**
+     * Sets the isManagementRestricted property value. The isManagementRestricted property
+     * @param bool|null $value Value to set for the isManagementRestricted property.
+    */
+    public function setIsManagementRestricted(?bool $value): void {
+        $this->getBackingStore()->set('isManagementRestricted', $value);
     }
 
     /**
@@ -1290,7 +1315,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the mailNickname property value. The mail alias for the group, unique for Microsoft 365 groups in the organization. Maximum length is 64 characters. This property can contain only characters in the ASCII character set 0 - 127 except the following: @ () / [] ' ; : <> , SPACE. Required. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
+     * Sets the mailNickname property value. The mail alias for the group, unique for Microsoft 365 groups in the organization. Maximum length is 64 characters. This property can contain only characters in the ASCII character set 0 - 127 except the following characters: @ () / [] ' ; : <> , SPACE. Required. Returned by default. Supports $filter (eq, ne, not, ge, le, in, startsWith, and eq on null values).
      * @param string|null $value Value to set for the mailNickname property.
     */
     public function setMailNickname(?string $value): void {
@@ -1346,7 +1371,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the onPremisesDomainName property value. The onPremisesDomainName property
+     * Sets the onPremisesDomainName property value. Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers synchronizing their on-premises directory to Microsoft Entra ID via Microsoft Entra Connect.Returned by default. Read-only.
      * @param string|null $value Value to set for the onPremisesDomainName property.
     */
     public function setOnPremisesDomainName(?string $value): void {
@@ -1354,7 +1379,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the onPremisesLastSyncDateTime property value. Indicates the last time at which the group was synced with the on-premises directory.The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only. Supports $filter (eq, ne, not, ge, le, in).
+     * Sets the onPremisesLastSyncDateTime property value. Indicates the last time at which the group was synced with the on-premises directory. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Read-only. Supports $filter (eq, ne, not, ge, le, in).
      * @param DateTime|null $value Value to set for the onPremisesLastSyncDateTime property.
     */
     public function setOnPremisesLastSyncDateTime(?DateTime $value): void {
@@ -1362,7 +1387,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the onPremisesNetBiosName property value. The onPremisesNetBiosName property
+     * Sets the onPremisesNetBiosName property value. Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers synchronizing their on-premises directory to Microsoft Entra ID via Microsoft Entra Connect.Returned by default. Read-only.
      * @param string|null $value Value to set for the onPremisesNetBiosName property.
     */
     public function setOnPremisesNetBiosName(?string $value): void {
@@ -1386,7 +1411,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the onPremisesSecurityIdentifier property value. Contains the on-premises security identifier (SID) for the group synchronized from on-premises to the cloud. Returned by default. Supports $filter (eq including on null values). Read-only.
+     * Sets the onPremisesSecurityIdentifier property value. Contains the on-premises security identifier (SID) for the group synchronized from on-premises to the cloud. Read-only. Returned by default. Supports $filter (eq including on null values).
      * @param string|null $value Value to set for the onPremisesSecurityIdentifier property.
     */
     public function setOnPremisesSecurityIdentifier(?string $value): void {
@@ -1394,7 +1419,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the onPremisesSyncEnabled property value. true if this group is synced from an on-premises directory; false if this group was originally synced from an on-premises directory but is no longer synced; null if this object has never been synced from an on-premises directory (default). Returned by default. Read-only. Supports $filter (eq, ne, not, in, and eq on null values).
+     * Sets the onPremisesSyncEnabled property value. true if this group is synced from an on-premises directory; false if this group was originally synced from an on-premises directory but is no longer synced; null if this object has never synced from an on-premises directory (default). Returned by default. Read-only. Supports $filter (eq, ne, not, in, and eq on null values).
      * @param bool|null $value Value to set for the onPremisesSyncEnabled property.
     */
     public function setOnPremisesSyncEnabled(?bool $value): void {
@@ -1402,7 +1427,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the owners property value. The owners of the group. Limited to 100 owners. Nullable. If this property is not specified when creating a Microsoft 365 group, the calling user is automatically assigned as the group owner.  Supports $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1). Supports $expand including nested $select. For example, /groups?$filter=startsWith(displayName,'Role')&$select=id,displayName&$expand=owners($select=id,userPrincipalName,displayName).
+     * Sets the owners property value. The owners of the group who can be users or service principals. Limited to 100 owners. Nullable. If this property isn't specified when creating a Microsoft 365 group the calling user (admin or non-admin) is automatically assigned as the group owner. A non-admin user can't explicitly add themselves to this collection when they're creating the group. For more information, see the related known issue. For security groups, the admin user isn't automatically added to this collection. For more information, see the related known issue. Supports $filter (/$count eq 0, /$count ne 0, /$count eq 1, /$count ne 1); Supports $expand including nested $select. For example, /groups?$filter=startsWith(displayName,'Role')&$select=id,displayName&$expand=owners($select=id,userPrincipalName,displayName).
      * @param array<DirectoryObject>|null $value Value to set for the owners property.
     */
     public function setOwners(?array $value): void {
@@ -1474,7 +1499,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the renewedDateTime property value. Timestamp of when the group was last renewed. This cannot be modified directly and is only updated via the renew service action. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
+     * Sets the renewedDateTime property value. Timestamp of when the group was last renewed. This value can't be modified directly and is only updated via the renew service action. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on January 1, 2014 is 2014-01-01T00:00:00Z. Returned by default. Supports $filter (eq, ne, not, ge, le, in). Read-only.
      * @param DateTime|null $value Value to set for the renewedDateTime property.
     */
     public function setRenewedDateTime(?DateTime $value): void {
@@ -1490,7 +1515,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the securityIdentifier property value. Security identifier of the group, used in Windows scenarios. Returned by default.
+     * Sets the securityIdentifier property value. Security identifier of the group, used in Windows scenarios. Read-only. Returned by default.
      * @param string|null $value Value to set for the securityIdentifier property.
     */
     public function setSecurityIdentifier(?string $value): void {
@@ -1498,7 +1523,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the serviceProvisioningErrors property value. Errors published by a federated service describing a non-transient, service-specific error regarding the properties or link from a group object .  Supports $filter (eq, not, for isResolved and serviceInstance).
+     * Sets the serviceProvisioningErrors property value. Errors published by a federated service describing a nontransient, service-specific error regarding the properties or link from a group object.  Supports $filter (eq, not, for isResolved and serviceInstance).
      * @param array<ServiceProvisioningError>|null $value Value to set for the serviceProvisioningErrors property.
     */
     public function setServiceProvisioningErrors(?array $value): void {
@@ -1506,7 +1531,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the settings property value. Settings that can govern this group's behavior, like whether members can invite guest users to the group. Nullable.
+     * Sets the settings property value. Settings that can govern this group's behavior, like whether members can invite guests to the group. Nullable.
      * @param array<GroupSetting>|null $value Value to set for the settings property.
     */
     public function setSettings(?array $value): void {
@@ -1530,7 +1555,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the theme property value. Specifies a Microsoft 365 group's color theme. Possible values are Teal, Purple, Green, Blue, Pink, Orange or Red. Returned by default.
+     * Sets the theme property value. Specifies a Microsoft 365 group's color theme. Possible values are Teal, Purple, Green, Blue, Pink, Orange, or Red. Returned by default.
      * @param string|null $value Value to set for the theme property.
     */
     public function setTheme(?string $value): void {
@@ -1570,7 +1595,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the unseenCount property value. Count of conversations that have received new posts since the signed-in user last visited the group. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
+     * Sets the unseenCount property value. Count of conversations that received new posts since the signed-in user last visited the group. Returned only on $select. Supported only on the Get group API (GET /groups/{ID}).
      * @param int|null $value Value to set for the unseenCount property.
     */
     public function setUnseenCount(?int $value): void {
@@ -1578,7 +1603,7 @@ class Group extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the visibility property value. Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value is not specified during group creation on Microsoft Graph, a security group is created as Private by default, and the Microsoft 365 group is Public. Groups assignable to roles are always Private. To learn more, see group visibility options. Returned by default. Nullable.
+     * Sets the visibility property value. Specifies the group join policy and group content visibility for groups. Possible values are: Private, Public, or HiddenMembership. HiddenMembership can be set only for Microsoft 365 groups when the groups are created. It can't be updated later. Other values of visibility can be updated after group creation. If visibility value isn't specified during group creation on Microsoft Graph, a security group is created as Private by default, and the Microsoft 365 group is Public. Groups assignable to roles are always Private. To learn more, see group visibility options. Returned by default. Nullable.
      * @param string|null $value Value to set for the visibility property.
     */
     public function setVisibility(?string $value): void {

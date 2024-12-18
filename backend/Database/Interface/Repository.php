@@ -28,8 +28,10 @@ class Repository extends stdClass
     {
         $statement = $this->repoTable->select();
         if (!is_null($id)) {
-            $statement->where($this->idField, $id);
-            if ($this->guidField) $statement->orWhere($this->guidField, $id);
+            if ($this->guidField) {
+                if (strlen($id) > 12) $statement->where($this->guidField, $id);
+                else $statement->where($this->idField, $id);
+            } else $statement->where($this->idField, $id);
         }
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
         if ($order && $this->orderField) $statement->orderBy($this->orderField, $this->orderDirection);
@@ -84,7 +86,8 @@ class Repository extends stdClass
     {
         unset($object[$this->idField]);
         unset($object[$this->deletedField]);
-        if ($this->guidField) $object[$this->guidField] = GUID::create();
+
+        if ($this->guidField) $object[$this->guidField] = $object[$this->guidField] ?: GUID::create();
 
         foreach ($object as $key => $value) {
             if (is_null($value)) unset($object[$key]);
@@ -92,6 +95,15 @@ class Repository extends stdClass
 
         $statement = $this->repoTable->insert($object);
         return $statement->execute();
+    }
+
+    public function delete($params = [])
+    {
+        $statement = $this->repoTable->delete();
+
+        foreach ($params as $key => $value) $statement->where($key, $value);
+
+        $statement->execute();
     }
 
     public function deleteWhereDeleteTrue()

@@ -2,7 +2,6 @@
 
 namespace Controllers\API;
 
-use Security\GUID;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
@@ -17,52 +16,23 @@ use Database\Repository\Helpdesk\Thread;
 use Database\Repository\Helpdesk\Ticket;
 use Database\Object\Helpdesk\Ticket as ObjectTicket;
 use Database\Object\Helpdesk\Thread as HelpdeskThread;
+use Database\Object\Mail\Mail as MailMail;
+use Database\Object\Mail\Receiver as MailReceiver;
+use Database\Repository\Mail\Mail;
+use Database\Repository\Mail\Receiver;
+use Helpers\HTML;
+use Security\FileSystem;
+use stdClass;
 
 class HelpdeskController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, "mine")) $this->getMine($view, $id);
-        else if (Strings::equal($what, "tickets")) $this->getTickets($view, $id);
-        else if (Strings::equal($what, "assigned")) $this->getAssigned($view, $id);
-        else if (Strings::equal($what, "priority")) $this->getPriority($view, $id);
-        else if (Strings::equal($what, "category")) $this->getCategory($view, $id);
-        else if (Strings::equal($what, "status")) $this->getStatus($view, $id);
-        else if (Strings::equal($what, "thread")) $this->getThread($view, $id);
-        else if (Strings::equal($what, "settings")) $this->getSettings($view, $id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "mine") || Strings::equal($what, "tickets") || Strings::equal($what, "assigned")) $this->postTicket($id);
-        else if (Strings::equal($what, "settings")) $this->postSettings();
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function delete($what, $id = null)
-    {
-        // if (Strings::equal($what, "mine")) $this->deleteTicket($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        else {
-            $this->setCloseModal();
-            $this->setReloadTable();
-        }
-        $this->handle();
-    }
-
     // Get functions
-    private function getMine($view, $id = null)
+    protected function getMine($view, $id = null)
     {
         $currentUserId = User::getLoggedInUser()->id;
         $repo = new Ticket;
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
                 'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
@@ -124,29 +94,28 @@ class HelpdeskController extends ApiController
                     [
                         "title" => "Laatste activiteit",
                         "data" => "formatted.lastActivity",
+                        "render" => [
+                            "_" => "display",
+                            "sort" => "sort"
+                        ],
+                        "type" => "date",
                         "width" => "300px"
                     ],
                 ]
             );
 
             $items = $repo->getByCreatorUserId($currentUserId);
-
-            foreach ($filters as $key => $value) {
-                if (!$value || empty($value)) continue;
-
-                if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
-                else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
-            }
+            General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "form")) $this->appendToJson('fields', Arrays::first($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
     }
 
-    private function getTickets($view, $id = null)
+    protected function getTickets($view, $id = null)
     {
         $repo = new Ticket;
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
                 'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
@@ -214,30 +183,29 @@ class HelpdeskController extends ApiController
                     [
                         "title" => "Laatste activiteit",
                         "data" => "formatted.lastActivity",
+                        "render" => [
+                            "_" => "display",
+                            "sort" => "sort"
+                        ],
+                        "type" => "date",
                         "width" => "300px"
                     ],
                 ]
             );
 
             $items = $repo->get();
-
-            foreach ($filters as $key => $value) {
-                if (!$value || empty($value)) continue;
-
-                if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
-                else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
-            }
+            General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "form")) $this->appendToJson('fields', Arrays::first($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
     }
 
-    private function getAssigned($view, $id = null)
+    protected function getAssigned($view, $id = null)
     {
         $currentUserId = User::getLoggedInUser()->id;
         $repo = new Ticket;
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
                 'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
@@ -299,30 +267,29 @@ class HelpdeskController extends ApiController
                     [
                         "title" => "Laatste activiteit",
                         "data" => "formatted.lastActivity",
+                        "render" => [
+                            "_" => "display",
+                            "sort" => "sort"
+                        ],
+                        "type" => "date",
                         "width" => "300px"
                     ],
                 ]
             );
 
             $items = $repo->getByAssignedToUserId($currentUserId);
-
-            foreach ($filters as $key => $value) {
-                if (!$value || empty($value)) continue;
-
-                if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
-                else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
-            }
+            General::filter($items, $filters);
 
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, "form")) $this->appendToJson('fields', Arrays::first($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
     }
 
-    private function getPriority($view, $id = null)
+    protected function getPriority($view, $id = null)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $priorities = $settings['priority'];
 
-        if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_SELECT)) {
             $_priorities = [];
 
             foreach ($priorities as $k => $v) $_priorities[] = ["id" => $k, ...$v];
@@ -331,12 +298,12 @@ class HelpdeskController extends ApiController
         }
     }
 
-    private function getStatus($view, $id = null)
+    protected function getStatus($view, $id = null)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $statuses = $settings['status'];
 
-        if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_SELECT)) {
             $_statuses = [];
 
             foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
@@ -345,12 +312,12 @@ class HelpdeskController extends ApiController
         }
     }
 
-    private function getCategory($view, $id = null)
+    protected function getCategory($view, $id = null)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $categories = $settings['category'];
 
-        if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_SELECT)) {
             $_optgroups = [];
             $_cateogries = [];
 
@@ -370,18 +337,43 @@ class HelpdeskController extends ApiController
         }
     }
 
-    private function getThread($view, $id = null)
+    protected function getThread($view, $id = null)
     {
         $threadRepo = new Thread;
+        if (!$id) $id = Helpers::url()->getParam('ticketId');
 
-        if (Strings::equal($view, "list")) {
+        if (Strings::equal($view, self::VIEW_LIST)) {
             $ticketId = Arrays::first((new Ticket)->get($id))->id;
             $items = Arrays::map($threadRepo->getByTicketId($ticketId), fn($i) => $i->toArray(true));
-            $this->appendToJson('items', $items);
+            $this->appendToJson('raw', General::processTemplate($items));
         }
     }
 
-    private function getSettings($view)
+    protected function getAttachments($view, $id = null)
+    {
+        $repo = new Ticket;
+        if (!$id) $id = Helpers::url()->getParam('ticketId');
+
+        if (Strings::equal($view, self::VIEW_LIST)) {
+            $ticket = Arrays::first($repo->get($id));
+            $attachments = FileSystem::getFiles(LOCATION_UPLOAD . "/helpdesk/{$ticket->guid}");
+
+            if (!$attachments) $this->appendToJson('raw', 'Geen bestanden!');
+            else {
+
+                $items = Arrays::map($attachments, function ($a) use ($ticket) {
+                    $item = new stdClass;
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/helpdesk/{$ticket->guid}/{$a}"), $a, HTML::LINK_TARGET_BLANK);
+
+                    return $item;
+                });
+
+                $this->appendToJson('raw', General::processTemplate($items));
+            }
+        }
+    }
+
+    protected function getSettings($view, $id = null)
     {
         $repo = new Navigation;
         $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
@@ -390,7 +382,22 @@ class HelpdeskController extends ApiController
     }
 
     // Post functions
-    private function postTicket($id)
+    protected function postMine($view, $id = null)
+    {
+        $this->postTicket($view, $id);
+    }
+
+    protected function postTickets($view, $id = null)
+    {
+        $this->postTicket($view, $id);
+    }
+
+    protected function postAssigned($view, $id = null)
+    {
+        $this->postTicket($view, $id);
+    }
+
+    protected function postTicket($view, $id)
     {
         if ($id == "add") $id = null;
         $navRepo = new Navigation;
@@ -406,23 +413,29 @@ class HelpdeskController extends ApiController
         $assetId = Helpers::input()->post('assetId')->getValue();
         $content = Helpers::input()->post('content')->getValue();
         $assignedToUserId = Helpers::input()->post('assignedToUserId');
+        $attachments = Helpers::input()->file('attachments');
+
+        $mailAssignedTo = false;
 
         if (!$id) {
-            if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-            if (!Input::check($category) || Input::empty($category)) $this->setValidation("category", "Categorie moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-            if (!Input::check($content) || Input::empty($content)) $this->setValidation("content", "Beschrijving probleem moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+            if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($category) || Input::empty($category)) $this->setValidation("category", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($content) || Input::empty($content)) $this->setValidation("content", state: self::VALIDATION_STATE_INVALID);
         }
 
         if (Arrays::first(explode("-", $category)) !== "O") {
-            if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-            if (!Input::check($assetId, Input::INPUT_TYPE_INT) || Input::empty($assetId)) $this->setValidation("assetId", "Toestel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+            if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($assetId, Input::INPUT_TYPE_INT) || Input::empty($assetId)) $this->setValidation("assetId", state: self::VALIDATION_STATE_INVALID);
         }
 
         if ($this->validationIsAllGood()) {
-            $helpdesk = $id ? Arrays::first($repo->get($id)) : (new ObjectTicket);
+            $helpdesk = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectTicket);
             if (!$helpdesk->number) $helpdesk->number = $settings['lastNumber'] + 1;
             if (!$helpdesk->creatorUserId) $helpdesk->creatorUserId = User::getLoggedInUser()->id;
-            if ($assignedToUserId) $helpdesk->assignedToUserId = $assignedToUserId;
+            if ($assignedToUserId) {
+                $helpdesk->assignedToUserId = $assignedToUserId;
+                if ($helpdesk->assignedToUserId != $assignedToUserId) $mailAssignedTo = true;
+            }
             $helpdesk->priority = $priority;
             $helpdesk->schoolId = $schoolId;
             $helpdesk->status = $status;
@@ -433,6 +446,16 @@ class HelpdeskController extends ApiController
 
             $newId = $repo->set($helpdesk);
             if (!$id) $helpdesk->id = $newId;
+            $helpdesk = Arrays::first($repo->get($helpdesk->id));
+
+            if ($attachments) {
+                $location = LOCATION_UPLOAD . "/helpdesk/{$helpdesk->guid}";
+                FileSystem::CreateFolder($location);
+
+                foreach ($attachments as $index => $attachment) {
+                    $attachment->move("{$location}/{$helpdesk->guid}_{$index}." . $attachment->getExtension());
+                }
+            }
 
             if ($content) {
                 $thread = new HelpdeskThread;
@@ -451,11 +474,19 @@ class HelpdeskController extends ApiController
                 $navRepo->set($navItem, ['settings']);
             }
 
+            // Mail
+            if (!$id) $this->mailNew($helpdesk->id);
+            else {
+                if ($helpdesk->creatorUserId != User::getLoggedInUser()->id && $content) $this->mailUpdate($helpdesk->id);
+                if ($mailAssignedTo) $this->mailAssigned($helpdesk->id);
+                if ($helpdesk->assignedToUserId && $content) $this->mailAssignedUpdate($helpdesk->id);
+            }
+
             $this->setReturn();
-        }
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
-    private function postSettings()
+    protected function postSettings($view, $id = null)
     {
         $_settings = Helpers::input()->all();
         $settings = [];
@@ -468,5 +499,132 @@ class HelpdeskController extends ApiController
 
         $repo->set($item, ['settings']);
         $this->setToast("De instellingen zijn opgeslagen!");
+    }
+
+    // Delete functions
+
+    // Mail functions
+    protected function mailNew($id)
+    {
+        $repo = new Ticket;
+        $mailRepo = new Mail;
+        $mailReceiverRepo = new Receiver;
+        $navRepo = new Navigation;
+        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+
+        $h = $repo->get($id)[0];
+        $mail = new MailMail;
+
+        $subject = $settings['mail']['template']['new']['subject'];
+        $body = $settings['mail']['template']['new']['body'];
+        foreach ($h->toArray(true) as $key => $value) {
+            $subject = str_replace("{{{$key}}}", $value, $subject);
+            $body = str_replace("{{{$key}}}", $value, $body);
+        }
+
+        $mail->subject = $subject;
+        $mail->body = $body;
+        if ($settings['mail']['template']['new']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+
+        $mId = $mailRepo->set($mail);
+
+        $receiver = new MailReceiver;
+        $receiver->mailId = $mId;
+        $receiver->email = $h->linked->creatorUser->username;
+        $receiver->name = $h->linked->creatorUser->formatted->fullName;
+        $mailReceiverRepo->set($receiver);
+    }
+
+    protected function mailUpdate($id)
+    {
+        $repo = new Ticket;
+        $mailRepo = new Mail;
+        $mailReceiverRepo = new Receiver;
+        $navRepo = new Navigation;
+        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+
+        $h = $repo->get($id)[0];
+        $mail = new MailMail;
+
+        $subject = $settings['mail']['template']['update']['subject'];
+        $body = $settings['mail']['template']['update']['body'];
+        foreach ($h->toArray(true) as $key => $value) {
+            $subject = str_replace("{{{$key}}}", $value, $subject);
+            $body = str_replace("{{{$key}}}", $value, $body);
+        }
+
+        $mail->subject = $subject;
+        $mail->body = $body;
+        if ($settings['mail']['template']['update']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+
+        $mId = $mailRepo->set($mail);
+
+        $receiver = new MailReceiver;
+        $receiver->mailId = $mId;
+        $receiver->email = $h->linked->creatorUser->username;
+        $receiver->name = $h->linked->creatorUser->formatted->fullName;
+        $mailReceiverRepo->set($receiver);
+    }
+
+    protected function mailAssigned($id)
+    {
+        $repo = new Ticket;
+        $mailRepo = new Mail;
+        $mailReceiverRepo = new Receiver;
+        $navRepo = new Navigation;
+        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+
+        $h = $repo->get($id)[0];
+        $mail = new MailMail;
+
+        $subject = $settings['mail']['template']['assigned']['subject'];
+        $body = $settings['mail']['template']['assigned']['body'];
+        foreach ($h->toArray(true) as $key => $value) {
+            $subject = str_replace("{{{$key}}}", $value, $subject);
+            $body = str_replace("{{{$key}}}", $value, $body);
+        }
+
+        $mail->subject = $subject;
+        $mail->body = $body;
+        if ($settings['mail']['template']['assigned']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+
+        $mId = $mailRepo->set($mail);
+
+        $receiver = new MailReceiver;
+        $receiver->mailId = $mId;
+        $receiver->email = $h->linked->assignedToUser->username;
+        $receiver->name = $h->linked->assignedToUser->formatted->fullName;
+        $mailReceiverRepo->set($receiver);
+    }
+
+    protected function mailAssignedUpdate($id)
+    {
+        $repo = new Ticket;
+        $mailRepo = new Mail;
+        $mailReceiverRepo = new Receiver;
+        $navRepo = new Navigation;
+        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+
+        $h = $repo->get($id)[0];
+        $mail = new MailMail;
+
+        $subject = $settings['mail']['template']['assignedUpdate']['subject'];
+        $body = $settings['mail']['template']['assignedUpdate']['body'];
+        foreach ($h->toArray(true) as $key => $value) {
+            $subject = str_replace("{{{$key}}}", $value, $subject);
+            $body = str_replace("{{{$key}}}", $value, $body);
+        }
+
+        $mail->subject = $subject;
+        $mail->body = $body;
+        if ($settings['mail']['template']['assignedUpdate']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+
+        $mId = $mailRepo->set($mail);
+
+        $receiver = new MailReceiver;
+        $receiver->mailId = $mId;
+        $receiver->email = $h->linked->assignedToUser->username;
+        $receiver->name = $h->linked->assignedToUser->formatted->fullName;
+        $mailReceiverRepo->set($receiver);
     }
 }

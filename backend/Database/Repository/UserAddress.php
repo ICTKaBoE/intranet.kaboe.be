@@ -29,10 +29,10 @@ class UserAddress extends Repository
         return $this->executeSelect($statement);
     }
 
-    public function getByInformatId($informatId)
+    public function getByInformatEmployeeAddressId($informatEmployeeAddressId)
     {
         $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
+        $statement->where('informatEmployeeAddressId', $informatEmployeeAddressId);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

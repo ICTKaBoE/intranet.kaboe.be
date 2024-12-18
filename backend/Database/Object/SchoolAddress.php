@@ -16,6 +16,7 @@ class SchoolAddress extends CustomObject
         "zipcode" => "string",
         "city" => "string",
         "country" => "string",
+        "phone" => "string",
         "deleted" => "boolean"
     ];
 

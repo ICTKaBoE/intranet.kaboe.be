@@ -2,10 +2,13 @@
 
 namespace Database\Object;
 
-use Database\Interface\CustomObject;
-use Database\Repository\Mapping;
+use Helpers\HTML;
 use Helpers\CString;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Database\Repository\Mapping;
+use Database\Repository\Navigation;
+use Database\Interface\CustomObject;
 
 class BikeDistance extends CustomObject
 {
@@ -19,8 +22,6 @@ class BikeDistance extends CustomObject
         "distance" => "double",
         "alias" => "string",
         "color" => "string",
-        "pricePerKm" => "double",
-        "userMainSchoolId" => "int",
         "deleted" => "boolean"
     ];
 
@@ -39,10 +40,11 @@ class BikeDistance extends CustomObject
     public function init()
     {
         $this->startAddress = (Strings::equal($this->type, "HW") ? $this->linked->userAddress->formatted->address : $this->linked->startSchool->formatted->addressWithSchool);
-        $this->mapped->type = (new Mapping)->get("bike/distance/type/{$this->type}")[0]->value;
+        $this->mapped->type = Arrays::first((new Navigation)->getByParentIdAndLink(0, "bike"))->settings['distance']['type'][$this->type]['name'];
         $this->formatted->distance = CString::formatNumber($this->distance, 2) . "km";
         $this->formatted->distanceWithDouble = $this->formatted->distance . " (" . CString::formatNumber($this->distance * 2, 2) . "km)";
-        $this->formatted->badge->color = "<span class=\"badge p-2 bg-{$this->color} rounded-circle\" style=\"margin-top: 2px\"></span>";
+        $this->formatted->badge->color = HTML::Badge("", null, $this->color, ["rounded-circle", "p-2"], ["margin-top" => "2px"]);
+        // $this->formatted->badge->color = "<span class=\"badge p-2 bg-{$this->color} rounded-circle\" style=\"margin-top: 2px\"></span>";
 
         $this->borderColor = $this->color;
         $this->textColor = "black";

@@ -6,8 +6,8 @@ use Controllers\ComponentController;
 
 class ActionButtonsComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('actionButtons');
+		parent::__construct('actionButtons', $arguments);
 	}
 }

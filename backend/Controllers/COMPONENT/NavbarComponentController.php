@@ -4,7 +4,10 @@ namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
 use Database\Repository\Navigation;
+use Database\Repository\RouteGroup;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
+use Router\Helpers;
 use Security\User;
 
 class NavbarComponentController extends ComponentController
@@ -40,40 +43,47 @@ class NavbarComponentController extends ComponentController
 														<i class="icon ti ti-{{navbar:subitem:icon}}"></i>
 													</span>';
 
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('navbar');
+		parent::__construct('navbar', $arguments);
 		$this->writeItems();
 	}
 
 	private function writeItems()
 	{
 		$navigationRepo = new Navigation;
-		$topLevelItems = $navigationRepo->getByParentId(0);
+		$domain = Helpers::url()->getHost();
+		$routeGroup = (new RouteGroup)->getByDomain($domain);
 
-		foreach ($topLevelItems as $tli) {
-			if ($tli->order < 0) continue;
-			if (!User::canAccess($tli->minimumRights)) continue;
+		$activeItem = Arrays::firstOrNull(Arrays::filter($navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0), fn($tli) => $tli->order >= 0 && User::canAccess($tli->minimumRights) && $tli->formatted->active));
 
-			$subLevelItems = $navigationRepo->getByParentId($tli->id);
+		if ($activeItem) {
+			$topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $activeItem->id);
 
-			$template = (count($subLevelItems) ? self::TEMPLATE_NAVBAR_ITEM_WITH_SUB : self::TEMPLATE_NAVBAR_ITEM);
-			if ($tli->icon) $template = str_replace("{{navbar:item:ifIcon}}", self::TEMPLATE_NAVBAR_ITEM_ICON, $template);
-			foreach ($tli->toArray(true) as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?? "", $template);
+			foreach ($topLevelItems as $tli) {
+				if ($tli->order < 0) continue;
+				if (!User::canAccess($tli->minimumRights)) continue;
 
-			if (count($subLevelItems)) {
-				foreach ($subLevelItems as $sli) {
-					if (!User::canAccess($sli->minimumRights)) continue;
+				$subLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $tli->id);
 
-					$sliTemplate = self::TEMPLATE_NAVBAR_SUBITEM;
-					if ($sli->icon) $sliTemplate = str_replace("{{navbar:subitem:ifIcon}}", self::TEMPLATE_NAVBAR_SUBITEM_ICON, $sliTemplate);
-					foreach ($sli->toArray(true) as $key => $value) $sliTemplate = str_replace("{{navbar:subitem:{$key}}}", $value ?? "", $sliTemplate);
+				$template = (count($subLevelItems) ? self::TEMPLATE_NAVBAR_ITEM_WITH_SUB : self::TEMPLATE_NAVBAR_ITEM);
+				if ($tli->icon) $template = str_replace("{{navbar:item:ifIcon}}", self::TEMPLATE_NAVBAR_ITEM_ICON, $template);
+				foreach ($tli->toArray(true) as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?: "", $template);
 
-					$template = str_replace("{{navbar:item:subitems}}", $sliTemplate, $template);
+				if (count($subLevelItems)) {
+					foreach ($subLevelItems as $sli) {
+						if (!User::canAccess($sli->minimumRights)) continue;
+
+						$sliTemplate = self::TEMPLATE_NAVBAR_SUBITEM;
+						if ($sli->icon) $sliTemplate = str_replace("{{navbar:subitem:ifIcon}}", self::TEMPLATE_NAVBAR_SUBITEM_ICON, $sliTemplate);
+						foreach ($sli->toArray(true) as $key => $value) $sliTemplate = str_replace("{{navbar:subitem:{$key}}}", $value ?: "", $sliTemplate);
+
+						$template = str_replace("{{navbar:item:subitems}}", $sliTemplate, $template);
+					}
 				}
-			}
 
-			$this->layout = str_replace("{{navbar:items}}", $template, $this->layout);
+				$this->layout = str_replace("{{navbar:items}}", $template, $this->layout);
+			}
 		}
 	}
 }

@@ -10,4 +10,12 @@ class Purchase extends Repository
     {
         parent::__construct("tbl_order_purchase", \Database\Object\Order\Purchase::class, orderField: 'number', orderDirection: 'DESC');
     }
+
+    public function getBySupplierId($supplierId)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where("supplierId", $supplierId);
+
+        return $this->executeSelect($statement);
+    }
 }

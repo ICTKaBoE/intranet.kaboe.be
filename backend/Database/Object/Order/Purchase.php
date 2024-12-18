@@ -2,6 +2,8 @@
 
 namespace Database\Object\Order;
 
+use Helpers\HTML;
+use Router\Helpers;
 use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
@@ -34,10 +36,11 @@ class Purchase extends CustomObject
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
 
-        $this->formatted->badge->status = "<span class=\"badge text-white bg-{$settings['status'][$this->status]['color']}\" style=\"margin-top: 2px\">{$settings['status'][$this->status]['name']}</span>";
+        $this->formatted->badge->status = HTML::Badge($settings['status'][$this->status]['name'], backgroundColor: $settings['status'][$this->status]['color'], style: ["margin-top" => "2px"]);
         $this->formatted->acceptor = is_array($this->linked->acceptorUser) ? join('<br />', Arrays::map($this->linked->acceptorUser, fn($a) => $a->formatted->fullName)) : $this->linked->acceptorUser->formatted->fullName;
 
-        // $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || Strings::equal($this->status, 'C'));
+        $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/order/accept/{$this->guid}";
+        $this->_lockedForm = !Arrays::contains(["N"], $this->status);
 
         $this->createNumber();
     }

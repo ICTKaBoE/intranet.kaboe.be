@@ -1,0 +1,11 @@
+{
+	"_": "light",
+	"overwrite": {
+		"public": {
+			"dark": ["/login"]
+		},
+		"intranet": {
+			"dark": ["/index"]
+		}
+	}
+}

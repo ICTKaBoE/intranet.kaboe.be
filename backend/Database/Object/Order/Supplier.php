@@ -15,4 +15,9 @@ class Supplier extends CustomObject
         "phone" => "string",
         "deleted" => "boolean"
     ];
+
+    public function init()
+    {
+        $this->formatted->contactWithName = ($this->contactName ? "{$this->contactName} ($this->name)" : $this->name);
+    }
 }

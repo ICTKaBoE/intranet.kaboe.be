@@ -12,6 +12,10 @@ use Ouzo\Utilities\Strings;
 use M365\AuthenticationManager;
 use Database\Repository\Setting;
 use Database\Repository\Navigation;
+use Database\Repository\RouteGroup;
+use Helpers\CString;
+
+use function Ramsey\Uuid\v1;
 
 class DefaultController extends stdClass
 {
@@ -24,6 +28,7 @@ class DefaultController extends stdClass
 		// "schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
+		"navigation" => \Controllers\COMPONENT\NavigationComponentController::class,
 		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
 		"actionButtons" => \Controllers\COMPONENT\ActionButtonsComponentController::class,
 		"searchField" => \Controllers\COMPONENT\SearchFieldComponentController::class,
@@ -42,8 +47,11 @@ class DefaultController extends stdClass
 	{
 		$this->createGlobalVariables();
 		$this->storeLayout();
+		$this->storeTheme();
+
 		$this->loadLoad();
 		$this->loadContent();
+		$this->loadExtraContent();
 		$this->loadComponents();
 		$this->loadActions();
 		$this->loadOthers();
@@ -61,7 +69,6 @@ class DefaultController extends stdClass
 
 	private function createGlobalVariables()
 	{
-		// $this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getReletiveUrl()));
 		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getDirectory()));
 		$this->pageAction = "";
 
@@ -70,23 +77,52 @@ class DefaultController extends stdClass
 
 	private function storeLayout()
 	{
-		$overrides = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layoutOverride.json"), true);
+		$layout = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layout.json"), true);
 		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
 		$route = Helpers::getReletiveUrl();
+		$domain = Helpers::getDomainFolder() ?: "public";
 
 		$file = false;
-		foreach ($overrides as $key => $paths) {
+
+		// Domain
+		foreach ($layout['overwrite'][$domain] as $key => $paths) {
+			if ($key == "_") continue;
+
 			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $url)) {
-				$file = $key;
+				$file = "{$domain}/{$key}";
 				break;
 			}
 		}
 
-		if (!$file) $file = "default";
+		if (!$file) $file = $domain . "/" . $layout['overwrite'][$domain]['_'];
+		if (!$file) $file = $layout['_'];
 
 		ob_start();
 		require_once LOCATION_SHARED . "/layout/{$file}.php";
 		$this->layout = ob_get_clean();
+	}
+
+	private function storeTheme()
+	{
+		$layout = json_decode(file_get_contents(LOCATION_BACKEND . "/config/theme.json"), true);
+		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		$route = Helpers::getReletiveUrl();
+		$domain = Helpers::getDomainFolder() ?: "public";
+
+		$theme = false;
+
+		// Domain
+		foreach ($layout['overwrite'][$domain] as $key => $paths) {
+			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $url)) {
+				$theme = $key;
+				break;
+			}
+		}
+
+		if (!$theme) $theme = $layout['overwrite'][$domain]['_'];
+		if (!$theme) $theme = $layout['_'];
+
+		$this->layout = str_replace("{{layout:theme}}", $theme, $this->layout);
 	}
 
 	// Loaders
@@ -100,7 +136,32 @@ class DefaultController extends stdClass
 	private function loadComponents()
 	{
 		foreach (self::COMPONENTS as $component => $controller) {
-			if (Strings::contains($this->layout, "{{component:{$component}}}")) $this->layout = str_replace("{{component:{$component}}}", (new $controller())->write(), $this->layout);
+			if (Strings::contains($this->layout, "{{component:{$component}")) {
+				$argumentList = CString::getStringBetween($this->layout, "{{component:{$component}", "}}");
+				parse_str(str_replace("?", "", $argumentList), $arguments);
+				$this->layout = str_replace("{{component:{$component}{$argumentList}}}", (new $controller($arguments))->write(), $this->layout);
+			}
+		}
+	}
+
+	private function loadExtraContent()
+	{
+		$extraContent = json_decode(file_get_contents(LOCATION_BACKEND . "/config/extraContent.json"), true);
+		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		$route = Helpers::getReletiveUrl();
+		$domain = Helpers::getDomainFolder() ?: "public";
+		$_route = explode("/", $route);
+		$_route[count($_route) - 1] = "*";
+		$_route = implode("/", $_route);
+
+		foreach ($extraContent[$domain] as $controller => $paths) {
+			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $_route) || Arrays::contains($paths, $url)) {
+				$layout = (new $controller())->write();
+
+				foreach ($layout as $key => $item) {
+					$this->layout = str_replace($item["pattern"], $item["content"], $this->layout);
+				}
+			}
 		}
 	}
 
@@ -133,7 +194,9 @@ class DefaultController extends stdClass
 
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(), $this->layout);
 
-		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v{{setting:api.version}}", $this->layout);
+		$mode = (new Setting)->get("site.mode")[0]->value;
+		$apiUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . (Strings::equal($mode, "dev") ? "dev." : "") . "api.kaboe.be";
+		$this->layout = str_replace("{{api:url}}", $apiUrl, $this->layout);
 	}
 
 	private function loadOthers()
@@ -170,6 +233,8 @@ class DefaultController extends stdClass
 	private function loadUrlParams()
 	{
 		foreach (Helpers::url()->getParams() as $key => $value) {
+			if (is_array($key) || is_array($value)) continue;
+
 			$this->layout = str_replace("{{url:param.{$key}}}", $value, $this->layout);
 		}
 	}
@@ -278,7 +343,9 @@ class DefaultController extends stdClass
 	private function getModuleSettings()
 	{
 		$repo = new Navigation;
-		$module = Arrays::firstOrNull($repo->getByParentIdAndLink(0, Helpers::getModule()));
+		$domain = Helpers::url()->getHost();
+		$routeGroup = (new RouteGroup)->getByDomain($domain);
+		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 		if (!$module) return [];
 
 		Session::set("moduleSettingsId", $module->id);

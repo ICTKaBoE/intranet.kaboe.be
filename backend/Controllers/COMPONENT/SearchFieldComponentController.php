@@ -6,8 +6,8 @@ use Controllers\ComponentController;
 
 class SearchFieldComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('searchField');
+		parent::__construct('searchField', $arguments);
 	}
 }

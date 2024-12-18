@@ -14,9 +14,9 @@ export default class Select {
 		this.loadSource = this.element.dataset.loadSource || false;
 		this.loadValue = this.element.dataset.loadValue || "id";
 		this.loadLabel = this.element.dataset.loadLabel || false;
-		this.loadParams = {};
 		this.defaultDetails = this.element.dataset.defaultDetails || false;
 		this.defaultValue = this.element.dataset.defaultValue || false;
+		this.defaultExtraData = this.element.dataset.extra || false;
 		this.multiple = this.element.hasAttribute("multiple");
 		this.search = this.element.hasAttribute("data-search");
 		this.parent = this.element.dataset.parentSelect || false;
@@ -28,6 +28,7 @@ export default class Select {
 
 		this.eventListeners = [];
 		this.selectedDetails = false;
+		this.loadParams = {};
 
 		if (this.loadSource && this.loadSource.startsWith("[")) {
 			let loadSource = this.loadSource
@@ -68,6 +69,19 @@ export default class Select {
 			});
 		}
 
+		if (this.defaultExtraData) {
+			let extraData = this.defaultExtraData
+				.replace("[", "")
+				.replace("]", "")
+				.split("|");
+
+			this.extraData = {};
+			extraData.forEach((v) => {
+				v = v.split("=");
+				this.loadParams[v[0]] = v[1];
+			});
+		}
+
 		this.loaded = false;
 		this.init();
 	}
@@ -102,6 +116,8 @@ export default class Select {
 	init = async () => {
 		this.element.setAttribute("role", "select");
 		this.element.removeAttribute("disabled");
+		if (!this.element.classList.contains("form-select"))
+			this.element.classList.add("form-select");
 
 		await this.getData();
 		this.createSelect();
@@ -220,7 +236,9 @@ export default class Select {
 	};
 
 	getValue = () => {
-		return this.tomSelect.getValue();
+		let items = this.tomSelect.getValue();
+		if (Array.isArray(items)) items = items.join(";");
+		return items;
 	};
 
 	getItemDetails = () => {

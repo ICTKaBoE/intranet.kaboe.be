@@ -19,7 +19,7 @@ class Firewall extends CustomObject
         "model" => "string",
         "serialnumber" => "string",
         "macaddress" => "string",
-        "link" => "url",
+        "ip" => "url",
         "deleted" => "boolean"
     ];
 
@@ -33,7 +33,7 @@ class Firewall extends CustomObject
     public function init()
     {
         $this->formatted->macaddress = CString::formatMacAddress($this->macaddress);
-        $this->formatted->link = CString::formatLink($this->link);
+        $this->formatted->ip = CString::formatLink($this->ip);
         $this->formatted->manModel = "{$this->manufacturer} {$this->model}";
     }
 }

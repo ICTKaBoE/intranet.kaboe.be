@@ -2,57 +2,125 @@
 
 namespace Controllers\API\Cron;
 
-use Database\Object\User as ObjectUser;
-use Database\Repository\Informat\Teacher;
-use Database\Repository\Informat\TeacherFreefield;
-use Database\Repository\School;
-use Database\Repository\Setting;
-use Database\Repository\User;
+use Security\Input;
+use Helpers\General;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Security\Input;
+use Database\Repository\User;
+use Database\Repository\School;
+use Database\Repository\Country;
+use Database\Repository\Setting;
+use Database\Repository\UserAddress;
+use Database\Object\User as ObjectUser;
+use Database\Repository\Informat\Teacher;
+use Database\Repository\Informat\Employee;
+use Database\Repository\Informat\EmployeeAddress;
+use Database\Repository\Informat\EmployeeOwnfield;
+use Database\Repository\Informat\TeacherFreefield;
+use Database\Object\UserAddress as ObjectUserAddress;
 
 abstract class Local
 {
     public static function Prepare()
     {
-        $informatToUser = self::InformatTeacherToUser();
+        $informatToUser = self::InformatEmployeeToUser();
+        $informatToUserAddress = self::InformatEmployeeToUserAddress();
 
-        return ($informatToUser);
+        return ($informatToUser && $informatToUserAddress);
+        // return true;
     }
 
-    private static function InformatTeacherToUser()
+    static private function InformatEmployeeToUser()
     {
-        $informatTeacherRepo = new Teacher;
-        $informatTeacherFreefields = new TeacherFreefield;
+        $_error_ = false;
+
+        $employeeRepo = new Employee;
+        $employeeOwnfieldRepo = new EmployeeOwnfield;
         $userRepo = new User;
+        $schoolRepo = new School;
         $settingRepo = new Setting;
-        $schools = (new School)->get();
-        $mainSchoolField = $settingRepo->get("informat.ownfieldname.mainSchool")[0]->value;
-        $statusField = $settingRepo->get("informat.ownfieldname.status")[0]->value;
-        $emailFormat = $settingRepo->get("sync.email.format")[0]->value;
 
-        $teachers = $informatTeacherRepo->get();
+        $_mainSchool = Arrays::first($settingRepo->get("informat.ownfieldname.mainSchool"))->value;
+        $_status = Arrays::first($settingRepo->get("informat.ownfieldname.status"))->value;
+        $_format = Arrays::first($settingRepo->get("sync.format.email"))->value;
 
-        foreach ($teachers as $teacher) {
-            $user = $userRepo->getByInformatId($teacher->informatId) ?? new ObjectUser;
-            if (!$user->id && !$teacher->active) continue;
+        // Temp disable users
+        foreach ($userRepo->get() as $user) {
+            if ($user->system) continue;
 
-            $mainSchool = $informatTeacherFreefields->getByInformatTeacherIdSesionAndDescription($teacher->informatId, "Tewerkstelling", $mainSchoolField);
-            $status = $informatTeacherFreefields->getByInformatTeacherIdSesionAndDescription($teacher->informatId, "Tewerkstelling", $statusField);
-
-            $user->informatId = $teacher->informatId;
-            $user->mainSchoolId = Arrays::firstOrNull(Arrays::filter($schools, fn($s) => Strings::equal($s->name, $mainSchool->value)))->id;
-            $user->username = Input::createEmail($emailFormat, $teacher->firstName, $teacher->name, EMAIL_SUFFIX);
-            $user->name = $teacher->name;
-            $user->firstName = $teacher->firstName;
-            $user->bankAccount = $teacher->bankAccount;
-            $user->active = $teacher->active;
-            if ($status) $user->active = Strings::equal($status->value, "IN DIENST");
-
+            $user->active = false;
             $userRepo->set($user);
         }
 
-        return true;
+        $employees = $employeeRepo->get();
+        foreach ($employees as $employee) {
+            try {
+                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? new ObjectUser;
+
+                $mainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool);
+                $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
+
+                $user->informatEmployeeId = $employee->informatId;
+                $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id;
+                $user->username = Input::createEmail($_format, $employee->firstName, $employee->name, EMAIL_SUFFIX);
+                $user->name = $employee->name;
+                $user->firstName = $employee->firstName;
+                $user->bankAccount = $employee->iban;
+                $user->active = $employee->active;
+                $user->api = $user->active;
+
+                if ($status) {
+                    $user->active = Strings::equal($status->value, "IN DIENST");
+                    $user->api = Strings::equal($status->value, "IN DIENST");
+                }
+
+                $userRepo->set($user);
+            } catch (\Exception $e) {
+                $_error_ = true;
+                continue;
+            }
+        }
+
+        return !$_error_;
+    }
+
+    private static function InformatEmployeeToUserAddress()
+    {
+        $_error_ = false;
+
+        $employeeRepo = new Employee;
+        $employeeAddressRepo = new EmployeeAddress;
+        $userRepo = new User;
+        $userAddressRepo = new UserAddress;
+        $countryRepo = new Country;
+
+        // Set all addresses as not current
+        foreach ($userAddressRepo->get() as $userAddress) {
+            $userAddress->current = false;
+            $userAddressRepo->set($userAddress);
+        }
+
+        foreach ($employeeAddressRepo->get() as $employeeAddress) {
+            $employee = Arrays::firstOrNull($employeeRepo->get($employeeAddress->informatEmployeeId));
+            if (!$employee) continue;
+
+            $user = $userRepo->getByInformatEmployeeId($employee->informatId);
+            if (!$user) continue;
+
+            $address = $userAddressRepo->getByInformatEmployeeAddressId($employeeAddress->id) ?? new ObjectUserAddress;
+            $address->userId = $user->id;
+            $address->informatEmployeeAddressId = $employeeAddress->id;
+            $address->street = $employeeAddress->street;
+            $address->number = $employeeAddress->number;
+            $address->bus = $employeeAddress->bus;
+            $address->zipcode = $employeeAddress->zipcode;
+            $address->city = $employeeAddress->city;
+            $address->countryId = $countryRepo->getByNisCode(General::removeLeadingZero($employeeAddress->countryCode))->id;
+            $address->current = $employeeAddress->current;
+
+            $userAddressRepo->set($address);
+        }
+
+        return !$_error_;
     }
 }

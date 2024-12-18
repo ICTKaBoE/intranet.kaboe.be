@@ -14,6 +14,13 @@ import ColorInput from "./object/ColorInput.js";
 import SearchField from "./object/SearchField.js";
 import List from "./object/List.js";
 
+$.ajaxSetup({
+	xhrFields: {
+		mode: "cors",
+		withCredentials: true,
+	},
+});
+
 Toast.Create();
 Button.ScanAndCreate();
 SearchField.ScanAndCreate();

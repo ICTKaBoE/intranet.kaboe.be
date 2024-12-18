@@ -9,47 +9,35 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\User;
 use Controllers\ApiController;
-use M365\AuthenticationManager;
 use Database\Repository\Setting;
 use Security\User as SecurityUser;
 use Database\Repository\UserAddress;
 use Database\Repository\UserLoginHistory;
 use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
+use Helpers\General;
 
 class UserController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, null)) $this->getUsers($view, $id);
-        else if (Strings::equal($what, "address")) $this->getAddress($view, $id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($what, $id = null)
-    {
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
     public function login()
     {
         $username = Helpers::input()->post("username")->getValue();
         $password = Helpers::input()->post("password")->getValue();
         $redirect = Helpers::url()->getParam("redirect");
 
-        if (!Input::check($username) || Input::empty($username)) $this->setValidation('username', "Gebruikersnaam kan niet leeg zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::isEmail($username) && (!Input::check($password) || Input::empty($password))) $this->setValidation('password', 'Wachtwoord kan niet leeg zijn!', self::VALIDATION_STATE_INVALID);
+        if (!Input::check($username) || Input::empty($username)) $this->setValidation('username', state: self::VALIDATION_STATE_INVALID);
+        if (!Input::isEmail($username) && (!Input::check($password) || Input::empty($password))) $this->setValidation('password', state: self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
             if (Input::isEmail($username) && Input::check($username, Input::INPUT_TYPE_EMAIL)) {
-                $this->setValidation("username", "Gelieve aan te melden via de knop 'Aanmelden via Office 365'!");
+                $this->setValidation("username", state: self::VALIDATION_STATE_INVALID);
+                $this->setToast("Gelieve aan te melden via de knop 'Aanmelden via Office 365'!", self::VALIDATION_STATE_INVALID);
             } else {
                 $users = (new User)->getByUsername($username);
 
-                if (!count($users)) $this->setValidation('username', 'Gebruikersnaam niet gevonden!', self::VALIDATION_STATE_INVALID);
-                else {
+                if (!count($users)) {
+                    $this->setValidation('username', state: self::VALIDATION_STATE_INVALID);
+                    $this->setToast("Gebruikersnaam niet gevonden!", self::VALIDATION_STATE_INVALID);
+                } else {
                     $loginUser = null;
 
                     foreach ($users as $user) {
@@ -59,9 +47,13 @@ class UserController extends ApiController
                         }
                     }
 
-                    if (is_null($loginUser)) $this->setValidation('password', 'Wachtwoord komt niet overeen!', self::VALIDATION_STATE_INVALID);
-                    else if (!$loginUser->active) $this->setValidation('username', 'Gebruiker is niet toegestaan aan te melden!');
-                    else {
+                    if (is_null($loginUser)) {
+                        $this->setValidation('password', state: self::VALIDATION_STATE_INVALID);
+                        $this->setToast("Wachtwoord komt niet overeen!", self::VALIDATION_STATE_INVALID);
+                    } else if (!$loginUser->active) {
+                        $this->setValidation('username', state: self::VALIDATION_STATE_INVALID);
+                        $this->setToast("Gebruiker is niet toegestaan aan te melden!", self::VALIDATION_STATE_INVALID);
+                    } else {
                         Session::set(SECURITY_SESSION_ISSIGNEDIN, [
                             'method' => SECURITY_SESSION_SIGNINMETHOD_LOCAL,
                             'id' => $loginUser->id
@@ -75,10 +67,12 @@ class UserController extends ApiController
                         (new UserLoginHistory)->set($userLoginHistory);
 
                         if ($redirect) $this->setRedirect($redirect);
-                        else $this->setRedirect(Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . (new Setting)->get(id: "page.default.afterLogin")[0]->value);
+                        else $this->setRedirect((new Setting)->get(id: "page.default.afterLogin")[0]->value);
                     }
                 }
             }
+        } else {
+            $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
         }
 
         if (!$this->validationIsAllGood()) $this->setHttpCode(400);
@@ -122,28 +116,57 @@ class UserController extends ApiController
     }
 
     // Get Functions
-    private function getUsers($view, $id)
+    protected function getList($view, $id)
     {
         $repo = new User;
+        $filters = [
+            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
+        ];
 
-        if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get();
+            General::filter($items, $filters);
             $items = Arrays::map($items, fn($i) => $i = $i->toArray(true));
             $this->appendToJson('items', $items);
+        } else if (Strings::equal($view, self::VIEW_TABLE)) {
+            $this->appendToJson("checkbox", false);
+            $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);
+            $this->appendToJson(
+                key: 'columns',
+                data: [
+                    [
+                        "title" => "Naam",
+                        "data" => "name",
+                        "width" => "200px"
+                    ],
+                    [
+                        "title" => "Voornaam",
+                        "data" => "firstName",
+                        "width" => "200px"
+                    ],
+                    [
+                        "title" => "Gebruikersnaam",
+                        "data" => "username"
+                    ]
+                ]
+            );
+
+            $items = $repo->get();
+            $this->appendToJson("rows", array_values($items));
         }
     }
 
-    private function getAddress($view, $id)
+    protected function getAddress($view, $id)
     {
         $repo = new UserAddress;
         $currentUserId = SecurityUser::getLoggedInUser()->id;
 
-        if (Strings::equal($view, "table")) {
-        } else if (Strings::equal($view, "select")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $address = $repo->getByUserId($currentUserId);
             $address = Arrays::map($address, fn($a) => $a = $a->toArray(true));
             $this->appendToJson('items', $address);
-        } else if (Strings::equal($view, "form")) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
         }
     }
 

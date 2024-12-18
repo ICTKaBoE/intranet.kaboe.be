@@ -10,7 +10,7 @@ class Holliday extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_holliday", \Database\Object\Holliday::class, orderField: 'start');
+        parent::__construct("tbl_holliday", \Database\Object\Holliday::class, orderField: 'start', guidField: false);
     }
 
     public function dateContainsHolliday($date)

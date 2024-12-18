@@ -2,13 +2,16 @@
 
 namespace Database\Object\Helpdesk;
 
+use stdClass;
+use Security\User;
+use Router\Helpers;
 use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Navigation;
 use Database\Interface\CustomObject;
-use Security\User;
+use Helpers\HTML;
 
 class Ticket extends CustomObject
 {
@@ -46,8 +49,8 @@ class Ticket extends CustomObject
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
 
-        $this->formatted->badge->status = "<span class=\"badge text-white bg-{$settings['status'][$this->status]['color']}\" style=\"margin-top: 2px\">{$settings['status'][$this->status]['name']}</span>";
-        $this->formatted->badge->priority = "<span class=\"badge text-white bg-{$settings['priority'][$this->priority]['color']}\" style=\"margin-top: 2px\">{$settings['priority'][$this->priority]['name']}</span>";
+        $this->formatted->badge->status = HTML::Badge($settings['status'][$this->status]['name'], backgroundColor: $settings['status'][$this->status]['color'], style: ["margin-top" => "2px"]);
+        $this->formatted->badge->priority = HTML::Badge($settings['priority'][$this->priority]['name'], backgroundColor: $settings['priority'][$this->priority]['color'], style: ["margin-top" => "2px"]);
 
         $category = explode("-", $this->category);
         $this->formatted->subject = $settings['category'][$category[0]]['name'];
@@ -60,6 +63,8 @@ class Ticket extends CustomObject
         else if (Strings::equal($category[0], "F")) $this->formatted->subject = $this->linked->firewall->hostname . " - " . $this->formatted->subject;
         else if (Strings::equal($category[0], "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
         else if (Strings::equal($category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
+
+        $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/helpdesk/mine/{$this->guid}";
 
         $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || Strings::equal($this->status, 'C'));
 
@@ -107,6 +112,9 @@ class Ticket extends CustomObject
         else if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0) $this->laage = $laage->h . " uren";
         else if ($laage->y == 0 && $laage->m == 0) $this->laage = $laage->d . " dagen";
         else if ($laage->y == 0) $this->laage = $laage->m . " maanden";
-        $this->formatted->lastActivity = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s") . " ({$this->laage} geleden)";
+
+        $this->formatted->lastActivity = new stdClass;
+        $this->formatted->lastActivity->display = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s") . " ({$this->laage} geleden)";
+        $this->formatted->lastActivity->sort = Clock::at($this->lastActionDateTime)->format("U");
     }
 }

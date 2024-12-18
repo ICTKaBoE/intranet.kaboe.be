@@ -6,7 +6,6 @@ use Helpers\PDF;
 use Helpers\ZIP;
 use Helpers\Date;
 use Helpers\Excel;
-use Security\GUID;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
@@ -30,48 +29,23 @@ use Database\Repository\BikePrice;
 
 class BikeController extends ApiController
 {
-    public function get($view, $what = null, $id = null)
-    {
-        if (Strings::equal($what, "distance")) $this->getDistance($view, $id);
-        else if (Strings::equal($what, "home-work")) $this->getEvent($view, $id, 'HW');
-        else if (Strings::equal($what, "work-work")) $this->getEvent($view, $id, 'WW');
-        else if (Strings::equal($what, "settings")) $this->getSettings($view);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function post($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "distance")) $this->postDistance($id);
-        else if (Strings::equal($what, "home-work")) $this->postEvent("HW");
-        else if (Strings::equal($what, "work-work")) $this->postEvent("WW");
-        else if (Strings::equal($what, "settings")) $this->postSettings();
-        else if (Strings::equal($what, "export")) $this->postExport();
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        $this->handle();
-    }
-
-    public function delete($view, $what, $id = null)
-    {
-        if (Strings::equal($what, "distance")) $this->deleteDistance($id);
-
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
-        else {
-            $this->setCloseModal();
-            $this->setReloadTable();
-        }
-        $this->handle();
-    }
-
     // Get Functions
-    private function getDistance($view, $id)
+    protected function getHomeWork($view, $id = null)
+    {
+        $this->getEvent($view, $id, "HW");
+    }
+
+    protected function getWorkWork($view, $id = null)
+    {
+        $this->getEvent($view, $id, "WW");
+    }
+
+    protected function getDistance($view, $id)
     {
         $repo = new BikeDistance;
         $currentUserId = User::getLoggedInUser()->id;
 
-        if (Strings::equal($view, "table")) {
+        if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
                 'type' => Helpers::url()->getParam("type"),
                 'startId' => Helpers::url()->getParam('startId')
@@ -128,34 +102,46 @@ class BikeController extends ApiController
             );
 
             $distances = $repo->getByUserId($currentUserId);
-
-            foreach ($filters as $key => $value) {
-                if (!$value) continue;
-                $distances = Arrays::filter($distances, fn($d) => Strings::equal($d->$key, $value));
-            }
+            General::filter($distances, $filters);
 
             $this->appendToJson("rows", array_values($distances));
-        } else if (Strings::equal($view, "select")) {
-        } else if (Strings::equal($view, "form")) $this->appendToJson('fields', $repo->get($id)[0]);
-        else if (Strings::equal($view, "list")) {
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
+        else if (Strings::equal($view, self::VIEW_LIST)) {
             $type = Helpers::input()->get('type')->getValue();
-            $this->appendToJson('items', $repo->getByUserIdAndType($currentUserId, $type));
+            $items = $repo->getByUserIdAndType($currentUserId, $type);
+            $items = Arrays::map($items, fn($i) => $i->toArray(true));
+            $this->appendToJson('raw', General::processTemplate($items));
         }
     }
 
-    private function getEvent($view, $id, $type)
+    protected function getDistanceType($view, $id)
+    {
+        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $statuses = $settings['distance']['type'];
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $_statuses = [];
+
+            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
+
+            $this->appendToJson('items', $_statuses);
+        }
+    }
+
+    protected function getEvent($view, $id, $type)
     {
         $repo = new BikeEvent;
         $currentUserId = User::getLoggedInUser()->id;
 
-        if (Strings::equal($view, "calendar")) {
+        if (Strings::equal($view, self::VIEW_CALENDAR)) {
             $items = $repo->getByUserIdAndType($currentUserId, $type);
             $items = Arrays::filter($items, fn($i) => $i->distance > 0);
 
             foreach ($items as $event) {
                 $this->appendToJson(data: [
                     "start" => $event->date,
-                    "title" => "{$event->alias} ({$event->formatted->distanceWithDouble})",
+                    "title" => "{$event->alias} ({$event->formatted->distance})",
                     "display" => "background",
                     "classNames" => [
                         "bg-{$event->color}",
@@ -167,7 +153,7 @@ class BikeController extends ApiController
         }
     }
 
-    private function getSettings($view)
+    protected function getSettings($view)
     {
         $repo = new Navigation;
         $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
@@ -176,7 +162,16 @@ class BikeController extends ApiController
     }
 
     // Post Functions
-    private function postDistance($id = null)
+    protected function postHomeWork($view, $id = null)
+    {
+        $this->postEvent($view, $id, "HW");
+    }
+    protected function postWorkWork($view, $id = null)
+    {
+        $this->postEvent($view, $id, "WW");
+    }
+
+    protected function postDistance($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -187,12 +182,12 @@ class BikeController extends ApiController
         $distance = Helpers::input()->post('distance')->getValue();
         $color = Helpers::input()->post('color')->getValue();
 
-        if (!Input::check($alias) || Input::empty($alias)) $this->setValidation("alias", "Alias moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", "Type adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($startId) || Input::empty($startId)) $this->setValidation("startId", "Startlocatie moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($endSchoolId) || Input::empty($endSchoolId)) $this->setValidation("endSchoolId", "Eindbestemming moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($distance) || Input::empty($distance)) $this->setValidation("distance", "Afstand moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($color) || Input::empty($color)) $this->setValidation("color", "Kleur moet aangeduid zijn!", self::VALIDATION_STATE_INVALID);
+        if (!Input::check($alias) || Input::empty($alias)) $this->setValidation("alias", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($startId) || Input::empty($startId)) $this->setValidation("startId", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($endSchoolId) || Input::empty($endSchoolId)) $this->setValidation("endSchoolId", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($distance) || Input::empty($distance)) $this->setValidation("distance", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($color) || Input::empty($color)) $this->setValidation("color", state: self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
             $repo = new BikeDistance;
@@ -200,8 +195,14 @@ class BikeController extends ApiController
             foreach ($repo->getByUserId(User::getLoggedInUser()->id) as $_distance) {
                 if (Strings::equal($_distance->id, $id) || Strings::equal($_distance->guid, $id)) continue;
 
-                if (Strings::equal($_distance->alias, $alias)) $this->setValidation("alias", "Er bestaat al een afstand met alias '{$alias}'!", self::VALIDATION_STATE_INVALID);
-                if (Strings::equal($_distance->type, $type) && Strings::equal($_distance->startId, $startId) && Strings::equal($_distance->endSchoolId, $endSchoolId)) $this->setValidation("startId", "Er bestaat al een rit met hetzelfde startlocatie en school!", self::VALIDATION_STATE_INVALID);
+                if (Strings::equal($_distance->alias, $alias)) {
+                    $this->setValidation("alias", state: self::VALIDATION_STATE_INVALID);
+                    $this->setToast("Er bestaat al een afstand met alias '{$alias}'!", self::VALIDATION_STATE_INVALID);
+                }
+                if (Strings::equal($_distance->type, $type) && Strings::equal($_distance->startId, $startId) && Strings::equal($_distance->endSchoolId, $endSchoolId)) {
+                    $this->setValidation("startId", state: self::VALIDATION_STATE_INVALID);
+                    $this->setToast("Er bestaat al een rit met hetzelfde startlocatie en school!", self::VALIDATION_STATE_INVALID);
+                }
                 if (!$this->validationIsAllGood()) break;
             }
 
@@ -222,10 +223,10 @@ class BikeController extends ApiController
         if ($this->validationIsAllGood()) {
             $this->setToast("De afstand is opgeslagen!");
             $this->setReturn();
-        }
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
-    private function postEvent($type)
+    protected function postEvent($view, $id, $type)
     {
         $date = Helpers::input()->post('date')->getValue();
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
@@ -235,7 +236,7 @@ class BikeController extends ApiController
             if ($settings['block']['past']['amount'] !== 0) $pastDate->modify("-" . $settings['block']['past']['amount']);
             $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-            if ($settings['lastPayDate'] && $pastDate->isBeforeOrEqualTo(Clock::at($settings['lastPayDate']))) $pastDate = clock::at($settings['lastPayDate']);
+            if ($settings['lastPayDate'] && $pastDate->isBeforeOrEqualTo(Clock::at($settings['lastPayDate']))) $pastDate = Clock::at($settings['lastPayDate']);
 
             if (Clock::at($date)->isBefore($pastDate)) $this->setToast("U kan geen rit inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
         }
@@ -292,7 +293,7 @@ class BikeController extends ApiController
         }
     }
 
-    private function postSettings()
+    protected function postSettings($view, $id = null)
     {
         $_settings = Helpers::input()->all();
         $settings = [];
@@ -307,7 +308,7 @@ class BikeController extends ApiController
         $this->setToast("De instellingen zijn opgeslagen!");
     }
 
-    private function postExport()
+    protected function postExport($view, $id = null)
     {
         $type = Helpers::input()->post('type')->getValue();
         $per = Helpers::input()->post('per')->getValue();
@@ -327,35 +328,45 @@ class BikeController extends ApiController
             $school = explode(";", $school);
         } else $school = [$school];
 
-        if (Input::empty($school)) $this->setValidation("school", "Scholen moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($start) || Input::empty($start)) $this->setValidation("start", "Start datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($end) || Input::empty($end)) $this->setValidation("end", "Eind datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        if (Input::empty($school)) $this->setValidation("school", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($start) || Input::empty($start)) $this->setValidation("start", state: self::VALIDATION_STATE_INVALID);
+        if (!Input::check($end) || Input::empty($end)) $this->setValidation("end", state: self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
             if (Strings::equal($per, "school") && Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end, $type);
             else if (Strings::equal($per, "school") && Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end, $type);
             else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "xlsx")) $this->exportPerTeacherAsXlsx($school, $start, $end, $type);
             else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "pdf")) $this->exportPerTeacherAsPdf($school, $start, $end, $type);
-        }
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Delete Functions
-    private function deleteDistance($id = null)
+    protected function deleteDistance($view, $id = null)
     {
-        $id = explode(";", $id);
+        $id = explode("_", $id);
         $repo = new BikeDistance;
+        $bikeEventRepo = new BikeEvent;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+
+            if (count($bikeEventRepo->getByBikeDistanceId($item->id))) {
+                $this->setToast("De afstand '{$item->alias}' kan niet worden verwijderd!<br />Deze is gekoppeld aan ritten!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
             $item->deleted = 1;
             $repo->set($item);
 
             $this->setToast("De afstand '{$item->alias}' is verwijderd!");
         }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
     }
 
     // Export functions
-    private function exportPerSchoolAsXlsx($schoolIds, $start, $end, $type)
+    protected function exportPerSchoolAsXlsx($schoolIds, $start, $end, $type)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -493,7 +504,7 @@ class BikeController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    private function exportPerSchoolAsPdf($schoolIds, $start, $end, $type)
+    protected function exportPerSchoolAsPdf($schoolIds, $start, $end, $type)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -590,7 +601,7 @@ class BikeController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    private function exportPerTeacherAsXlsx($schoolIds, $start, $end, $type)
+    protected function exportPerTeacherAsXlsx($schoolIds, $start, $end, $type)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -705,7 +716,7 @@ class BikeController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    private function exportPerTeacherAsPdf($schoolIds, $start, $end, $type)
+    protected function exportPerTeacherAsPdf($schoolIds, $start, $end, $type)
     {
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
         $lastPayDate = $settings["lastPayDate"];
@@ -825,7 +836,7 @@ class BikeController extends ApiController
     }
 
     // Other functions
-    private function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type)
+    protected function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type)
     {
         $eventRepo = new BikeEvent;
         $userRepo = new RepositoryUser();
@@ -835,10 +846,10 @@ class BikeController extends ApiController
         $events = Arrays::filter($events, fn($e) => Clock::at($e->date)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->date)->isBeforeOrEqualTo(Clock::at($end)));
 
         Arrays::each($events, fn($e) => $e->user = Arrays::first($userRepo->get($e->userId))->formatted->fullNameReversed);
+        $events = Arrays::filter($events, fn($e) => !is_null($e->distance) && !Strings::equal($e->distance, 0));
         $events = Arrays::orderBy($events, "user");
 
         foreach ($events as $event) {
-            if (Strings::equal($event->distance, 0)) continue;
             $eventsGrouped[$event->user][Clock::at($event->date)->format("F Y")]['distance'] += floatval($event->distance) * 2;
             $eventsGrouped[$event->user][Clock::at($event->date)->format("F Y")]['price'] += floatval($event->pricePerKm) * (floatval($event->distance) * 2);
         }
@@ -846,7 +857,7 @@ class BikeController extends ApiController
         return $eventsGrouped;
     }
 
-    private function getEventsGroupedByMonthByTeacherBySchool($start, $end, $allowedSchoolIds, $type)
+    protected function getEventsGroupedByMonthByTeacherBySchool($start, $end, $allowedSchoolIds, $type)
     {
         $eventRepo = new BikeEvent;
         $userRepo = new RepositoryUser;
@@ -868,16 +879,18 @@ class BikeController extends ApiController
             $eventsGrouped[$user->username]['address'] = $address;
 
             $events = $eventRepo->getByUserIdAndType($user->id, $type);
+
+            $events = Arrays::filter($events, fn($e) => Clock::at($e->date)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->date)->isBeforeOrEqualTo(Clock::at($end)));
+            $events = Arrays::filter($events, fn($e) => !is_null($e->distance) && !Strings::equal($e->distance, 0));
+
             if (!count($events)) {
                 unset($eventsGrouped[$user->username]);
                 continue;
             }
 
-            $events = Arrays::filter($events, fn($e) => Clock::at($e->date)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->date)->isBeforeOrEqualTo(Clock::at($end)));
             $events = Arrays::orderBy($events, "date");
 
             foreach ($events as $event) {
-                if (Strings::equal($event->distance, 0)) continue;
                 $eventsGrouped[$user->username]['events'][Clock::at($event->date)->format("F Y")][] = $event;
             }
         }

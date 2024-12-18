@@ -12,8 +12,9 @@ define("LOCATION_SHARED", LOCATION_FRONTEND . "/shared");
 define("LOCATION_APP", LOCATION_FRONTEND . "/app");
 define("LOCATION_PUBLIC", LOCATION_FRONTEND . "/public");
 define("LOCATION_ICON", LOCATION_SHARED . "/ui/icons/");
-define("LOCATION_IMAGE", LOCATION_SHARED . "/ui/img/");
+define("LOCATION_IMAGE", LOCATION_SHARED . "/default/images/");
 define("LOCATION_DOWNLOAD", LOCATION_ROOT . "/downloads");
+define("LOCATION_UPLOAD", LOCATION_ROOT . "/uploads");
 
 define("SECURITY_SESSION_ISSIGNEDIN", sha1("isSignedIn"));
 
@@ -42,8 +43,11 @@ define("ROUTER_DEFAULT_FUNCTION", "index");
 define("SELECT_ALL_VALUES", "Alle");
 define("SELECT_OTHER_ID", "O");
 define("SELECT_OTHER_VALUE", "Andere");
+define("SELECT_ALL_ID", 0);
+define("SELECT_ALL_VALUE", "Alle");
 
 define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
-// define("INFORMAT_CURRENT_SCHOOLYEAR", "2022-23");
+// define("INFORMAT_CURRENT_SCHOOLYEAR", "2023-24");
+define("INFORMAT_REFERENCE_DATE", "2024-01-01");
 
 define("EMAIL_SUFFIX", "coltd.be");

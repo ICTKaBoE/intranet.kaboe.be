@@ -26,7 +26,7 @@ class ApiMiddleware implements IMiddleware
                 else $user = UserController::ApiLogin();
 
                 if (!$user) Helpers::response()->httpCode(401)->json(["error" => "You are not authorized!"]);
-                else if (!$user->api) Helpers::response()->httpCode(401)->json(["error" => "You are not authorized!"]);
+                else if (!$user->api) Helpers::response()->httpCode(401)->json(["error" => "You are not able to use the API!"]);
             }
         }
     }

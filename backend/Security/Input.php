@@ -93,13 +93,10 @@ abstract class Input
 	static public function convertToBool($input)
 	{
 		if (Strings::equal($input, "on")) return true;
-		else if (Strings::equal($input, "off")) return false;
 		else if (Strings::equal($input, "true")) return true;
-		else if (Strings::equal($input, "false")) return false;
 		else if (Strings::equal($input, "1")) return true;
-		else if (Strings::equal($input, "0")) return false;
 
-		return $input;
+		return false;
 	}
 
 	static public function formatInsz($input)
@@ -141,7 +138,7 @@ abstract class Input
 			'/[ÓÒÔÕÖ]/u'    =>   'O',
 			'/[úùûü]/u'     =>   'u',
 			'/[ÚÙÛÜ]/u'     =>   'U',
-			'/[çc̕]/'        =>   'c',
+			'/[ç]/'        =>   'c',
 			'/Ç/'           =>   'C',
 			'/ñ/'           =>   'n',
 			'/Ñ/'           =>   'N',
@@ -152,15 +149,31 @@ abstract class Input
 			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)
 		);
 
-		return preg_replace(array_keys($utf8), array_values($utf8), $input);
+		$output = preg_replace(array_keys($utf8), array_values($utf8), $input);
+		$output = str_replace("c̕", "c", $output);
+
+		return $output;
 	}
 
 	static public function createEmail($format, $firstName, $name, $suffix)
 	{
-		$firstName = self::clean($firstName);
-		$name = self::clean($name);
+		$firstName = strtolower(self::clean($firstName));
+		$name = strtolower(self::clean($name));
 
-		if (Strings::equal($format, "FN.LN@SUFFIX")) return strtolower("{$firstName}.{$name}@{$suffix}");
-		else if (Strings::equal($format, "LN.FN@SUFFIX")) return strtolower("{$name}.{$firstName}@{$suffix}");
+		$output = $format;
+		$output = str_replace("{{FN}}", $firstName, $output);
+		$output = str_replace("{{LN}}", $name, $output);
+		$output = str_replace("{{SUFFIX}}", $suffix, $output);
+
+		return $output;
+	}
+
+	static public function createDisplayName($format, $firstName, $name)
+	{
+		$output = $format;
+		$output = str_replace("{{FN}}", $firstName, $output);
+		$output = str_replace("{{LN}}", $name, $output);
+
+		return $output;
 	}
 }

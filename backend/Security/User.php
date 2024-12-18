@@ -8,6 +8,7 @@ use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
 use Database\Repository\SecurityGroup;
 use Database\Repository\SecurityGroupUser;
+use Database\Repository\Setting;
 use Database\Repository\User as RepositoryUser;
 
 abstract class User
@@ -56,9 +57,8 @@ abstract class User
 
     static public function generatePassword()
     {
-        $module = (new Module)->getByModule('synchronisation');
-        $moduleSettingRepo = new ModuleSetting;
-        $dictionary = $moduleSettingRepo->getByModuleAndKey($module->id, "dictionary")->value;
+        $settingRepo = new Setting;
+        $dictionary = $settingRepo->get("sync.dictionary")[0]->value;
         $words = explode(PHP_EOL, $dictionary);
 
         $password = Arrays::randElement($words);

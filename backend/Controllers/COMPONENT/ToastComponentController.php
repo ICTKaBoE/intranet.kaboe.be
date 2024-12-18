@@ -6,8 +6,8 @@ use Controllers\ComponentController;
 
 class ToastComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('toast');
+		parent::__construct('toast', $arguments);
 	}
 }

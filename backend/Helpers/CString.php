@@ -46,6 +46,11 @@ abstract class CString
 		return $ret;
 	}
 
+	public static function formatAddress($street = null, $number = null, $bus = null, $zipcode = null, $city = null, $countryCode = null)
+	{
+		return "{$street} {$number}" . ($bus ? "/{$bus}" : "") . ", {$zipcode} {$city}";
+	}
+
 	public static function leadingZeros($value, $fullLength)
 	{
 		return sprintf("%0{$fullLength}d", $value);
@@ -70,5 +75,12 @@ abstract class CString
 		foreach (explode(" ", Strings::trimToNull($value)) as $v) $floew .= substr($v, 0, 1);
 
 		return $floew;
+	}
+
+	public static function getStringBetween($string, $startChar, $endChar)
+	{
+		$pattern = "/" . preg_quote($startChar, '/') . "(.*?)" . preg_quote($endChar, '/') . "/";
+		preg_match($pattern, $string, $matches);
+		return $matches[1] ?? '';
 	}
 }

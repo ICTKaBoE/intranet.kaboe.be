@@ -9,9 +9,9 @@ use Security\User;
 
 class SchoolHeaderComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('schoolheader');
+		parent::__construct('schoolheader', $arguments);
 		$this->loadSchoolDetails();
 	}
 

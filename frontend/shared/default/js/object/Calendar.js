@@ -122,25 +122,8 @@ export default class Calendar {
 	};
 
 	reload = () => {
-		if (this.source) {
-			let es = this.elementObject.getEventSources();
-			for (const e of es) e.remove();
-
-			if (Array.isArray(this.source)) {
-				for (const s of this.source) {
-					this.elementObject.addEventSource({
-						url: s,
-						extraParams: this.extraData,
-					});
-				}
-			} else
-				this.elementObject.addEventSource({
-					url: this.source,
-					extraParams: this.extraData,
-				});
-
-			this.elementObject.refetchEvents();
-		}
+		if (!this.source) return;
+		this.elementObject.refetchEvents();
 	};
 
 	addExtraData = (key, value) => {

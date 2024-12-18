@@ -15,22 +15,38 @@ use Database\Repository\Management\Computer;
 use Database\Repository\User as RepositoryUser;
 use M365\Repository\Computer as RepositoryComputer;
 use Database\Object\Management\Computer as ManagementComputer;
+use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
+use Database\Repository\SecurityGroup;
+use Database\Repository\SecurityGroupUser;
 
 abstract class M365
 {
     static public function ImportUsers()
     {
         $settings = new Setting;
+        $securityGroupRepo = new SecurityGroup;
+        $sguRepo = new SecurityGroupUser;
         $userRepo = new RepositoryUser;
 
-        $members = (new User)->getGroupMembersByGroupId(Arrays::first($settings->get("m365.access.groupId"))->value, ['id', 'mail', 'employeeId', 'surname', 'givenName']);
+        $securityGroups = Arrays::filter($securityGroupRepo->get(), fn($s) => Strings::isNotBlank($s->m365GroupId));
 
-        foreach ($members as $member) {
-            $user = $userRepo->getByEntraId($member->getId()) ?? $userRepo->getByEmployeeId($member->getEmployeeId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
+        foreach ($securityGroups as $sg) {
+            $sguRepo->delete(["securityGroupId" => $sg->id]);
+            $members = (new User)->getGroupMembersByGroupId($sg->m365GroupId, ['id', 'mail', 'employeeId', 'surname', 'givenName']);
 
-            if ($user) {
-                $user->entraId = $member->getId();
-                $userRepo->set($user);
+            foreach ($members as $member) {
+                $user = $userRepo->getByEntraId($member->getId()) ?? $userRepo->getByInformatEmployeeId($member->getEmployeeId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
+
+                if ($user) {
+                    $user->entraId = $member->getId();
+                    $userRepo->set($user);
+
+                    $sgu = new ObjectSecurityGroupUser;
+                    $sgu->securityGroupId = $sg->id;
+                    $sgu->userId = $user->id;
+
+                    $sguRepo->set($sgu);
+                }
             }
         }
 

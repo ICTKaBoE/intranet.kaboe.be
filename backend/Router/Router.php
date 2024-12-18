@@ -28,7 +28,7 @@ class Router extends SimpleRouter
         $routeGroups = (new RouteGroup)->get();
 
         foreach ($routeGroups as $rg) {
-            SimpleRouter::group(['prefix' => $rg->prefix, 'controller' => $rg->controller, 'middleware' => $rg->middleware], function () use ($routeRepo, $rg) {
+            SimpleRouter::group(['domain' => $rg->domain, 'prefix' => $rg->prefix, 'controller' => $rg->controller, 'middleware' => $rg->middleware], function () use ($routeRepo, $rg) {
                 $routes = $routeRepo->getByRouteGroupId($rg->id);
 
                 foreach ($routes as $r) {

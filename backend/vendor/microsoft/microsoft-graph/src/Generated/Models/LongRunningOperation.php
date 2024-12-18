@@ -7,6 +7,9 @@ use Microsoft\Kiota\Abstractions\Serialization\Parsable;
 use Microsoft\Kiota\Abstractions\Serialization\ParseNode;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
 
+/**
+ * The status of a long-running operation.
+*/
 class LongRunningOperation extends Entity implements Parsable 
 {
     /**
@@ -27,6 +30,7 @@ class LongRunningOperation extends Entity implements Parsable
             $mappingValue = $mappingValueNode->getStringValue();
             switch ($mappingValue) {
                 case '#microsoft.graph.attackSimulationOperation': return new AttackSimulationOperation();
+                case '#microsoft.graph.engagementAsyncOperation': return new EngagementAsyncOperation();
                 case '#microsoft.graph.richLongRunningOperation': return new RichLongRunningOperation();
             }
         }
@@ -34,7 +38,7 @@ class LongRunningOperation extends Entity implements Parsable
     }
 
     /**
-     * Gets the createdDateTime property value. The start time of the operation. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * Gets the createdDateTime property value. The start time of the operation. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @return DateTime|null
     */
     public function getCreatedDateTime(): ?DateTime {
@@ -61,7 +65,7 @@ class LongRunningOperation extends Entity implements Parsable
     }
 
     /**
-     * Gets the lastActionDateTime property value. The time of the last action in the operation. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * Gets the lastActionDateTime property value. The time of the last action in the operation. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @return DateTime|null
     */
     public function getLastActionDateTime(): ?DateTime {
@@ -122,7 +126,7 @@ class LongRunningOperation extends Entity implements Parsable
     }
 
     /**
-     * Sets the createdDateTime property value. The start time of the operation. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * Sets the createdDateTime property value. The start time of the operation. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @param DateTime|null $value Value to set for the createdDateTime property.
     */
     public function setCreatedDateTime(?DateTime $value): void {
@@ -130,7 +134,7 @@ class LongRunningOperation extends Entity implements Parsable
     }
 
     /**
-     * Sets the lastActionDateTime property value. The time of the last action in the operation. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * Sets the lastActionDateTime property value. The time of the last action in the operation. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @param DateTime|null $value Value to set for the lastActionDateTime property.
     */
     public function setLastActionDateTime(?DateTime $value): void {

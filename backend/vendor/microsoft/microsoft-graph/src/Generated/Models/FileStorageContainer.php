@@ -112,13 +112,14 @@ class FileStorageContainer extends Entity implements Parsable
             'displayName' => fn(ParseNode $n) => $o->setDisplayName($n->getStringValue()),
             'drive' => fn(ParseNode $n) => $o->setDrive($n->getObjectValue([Drive::class, 'createFromDiscriminatorValue'])),
             'permissions' => fn(ParseNode $n) => $o->setPermissions($n->getCollectionOfObjectValues([Permission::class, 'createFromDiscriminatorValue'])),
+            'settings' => fn(ParseNode $n) => $o->setSettings($n->getObjectValue([FileStorageContainerSettings::class, 'createFromDiscriminatorValue'])),
             'status' => fn(ParseNode $n) => $o->setStatus($n->getEnumValue(FileStorageContainerStatus::class)),
             'viewpoint' => fn(ParseNode $n) => $o->setViewpoint($n->getObjectValue([FileStorageContainerViewpoint::class, 'createFromDiscriminatorValue'])),
         ]);
     }
 
     /**
-     * Gets the permissions property value. The set of permissions for users in the fileStorageContainer. Permission for each user is set by the roles property. The possible values are 'reader', 'writer', 'manager', and 'owner'. Read-write.
+     * Gets the permissions property value. The set of permissions for users in the fileStorageContainer. Permission for each user is set by the roles property. The possible values are: reader, writer, manager, and owner. Read-write.
      * @return array<Permission>|null
     */
     public function getPermissions(): ?array {
@@ -132,7 +133,19 @@ class FileStorageContainer extends Entity implements Parsable
     }
 
     /**
-     * Gets the status property value. Status of the fileStorageContainer. Containers are created as inactive and require activation. Inactive containers are subjected to automatic deletion in 24 hours. The possible values are: inactive,  active. Read-only.
+     * Gets the settings property value. The settings property
+     * @return FileStorageContainerSettings|null
+    */
+    public function getSettings(): ?FileStorageContainerSettings {
+        $val = $this->getBackingStore()->get('settings');
+        if (is_null($val) || $val instanceof FileStorageContainerSettings) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'settings'");
+    }
+
+    /**
+     * Gets the status property value. Status of the fileStorageContainer. Containers are created as inactive and require activation. Inactive containers are subjected to automatic deletion in 24 hours. The possible values are: inactive, active. Read-only.
      * @return FileStorageContainerStatus|null
     */
     public function getStatus(): ?FileStorageContainerStatus {
@@ -168,6 +181,7 @@ class FileStorageContainer extends Entity implements Parsable
         $writer->writeStringValue('displayName', $this->getDisplayName());
         $writer->writeObjectValue('drive', $this->getDrive());
         $writer->writeCollectionOfObjectValues('permissions', $this->getPermissions());
+        $writer->writeObjectValue('settings', $this->getSettings());
         $writer->writeEnumValue('status', $this->getStatus());
         $writer->writeObjectValue('viewpoint', $this->getViewpoint());
     }
@@ -221,7 +235,7 @@ class FileStorageContainer extends Entity implements Parsable
     }
 
     /**
-     * Sets the permissions property value. The set of permissions for users in the fileStorageContainer. Permission for each user is set by the roles property. The possible values are 'reader', 'writer', 'manager', and 'owner'. Read-write.
+     * Sets the permissions property value. The set of permissions for users in the fileStorageContainer. Permission for each user is set by the roles property. The possible values are: reader, writer, manager, and owner. Read-write.
      * @param array<Permission>|null $value Value to set for the permissions property.
     */
     public function setPermissions(?array $value): void {
@@ -229,7 +243,15 @@ class FileStorageContainer extends Entity implements Parsable
     }
 
     /**
-     * Sets the status property value. Status of the fileStorageContainer. Containers are created as inactive and require activation. Inactive containers are subjected to automatic deletion in 24 hours. The possible values are: inactive,  active. Read-only.
+     * Sets the settings property value. The settings property
+     * @param FileStorageContainerSettings|null $value Value to set for the settings property.
+    */
+    public function setSettings(?FileStorageContainerSettings $value): void {
+        $this->getBackingStore()->set('settings', $value);
+    }
+
+    /**
+     * Sets the status property value. Status of the fileStorageContainer. Containers are created as inactive and require activation. Inactive containers are subjected to automatic deletion in 24 hours. The possible values are: inactive, active. Read-only.
      * @param FileStorageContainerStatus|null $value Value to set for the status property.
     */
     public function setStatus(?FileStorageContainerStatus $value): void {

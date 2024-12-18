@@ -12,6 +12,7 @@ export default class Helpers {
 		let modal = bootstrap.Modal.getOrCreateInstance(`#modal-${id}`, {
 			focus: true,
 		});
+
 		modal.toggle();
 	};
 
@@ -125,6 +126,8 @@ export default class Helpers {
 		return value;
 	};
 
+	static fetch = ({ url, options = {} }) => {};
+
 	static request = ({
 		url,
 		method = "GET",
@@ -136,10 +139,11 @@ export default class Helpers {
 	}) => {
 		let properties = {
 			url: url,
-			method: method,
+			type: method,
 			cache: false,
 			processData: false,
 			contentType: false,
+			async: false,
 		};
 
 		if (method === "POST") properties.data = data;
@@ -186,14 +190,8 @@ export default class Helpers {
 		);
 	};
 
-	static sleep = (ms) => {
-		const date = Date.now();
-		let currentDate = null;
-
-		do {
-			currentDate = Date.now();
-		} while (currentDate - date < ms);
-	};
+	static sleep = (delay) =>
+		new Promise((resolve) => setTimeout(resolve, delay));
 
 	static precessDownload = (link) => {
 		let a = document.createElement("a");

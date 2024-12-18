@@ -28,18 +28,10 @@ class User extends Repository
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
-    public function getByInformatId($informatId)
+    public function getByInformatEmployeeId($informatEmployeeId)
     {
         $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
-
-        return Arrays::firstOrNull($this->executeSelect($statement));
-    }
-
-    public function getByEmployeeId($employeeId)
-    {
-        $statement = $this->prepareSelect();
-        $statement->where('employeeId', $employeeId);
+        $statement->where('informatEmployeeId', $informatEmployeeId);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

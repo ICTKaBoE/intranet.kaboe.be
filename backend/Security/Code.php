@@ -17,6 +17,7 @@ abstract class Code
 
 	static public function noTimeLimit()
 	{
+		ignore_user_abort(true);
 		set_time_limit(0);
 	}
 }

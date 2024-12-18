@@ -4,7 +4,6 @@ namespace Controllers\API;
 
 use Router\Helpers;
 use Security\Session;
-use Database\Repository\User;
 use Controllers\ApiController;
 use M365\AuthenticationManager;
 use Database\Repository\Setting;

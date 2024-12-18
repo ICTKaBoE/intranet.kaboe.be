@@ -32,6 +32,21 @@ abstract class FileSystem
 		return $path;
 	}
 
+	static public function WriteFile($path, $content)
+	{
+		$path = Path::normalize($path);
+		$stream = fopen($path, "wb");
+		$result = fwrite($stream, $content);
+		fclose($stream);
+
+		return ($result !== 0);
+	}
+
+	static public function RemoveFile($path)
+	{
+		return unlink($path);
+	}
+
 	static public function unifyPath($path)
 	{
 		$path = str_replace(LOCATION_ROOT, "", $path);
@@ -40,7 +55,8 @@ abstract class FileSystem
 
 	static public function getFiles($path)
 	{
-		return array_values(array_diff(scandir($path), [".", ".."]));
+		if (!self::PathExists($path)) return false;
+		return array_values(array_diff(scandir(Path::normalize($path)), [".", ".."]));
 	}
 
 	static public function getLatestFile($path)

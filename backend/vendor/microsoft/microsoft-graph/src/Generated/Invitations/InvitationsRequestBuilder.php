@@ -5,7 +5,8 @@ namespace Microsoft\Graph\Generated\Invitations;
 use Exception;
 use Http\Promise\Promise;
 use Microsoft\Graph\Generated\Invitations\Count\CountRequestBuilder;
-use Microsoft\Graph\Generated\Invitations\Item\InvitationItemRequestBuilder;
+use Microsoft\Graph\Generated\Invitations\InvitedUser\InvitedUserRequestBuilder;
+use Microsoft\Graph\Generated\Invitations\InvitedUserSponsors\InvitedUserSponsorsRequestBuilder;
 use Microsoft\Graph\Generated\Models\Invitation;
 use Microsoft\Graph\Generated\Models\InvitationCollectionResponse;
 use Microsoft\Graph\Generated\Models\ODataErrors\ODataError;
@@ -27,16 +28,19 @@ class InvitationsRequestBuilder extends BaseRequestBuilder
     }
     
     /**
-     * Provides operations to manage the collection of invitation entities.
-     * @param string $invitationId The unique identifier of invitation
-     * @return InvitationItemRequestBuilder
+     * Provides operations to manage the invitedUser property of the microsoft.graph.invitation entity.
     */
-    public function byInvitationId(string $invitationId): InvitationItemRequestBuilder {
-        $urlTplParams = $this->pathParameters;
-        $urlTplParams['invitation%2Did'] = $invitationId;
-        return new InvitationItemRequestBuilder($urlTplParams, $this->requestAdapter);
+    public function invitedUser(): InvitedUserRequestBuilder {
+        return new InvitedUserRequestBuilder($this->pathParameters, $this->requestAdapter);
     }
-
+    
+    /**
+     * Provides operations to manage the invitedUserSponsors property of the microsoft.graph.invitation entity.
+    */
+    public function invitedUserSponsors(): InvitedUserSponsorsRequestBuilder {
+        return new InvitedUserSponsorsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
     /**
      * Instantiates a new InvitationsRequestBuilder and sets the default values.
      * @param array<string, mixed>|string $pathParametersOrRawUrl Path parameters for the request or a String representing the raw URL.
@@ -66,7 +70,7 @@ class InvitationsRequestBuilder extends BaseRequestBuilder
     }
 
     /**
-     * Use this API to create a new invitation. Invitation adds an external user to the organization. When creating a new invitation, you have several options available:
+     * Use this API to create a new invitation or reset the redemption status for a guest user who already redeemed their invitation. The invitation adds the external user to the organization as part of B2B collaboration. B2B collaboration is supported in both Microsoft Entra External ID in workforce and external tenants. When creating a new invitation, you have several options available:
      * @param Invitation $body The request body
      * @param InvitationsRequestBuilderPostRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<Invitation|null>
@@ -103,7 +107,7 @@ class InvitationsRequestBuilder extends BaseRequestBuilder
     }
 
     /**
-     * Use this API to create a new invitation. Invitation adds an external user to the organization. When creating a new invitation, you have several options available:
+     * Use this API to create a new invitation or reset the redemption status for a guest user who already redeemed their invitation. The invitation adds the external user to the organization as part of B2B collaboration. B2B collaboration is supported in both Microsoft Entra External ID in workforce and external tenants. When creating a new invitation, you have several options available:
      * @param Invitation $body The request body
      * @param InvitationsRequestBuilderPostRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return RequestInformation

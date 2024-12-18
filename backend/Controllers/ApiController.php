@@ -5,6 +5,7 @@ namespace Controllers;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
+use Security\Code;
 use stdClass;
 
 class ApiController extends stdClass
@@ -12,12 +13,39 @@ class ApiController extends stdClass
 	const VALIDATION_STATE_VALID = "valid";
 	const VALIDATION_STATE_INVALID = "invalid";
 
+	const VIEW_FORM = "form";
+	const VIEW_CALENDAR = "calendar";
+	const VIEW_TABLE = "table";
+	const VIEW_SELECT = "select";
+	const VIEW_CHART = "chart";
+	const VIEW_LIST = "list";
+
 	private $httpCode = 200;
 	private $validation = [];
 	private $reload = false;
 	private $toast = [];
 
 	private $json = [];
+
+	public function any($view = null, $what = null, $id = null)
+	{
+		Code::noTimeLimit();
+
+		$method = Helpers::request()->getMethod();
+		$what = explode("-", $what);
+		$what = Arrays::map($what, fn($w) => ucfirst($w));
+		$what = implode("", $what);
+		$function = $method . ucfirst($what ?: "list");
+
+		if (method_exists($this, $function)) $this->$function($view, $id);
+		else {
+			$this->setHttpCode(400);
+			$this->setError("Function '{$function}' not found in '" . $this::class . "'!");
+		}
+
+		if (!$this->validationIsAllGood()) $this->setHttpCode(400);
+		$this->handle();
+	}
 
 	public function handle()
 	{
