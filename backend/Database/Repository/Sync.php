@@ -1,15 +1,15 @@
 <?php
 
-namespace Database\Repository\Sync\AD;
+namespace Database\Repository;
 
 use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
 
-class Staff extends Repository
+class Sync extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_sync_ad_staff", \Database\Object\Sync\AD\Staff::class, orderField: false, deletedField: false, guidField: false);
+        parent::__construct("tbl_sync", \Database\Object\Sync::class, orderField: 'lastSync', orderDirection: 'DESC', deletedField: false, guidField: false);
     }
 
     public function getByEmployeeId($employeeId)

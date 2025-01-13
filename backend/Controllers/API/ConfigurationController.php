@@ -18,6 +18,7 @@ use Database\Repository\GeneralMessage;
 use Database\Repository\SecurityGroupUser;
 use Database\Object\SecurityGroup as ObjectSecurityGroup;
 use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
+use Database\Repository\SettingTab;
 
 class ConfigurationController extends ApiController
 {
@@ -33,6 +34,32 @@ class ConfigurationController extends ApiController
             foreach ($items as $item) $settings[$item->id] = $item->value;
 
             $this->appendToJson('fields', $settings);
+        } else if (Strings::equal($view, self::VIEW_LIST)) {
+            $settingTabs = (new SettingTab)->get();
+
+            $tabs = Arrays::map($settingTabs, fn($t) => $t->formatted->html);
+            $tabs = implode("", $tabs);
+
+            foreach ($settingTabs as $tab) {
+                $settings = (new Setting)->getBySettingTabId($tab->id);
+                $settings = Arrays::filter($settings, fn($s) => $s->order > 0);
+                $settings = Arrays::map($settings, fn($s) => $s->formatted->html);
+                $settings = implode("", $settings);
+
+                $tab->settings($settings);
+            }
+
+            $contents = Arrays::map($settingTabs, fn($t) => $t->formatted->contentHtml);
+            $contents = implode("", $contents);
+
+            $items = [
+                [
+                    "navtabs" => $tabs,
+                    "contents" => $contents
+                ]
+            ];
+
+            $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "&"));
         }
     }
 

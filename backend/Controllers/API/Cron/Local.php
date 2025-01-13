@@ -9,15 +9,13 @@ use Ouzo\Utilities\Strings;
 use Database\Repository\User;
 use Database\Repository\School;
 use Database\Repository\Country;
-use Database\Repository\Setting;
 use Database\Repository\UserAddress;
 use Database\Object\User as ObjectUser;
-use Database\Repository\Informat\Teacher;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Informat\EmployeeAddress;
 use Database\Repository\Informat\EmployeeOwnfield;
-use Database\Repository\Informat\TeacherFreefield;
 use Database\Object\UserAddress as ObjectUserAddress;
+use Database\Repository\Navigation;
 
 abstract class Local
 {
@@ -38,11 +36,11 @@ abstract class Local
         $employeeOwnfieldRepo = new EmployeeOwnfield;
         $userRepo = new User;
         $schoolRepo = new School;
-        $settingRepo = new Setting;
 
-        $_mainSchool = Arrays::first($settingRepo->get("informat.ownfieldname.mainSchool"))->value;
-        $_status = Arrays::first($settingRepo->get("informat.ownfieldname.status"))->value;
-        $_format = Arrays::first($settingRepo->get("sync.format.email"))->value;
+        $_settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, 'sync'))->settings;
+        $_status = $_settings['informat']['ownfield']['status'];
+        $_mainSchool = $_settings['informat']['ownfield']['mainSchool'];
+        $_format = $_settings['format']['email'];
 
         // Temp disable users
         foreach ($userRepo->get() as $user) {

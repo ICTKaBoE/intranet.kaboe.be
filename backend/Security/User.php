@@ -58,7 +58,7 @@ abstract class User
     static public function generatePassword()
     {
         $settingRepo = new Setting;
-        $dictionary = $settingRepo->get("sync.dictionary")[0]->value;
+        $dictionary = $settingRepo->get("dictionary")[0]->value;
         $words = explode(PHP_EOL, $dictionary);
 
         $password = Arrays::randElement($words);

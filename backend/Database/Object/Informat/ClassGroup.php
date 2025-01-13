@@ -13,6 +13,7 @@ class ClassGroup extends CustomObject
         "schoolInstituteId" => "int",
         "schoolyear" => "string",
         "code" => "string",
-        "name" => "string"
+        "name" => "string",
+        "type" => "string"
     ];
 }

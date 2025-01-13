@@ -25,10 +25,18 @@ export default class Select {
 			this.element.dataset.optgroupAttribute || false;
 		this.optgroupValue = this.element.dataset.optgroupValue || false;
 		this.optgroupLabel = this.element.dataset.optgroupLabel || false;
+		this.limit = this.element.dataset.limit || 200;
 
 		this.eventListeners = [];
 		this.selectedDetails = false;
+		this.data = {
+			items: [],
+		};
 		this.loadParams = {};
+		this.loadParams.limit = this.limit;
+		this.loadParams.page = 0;
+
+		this.stopCheckNext = false;
 
 		if (this.loadSource && this.loadSource.startsWith("[")) {
 			let loadSource = this.loadSource
@@ -41,6 +49,9 @@ export default class Select {
 				source = source.split("@");
 				this.loadSource[source[0]] = source[1];
 			});
+
+			if (!this.defaultDetails)
+				this.defaultDetails = Object.keys(this.loadSource)[0];
 		}
 
 		if (this.loadValue && this.loadValue.startsWith("[")) {
@@ -119,7 +130,12 @@ export default class Select {
 		if (!this.element.classList.contains("form-select"))
 			this.element.classList.add("form-select");
 
-		await this.getData();
+		if (this.loadSource) {
+			this.loadParams.page = 0;
+			await this.getData();
+			if (!this.stopCheckNext) await this.checkNext();
+		}
+
 		this.createSelect();
 		this.disable();
 		if (this.parent) this.detectParentAndSetFunctions();
@@ -133,7 +149,13 @@ export default class Select {
 		this.disable();
 		this.clear();
 		this.destroy();
-		await this.getData();
+
+		if (this.loadSource) {
+			this.loadParams.page = 0;
+			await this.getData();
+			if (!this.stopCheckNext) await this.checkNext();
+		}
+
 		this.createSelect();
 		this.setEventListeners();
 		this.setDefaultValue();
@@ -143,6 +165,7 @@ export default class Select {
 
 	setDetails = (id) => {
 		this.selectedDetails = id;
+		this.data.items = [];
 		this.reload();
 	};
 
@@ -200,12 +223,11 @@ export default class Select {
 			];
 		}
 
-		if (this.data) {
-			if (this.data?.optgroups && this.optgroupAttribute)
-				settings.optgroups = this.data.optgroups;
+		if (this.data?.optgroups && this.optgroupAttribute)
+			settings.optgroups = this.data.optgroups;
 
+		if (this.data?.items && this.data?.items.length)
 			settings.options = this.data.items;
-		}
 
 		this.tomSelect = new TomSelect(this.element, settings);
 	};
@@ -218,8 +240,23 @@ export default class Select {
 				this.loadSource,
 			this.loadParams
 		).done((data) => {
-			this.data = data;
+			let items = data.items;
+			delete data.items;
+			this.data = Object.assign(this.data, data);
+
+			if (this.data.items.length == 0) this.data.items = items;
+			else this.data.items.push(...items);
 		});
+	};
+
+	checkNext = async () => {
+		if (this.data.next) {
+			await Helpers.sleep(100);
+			this.loadParams.page++;
+
+			await this.getData();
+			if (!this.stopCheckNext) await this.checkNext();
+		}
 	};
 
 	setDefaultValue = () => {

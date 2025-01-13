@@ -18,7 +18,7 @@ class StudentNumber extends CustomObject
 
     public function init()
     {
-        $this->formatted->numberLink = HTML::Link(HTML::LINK_TYPE_PHONE, $this->number, $this->number);
-        $this->formatted->typeWithNumberLink = "{$this->type} ({$this->category}): {$this->formatted->numberLink}";
+        $this->formatted->link = HTML::Link(HTML::LINK_TYPE_PHONE, $this->number);
+        $this->formatted->typeWithLink = "{$this->type} - {$this->category}:\t{$this->formatted->link}";
     }
 }

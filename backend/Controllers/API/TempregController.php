@@ -145,7 +145,7 @@ class TempregController extends ApiController
     }
 
     // Post functions
-    protected function postRegistration($view, $id)
+    protected function postAdd($view, $id)
     {
         if ($id == "add") $id = null;
 

@@ -3,6 +3,7 @@
 namespace Database\Object\Informat;
 
 use Database\Interface\CustomObject;
+use Helpers\CString;
 
 class StudentBank extends CustomObject
 {
@@ -25,6 +26,8 @@ class StudentBank extends CustomObject
 
     public function init()
     {
-        $this->formatted->details = self::MAPPING_TYPE[$this->type] . ": {$this->iban} - {$this->bic}";
+        $this->formatted->iban = CString::formatBankAccount($this->iban);
+        $this->formatted->bic = CString::formatBankId($this->bic);
+        $this->formatted->details = self::MAPPING_TYPE[$this->type] . ":\t{$this->formatted->iban} - {$this->formatted->bic}";
     }
 }

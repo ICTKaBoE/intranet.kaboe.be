@@ -355,7 +355,6 @@ class AccidentController extends ApiController
             if (!$id) {
                 $navItem = Arrays::first($navRepo->get(Session::get("moduleSettingsId")));
                 $navItem->settings['lastNumber']++;
-                $navItem->settings = json_encode($navItem->settings);
                 $navRepo->set($navItem, ['settings']);
             }
 
@@ -466,7 +465,7 @@ class AccidentController extends ApiController
     protected function postSettings()
     {
         $_settings = Helpers::input()->all();
-        $file = Helpers::input()->file("blancoForm_original");
+        $file = Helpers::input()->file("blancoForm_original")[0];
         unset($_settings['blancoForm_original']);
 
         if ($file && $file->getSize() > 0) {
@@ -474,6 +473,7 @@ class AccidentController extends ApiController
             $origFilename = $file->getFilename();
             $origExt = $file->getExtension();
             $newName = GUID::create() . "." . $file->getExtension();
+
             if ($file->move(LOCATION_UPLOAD . "/{$newName}")) {
                 $_settings['blancoForm.original'] = $origFilename;
                 $_settings['blancoForm.ext'] = $origExt;
@@ -487,7 +487,7 @@ class AccidentController extends ApiController
 
         $repo = new Navigation;
         $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = json_encode(array_replace_recursive($item->settings, $settings));
+        $item->settings = array_replace_recursive($item->settings, $settings);
 
         $repo->set($item, ['settings']);
         $this->setToast("De instellingen zijn opgeslagen!");

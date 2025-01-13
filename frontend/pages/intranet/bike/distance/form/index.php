@@ -40,7 +40,7 @@
 
             <div class="row">
                 <label for="color" class="form-label mb-0">Kleur</label>
-                <div role="colorinput" data-colors="blue|azure|indigo|purple|pink|red|orange|yellow|lime" data-input-name="color" data-default-value="blue"></div>
+                <div id="cinColor" role="colorinput" data-colors="blue|azure|indigo|purple|pink|red|orange|yellow|lime" data-input-name="color" data-default-value="blue"></div>
                 <div class="invalid-feedback" data-feedback-input="color"></div>
             </div>
         </div>

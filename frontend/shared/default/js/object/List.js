@@ -11,6 +11,7 @@ export default class List {
 		this.extraDataString = this.element.dataset.extra || false;
 		this.template = this.element.dataset.template || false;
 		this.limit = this.element.dataset.limit || 200;
+		this.stopCheckNext = false;
 
 		this.element.removeAttribute("data-template");
 

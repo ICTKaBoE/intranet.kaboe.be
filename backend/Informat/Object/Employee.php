@@ -12,6 +12,7 @@ class Employee extends CustomObject
         "personaId" => "string",
         "naam" => "string",
         "voornaam" => "string",
+        "bijkomendeVoornamen" => "string",
         "stamnr" => "string",
         "geslacht" => "string",
         "geboortedatum" => "date",

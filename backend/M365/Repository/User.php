@@ -28,11 +28,38 @@ class User extends Repository
         $headers = ["ConsistencyLevel" => "eventual"];
         $config->headers = $headers;
         $config->queryParameters = UsersRequestBuilderGetRequestConfiguration::createQueryParameters();
-        $config->queryParameters->top = 999;
+        $config->queryParameters->top = 50;
         $config->queryParameters->count = true;
-        $config->queryParameters->filter = "endswith(mail,'@coltd.be') and employeeId ne null";
+        $config->queryParameters->filter = "endswith(mail,'@coltd.be')";
         if ($select) $config->queryParameters->select = $select;
 
         return $this->iterate(GraphHelper::$appClient->users()->get($config)->wait());
+    }
+
+    public function getAllStudents($select = [])
+    {
+        $config = new  UsersRequestBuilderGetRequestConfiguration;
+        $headers = ["ConsistencyLevel" => "eventual"];
+        $config->headers = $headers;
+        $config->queryParameters = UsersRequestBuilderGetRequestConfiguration::createQueryParameters();
+        $config->queryParameters->top = 50;
+        $config->queryParameters->count = true;
+        $config->queryParameters->filter = "endswith(mail,'@student.coltd.be')";
+        if ($select) $config->queryParameters->select = $select;
+
+        return $this->iterate(GraphHelper::$appClient->users()->get($config)->wait());
+    }
+
+    public function getMemberOf($userId, $select = [])
+    {
+        $config = new UsersRequestBuilderGetRequestConfiguration;
+        $headers = ["ConsistencyLevel" => "eventual"];
+        $config->headers = $headers;
+        $config->queryParameters = UsersRequestBuilderGetRequestConfiguration::createQueryParameters();
+        $config->queryParameters->top = 50;
+        $config->queryParameters->count = true;
+        if ($select) $config->queryParameters->select = $select;
+
+        return $this->iterate(GraphHelper::$appClient->users()->byUserId($userId)->memberOf()->get()->wait());
     }
 }

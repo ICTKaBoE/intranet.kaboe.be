@@ -28,47 +28,17 @@
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label for="type" class="form-label">Type</label>
-                    <div>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="type" checked value="HW" required>
-                            <span class="form-check-label">Woon-Werk</span>
-                        </label>
-
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="type" value="WW" required>
-                            <span class="form-check-label">Werk-Werk</span>
-                        </label>
-                    </div>
+                    <div id="chbType" role="checkbox" data-type="radio" data-name="type" data-value="HW|WW" data-text="Woon-Werk|Werk-Werk" data-default-value="HW"></div>
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label for="per" class="form-label">Exporteer per</label>
-                    <div>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="per" checked value="school" required>
-                            <span class="form-check-label">School</span>
-                        </label>
-
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="per" value="teacher" required>
-                            <span class="form-check-label">Leerkracht</span>
-                        </label>
-                    </div>
+                    <div id="chbPer" role="checkbox" data-type="radio" data-name="per" data-value="school|teacher" data-text="School|Leerkracht" data-default-value="school"></div>
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="exportAs">Exporteren als</label>
-                    <div>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="exportAs" checked value="xlsx" required>
-                            <span class="form-check-label">Excel</span>
-                        </label>
-
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="exportAs" value="pdf" required>
-                            <span class="form-check-label">PDF</span>
-                        </label>
-                    </div>
+                    <div id="chbExportAs" role="checkbox" data-type="radio" data-name="exportAs" data-value="xlsx|pdf" data-text="Excel|PDF" data-default-value="xlsx"></div>
                     <div class="invalid-feedback" data-feedback-input="exportAs"></div>
                 </div>
             </div>

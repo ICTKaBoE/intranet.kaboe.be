@@ -3,6 +3,7 @@
 namespace Database\Object\Informat;
 
 use Database\Interface\CustomObject;
+use Helpers\CString;
 
 class StudentAddress extends CustomObject
 {
@@ -25,6 +26,6 @@ class StudentAddress extends CustomObject
 
     public function init()
     {
-        $this->formatted->full = "{$this->street} {$this->number}" . ($this->bus ? "/{$this->bus}" : "") . ", {$this->zipcode} {$this->city} {$this->linked->country->translatedName}";
+        $this->formatted->full = CString::formatAddress($this->street, $this->number, $this->bus, $this->zipcode, $this->city, $this->linked->country->translatedName);
     }
 }

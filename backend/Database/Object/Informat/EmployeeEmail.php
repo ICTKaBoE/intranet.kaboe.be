@@ -3,6 +3,7 @@
 namespace Database\Object\Informat;
 
 use Database\Interface\CustomObject;
+use Helpers\HTML;
 
 class EmployeeEmail extends CustomObject
 {
@@ -13,4 +14,9 @@ class EmployeeEmail extends CustomObject
         "email" => "string",
         "type" => "string"
     ];
+
+    public function init()
+    {
+        $this->formatted->link = HTML::Link(HTML::LINK_TYPE_EMAIL, $this->email);
+    }
 }

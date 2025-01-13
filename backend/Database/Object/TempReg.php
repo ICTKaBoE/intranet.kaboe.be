@@ -54,9 +54,10 @@ class TempReg extends CustomObject
 
     private function createBadgeSoup()
     {
-        $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
-        $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->soup <= $s['max'] && $this->soup >= $s['min']));
+        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
+        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->soup <= $s['max'] && $this->soup >= $s['min']));
 
+        if (!$level) return;
         $this->formatted->badge->soup = new stdClass;
         $this->formatted->badge->soup->display = $this->soup > 0 ? HTML::Badge($this->formatted->soup, backgroundColor: $level['color']) : "";
         $this->formatted->badge->soup->sort = $this->soup;
@@ -64,9 +65,10 @@ class TempReg extends CustomObject
 
     private function createBadgePasta()
     {
-        $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
-        $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->pasta <= $s['max'] && $this->pasta >= $s['min']));
+        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
+        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->pasta <= $s['max'] && $this->pasta >= $s['min']));
 
+        if (!$level) return;
         $this->formatted->badge->pasta = new stdClass;
         $this->formatted->badge->pasta->display = $this->pasta > 0 ? HTML::Badge($this->formatted->pasta, backgroundColor: $level['color']) : "";
         $this->formatted->badge->pasta->sort = $this->pasta;
@@ -74,9 +76,10 @@ class TempReg extends CustomObject
 
     private function createBadgeVegetables()
     {
-        $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
-        $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->vegetables <= $s['max'] && $this->vegetables >= $s['min']));
+        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
+        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->vegetables <= $s['max'] && $this->vegetables >= $s['min']));
 
+        if (!$level) return;
         $this->formatted->badge->vegetables = new stdClass;
         $this->formatted->badge->vegetables->display = $this->vegetables > 0 ? HTML::Badge($this->formatted->vegetables, backgroundColor: $level['color']) : "";
         $this->formatted->badge->vegetables->sort = $this->vegetables;
@@ -84,9 +87,10 @@ class TempReg extends CustomObject
 
     private function createBadgeMeat()
     {
-        $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
-        $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->meat <= $s['max'] && $this->meat >= $s['min']));
+        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "tempreg"))->settings['treshhold'];
+        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->meat <= $s['max'] && $this->meat >= $s['min']));
 
+        if (!$level) return;
         $this->formatted->badge->meat = new stdClass;
         $this->formatted->badge->meat->display = $this->meat > 0 ? HTML::Badge($this->formatted->meat, backgroundColor: $level['color']) : "";
         $this->formatted->badge->meat->sort = $this->meat;

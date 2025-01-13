@@ -33,6 +33,9 @@ abstract class General
         if (is_null($value)) return $value;
         else if ($origType == "list") $value = implode(PHP_EOL, $value);
         else if ($origType == "binary") $value = implode("", $value);
+        else if ($origType == "json") $value = json_encode($value);
+
+        if ($origType == "json" && empty($value)) $value = null;
 
         return $value;
     }
@@ -96,6 +99,35 @@ abstract class General
         }
 
         return $items;
+    }
+
+    static public function page(&$items, $page = null, $limit = null)
+    {
+        if (!$page) $page = Helpers::url()->getParam("page", 0);
+        if (!$limit) $limit = Helpers::url()->getParam("limit");
+
+        if ($page || $limit) {
+            $start = $page * $limit;
+            $items = array_slice($items, $start, $limit);
+
+            return $items;
+        }
+
+        return $items;
+    }
+
+    static public function hasNextPage($items, $page = null, $limit = null)
+    {
+        if (!$page) $page = Helpers::url()->getParam("page", 0);
+        if (!$limit) $limit = Helpers::url()->getParam("limit");
+
+        if ($page || $limit) {
+            $start = $page * $limit;
+            $items = array_slice($items, $start);
+            return (count($items) > $limit);
+        }
+
+        return false;
     }
 
     static public function processTemplate($items = [], $template = null, $searchPrePost = "@")

@@ -143,7 +143,7 @@ export default class Helpers {
 			cache: false,
 			processData: false,
 			contentType: false,
-			async: false,
+			async: true,
 		};
 
 		if (method === "POST") properties.data = data;

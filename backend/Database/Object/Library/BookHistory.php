@@ -25,8 +25,10 @@ class BookHistory extends CustomObject
         "book" => ['bookId' => \Database\Repository\Library\Book::class],
         "lenderUser" => ['lenderUserId' => \Database\Repository\User::class],
         "receiverUser" => ['receiverUserId' => \Database\Repository\User::class],
-        "lenderTeacher" => ['lenderInformatId' => \Database\Repository\Informat\Teacher::class],
-        "returnerTeacher" => ['returnerInformatId' => \Database\Repository\Informat\Teacher::class]
+        "lenderTeacher" => ['lenderInformatId' => \Database\Repository\Informat\Employee::class],
+        "returnerTeacher" => ['returnerInformatId' => \Database\Repository\Informat\Employee::class],
+        "lenderStudent" => ['lenderInformatId' => \Database\Repository\Informat\Student::class],
+        "returnerStudent" => ['returnerInformatId' => \Database\Repository\Informat\Student::class]
     ];
 
     public function init()

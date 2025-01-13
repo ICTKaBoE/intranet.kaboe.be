@@ -28,7 +28,7 @@ class StudentRelation extends CustomObject
     {
         $this->formatted->fullName = Input::createDisplayName("{{FN}} {{LN}}", $this->firstName, $this->name);
         $this->formatted->fullNameReversed = Input::createDisplayName("{{LN}} {{FN}}", $this->firstName, $this->name);
-        $this->formatted->typeWithFullName = "{$this->type}: {$this->formatted->fullName}";
-        $this->formatted->typeWithFullNameReversed = "{$this->type}: {$this->formatted->fullNameReversed}";
+        $this->formatted->typeWithFullName = "{$this->type}:\t{$this->formatted->fullName}";
+        $this->formatted->typeWithFullNameReversed = "{$this->type}:\t{$this->formatted->fullNameReversed}";
     }
 }

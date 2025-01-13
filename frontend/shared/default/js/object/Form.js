@@ -3,6 +3,8 @@ import Helpers from "./Helpers.js";
 import Select from "./Select.js";
 import DatePicker from "./DatePicker.js";
 import TinyMCE from "./TinyMCE.js";
+import Checkbox from "./Checkbox.js";
+import ColorInput from "./ColorInput.js";
 
 export default class Form {
 	static INSTANCES = {};
@@ -280,39 +282,49 @@ export default class Form {
 		let data = {};
 
 		$(this.element)
-			.find(":input")
+			.find(":input,[role]")
 			.each((id, el) => {
-				if (null !== el && null !== el.name && "" !== el.name) {
-					if (el.role === "select") {
-						let v = Select.GetInstance(el.id).getValue();
-						data[el.name] = typeof v == "string" ? v : v.join(";");
-					} else if (el.role === "tinymce")
-						data[el.name] = TinyMCE.INSTANCES[el.id].getValue();
-					else if (el.type === "radio" || el.type === "checkbox") {
-						let element = $(this.element).find(
-							`[type='${el.type}'][name='${el.name}']`
-						);
-						let value = element.val();
-						let checked = element.is(":checked");
-						data[el.name] = value == "on" ? checked : value;
-					} else if (el.type === "file") {
-						// let files = [];
-						// for (let i = 0; i < el.files.length; i++)
-						// 	files.push(el.files[i]);
-						// data[el.name + (el.multiple ? "[]" : "")] = files;
-					} else data[el.name] = el.value;
-				}
+				if (null === el) return;
+				if (el.type === "checkbox" || el.type === "radio") return;
+
+				let name = el.name;
+				let value = el.value;
+
+				if (el.role === "select") {
+					let v = Select.GetInstance(el.id).getValue();
+					data[name] = typeof v == "string" ? v : v.join(";");
+				} else if (el.role === "tinymce")
+					data[name] = TinyMCE.INSTANCES[el.id].getValue();
+				else if (el.role === "checkbox") {
+					console.log(Checkbox.GetInstance(el.id).getValue());
+					name = Checkbox.GetInstance(el.id).getName();
+					data[name] = Checkbox.GetInstance(el.id).getValue();
+				} else if (el.role === "colorinput") {
+					name = ColorInput.GetInstance(el.id).getName();
+					data[name] = ColorInput.GetInstance(el.id).getValue();
+				} else if (el.type === "file") {
+					data[name] = [];
+
+					for (let i = 0; i < el.files.length; i++) {
+						data[name].push(el.files[i]);
+					}
+				} else data[name] = value;
+
+				if (!name) return;
 			});
 
 		return data;
 	};
 
 	submit = (stepCheck = false) => {
-		let data = new FormData(this.element);
+		let data = new FormData();
 		let submitData = this.getSubmitData();
 
 		Object.keys(submitData).forEach((k) => {
-			data.set(k, submitData[k]);
+			if (Array.isArray(submitData[k])) {
+				for (let i = 0; i < submitData[k].length; i++)
+					data.append(k + "[]", submitData[k][i]);
+			} else data.set(k, submitData[k]);
 		});
 
 		this.disable();

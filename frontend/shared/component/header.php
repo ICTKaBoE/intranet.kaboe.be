@@ -10,19 +10,13 @@
 				</h1>
 
 				<div class="col-auto">
-					<div class="navbar-nav">
-						<div class="nav-item dropdown">
-							<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-								<span class="avatar avatar-sm">{{user:initials}}</span>
-								<div class="d-none d-xl-block ps-2">
-									<div>{{user:fullName}}</div>
-								</div>
-							</a>
-							<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-								<a href="/user/profile" class="dropdown-item">Profiel</a>
-								<a href="/user/logout" class="dropdown-item">Afmelden</a>
-							</div>
+					<div class="nav-link d-flex lh-1 text-reset p-0">
+						<div class="d-none d-xl-block px-2">
+							<div>{{user:fullName}}</div>
 						</div>
+
+						<span class="avatar avatar-sm me-2">{{user:initials}}</span>
+						<a href="/user/logout" class="avatar avatar-sm"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
 					</div>
 				</div>
 			</div>
@@ -41,19 +35,14 @@
 			</div>
 
 			<div class="col-auto d-none d-lg-flex">
-				<div class="navbar-nav">
-					<div class="nav-item dropdown">
-						<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-							<span class="avatar avatar-sm">{{user:initials}}</span>
-							<div class="d-none d-xl-block ps-2">
-								<div>{{user:fullName}}</div>
-							</div>
-						</a>
-						<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-							<a href="/user/profile" class="dropdown-item">Profiel</a>
-							<a href="/user/logout" class="dropdown-item">Afmelden</a>
-						</div>
+				<div class="nav-link d-flex lh-1 text-reset p-0">
+
+					<div class="d-none d-xl-block px-2">
+						<div>{{user:fullName}}</div>
 					</div>
+
+					<span class="avatar avatar-sm me-2">{{user:initials}}</span>
+					<a href="/user/logout" class="avatar avatar-sm"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
 				</div>
 			</div>
 		</div>

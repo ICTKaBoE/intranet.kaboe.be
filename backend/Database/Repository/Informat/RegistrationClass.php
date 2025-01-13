@@ -2,8 +2,10 @@
 
 namespace Database\Repository\Informat;
 
-use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
+use Database\Interface\Repository;
+use ClanCats\Hydrahon\Query\Sql\Func;
+use Ouzo\Utilities\Clock;
 
 class RegistrationClass extends Repository
 {
@@ -24,6 +26,17 @@ class RegistrationClass extends Repository
     {
         $statement = $this->prepareSelect();
         $statement->where('informatRegistrationId', $informatRegistrationId);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getCurrentByInformatRegistrationId($informatRegistrationId)
+    {
+
+        $statement = $this->prepareSelect();
+        $statement->where('informatRegistrationId', $informatRegistrationId);
+        $statement->where('start', '<=', Clock::nowAsString("Y-m-d"));
+        $statement->whereNotNull('end');
 
         return $this->executeSelect($statement);
     }

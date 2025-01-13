@@ -470,7 +470,6 @@ class HelpdeskController extends ApiController
             if (!$id) {
                 $navItem = Arrays::first($navRepo->get(Session::get("moduleSettingsId")));
                 $navItem->settings['lastNumber']++;
-                $navItem->settings = json_encode($navItem->settings);
                 $navRepo->set($navItem, ['settings']);
             }
 
@@ -495,7 +494,7 @@ class HelpdeskController extends ApiController
 
         $repo = new Navigation;
         $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = json_encode(array_replace_recursive($item->settings, $settings));
+        $item->settings = array_replace_recursive($item->settings, $settings);
 
         $repo->set($item, ['settings']);
         $this->setToast("De instellingen zijn opgeslagen!");
@@ -524,7 +523,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['new']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['new']['reply'], "bool")) $mail->replyTo = $settings['mail']['reply'];
 
         $mId = $mailRepo->set($mail);
 
@@ -555,7 +554,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['update']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['update']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 
@@ -586,7 +585,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['assigned']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['assigned']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 
@@ -617,7 +616,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['assignedUpdate']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['assignedUpdate']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 

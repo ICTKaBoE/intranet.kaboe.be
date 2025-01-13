@@ -47,13 +47,13 @@ abstract class Informat
 {
     static public function Import()
     {
-        $student = self::Students();
+        // $student = self::Students();
         $registration = self::Registrations();
-        $employee = self::Employees();
-        $employeeOwnfield = self::EmployeeOwnfields();
-        $employeePhoto = self::EmployeePhotos();
+        // $employee = self::Employees();
+        // $employeeOwnfield = self::EmployeeOwnfields();
+        // $employeePhoto = self::EmployeePhotos();
 
-        return ($student && $registration && $employee && $employeeOwnfield);
+        return ($student && $registration && $employee && $employeeOwnfield && $employeePhoto);
         // return true;
     }
 
@@ -119,6 +119,8 @@ abstract class Informat
 
             foreach ($iItems as $iItem) {
                 try {
+                    if (Clock::at($iItem->end)->format("m-d") === "06-30") $iItem->end = Clock::at($iItem->end)->format("Y-08-31");
+
                     $item = $repo->getByInformatId($iItem->pInschr) ?? $repo->getByInformatGuid($iItem->inschrijvingsId) ?? new InformatRegistration;
                     $item->informatId = $iItem->pInschr;
                     $item->informatGuid = $iItem->inschrijvingsId;
@@ -165,6 +167,7 @@ abstract class Informat
                     $item->informatGuid = $iItem->personId;
                     $item->name = $iItem->naam;
                     $item->firstName = $iItem->voornaam;
+                    $item->extraFirstName = $iItem->bijkomendeVoornamen;
                     $item->basenumber = $iItem->stamnr;
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
@@ -341,6 +344,7 @@ abstract class Informat
         $classgroup->schoolyear = INFORMAT_CURRENT_SCHOOLYEAR;
         $classgroup->code = $inschr->klasCode;
         $classgroup->name = $inschr->klas;
+        $classgroup->type = $inschr->groepType == 0 ? 'C' : 'S';
 
         $nId = $classgroupRepo->set($classgroup);
         if (!$classgroup->id) $classgroup->id = $nId;

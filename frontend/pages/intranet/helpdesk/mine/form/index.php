@@ -60,7 +60,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
 
             <div class="row">
                 <label class="form-label" for="attachments">Bijlagen</label>
-                <input type="file" class="form-control" name="attachments[]" id="attachments" accept="image/*" multiple />
+                <input type="file" class="form-control" name="attachments" id="attachments" accept="image/*" multiple />
                 <div class="invalid-feedback" data-feedback-input="attachments"></div>
             </div>
         </div>

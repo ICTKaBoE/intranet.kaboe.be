@@ -146,23 +146,23 @@ class DefaultController extends stdClass
 
 	private function loadExtraContent()
 	{
-		$extraContent = json_decode(file_get_contents(LOCATION_BACKEND . "/config/extraContent.json"), true);
-		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
-		$route = Helpers::getReletiveUrl();
-		$domain = Helpers::getDomainFolder() ?: "public";
-		$_route = explode("/", $route);
-		$_route[count($_route) - 1] = "*";
-		$_route = implode("/", $_route);
+		// $extraContent = json_decode(file_get_contents(LOCATION_BACKEND . "/config/extraContent.json"), true);
+		// $url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		// $route = Helpers::getReletiveUrl();
+		// $domain = Helpers::getDomainFolder() ?: "public";
+		// $_route = explode("/", $route);
+		// $_route[count($_route) - 1] = "*";
+		// $_route = implode("/", $_route);
 
-		foreach ($extraContent[$domain] as $controller => $paths) {
-			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $_route) || Arrays::contains($paths, $url)) {
-				$layout = (new $controller())->write();
+		// foreach ($extraContent[$domain] as $controller => $paths) {
+		// 	if (Arrays::contains($paths, $route) || Arrays::contains($paths, $_route) || Arrays::contains($paths, $url)) {
+		// 		$layout = (new $controller())->write();
 
-				foreach ($layout as $key => $item) {
-					$this->layout = str_replace($item["pattern"], $item["content"], $this->layout);
-				}
-			}
-		}
+		// 		foreach ($layout as $key => $item) {
+		// 			$this->layout = str_replace($item["pattern"], $item["content"], $this->layout);
+		// 		}
+		// 	}
+		// }
 	}
 
 	private function loadContent()

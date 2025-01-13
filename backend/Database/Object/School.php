@@ -14,6 +14,8 @@ class School extends CustomObject
         "intuneOrderIdPrefix" => "string",
         "jamfIpadPrefix" => "string",
         "adJobTitlePrefix" => "string",
+        "adOuPart" => "string",
+        "adSecGroupPart" => "string",
         "deleted" => "boolean"
     ];
 

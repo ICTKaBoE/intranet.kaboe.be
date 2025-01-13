@@ -16,12 +16,7 @@
             </div>
 
             <div class="row">
-                <div class="col-12">
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="fullDay" name="fullDay">
-                        <span class="form-check-label">Volledige dag</span>
-                    </label>
-                </div>
+                <div class="col-12" id="chbFullDay" role="checkbox" data-type="checkbox" data-name="fullDay" data-text="Volledige dag"></div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="start">Startdatum</label>

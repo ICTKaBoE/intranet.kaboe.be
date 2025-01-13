@@ -14,6 +14,7 @@ class Employee extends CustomObject
         "informatGuid" => "string",
         "name" => "string",
         "firstName" => "string",
+        "extraFirstName" => "string",
         "basenumber" => "string",
         "sex" => "string",
         "birthDate" => "date",

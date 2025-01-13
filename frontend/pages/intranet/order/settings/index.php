@@ -69,13 +69,7 @@
                     <div class="invalid-feedback" data-feedback-input="mail.template.quote.body"></div>
                 </div>
 
-                <div class="col-12 mb-3">
-                    <label class="form-check">
-                        <input type="checkbox" name="mail.template.quote.reply" id="mail.template.quote.reply" class="form-check-input">
-                        <span class="form-check-label">Mag antwoorden op de mail?</span>
-                    </label>
-                    <div class="invalid-feedback" data-feedback-input="mail.template.quote.reply"></div>
-                </div>
+                <div class="col-12 mb-3" id="chbMailTemplateQuoteReploy" role="checkbox" data-type="checkbox" data-name="mail.template.quote.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -97,13 +91,7 @@
                     <div class="invalid-feedback" data-feedback-input="mail.template.order.body"></div>
                 </div>
 
-                <div class="col-12 mb-3">
-                    <label class="form-check">
-                        <input type="checkbox" name="mail.template.order.reply" id="mail.template.order.reply" class="form-check-input">
-                        <span class="form-check-label">Mag antwoorden op de mail?</span>
-                    </label>
-                    <div class="invalid-feedback" data-feedback-input="mail.template.order.reply"></div>
-                </div>
+                <div class="col-12 mb-3" id="chbMailTemplateOrderReploy" role="checkbox" data-type="checkbox" data-name="mail.template.order.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -125,13 +113,7 @@
                     <div class="invalid-feedback" data-feedback-input="mail.template.accept.body"></div>
                 </div>
 
-                <div class="col-12 mb-3">
-                    <label class="form-check">
-                        <input type="checkbox" name="mail.template.accept.reply" id="mail.template.accept.reply" class="form-check-input">
-                        <span class="form-check-label">Mag antwoorden op de mail?</span>
-                    </label>
-                    <div class="invalid-feedback" data-feedback-input="mail.template.accept.reply"></div>
-                </div>
+                <div class="col-12 mb-3" id="chbMailTemplateAcceptReploy" role="checkbox" data-type="checkbox" data-name="mail.template.accept.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -153,13 +135,7 @@
                     <div class="invalid-feedback" data-feedback-input="mail.template.status.body"></div>
                 </div>
 
-                <div class="col-12 mb-3">
-                    <label class="form-check">
-                        <input type="checkbox" name="mail.template.status.reply" id="mail.template.status.reply" class="form-check-input">
-                        <span class="form-check-label">Mag antwoorden op de mail?</span>
-                    </label>
-                    <div class="invalid-feedback" data-feedback-input="mail.template.status.reply"></div>
-                </div>
+                <div class="col-12 mb-3" id="chbMailTemplateStatusReploy" role="checkbox" data-type="checkbox" data-name="mail.template.status.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
     </div>

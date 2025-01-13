@@ -3,19 +3,15 @@ import Helpers from "./Helpers.js";
 export default class ColorInput {
 	static INSTANCES = {};
 
-	constructor({ element = null, options = {} }) {
-		this.options = options;
+	constructor(element) {
 		this.element = element;
+		this.id = this.element.id;
 
-		this.colors =
-			options.colors || this.element.dataset.colors.split("|") || [];
+		this.colors = this.element.dataset.colors.split("|") || [];
 		this.name = this.element.dataset.inputName;
 		this.defaultValue = this.element.dataset.defaultValue || false;
 
 		this.inputs = [];
-
-		this.element.id = Helpers.generateId("cin");
-		this.id = this.element.id;
 
 		this.init();
 	}
@@ -23,15 +19,16 @@ export default class ColorInput {
 	static ScanAndCreate = () => {
 		$("[role='colorinput']").each((ids, el) => {
 			if (!ColorInput.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				ColorInput.INSTANCES[el.getAttribute("id")] = new ColorInput({
-					element: el,
-				});
+				ColorInput.INSTANCES[el.getAttribute("id")] = new ColorInput(
+					el
+				);
 		});
 	};
 
 	static GetInstance = (id) => {
+		console.log(id);
 		if (!id.startsWith("cin")) id = `cin${id}`;
-		return Button.INSTANCES[id] || false;
+		return ColorInput.INSTANCES[id] || false;
 	};
 
 	init = () => {
@@ -56,10 +53,9 @@ export default class ColorInput {
 			label.classList.add("form-colorinput");
 
 			this.inputs[color] = document.createElement("input");
-			this.inputs[color].role = "colorInput";
 			this.inputs[color].name = this.name;
 			this.inputs[color].type = "radio";
-			this.inputs[color].value = color;
+			this.inputs[color].dataset.value = color;
 			this.inputs[color].classList.add("form-colorinput-input");
 			label.appendChild(this.inputs[color]);
 
@@ -90,8 +86,10 @@ export default class ColorInput {
 	};
 
 	getValue = () => {
-		Object.keys(this.inputs).forEach((color) => {
-			if (this.inputs[color].checked) return color;
-		});
+		return Object.keys(this.inputs).filter(
+			(item) => this.inputs[item].checked
+		)[0];
 	};
+
+	getName = () => this.name;
 }

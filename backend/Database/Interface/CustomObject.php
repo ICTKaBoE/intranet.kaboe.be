@@ -69,7 +69,7 @@ class CustomObject extends stdClass
         foreach ($this->linkedAttributes as $la => $prop) {
             $attribute = key($prop);
 
-            if (is_null($this->$attribute)) continue;
+            if (is_null($this->$attribute) || Strings::isBlank($this->$attribute)) continue;
 
             $repo = $prop[$attribute];
 

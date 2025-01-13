@@ -46,9 +46,9 @@ abstract class CString
 		return $ret;
 	}
 
-	public static function formatAddress($street = null, $number = null, $bus = null, $zipcode = null, $city = null, $countryCode = null)
+	public static function formatAddress($street = null, $number = null, $bus = null, $zipcode = null, $city = null, $country = null)
 	{
-		return "{$street} {$number}" . ($bus ? "/{$bus}" : "") . ", {$zipcode} {$city}";
+		return "{$street} {$number}" . ($bus ? "/{$bus}" : "") . ", {$zipcode} {$city}, {$country}";
 	}
 
 	public static function leadingZeros($value, $fullLength)

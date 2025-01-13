@@ -16,36 +16,13 @@
             </div>
 
             <div class="row">
-                <div class="col-12 mb-3">
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="read" name="read" type="checkbox" />
-                        <span class="form-check-label">Lezen</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="create" name="create" type="checkbox" />
-                        <span class="form-check-label">Aanmaken</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="update" name="update" type="checkbox" />
-                        <span class="form-check-label">Update</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="delete" name="delete" type="checkbox" />
-                        <span class="form-check-label">Verwijderen</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="export" name="export" type="checkbox" />
-                        <span class="form-check-label">Exporteren</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="changeSettings" name="changeSettings" type="checkbox" />
-                        <span class="form-check-label">Instellingen wijzigen</span>
-                    </label>
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" id="admin" name="admin" type="checkbox" />
-                        <span class="form-check-label">Administator</span>
-                    </label>
-                </div>
+                <div class="col-12" id="chbRead" role="checkbox" data-type="checkbox" data-name="read" data-text="Lezen"></div>
+                <div class="col-12" id="chbCreate" role="checkbox" data-type="checkbox" data-name="create" data-text="Aanmaken"></div>
+                <div class="col-12" id="chbUpdate" role="checkbox" data-type="checkbox" data-name="update" data-text="Update"></div>
+                <div class="col-12" id="chbDelete" role="checkbox" data-type="checkbox" data-name="delete" data-text="Verwijderen"></div>
+                <div class="col-12" id="chbExport" role="checkbox" data-type="checkbox" data-name="export" data-text="Exporteren"></div>
+                <div class="col-12" id="chbChangeSettings" role="checkbox" data-type="checkbox" data-name="changeSettings" data-text="Instellingen wijzigen"></div>
+                <div class="col-12" id="chbAdmin" role="checkbox" data-type="checkbox" data-name="admin" data-text="Administrator"></div>
             </div>
 
             <div class="row">

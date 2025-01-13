@@ -51,3 +51,4 @@ define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . d
 define("INFORMAT_REFERENCE_DATE", "2024-01-01");
 
 define("EMAIL_SUFFIX", "coltd.be");
+define("EMAIL_SUFFIX_STUDENT", "student.coltd.be");

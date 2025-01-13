@@ -80,6 +80,37 @@ class InformatController extends ApiController
         }
     }
 
+    protected function getStudent($view, $id = null)
+    {
+        $repo = new Student;
+        $regRepo = new Registration;
+        $schoolId = Helpers::url()->getParam("schoolId");
+        $institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
+
+        $items = [];
+        foreach ($institutes as $institute) {
+            $regs = $regRepo->getBySchoolInstituteId($institute->id);
+
+            foreach ($regs as $reg) {
+                if (!is_null($reg->end)) continue;
+                if (Clock::at($reg->start)->isAfter(Clock::now())) continue;
+
+                $student = $repo->get($reg->informatStudentId)[0];
+                if (!$student) continue;
+
+                $items[] = $student;
+            }
+        }
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = Arrays::orderBy($items, "name");
+            $this->appendToJson('next', General::hasNextPage($items));
+            General::page($items);
+
+            $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
     protected function getStudentByClass($view, $id = null)
     {
         $repo = new Student;

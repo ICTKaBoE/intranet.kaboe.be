@@ -140,7 +140,7 @@ class SupervisionController extends ApiController
 
         $repo = new Navigation;
         $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = json_encode(array_replace_recursive($item->settings, $settings));
+        $item->settings = array_replace_recursive($item->settings, $settings);
 
         $repo->set($item, ['settings']);
         $this->setToast("De instellingen zijn opgeslagen!");
@@ -196,6 +196,9 @@ class SupervisionController extends ApiController
 
             $this->setToast("Het middagtoezicht op '{$item->start}' is verwijderd!");
         }
+
+        $this->setCloseModal();
+        $this->setReloadCalendar();
     }
 
     // Export functions

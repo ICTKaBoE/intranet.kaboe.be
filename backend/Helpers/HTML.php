@@ -16,6 +16,7 @@ abstract class HTML
 
 	static public function Icon($icon, $title = null, $color = null, $class = [], $style = [])
 	{
+		if (!$icon) return "";
 		$classes = ["ti", "icon", ...$class];
 		$styles = [];
 
@@ -54,8 +55,10 @@ abstract class HTML
 		return $el->ownerDocument->saveHTML($el);
 	}
 
-	static public function Link($type, $value, $text, $target = self::LINK_TARGET_SELF)
+	static public function Link($type, $value, $text = null, $target = self::LINK_TARGET_SELF)
 	{
+		if (!$text) $text = $value;
+
 		$dom = new DOMDocument;
 		$el = $dom->createElement("a", $text);
 

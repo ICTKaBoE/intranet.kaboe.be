@@ -18,7 +18,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="lenderInformatId">Persoon</label>
-                        <select name="lenderInformatId" id="lenderInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" required></select>
+                        <select name="lenderInformatId" id="lenderInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-search required></select>
                         <div class="invalid-feedback" data-feedback-input="lenderInformatId"></div>
                     </div>
                 </div>

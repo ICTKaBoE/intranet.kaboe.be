@@ -34,6 +34,19 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                                             <div class="datagrid-content">{{history:formatted.details}}</div>
                                         </div>
                                     </div>';
+
+const LIST_TEMPLATE = " <div class='datagrid-item'>
+                            <div class='datagrid-item'>#title#</div>
+                            <div class='datagrid-content'>#content#</div>
+                        </div>";
+
+const LIST_TEMPLATE_ADDRESS = " <div>#address#</div>";
+const LIST_TEMPLATE_RELATION = "<div>#relation#</div>";
+const LIST_TEMPLATE_NUMBER = "  <div>#number#</div>";
+const LIST_TEMPLATE_EMAIL = "  <div>#email#</div>";
+const LIST_TEMPLATE_BANK = "<div>#bank#</div>";
+const LIST_TEMPLATE_HISTORY = " <div>#history#</div>";
+const LIST_IMAGE = "<img class='img-fluid rounded' src='{{site:url}}/frontend/shared/default/images/informat/student/#informatGuid#.jpg' alt='#fullNameReversed#'>";
 ?>
 
 <div class="row">
@@ -44,20 +57,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
             </div>
 
             <div class="card-body">
-                <div class="datagrid">
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">Naam</div>
-                        <div class="datagrid-content">{{student:name}}</div>
-                    </div>
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">Voornaam</div>
-                        <div class="datagrid-content">{{student:firstName}}</div>
-                    </div>
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">Geboortedatum</div>
-                        <div class="datagrid-content">{{student:formatted.birthDate}}</div>
-                    </div>
-                </div>
+                <div class="datagrid" role="list" id="lst{{page:id}}" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE; ?>"></div>
             </div>
         </div>
 
@@ -66,9 +66,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Geschiedenis (Nieuw - Oud)</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.history}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}History" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_HISTORY ?>"></div>
         </div>
     </div>
 
@@ -78,9 +76,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Adres(sen)</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.address}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}Address" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_ADDRESS ?>"></div>
         </div>
 
         <div class="card mb-3">
@@ -88,9 +84,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Relatie(s)</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.relation}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}Relation" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_RELATION ?>"></div>
         </div>
 
         <div class="card mb-3">
@@ -98,9 +92,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Telefoon/GSM</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.number}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}Number" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_NUMBER ?>"></div>
         </div>
 
         <div class="card mb-3">
@@ -108,9 +100,7 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Email(s)</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.email}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}Email" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_EMAIL ?>"></div>
         </div>
 
         <div class="card mb-3">
@@ -118,15 +108,11 @@ const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
                 <h2 class="card-title">Bankgegeven(s)</h2>
             </div>
 
-            <div class="card-body">
-                {{student:repeat.bank}}
-            </div>
+            <div class="card-body" role="list" id="lst{{page:id}}Bank" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_BANK ?>"></div>
         </div>
     </div>
 
     <div class="d-none d-lg-block col-3">
-        <div class="card">
-            <img class="img-fluid rounded" src="{{site:url}}/frontend/shared/default/images/informat/student/{{student:informatGuid}}.jpg" alt="{{student:formatted.fullNameReversed}}">
-        </div>
+        <div class="card" role="list" id="lst{{page:id}}Image" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_IMAGE; ?>"></div>
     </div>
 </div>

@@ -216,6 +216,7 @@ class ManagementController extends ApiController
             );
 
             $items = (new ComputerUsageOnOff)->getByComputerId($computer->id);
+            // $items = Arrays::filter($items, fn($i) => Strings::isNotBlank($i->shutdown));
             $logonRepo = new ComputerUsageLogOn;
 
             Arrays::each($items, fn($i) => $i->logon = array_reverse(Arrays::orderBy($logonRepo->getByComputerIdAndLogonBetweenStartupAndShutdown($computer->id, $i->startup, $i->shutdown), 'logon')));

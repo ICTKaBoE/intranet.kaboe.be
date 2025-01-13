@@ -28,33 +28,13 @@
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="showNamesAs">Namen weergeven</label>
-                    <div>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="showNamesAs" checked value="initials" required>
-                            <span class="form-check-label">Initialen</span>
-                        </label>
-
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="showNamesAs" value="full" required>
-                            <span class="form-check-label">Volledige naam</span>
-                        </label>
-                    </div>
+                    <div id="chbShowAsNames" role="checkbox" data-type="radio" data-name="showNamesAs" data-value="initials|full" data-text="Initialen|Volledige Naam" data-default-value="initials"></div>
                     <div class="invalid-feedback" data-feedback-input="showNamesAs"></div>
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="exportAs">Exporteren als</label>
-                    <div>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="exportAs" checked value="xlsx" required>
-                            <span class="form-check-label">Excel</span>
-                        </label>
-
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="exportAs" value="pdf" required>
-                            <span class="form-check-label">PDF</span>
-                        </label>
-                    </div>
+                    <div id="chbExportAs" role="checkbox" data-type="radio" data-name="exportAs" data-value="xlsx|pdf" data-text="Excel|PDF" data-default-value="xlsx"></div>
                     <div class="invalid-feedback" data-feedback-input="exportAs"></div>
                 </div>
             </div>

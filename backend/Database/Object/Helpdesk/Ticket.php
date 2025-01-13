@@ -65,6 +65,7 @@ class Ticket extends CustomObject
         else if (Strings::equal($category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
 
         $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/helpdesk/mine/{$this->guid}";
+        $this->formatted->assignedLink = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/helpdesk/assigned/{$this->guid}";
 
         $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || Strings::equal($this->status, 'C'));
 

@@ -15,4 +15,9 @@ class EmployeeNumber extends CustomObject
         "type" => "string",
         "category" => "string"
     ];
+
+    public function init()
+    {
+        $this->formatted->link = HTML::Link(HTML::LINK_TYPE_PHONE, $this->number);
+    }
 }
