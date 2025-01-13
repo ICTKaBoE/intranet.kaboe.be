@@ -41,6 +41,7 @@ abstract class Local
         $_status = $_settings['informat']['ownfield']['status'];
         $_mainSchool = $_settings['informat']['ownfield']['mainSchool'];
         $_format = $_settings['format']['email'];
+        $_firstName = $_settings['informat']['ownfield']['createEmailWith'];
 
         // Temp disable users
         foreach ($userRepo->get() as $user) {
@@ -53,16 +54,18 @@ abstract class Local
         $employees = $employeeRepo->get();
         foreach ($employees as $employee) {
             try {
-                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? new ObjectUser;
+                $firstName = (Strings::equalsIgnoreCase(($employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_firstName)->value ?: "Officiële voornaam"), "officiële voornaam") ? $employee->firstName : $employee->extraFirstName);
+                $email = Input::createEmail($_format, $firstName, $employee->name, EMAIL_SUFFIX);
+                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? new ObjectUser;
 
                 $mainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool);
                 $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
 
                 $user->informatEmployeeId = $employee->informatId;
                 $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id;
-                $user->username = Input::createEmail($_format, $employee->firstName, $employee->name, EMAIL_SUFFIX);
+                $user->username = $email;
                 $user->name = $employee->name;
-                $user->firstName = $employee->firstName;
+                $user->firstName = $firstName;
                 $user->bankAccount = $employee->iban;
                 $user->active = $employee->active;
                 $user->api = $user->active;

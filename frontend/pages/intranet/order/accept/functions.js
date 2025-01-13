@@ -2,10 +2,11 @@ import Button from "../../../../shared/default/js/object/Button.js";
 import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Table from "../../../../shared/default/js/object/Table.js";
 import Component from "../../../../shared/default/js/object/Component.js";
+import Select from "../../../../shared/default/js/object/Select.js";
 
 window.emptyFilter = () => {
 	Select.GetInstance("status").clear();
-	Select.GetInstance("schoolId").clear();
+	// Select.GetInstance("schoolId").clear();
 
 	filter();
 };
@@ -16,10 +17,10 @@ window.filter = () => {
 		Select.GetInstance("status").getValue()
 	);
 
-	Table.GetInstance(pageId).addExtraData(
-		"schoolId",
-		Select.GetInstance("schoolId").getValue()
-	);
+	// Table.GetInstance(pageId).addExtraData(
+	// 	"schoolId",
+	// 	Select.GetInstance("schoolId").getValue()
+	// );
 
 	Helpers.closeAllModals();
 	Table.GetInstance(pageId).reload();

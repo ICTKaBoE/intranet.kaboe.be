@@ -98,7 +98,7 @@ abstract class General
             else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
         }
 
-        return $items;
+        return array_values($items);
     }
 
     static public function page(&$items, $page = null, $limit = null)

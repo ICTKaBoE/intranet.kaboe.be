@@ -47,11 +47,11 @@ abstract class Informat
 {
     static public function Import()
     {
-        // $student = self::Students();
+        $student = self::Students();
         $registration = self::Registrations();
-        // $employee = self::Employees();
-        // $employeeOwnfield = self::EmployeeOwnfields();
-        // $employeePhoto = self::EmployeePhotos();
+        $employee = self::Employees();
+        $employeeOwnfield = self::EmployeeOwnfields();
+        $employeePhoto = self::EmployeePhotos();
 
         return ($student && $registration && $employee && $employeeOwnfield && $employeePhoto);
         // return true;

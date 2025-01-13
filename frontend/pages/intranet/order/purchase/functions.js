@@ -3,6 +3,7 @@ import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Table from "../../../../shared/default/js/object/Table.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
+import Select from "../../../../shared/default/js/object/Select.js";
 
 window.emptyFilter = () => {
 	Select.GetInstance("status").clear();

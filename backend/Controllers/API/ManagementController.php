@@ -125,7 +125,7 @@ class ManagementController extends ApiController
             $items = $repo->get($id);
             General::filter($items, $filters);
 
-            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+            $this->appendToJson('items', array_values(Arrays::map($items, fn($i) => $i->toArray(true))));
         }
     }
 
@@ -884,7 +884,7 @@ class ManagementController extends ApiController
             $items = $repo->get($id);
             General::filter($items, $filters);
 
-            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+            $this->appendToJson('items', array_values(Arrays::map($items, fn($i) => $i->toArray(true))));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
         }

@@ -137,15 +137,15 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label mb-1" for="assetId">Toestel</label>
-                        <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" required></select>
-                        <div class="invalid-feedback" data-feedback-input="assetId"></div>
-                    </div>
-
-                    <div class="mb-2">
                         <label class="form-label mb-1" for="roomId">Lokaal</label>
                         <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room" data-load-value="id" data-load-label="formatted.full" data-parent-select="schoolId" data-search required></select>
                         <div class="invalid-feedback" data-feedback-input="roomId"></div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label mb-1" for="assetId">Toestel</label>
+                        <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" required></select>
+                        <div class="invalid-feedback" data-feedback-input="assetId"></div>
                     </div>
 
                     <div class="mb-2">

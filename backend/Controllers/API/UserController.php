@@ -127,7 +127,7 @@ class UserController extends ApiController
             $items = $repo->get();
             General::filter($items, $filters);
             $items = Arrays::map($items, fn($i) => $i = $i->toArray(true));
-            $this->appendToJson('items', $items);
+            $this->appendToJson('items', array_values($items));
         } else if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);

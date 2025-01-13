@@ -382,6 +382,11 @@ class OrderController extends ApiController
     }
 
     // Post functions
+    protected function postAccept($view, $id = null)
+    {
+        $this->postPurchase($view, $id);
+    }
+
     protected function postPurchase($view, $id = null)
     {
         if ($id == "add") $id = null;
@@ -630,7 +635,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['quote']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['quote']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
 
         $mId = $mailRepo->set($mail);
 
@@ -693,7 +698,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['order']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['order']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
 
         $mId = $mailRepo->set($mail);
 
@@ -724,7 +729,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['accept']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['accept']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
 
         $mId = $mailRepo->set($mail);
 
@@ -755,7 +760,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if ($settings['mail']['template']['status']['reply']) $mail->replyTo = json_encode($settings['mail']['reply']);
+        if (General::convert($settings['mail']['template']['status']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
 
         $mId = $mailRepo->set($mail);
 

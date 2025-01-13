@@ -18,7 +18,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label mb-1" for="status">Status</label>
-                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N;QR;QA;WA;A;D;S;R;PR" multiple></select>
+                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N;QR;QA;WA;A;D;S;R;PR;O" multiple></select>
                         <div class="invalid-feedback" data-feedback-input="status"></div>
                     </div>
                 </div>
