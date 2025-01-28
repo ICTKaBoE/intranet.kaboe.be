@@ -81,7 +81,7 @@ class UserController extends ApiController
 
     static public function ApiLogin()
     {
-        $authentication = getallheaders()["Authorization"];
+        $authentication = getallheaders()["X-Authorization"];
 
         if ($authentication) {
             $authentication = explode(":", base64_decode(str_replace("Basic ", "", $authentication)));

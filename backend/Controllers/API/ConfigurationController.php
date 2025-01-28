@@ -11,6 +11,7 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\GeneralMessage as ObjectGeneralMessage;
+use Database\Object\School as ObjectSchool;
 use Database\Repository\Setting;
 use Database\Repository\Navigation;
 use Database\Repository\SecurityGroup;
@@ -18,6 +19,7 @@ use Database\Repository\GeneralMessage;
 use Database\Repository\SecurityGroupUser;
 use Database\Object\SecurityGroup as ObjectSecurityGroup;
 use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
+use Database\Repository\School;
 use Database\Repository\SettingTab;
 
 class ConfigurationController extends ApiController
@@ -60,6 +62,38 @@ class ConfigurationController extends ApiController
             ];
 
             $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "&"));
+        }
+    }
+
+    protected function getSchools($view, $id = null)
+    {
+        $repo = new School;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            $this->appendToJson("checkbox", true);
+            $this->appendToJson("defaultOrder", [[1, "asc"]]);
+            $this->appendToJson(
+                key: 'columns',
+                data: [
+                    [
+                        "type" => "checkbox",
+                        "data" => null,
+                        "orderable" => false,
+                        "searchable" => false,
+                        "width" => "20px"
+                    ],
+                    [
+                        "title" => "Naam",
+                        "data" => "name"
+                    ]
+                ]
+            );
+
+            $items = $repo->get();
+            $this->appendToJson("rows", array_values($items));
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+            $group = Arrays::firstOrNull($repo->get($id));
+            $this->appendToJson('fields', $group);
         }
     }
 
@@ -239,6 +273,43 @@ class ConfigurationController extends ApiController
 
         $this->setToast("De instellingen zijn opgeslagen!");
         $this->handle();
+    }
+
+    protected function postSchools($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $name = Helpers::input()->post('name')->getValue();
+        $color = Helpers::input()->post('color')->getValue();
+        $intuneOrderIdPrefix = Helpers::input()->post('intuneOrderIdPrefix')->getValue();
+        $jamfIpadPrefix = Helpers::input()->post('jamfIpadPrefix')->getValue();
+        $adJobTitlePrefix = Helpers::input()->post('adJobTitlePrefix')->getValue();
+        $adOuPart = Helpers::input()->post('adOuPart')->getValue();
+        $adSecGroupPart = Helpers::input()->post('adSecGroupPart')->getValue();
+        $syncUpdateMail = Helpers::input()->post('syncUpdateMail')->getValue();
+
+        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
+
+        if ($this->validationIsAllGood()) {
+            $repo = new School;
+
+            if ($this->validationIsAllGood()) {
+                $item = $id ? Arrays::first($repo->get($id)) : new ObjectSchool;
+                $item->name = $name;
+                $item->color = $color;
+                $item->intuneOrderIdPrefix = $intuneOrderIdPrefix;
+                $item->jamfIpadPrefix = $jamfIpadPrefix;
+                $item->adJobTitlePrefix = $adJobTitlePrefix;
+                $item->adOuPart = $adOuPart;
+                $item->adSecGroupPart = $adSecGroupPart;
+                $item->syncUpdateMail = $syncUpdateMail;
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postGroups($view, $id = null)

@@ -1,11 +1,7 @@
 $getSyncUrl = "https://dev.api.kaboe.be/ps/sync";
 $postSyncUrl = "$($getSyncUrl)/update/<ID>";
-$baseOU = "OU=BASISSCHOLEN,OU=UsersCOLTD,OU=COLTD,DC=coltd,DC=be";
+$baseOU = "OU=COLTD,DC=coltd,DC=be";
 $server = "SRV-DC01.coltd.be";
-
-$script:updateDatabase = $true;
-$script:lastError = $null;
-$script:ignoreError = $false;
 
 add-type @"
     using System.Net;
@@ -21,7 +17,7 @@ add-type @"
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy; 
 
 $headers = @{
-    "Authorization" = "Basic " + [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("admin:PianomanPA"))
+    "X-Authorization" = "Basic " + [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("admin:PianomanPA"))
 };
 
 function StartSync {
@@ -44,7 +40,7 @@ function GetExistingItem {
         $item
     );
 
-    $i = Get-ADUser -Server $script:server -SearchBase $script:baseOU -Filter "EmployeeID -eq $($item.employeeId)";
+    $i = Get-ADUser -Server $script:server -SearchBase $script:baseOU -Filter "EmployeeID -eq '$($item.employeeId)' -or EmployeeID -eq 'P$($item.employeeId)'";
     return $i;
 }
 
@@ -54,31 +50,36 @@ function LoopItems {
     );
 
     foreach ($item in $items) {
-        $script:updateDatabase = $true;
-        $script:lastError = $null;
-        $script:ignoreError = $false;
-
-        switch ($item.action) {
-            "C" { 
-                CreateItem -item $item;
-            }
-            "U" {
-                UpdateItem -item $item;
-            }
-            "E" {
-                EnableItem -item $item;
-            }
-            "D" {
-                DisableItem -item $item;
-            }
-            Default {
-                $script:updateDatabase = $false;
-                $script:ignoreError = $true;
+        $lastError = $null;
+        $updateDatabase = $true;
+        $ignoreError = $false;
+        
+        try {
+            switch ($item.action) {
+                "C" { 
+                    CreateItem -item $item;
+                }
+                "U" {
+                    UpdateItem -item $item;
+                }
+                "E" {
+                    EnableItem -item $item;
+                }
+                "D" {
+                    DisableItem -item $item;
+                }
+                Default {
+                    $updateDatabase = $false;
+                    $ignoreError = $true;
+                }
             }
         }
+        catch {
+            $lastError = $_;
+        }
 
-        if ($script:updateDatabase -eq $true) {
-            UpdateDatabase -item $item -itemError $script:lastError -ignoreError $script:ignoreError;
+        if ($updateDatabase -eq $true) {
+            UpdateDatabase -item $item -itemError $lastError -ignoreError $ignoreError;
         }
     }
 
@@ -93,44 +94,36 @@ function CreateItem {
 
     if ($null -eq $i) {
         if ($item.password) {
-            try {
-                New-ADUser `
-                    -EmployeeID $item.employeeId `
-                    -Name $item.displayName `
-                    -GivenName $item.givenName `
-                    -Surname $item.surname `
-                    -DisplayName $item.displayName `
-                    -EmailAddress $item.emailAddress `
-                    -SamAccountName $item.samAccountName `
-                    -UserPrincipalName $item.userPrincipalName `
-                    -Company $item.companyName `
-                    -Department $item.department `
-                    -Title $item.jobTitle `
-                    -OtherAttributes $item.otherAttributes `
-                    -AccountPassword (ConvertTo-SecureString -String $item.password -AsPlainText -Force)`
-                    -ChangePasswordAtLogon $false `
-                    -Path $item.ou `
-                    -Server $script:server -Confirm:$false;
+            New-ADUser `
+                -EmployeeID $item.employeeId `
+                -Name $item.displayName `
+                -GivenName $item.givenName `
+                -Surname $item.surname `
+                -DisplayName $item.displayName `
+                -EmailAddress $item.emailAddress `
+                -SamAccountName $item.samAccountName `
+                -UserPrincipalName $item.userPrincipalName `
+                -Path $item.ou `
+                -Server $script:server -Confirm:$false;
 
-                while ($null -eq $i) {
-                    Start-Sleep -Seconds 1;
-                    $i = GetExistingItem -item $item;
-                }
+            while ($null -eq $i) {
+                Start-Sleep -Seconds 1;
+                $i = GetExistingItem -item $item;
+            }
 
-                SetItemMembership -item $item;
-                EnableItem -item $item;       
-            }
-            catch {
-                $script:lastError = "User already exists in other OU!";
-            }
-        }
-        else {
-            $script:lastError = "Cannot create user as no password is set!";
+            UpdateItem -item $item;
+            SetItemMembership -item $item;
+            EnableItem -item $item;       
         }
     }
     else {
-        $script:lastError = "User already exists!";
+        throw "Cannot create user as no password is set!";
+        # $script:lastError = "Cannot create user as no password is set!";
     }
+}
+else {
+    throw "User already exists!";
+    # $script:lastError = "User already exists!";
 }
 
 function SetItemMembership {
@@ -153,7 +146,8 @@ function UpdateItem {
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
-        $script:lastError = "User not found in OU '$($script:baseOU)'!";
+        throw "User not found in OU '$($script:baseOU)'";
+        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         if ($null -ne $item.givenName) {
@@ -165,6 +159,7 @@ function UpdateItem {
         if ($null -ne $item.displayName) {
             $i | Set-ADUser -DisplayName $item.displayName -Server $script:server -Confirm:$false;
             $i | Rename-ADObject -NewName $item.displayName -Server $script:server -Confirm:$false;
+            $i = GetExistingItem -item $item;
         }
         if ($null -ne $item.companyName) {
             $i | Set-ADUser -Company $item.companyName -Server $script:server -Confirm:$false;
@@ -187,8 +182,8 @@ function UpdateItem {
             SetItemMembership -item $item;
         }
         if ($null -ne $item.password) {
-            $i | Set-ADAccountPassword -NewPassword (ConvertTo-SecureString -AsPlainText $item.password -Force);
-            $i | Set-ADUser -ChangePasswordAtLogon $false;
+            $i | Set-ADAccountPassword -NewPassword (ConvertTo-SecureString -AsPlainText $item.password -Force) -Server $script:server;
+            $i | Set-ADUser -ChangePasswordAtLogon $false -PasswordNeverExpires ($item.type -eq "S") -Server $script:server;
         }
         if ($null -ne $item.ou) {
             $i | Move-ADObject -TargetPath $item.ou -Server $script:server -Confirm:$false;
@@ -204,14 +199,16 @@ function EnableItem {
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
-        $script:lastError = "User not found in OU '$($script:baseOU)'!";
+        throw "User not found in OU '$($script:baseOU)'!";
+        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         $i | Enable-ADAccount -Server $script:server -Confirm:$false;
         $i = GetExistingItem -item $item; 
 
         if ($i.Enabled -ne $true) {
-            $script:lastError = "Could not enable user!";
+            throw "Could not enable user!";
+            # $script:lastError = "Could not enable user!";
         }
         else {
             UpdateItem -item $item;
@@ -227,14 +224,16 @@ function DisableItem {
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
-        $script:lastError = "User not found in OU '$($script:baseOU)'!";
+        throw "User not found in OU '$($script:baseOU)'!";
+        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         $i | Disable-ADAccount -Server $script:server -Confirm:$false;
         $i = GetExistingItem -item $item;
         
         if ($i.Enabled -ne $false) {
-            $script:lastError = "Could not disable user!";
+            throw "Could not disable user!";
+            # $script:lastError = "Could not disable user!";
         }
     }
 }
@@ -252,8 +251,6 @@ function UpdateDatabase {
         lastError  = $itemError
         lastSync   = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
     };
-
-    Write-Host $item.id, $itemError, $ignoreError
     
     if ($itemError.Length -gt 0 -and $false -eq $ignoreError) {
         $body.action = $item.action;

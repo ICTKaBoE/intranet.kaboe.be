@@ -36,7 +36,7 @@ abstract class HTML
 	}
 
 
-	static public function Badge($text, $textColor = "white", $backgroundColor = null, $class = [], $style = [])
+	static public function Badge($text, $textColor = "white", $backgroundColor = null, $class = [], $style = [], $title = null)
 	{
 		$classes = ["badge", ...$class];
 		$styles = [];
@@ -49,6 +49,7 @@ abstract class HTML
 		$el = $dom->createElement("span", $text);
 		if (!empty($classes)) $el->setAttribute("class", implode(" ", $classes));
 		if (!empty($styles)) $el->setAttribute("style", implode("; ", $styles));
+		if ($title) $el->setAttribute("title", $title);
 
 		$el->normalize();
 		$dom->appendChild($el);

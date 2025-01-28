@@ -14,7 +14,8 @@ class RegistrationClass extends CustomObject
         "informatClassGroupId" => "int",
         "rank" => "int",
         "start" => "date",
-        "end" => "date"
+        "end" => "date",
+        "current" => "bool"
     ];
 
     public function init()

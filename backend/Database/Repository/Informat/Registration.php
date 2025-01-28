@@ -42,9 +42,9 @@ class Registration extends Repository
     {
         $statement = $this->prepareSelect();
         $statement->where('informatStudentId', $informatStudentId);
-        $statement->where('status', "0");
-        $statement->where('start', '<=', Clock::nowAsString("Y-m-d"));
-        $statement->whereNotNull('end');
+        // $statement->where('status', 0);
+        // $statement->where('start', '>=', Clock::nowAsString("Y-m-d"));
+        // $statement->whereNotNull('end');
 
         return $this->executeSelect($statement);
     }

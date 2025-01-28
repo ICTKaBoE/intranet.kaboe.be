@@ -14,9 +14,13 @@ class Registration extends CustomObject
         "informatStudentId" => "int",
         "schoolInstituteId" => "int",
         "basenumber" => "string",
+        "departmentCode" => "string",
+        "grade" => "int",
+        "year" => "int",
         "start" => "date",
         "end" => "date",
-        "status" => "int"
+        "status" => "int",
+        "current" => "bool"
     ];
 
     public function init()

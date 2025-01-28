@@ -73,7 +73,7 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/dist/tabler-icons.min.css",
+				"href": "{{site:url}}/frontend/shared/ui/icons/tabler-icons.min.css",
 				"rel": "stylesheet"
 			}
 		},

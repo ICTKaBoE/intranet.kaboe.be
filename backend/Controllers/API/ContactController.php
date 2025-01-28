@@ -194,8 +194,9 @@ class ContactController extends ApiController
 
                 foreach ($items as $index => $i) {
                     $currentRegistration = $registrationRepo->getByInformatStudentId($i->id);
-                    $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => Clock::now()->isAfterOrEqualTo(Clock::at($cr->start)) && (is_null($cr->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($cr->end))));
-                    $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->status == 0);
+                    $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->current);
+                    // $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => Clock::now()->isAfterOrEqualTo(Clock::at($cr->start)) && (is_null($cr->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($cr->end))));
+                    // $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->status == 0);
                     $currentRegistration = Arrays::firstOrNull($currentRegistration);
 
                     if (!$currentRegistration) {
@@ -208,8 +209,9 @@ class ContactController extends ApiController
                     $i->linked->school = $school;
 
                     $currentRegistrationClass = $registrationClassRepo->getByInformatRegistrationId($currentRegistration->id);
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)) && (is_null($crc->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($crc->end))));
-                    $currentRegistrationClass = array_reverse(Arrays::orderBy($currentRegistrationClass, 'start'));
+                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => $crc->current);
+                    // $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)) && (is_null($crc->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($crc->end))));
+                    // $currentRegistrationClass = array_reverse(Arrays::orderBy($currentRegistrationClass, 'start'));
                     $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
 
                     if (!$currentRegistrationClass) continue;

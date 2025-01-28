@@ -420,7 +420,7 @@ class OrderController extends ApiController
             if (!$id) {
                 $navItem = Arrays::first($navRepo->get(Session::get("moduleSettingsId")));
                 $navItem->settings['lastNumber']++;
-                $navItem->settings = json_encode($navItem->settings);
+                $navItem->settings = $navItem->settings;
                 $navRepo->set($navItem, ['settings']);
             }
 

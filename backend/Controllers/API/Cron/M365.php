@@ -93,4 +93,6 @@ abstract class M365
 
         return true;
     }
+
+    static public function ExpiredPasswords() {}
 }

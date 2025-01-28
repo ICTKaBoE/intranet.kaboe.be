@@ -119,7 +119,7 @@ abstract class Informat
 
             foreach ($iItems as $iItem) {
                 try {
-                    if (Clock::at($iItem->end)->format("m-d") === "06-30") $iItem->end = Clock::at($iItem->end)->format("Y-08-31");
+                    if (Clock::at($iItem->einddatum)->format("m-d") === "06-30") $iItem->einddatum = Clock::at($iItem->einddatum)->format("Y-08-31");
 
                     $item = $repo->getByInformatId($iItem->pInschr) ?? $repo->getByInformatGuid($iItem->inschrijvingsId) ?? new InformatRegistration;
                     $item->informatId = $iItem->pInschr;
@@ -127,9 +127,13 @@ abstract class Informat
                     $item->informatStudentId = $studentRepo->getByInformatGuid($iItem->persoonId)->id;
                     $item->schoolInstituteId = $institute->id;
                     $item->basenumber = $iItem->stamnr;
+                    $item->departmentCode = $iItem->afdCode;
+                    $item->grade = $iItem->graad;
+                    $item->year = $iItem->leerjaar;
                     $item->start = $iItem->begindatum;
                     $item->end = $iItem->einddatum;
                     $item->status = $iItem->status;
+                    $item->current = ($iItem->status == 0 && Clock::now()->isAfterOrEqualTo(Clock::at($iItem->begindatum)) && (is_null($iItem->einddatum) || Clock::now()->isBeforeOrEqualTo(Clock::at($iItem->einddatum))));
 
                     $nId = $repo->set($item);
                     if (!$item->id) $item->id = $nId;
@@ -362,6 +366,7 @@ abstract class Informat
         $registrationClass->rank = $inschr->klasnummer;
         $registrationClass->start = $inschr->begindatum;
         $registrationClass->end = $inschr->einddatum;
+        $registrationClass->current = (Clock::now()->isAfterOrEqualTo(Clock::at($inschr->begindatum)) && (is_null($inschr->einddatum) || Clock::now()->isBeforeOrEqualTo(Clock::at($inschr->einddatum))));
 
         $registrationClassRepo->set($registrationClass);
     }

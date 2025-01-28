@@ -52,6 +52,11 @@ class CronController extends ApiController
             else $this->appendToJson('sendMails', 'failed');
         }
 
+        if (Strings::equalsIgnoreCase($action, "m365ExpiredPasswords")) {
+            if (\Controllers\API\Cron\M365::ExpiredPasswords()) $this->appendToJson('m365ExpiredPasswords', 'passed');
+            else $this->appendToJson('m365ExpiredPasswords', 'failed');
+        }
+
         $this->handle();
     }
 }

@@ -35,11 +35,13 @@ List.ScanAndCreate();
 Checkbox.ScanAndCreate();
 
 window.checkAllLoadedCallback = () => {
-	ColorInput.ScanAndCreate();
-	Form.ScanAndCreate();
+	setTimeout(() => {
+		ColorInput.ScanAndCreate();
+		Form.ScanAndCreate();
 
-	Clock.ScanAndCreate();
-	// NoteScreen.ScanAndCreate();
+		Clock.ScanAndCreate();
+		// NoteScreen.ScanAndCreate();
+	}, 100);
 };
 
 Helpers.CheckAllLoaded(window.checkAllLoadedCallback);

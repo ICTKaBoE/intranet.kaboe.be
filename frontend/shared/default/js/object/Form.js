@@ -310,7 +310,7 @@ export default class Form {
 					}
 				} else data[name] = value;
 
-				if (!name) return;
+				if (!name) delete data[name];
 			});
 
 		return data;

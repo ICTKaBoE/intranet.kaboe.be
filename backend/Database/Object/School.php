@@ -16,6 +16,7 @@ class School extends CustomObject
         "adJobTitlePrefix" => "string",
         "adOuPart" => "string",
         "adSecGroupPart" => "string",
+        "syncUpdateMail" => "list",
         "deleted" => "boolean"
     ];
 
