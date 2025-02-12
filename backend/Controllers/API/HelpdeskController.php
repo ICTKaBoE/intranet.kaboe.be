@@ -406,7 +406,7 @@ class HelpdeskController extends ApiController
         $threadRepo = new Thread;
 
         $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $priority = Helpers::input()->post('priority')->getValue();
+        $priority = Helpers::input()->post('priority');
         $status = Helpers::input()->post('status');
         $category = Helpers::input()->post('category')->getValue();
         $roomId = Helpers::input()->post('roomId')->getValue();
@@ -424,7 +424,6 @@ class HelpdeskController extends ApiController
         }
 
         if (Arrays::first(explode("-", $category)) !== "O") {
-            if (!Input::check($roomId, Input::INPUT_TYPE_INT) || Input::empty($roomId)) $this->setValidation("roomId", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($assetId, Input::INPUT_TYPE_INT) || Input::empty($assetId)) $this->setValidation("assetId", state: self::VALIDATION_STATE_INVALID);
         }
 
@@ -432,14 +431,14 @@ class HelpdeskController extends ApiController
             $helpdesk = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectTicket);
             if (!$helpdesk->number) $helpdesk->number = $settings['lastNumber'] + 1;
             if (!$helpdesk->creatorUserId) $helpdesk->creatorUserId = User::getLoggedInUser()->id;
-            if ($assignedToUserId) {
-                $helpdesk->assignedToUserId = $assignedToUserId;
-                if ($helpdesk->assignedToUserId != $assignedToUserId) $mailAssignedTo = true;
+            if ($assignedToUserId?->getValue()) {
+                if ($helpdesk->assignedToUserId != $assignedToUserId->getValue()) $mailAssignedTo = true;
+                $helpdesk->assignedToUserId = $assignedToUserId->getValue();
             }
-            $helpdesk->priority = $priority;
+            $helpdesk->priority = $priority?->getValue() ?: null;
             $helpdesk->schoolId = $schoolId;
             $helpdesk->status = $status;
-            $helpdesk->roomId = $roomId;
+            $helpdesk->roomId = $roomId ?: null;
             $helpdesk->category = $category;
             $helpdesk->assetId = $assetId;
             $helpdesk->lastActionDateTime = Clock::nowAsString("Y-m-d H:i:s");
@@ -464,6 +463,11 @@ class HelpdeskController extends ApiController
                 $thread->content = $content;
 
                 $threadRepo->set($thread);
+                
+                if ($helpdesk->status == "C" && $thread->creatorId != $helpdesk->assignedToUserId) {
+                    $helpdesk->status = "O";
+                    $repo->set($helpdesk);
+                }
             }
 
             // Update settings
@@ -554,7 +558,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['update']['reply'], "bool")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settings['mail']['template']['update']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 
@@ -585,7 +589,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['assigned']['reply'], "bool")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settings['mail']['template']['assigned']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 
@@ -616,7 +620,7 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['assignedUpdate']['reply'], "bool")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settings['mail']['template']['assignedUpdate']['reply'], "bool")) $mail->replyTo = json_encode($settings['mail']['reply']);
 
         $mId = $mailRepo->set($mail);
 

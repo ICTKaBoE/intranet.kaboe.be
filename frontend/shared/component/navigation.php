@@ -8,7 +8,7 @@
 
         <h1 class="navbar-brand navbar-brand-autodark">
             <a href=".">
-                <img src="{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
+                <img src="https://kaboe.be/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
                 <span class="ms-2"><?php if ($_COOKIE["component_navigation_mode"] == "extranet"): ?>{{setting:site.title.extranet}}<?php else: ?>{{setting:site.title.default}}<?php endif; ?></span>
             </a>
         </h1>

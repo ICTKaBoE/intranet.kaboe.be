@@ -4,7 +4,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                             <div class='datagrid-content'>&content&</div>
                         </div>";
 
-const LIST_IMAGE = "    <img class='img-fluid rounded' src='{{site:url}}/frontend/shared/default/images/informat/employee/&informatGuid&.jpg' alt='&fullNameReversed&'>";
+const LIST_IMAGE = "    <img class='img-fluid rounded' src='https://kaboe.be/frontend/shared/default/images/informat/employee/&informatGuid&.jpg' alt='&fullNameReversed&'>";
 ?>
 
 <div class="row">

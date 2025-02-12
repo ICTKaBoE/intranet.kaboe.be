@@ -15,13 +15,11 @@
                     <div class="mb-3">
                         <label class="form-label" for="username">Gebruikersnaam</label>
                         <input type="email" name="username" id="username" class="form-control" placeholder="john.doe@coltd.be" required autofocus>
-                        <div class="invalid-feedback" data-feedback-input="username"></div>
                     </div>
 
                     <div class="mb-2">
                         <label class="form-label" for="password">Wachtwoord</label>
                         <input type="password" name="password" id="password" class="form-control" placeholder="Wachtwoord" required>
-                        <div class="invalid-feedback" data-feedback-input="password"></div>
                     </div>
 
                     <div class="form-footer">

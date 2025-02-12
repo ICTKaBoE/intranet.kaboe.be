@@ -64,7 +64,7 @@ abstract class CString
 	public static function noLines($value, $spacer)
 	{
 		$value = self::noHtml($value);
-		$value = explode(PHP_EOL, $value);
+		$value = preg_split('/\r\n|\r|\n/', $value);
 		return implode($spacer, $value);
 	}
 

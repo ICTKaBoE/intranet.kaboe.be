@@ -165,11 +165,11 @@ class TempregController extends ApiController
             $item = new ObjectTempReg;
             $item->schoolId = $schoolId;
             $item->name = $name;
-            $item->soup = $soup;
-            $item->pasta = $pasta;
-            $item->vegetables = $vegetables;
-            $item->meat = $meat;
-            $item->notes = $notes;
+            $item->soup = $soup ?: 0;
+            $item->pasta = $pasta ?: 0;
+            $item->vegetables = $vegetables ?: 0;
+            $item->meat = $meat ?: 0;
+            $item->notes = $notes ?: null;
 
             $repo->set($item);
         }

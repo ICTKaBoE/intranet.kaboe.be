@@ -11,7 +11,7 @@
                     <div class="col">
                         <label class="form-label" for="returnerType">Type persoon</label>
                         <select name="returnerType" id="returnerType" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-load-value="id" data-load-label="name" data-on-change="setReturner" required></select>
-                        <div class="invalid-feedback" data-feedback-input="returnerType"></div>
+
                     </div>
                 </div>
 
@@ -19,7 +19,7 @@
                     <div class="col">
                         <label class="form-label" for="returnerInformatId">Persoon</label>
                         <select name="returnerInformatId" id="returnerInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" required></select>
-                        <div class="invalid-feedback" data-feedback-input="returnerInformatId"></div>
+
                     </div>
                 </div>
             </div>

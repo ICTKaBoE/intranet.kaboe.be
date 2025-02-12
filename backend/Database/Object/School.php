@@ -17,6 +17,7 @@ class School extends CustomObject
         "adOuPart" => "string",
         "adSecGroupPart" => "string",
         "syncUpdateMail" => "list",
+        "dynamicTeam" => "boolean",
         "deleted" => "boolean"
     ];
 

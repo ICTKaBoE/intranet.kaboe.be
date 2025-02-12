@@ -62,7 +62,7 @@ abstract class Local
                 $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
 
                 $user->informatEmployeeId = $employee->informatId;
-                $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id;
+                $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id ?: 0;
                 $user->username = $email;
                 $user->name = $employee->name;
                 $user->firstName = $firstName;
@@ -116,7 +116,7 @@ abstract class Local
             $address->bus = $employeeAddress->bus;
             $address->zipcode = $employeeAddress->zipcode;
             $address->city = $employeeAddress->city;
-            $address->countryId = $countryRepo->getByNisCode(General::removeLeadingZero($employeeAddress->countryCode))->id;
+            $address->countryId = $employeeAddress->countryId;
             $address->current = $employeeAddress->current;
 
             $userAddressRepo->set($address);

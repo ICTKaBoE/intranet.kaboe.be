@@ -1,7 +1,12 @@
+import Checkbox from "../../../../../shared/default/js/object/Checkbox.js";
 import Select from "../../../../../shared/default/js/object/Select.js";
 
 window.renderOptgroupItem = (data, escape) => {
-	return `<div>${data.optgroupName} - ${data.name}</div>`;
+	return (
+		"<div>" +
+		(data.optgroupName ? `${data.optgroupName} - ` : "") +
+		`${data.name}</div>`
+	);
 };
 
 window.locationView = (info) => {
@@ -32,14 +37,14 @@ window.partyView = (info) => {
 };
 
 window.policeView = () => {
-	let police = $("#police").is(":checked");
+	let police = Checkbox.GetInstance("chbPolice").getValue();
 
 	if (police) document.getElementById("police-Y").classList.remove("d-none");
 	else document.getElementById("police-Y").classList.add("d-none");
 };
 
 window.supervisionView = () => {
-	let supervision = $("#supervision").is(":checked");
+	let supervision = Checkbox.GetInstance("chbSupervision").getValue();
 
 	if (supervision)
 		document.getElementById("supervision-Y").classList.remove("d-none");

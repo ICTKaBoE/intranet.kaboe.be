@@ -8,8 +8,6 @@ import Calendar from "./object/Calendar.js";
 import DatePicker from "./object/DatePicker.js";
 import TinyMCE from "./object/TinyMCE.js";
 import Chart from "./object/Chart.js";
-import Clock from "./object/Clock.js";
-// import NoteScreen from "./object/NoteScreen.js";
 import ColorInput from "./object/ColorInput.js";
 import SearchField from "./object/SearchField.js";
 import List from "./object/List.js";
@@ -22,26 +20,23 @@ $.ajaxSetup({
 	},
 });
 
+Select.ScanAndCreate();
 Toast.Create();
+Checkbox.ScanAndCreate();
 Button.ScanAndCreate();
 SearchField.ScanAndCreate();
 TinyMCE.ScanAndCreate();
-Select.ScanAndCreate();
 Table.ScanAndCreate();
 Calendar.ScanAndCreate();
 DatePicker.ScanAndCreate();
 Chart.ScanAndCreate();
 List.ScanAndCreate();
-Checkbox.ScanAndCreate();
 
 window.checkAllLoadedCallback = () => {
 	setTimeout(() => {
 		ColorInput.ScanAndCreate();
 		Form.ScanAndCreate();
-
-		Clock.ScanAndCreate();
-		// NoteScreen.ScanAndCreate();
-	}, 100);
+	}, 250);
 };
 
 Helpers.CheckAllLoaded(window.checkAllLoadedCallback);

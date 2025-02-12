@@ -110,6 +110,7 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'C' => 
         array (
             'Composer\\Semver\\' => 16,
+            'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
             'ClanCats\\Hydrahon\\' => 18,
         ),
@@ -304,6 +305,10 @@ class ComposerStaticInit5c68ada3cf7d82c78ed48898533560ae
         'Composer\\Semver\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
+        ),
+        'Composer\\Pcre\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/pcre/src',
         ),
         'Complex\\' => 
         array (

@@ -445,8 +445,8 @@ class OrderController extends ApiController
         $assetId = Helpers::input()->post('assetId')->getValue();
         $clarifycation = Helpers::input()->post('clarifycation')->getValue();
         $quotePrice = Helpers::input()->post('quotePrice')->getValue();
-        $quoteVatIncluded = Helpers::input()->post('quoteVatIncluded')->getValue();
-        $warrenty = Helpers::input()->post('warrenty')->getValue();
+        $quoteVatIncluded = Helpers::input()->post('quoteVatIncluded')?->getValue();
+        $warrenty = Helpers::input()->post('warrenty')?->getValue();
 
         if (!Input::check($amount) || Input::empty($amount)) $this->setValidation("amount", "Aantal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
         if (!Input::check($category) || Input::empty($category)) $this->setValidation("category", "Categorie moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
@@ -469,7 +469,7 @@ class OrderController extends ApiController
                 $line->category = $category;
                 $line->assetId = Arrays::contains(["O"], Arrays::first(explode("-", $category))) ? "" : $assetId;
                 $line->clarifycation = $clarifycation;
-                $line->quotePrice = $quotePrice;
+                $line->quotePrice = $quotePrice ?: 0;
                 $line->quoteVatIncluded = Input::convertToBool($quoteVatIncluded);
                 $line->warrenty = Input::convertToBool($warrenty);
                 $repo->set($line);

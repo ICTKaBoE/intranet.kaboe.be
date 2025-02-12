@@ -34,18 +34,11 @@ class AccidentController extends ApiController
                 'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[2, "asc"]]);
+            $this->appendToJson("checkbox", false);
+            $this->appendToJson("defaultOrder", [[1, "desc"]]);
             $this->appendToJson(
                 key: 'columns',
                 data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
                     [
                         "title" => "#",
                         "data" => "formatted.number",
@@ -240,6 +233,16 @@ class AccidentController extends ApiController
     // Post functions
     protected function postMine($view, $id = null)
     {
+        $this->post($view, $id);
+    }
+
+    protected function postDeclarations($view, $id = null)
+    {
+        $this->post($view, $id);
+    }
+
+    protected function post($view, $id = null)
+    {
         if ($id == "add") $id = null;
         $navRepo = new Navigation;
         $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
@@ -274,6 +277,12 @@ class AccidentController extends ApiController
         $police = General::convert(Helpers::input()->post('police')->getValue(), "bool");
         $policeName = Helpers::input()->post('policeName')->getValue();
         $policePVNumber = Helpers::input()->post('policePVNumber')->getValue();
+        $status = Helpers::input()->post("status");
+        $informatStudentRelationId = Helpers::input()->post("informatStudentRelationId");
+        $informatStudentEmailId = Helpers::input()->post("informatStudentEmailId");
+        $informatStudentNumberId = Helpers::input()->post("informatStudentNumberId");
+        $informatStudentBankId = Helpers::input()->post("informatStudentBankId");
+        $informatStudentAddressId = Helpers::input()->post("informatStudentAddressId");
 
         if (!$id) {
             if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
@@ -316,13 +325,27 @@ class AccidentController extends ApiController
             if (!Input::check($informatSupervisorId, Input::INPUT_TYPE_INT) || Input::empty($informatSupervisorId)) $this->setValidation("informatSupervisorId", state: self::VALIDATION_STATE_INVALID);
         }
 
+        if ($id) {
+            if (!Input::check($informatStudentRelationId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentRelationId)) $this->setValidation("informatStudentRelationId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($informatStudentEmailId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentEmailId)) $this->setValidation("informatStudentEmailId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($informatStudentNumberId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentNumberId)) $this->setValidation("informatStudentNumberId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($informatStudentBankId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentBankId)) $this->setValidation("informatStudentBankId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($informatStudentAddressId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentAddressId)) $this->setValidation("informatStudentAddressId", state: self::VALIDATION_STATE_INVALID);
+        }
+
         if ($this->validationIsAllGood()) {
             $accident = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectAccident);
             if (!$accident->number) $accident->number = $settings['lastNumber'] + 1;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
+            if ($status) $accident->status = $status->getValue();
             $accident->schoolId = $schoolId;
             $accident->informatSubgroupId = $informatSubgroupId;
             $accident->informatStudentId = $informatStudentId;
+            if ($informatStudentRelationId) $accident->informatStudentRelationId = $informatStudentRelationId->getValue();
+            if ($informatStudentEmailId) $accident->informatStudentEmailId = $informatStudentEmailId->getValue();
+            if ($informatStudentNumberId) $accident->informatStudentNumberId = $informatStudentNumberId->getValue();
+            if ($informatStudentBankId) $accident->informatStudentBankId = $informatStudentBankId->getValue();
+            if ($informatStudentAddressId) $accident->informatStudentAddressId = $informatStudentAddressId->getValue();
             $accident->datetime = Clock::at($datetime)->format("Y-m-d H:i:s");
             $accident->description = $description;
             $accident->location = $location;
@@ -385,8 +408,15 @@ class AccidentController extends ApiController
                 foreach ($item->linked->school->toArray(true) as $key => $value) $template->setValue("school:{$key}", $value);
                 foreach ($item->linked->informatStudent->toArray(true) as $key => $value) $template->setValue("student:{$key}", $value);
                 foreach ($item->linked?->supervisor?->toArray(true) ?: [] as $key => $value) $template->setValue("supervisor:{$key}", $value);
+                foreach ($item->linked?->informatStudentAddress?->toArray(true) ?: [] as $key => $value) $template->setValue("student:address.{$key}", $value);
                 foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) $template->setValue("setting:{$key}", $value);
                 foreach (User::getLoggedInUser()->toArray(true) as $key => $value) $template->setValue("user:{$key}", $value);
+
+                $template->setValue("represent:name", $item->linked->informatStudentRelation->formatted->fullNameReversed);
+                $template->setValue("represent:email", $item->linked->informatStudentEmail->email);
+                $template->setValue("represent:phone", $item->linked->informatStudentNumber->number);
+                $template->setValue("represent:bank.iban", $item->linked->informatStudentBank->formatted->iban);
+                $template->setValue("represent:bank.bic", $item->linked->informatStudentBank->formatted->bic);
 
                 $template->setCheckbox("checkbox:sex.m", Strings::equalsIgnoreCase($item->linked->informatStudent->sex, "M"));
                 $template->setCheckbox("checkbox:sex.f", Strings::equalsIgnoreCase($item->linked->informatStudent->sex, "F"));
@@ -434,7 +464,6 @@ class AccidentController extends ApiController
                 } else if ($item->party == "I") {
                     $template->setValue("party:installation", $item->partyInstallReason);
                 }
-
 
                 if ($item->police) {
                     $template->setValue("police:name", $item->policeName);

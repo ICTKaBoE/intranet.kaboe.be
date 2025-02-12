@@ -31,9 +31,10 @@ abstract class General
     static public function deconvert($value, $origType)
     {
         if (is_null($value)) return $value;
-        else if ($origType == "list") $value = implode(PHP_EOL, $value);
+        else if ($origType == "list" && is_array($value)) $value = implode(PHP_EOL, $value);
         else if ($origType == "binary") $value = implode("", $value);
         else if ($origType == "json") $value = json_encode($value);
+        else if ($origType == "bool" || $origType == "boolean") $value = (int)$value;
 
         if ($origType == "json" && empty($value)) $value = null;
 
@@ -94,7 +95,7 @@ abstract class General
         foreach ($filters as $key => $value) {
             if (!$value || empty($value)) continue;
 
-            if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, $i->$key));
+            if (is_array($value)) $items = Arrays::filter($items, fn($i) => Arrays::contains($value, self::convert($i->$key, "string")));
             else $items = Arrays::filter($items, fn($i) => Strings::equal($i->$key, $value));
         }
 

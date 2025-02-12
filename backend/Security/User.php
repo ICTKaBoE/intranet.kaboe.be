@@ -44,15 +44,24 @@ abstract class User
     static public function canAccess($minimumRights)
     {
         $user = self::getLoggedInUser();
-        $userSecurityGroup = Arrays::firstOrNull((new SecurityGroupUser)->getByUserId($user->id));
+        $userSecurityGroup = (new SecurityGroupUser)->getByUserId($user->id);
         if (!$userSecurityGroup) return false;
 
-        $securityGroup = Arrays::firstOrNull((new SecurityGroup)->get($userSecurityGroup->securityGroupId));
-        if (!$securityGroup) return false;
+        $permissions = [];
+        foreach ($userSecurityGroup as $usg) {
+            $securityGroup = Arrays::firstOrNull((new SecurityGroup)->get($usg->securityGroupId));
+            if (!$securityGroup) continue;
+
+            if (empty($permissions)) $permissions = $securityGroup->permission;
+            else {
+                foreach ($securityGroup->permission as $index => $value) {
+                    if ($permissions[$index] == 0 && $value == 1) $permissions[$index] = 1;
+                }
+            }
+        }
 
         $firstIsTrue = Arrays::findKeyByValue($minimumRights, 1);
-
-        return Strings::equal($securityGroup->permission[$firstIsTrue], 1);
+        return Strings::equal($permissions[$firstIsTrue], 1);
     }
 
     static public function generatePassword()
@@ -61,8 +70,9 @@ abstract class User
         $dictionary = $settingRepo->get("dictionary")[0]->value;
         $words = explode(PHP_EOL, $dictionary);
 
-        $password = Arrays::randElement($words);
+        $password = trim(Arrays::randElement($words));
         $password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
+        $password = str_replace(" ", "", $password);
 
         return $password;
     }

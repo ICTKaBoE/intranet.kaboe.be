@@ -11,10 +11,16 @@ window.deviceView = (info) => {
 	if (category == "O") {
 		Select.GetInstance("assetId").disable();
 	} else {
-		Select.GetInstance("assetId").setExtraLoadParam(
-			"schoolId",
-			Select.GetInstance("schoolId").getValue()
-		);
+		let schoolId = Select.GetInstance("schoolId").getValue();
+		let roomId = Select.GetInstance("roomId").getValue();
+
+		if (schoolId)
+			Select.GetInstance("assetId").setExtraLoadParam(
+				"schoolId",
+				schoolId
+			);
+		if (roomId)
+			Select.GetInstance("assetId").setExtraLoadParam("roomId", roomId);
 		Select.GetInstance("assetId").setDetails(category);
 
 		setTimeout(() => {
@@ -27,7 +33,11 @@ window.deviceView = (info) => {
 };
 
 window.renderOptgroupItem = (data, escape) => {
-	return `<div>${data.optgroupName} - ${data.name}</div>`;
+	return (
+		"<div>" +
+		(data.optgroupName ? `${data.optgroupName} - ` : "") +
+		`${data.name}</div>`
+	);
 };
 
 let btnCancel = new Button({

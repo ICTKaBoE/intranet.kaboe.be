@@ -17,6 +17,8 @@ class StudentEmail extends CustomObject
 
     public function init()
     {
+        $this->formatted->typeWithEmail = "{$this->type}:\t{$this->email}";
+
         $this->formatted->link = HTML::Link(HTML::LINK_TYPE_EMAIL, $this->email);
         $this->formatted->typeWithLink = "{$this->type}:\t{$this->formatted->link}";
     }

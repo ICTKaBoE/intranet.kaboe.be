@@ -5,13 +5,13 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="name">Naam</label>
                     <input type="text" name="name" id="name" class="form-control" required />
-                    <div class="invalid-feedback" data-feedback-input="name"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="contactName">Contactpersoon</label>
                     <input type="text" name="contactName" id="contactName" class="form-control" />
-                    <div class="invalid-feedback" data-feedback-input="contactName"></div>
+
                 </div>
             </div>
 
@@ -19,13 +19,13 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="email">E-mail</label>
                     <input type="email" name="email" id="email" class="form-control" required />
-                    <div class="invalid-feedback" data-feedback-input="email"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="phone">Telefoon</label>
                     <input type="phone" name="phone" id="phone" class="form-control" />
-                    <div class="invalid-feedback" data-feedback-input="phone"></div>
+
                 </div>
             </div>
         </div>

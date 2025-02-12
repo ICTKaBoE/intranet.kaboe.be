@@ -11,7 +11,6 @@
                     <div class="col">
                         <label class="form-label" for="type">Type</label>
                         <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-load-value="id" data-load-label="name" data-on-change="changeLocationType" data-default-value="HW" required></select>
-                        <div class="invalid-feedback" data-feedback-input="type"></div>
                     </div>
                 </div>
 
@@ -19,7 +18,6 @@
                     <div class="col">
                         <label class="form-label" for="startId">Startlocatie</label>
                         <select name="startId" id="startId" data-load-source="[HW@{{select:url:short}}/user/address;WW@{{select:url:short}}/school/address]" data-load-value="id" data-load-label="[HW@address;WW@addressWithSchool]" data-default-details="HW" required></select>
-                        <div class="invalid-feedback" data-feedback-input="startId"></div>
                     </div>
                 </div>
             </div>

@@ -27,7 +27,9 @@ abstract class FileSystem
 	{
 		$path = Path::normalize($path);
 		$path = self::unifyPath($path);
+
 		$path = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . $path;
+		// $path = "https://kaboe.be" . $path;
 
 		return $path;
 	}

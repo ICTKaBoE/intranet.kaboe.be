@@ -25,6 +25,17 @@
 
         <div class="card mb-3">
             <div class="card-header">
+                <h2 class="card-title">Informat - Foto's</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12" id="chbEmployee" role="checkbox" data-type="checkbox" data-name="photo.employee" data-text="Personeel"></div>
+                <div class="col-12" id="chbStudent" role="checkbox" data-type="checkbox" data-name="photo.student" data-text="Leerling"></div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
                 <h2 class="card-title">Office 365 - Standaarden - Bedrijfsnaam</h2>
             </div>
 
@@ -55,6 +66,60 @@
                 <div class="col-12 mb-3">
                     <label class="form-label" for="default.ou.student">Leerling</label>
                     <input type="text" name="default.ou.student" id="default.ou.student" class="form-control" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Office 365 - Teams - Standaarden</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.owner">Algemeen Eigenaar</label>
+                    <input type="text" name="default.teams.owner" id="default.teams.owner" class="form-control" required />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.template">Klas Template ID</label>
+                    <input type="text" name="default.teams.template" id="default.teams.template" class="form-control" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Office 365 - Teams - Dynamische Regel</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.rule.class">Klas</label>
+                    <input type="text" name="default.teams.rule.class" id="default.teams.rule.class" class="form-control" required />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.rule.school">School</label>
+                    <input type="text" name="default.teams.rule.school" id="default.teams.rule.school" class="form-control" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Office 365 - Teams - Naam</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.name.class">Klas</label>
+                    <input type="text" name="default.teams.name.class" id="default.teams.name.class" class="form-control" required />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="default.teams.rule.school">School</label>
+                    <input type="text" name="default.teams.name.school" id="default.teams.name.school" class="form-control" required />
                 </div>
             </div>
         </div>

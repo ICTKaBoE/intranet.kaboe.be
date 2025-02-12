@@ -5,7 +5,7 @@
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="school">Scholen</label>
                     <select name="school" id="school" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" multiple required></select>
-                    <div class="invalid-feedback" data-feedback-input="school"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">
@@ -14,7 +14,7 @@
                         <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                         <input role="datepicker" name="start" id="start" class="form-control" required />
                     </div>
-                    <div class="invalid-feedback" data-feedback-input="start"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">
@@ -23,7 +23,7 @@
                         <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                         <input role="datepicker" name="end" id="end" class="form-control" required />
                     </div>
-                    <div class="invalid-feedback" data-feedback-input="end"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
@@ -54,7 +54,7 @@
                             <span class="form-check-label">PDF</span>
                         </label>
                     </div>
-                    <div class="invalid-feedback" data-feedback-input="exportAs"></div>
+
                 </div>
             </div>
         </div>

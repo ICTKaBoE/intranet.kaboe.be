@@ -3,6 +3,11 @@ $postSyncUrl = "$($getSyncUrl)/update/<ID>";
 $baseOU = "OU=COLTD,DC=coltd,DC=be";
 $server = "SRV-DC01.coltd.be";
 
+$today = Get-Date -Format "yyyy-MM-dd";
+$now = Get-Date -Format "yyyy-MM-dd HH:mm:ss";
+$logPath = "$($PSScriptRoot)\Logs\Sync\$($today)";
+$logFile = "$($now.Replace(":", "-")).log";
+
 add-type @"
     using System.Net;
     using System.Security.Cryptography.X509Certificates;
@@ -20,16 +25,8 @@ $headers = @{
     "X-Authorization" = "Basic " + [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("admin:PianomanPA"))
 };
 
-function StartSync {
-    Clear-Host;
-    $items = GatherItems;
-
-    if ($items.items.Length -gt 0) {
-        LoopItems -items $items.items;
-    }
-}
-
 function GatherItems {
+    WriteLogFile -type "info" -message "Gathering items...";
     $items = Invoke-RestMethod -Method Get -Uri $script:getSyncUrl -Headers $script:headers;
 
     return $items;
@@ -39,6 +36,8 @@ function GetExistingItem {
     param (
         $item
     );
+
+    WriteLogFile -type "info" -message "Trying to search for user with EmployeeID '$($item.employeeId)'...";
 
     $i = Get-ADUser -Server $script:server -SearchBase $script:baseOU -Filter "EmployeeID -eq '$($item.employeeId)' -or EmployeeID -eq 'P$($item.employeeId)'";
     return $i;
@@ -50,6 +49,8 @@ function LoopItems {
     );
 
     foreach ($item in $items) {
+        WriteLogFile -type "info" -message "$($item.linked.employee.formatted.fullNameReversed) - $($item.employeeId)";
+
         $lastError = $null;
         $updateDatabase = $true;
         $ignoreError = $false;
@@ -76,13 +77,15 @@ function LoopItems {
         }
         catch {
             $lastError = $_;
+            WriteLogFile -type "error" -message $lastError;
         }
 
         if ($updateDatabase -eq $true) {
             UpdateDatabase -item $item -itemError $lastError -ignoreError $ignoreError;
         }
-    }
 
+        EmptyLineLogFile;
+    }
 }
 
 function CreateItem {
@@ -90,6 +93,7 @@ function CreateItem {
         $item
     );
 
+    WriteLogFile -type "warn" -message "Creating user...";
     $i = GetExistingItem -item $item;
 
     if ($null -eq $i) {
@@ -111,19 +115,21 @@ function CreateItem {
                 $i = GetExistingItem -item $item;
             }
 
+            $item.displayName = $null;
+            $item.givenName = $null;
+            $item.surname = $null;
+            $item.ou = $null;
+
             UpdateItem -item $item;
-            SetItemMembership -item $item;
             EnableItem -item $item;       
+        }
+        else {
+            throw "Cannot create user as no password is set!";
         }
     }
     else {
-        throw "Cannot create user as no password is set!";
-        # $script:lastError = "Cannot create user as no password is set!";
+        throw "User already exists!";
     }
-}
-else {
-    throw "User already exists!";
-    # $script:lastError = "User already exists!";
 }
 
 function SetItemMembership {
@@ -143,50 +149,78 @@ function UpdateItem {
         $item
     );
 
+    WriteLogFile -type "warn" -message "Updating user...";
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
         throw "User not found in OU '$($script:baseOU)'";
-        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         if ($null -ne $item.givenName) {
+            WriteLogFile -type "warn" -message "Updating user GivenName...";
             $i | Set-ADUser -GivenName $item.givenName -Server $script:server -Confirm:$false;
         }
+
         if ($null -ne $item.surname) {
+            WriteLogFile -type "warn" -message "Updating user Surname...";
             $i | Set-ADUser -Surname $item.surname -Server $script:server -Confirm:$false;
         }
+
         if ($null -ne $item.displayName) {
+            WriteLogFile -type "warn" -message "Updating user DisplayName...";
             $i | Set-ADUser -DisplayName $item.displayName -Server $script:server -Confirm:$false;
             $i | Rename-ADObject -NewName $item.displayName -Server $script:server -Confirm:$false;
             $i = GetExistingItem -item $item;
         }
+
         if ($null -ne $item.companyName) {
+            WriteLogFile -type "warn" -message "Updating user Company...";
             $i | Set-ADUser -Company $item.companyName -Server $script:server -Confirm:$false;
         }
+
         if ($null -ne $item.department) {
+            WriteLogFile -type "warn" -message "Updating user Department...";
             $i | Set-ADUser -Department $item.department -Server $script:server -Confirm:$false;
         }
+
         if ($null -ne $item.jobTitle) {
+            WriteLogFile -type "warn" -message "Updating user Title...";
             $i | Set-ADUser -Title $item.jobTitle -Server $script:server -Confirm:$false;
         }
+
         if ($null -ne $item.otherAttributes) {
             $otherAttributes = @{};
             $item.otherAttributes.PSObject.properties | Foreach { $otherAttributes[$_.Name] = $_.Value };
 
             if ($otherAttributes.Length -gt 0) {
+                WriteLogFile -type "warn" -message "Updating user Extension Attributes...";
                 $i | Set-ADUser -Replace $otherAttributes -Server $script:server -Confirm:$false;
             }
         }
+
         if ($null -ne $item.memberOf) {
+            WriteLogFile -type "warn" -message "Set user membership...";
             SetItemMembership -item $item;
         }
+
         if ($null -ne $item.password) {
+            WriteLogFile -type "warn" -message "Updating user Password...";
             $i | Set-ADAccountPassword -NewPassword (ConvertTo-SecureString -AsPlainText $item.password -Force) -Server $script:server;
             $i | Set-ADUser -ChangePasswordAtLogon $false -PasswordNeverExpires ($item.type -eq "S") -Server $script:server;
         }
+
         if ($null -ne $item.ou) {
+            WriteLogFile -type "warn" -message "Moving user to '$($item.ou)'...";
             $i | Move-ADObject -TargetPath $item.ou -Server $script:server -Confirm:$false;
+        }
+
+        if ($null -ne $item.thumbnailPhoto) {
+            WriteLogFile -type "warn" -message "Updating user ThumbnailPhoto...";
+            Invoke-WebRequest -Uri $item.thumbnailPhoto -OutFile "$($PSScriptRoot)\temp.jpg";
+            $photo = [byte[]](Get-Content "$($PSScriptRoot)\temp.jpg" -Encoding Byte);
+            Remove-Item -Path "$($PSScriptRoot)\temp.jpg" -Force -Confirm:$false;
+            
+            $i | Set-ADUser -Replace @{thumbnailPhoto = $photo } -Server $script:server;
         }
     }
 }
@@ -196,11 +230,11 @@ function EnableItem {
         $item
     );
 
+    WriteLogFile -type "warn" -message "Enable user...";
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
         throw "User not found in OU '$($script:baseOU)'!";
-        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         $i | Enable-ADAccount -Server $script:server -Confirm:$false;
@@ -208,7 +242,6 @@ function EnableItem {
 
         if ($i.Enabled -ne $true) {
             throw "Could not enable user!";
-            # $script:lastError = "Could not enable user!";
         }
         else {
             UpdateItem -item $item;
@@ -221,11 +254,11 @@ function DisableItem {
         $item
     );
 
+    WriteLogFile -type "warn" -message "Disable user...";
     $i = GetExistingItem -item $item;
 
     if ([string]::IsNullOrEmpty($i)) {
         throw "User not found in OU '$($script:baseOU)'!";
-        # $script:lastError = "User not found in OU '$($script:baseOU)'!";
     }
     else {
         $i | Disable-ADAccount -Server $script:server -Confirm:$false;
@@ -233,7 +266,6 @@ function DisableItem {
         
         if ($i.Enabled -ne $false) {
             throw "Could not disable user!";
-            # $script:lastError = "Could not disable user!";
         }
     }
 }
@@ -244,6 +276,8 @@ function UpdateDatabase {
         $itemError = $null,
         $ignoreError = $false
     );
+    
+    WriteLogFile -type "warn" -message "Updating database...";
 
     $body = @{
         action     = $null
@@ -260,4 +294,64 @@ function UpdateDatabase {
     Invoke-RestMethod -Method Post -Uri $postUri -Body $body -Headers $script:headers;
 }
 
-StartSync;
+function CreateLogFile {
+    param(
+        [string]$path,
+        [string]$file
+    )
+
+    if ((Test-Path -Path $path) -eq $false) {
+        New-Item -Path $path -ItemType Directory;
+    }
+
+    if ((Test-Path -Path $path) -eq $false) {
+        New-Item -Path $path -Name $file -ItemType File;
+    }
+
+    $path = "$($path)\$($file)";
+
+    Set-Content -Path $path -Value "[START OF LOG - $($script:now)]";
+}
+
+function WriteLogFile {
+    param(
+        [string]$type,
+        [string]$message
+    )
+
+    $path = "$($script:logPath)\$($script:logFile)";
+    $type = $type.ToUpper();
+
+    Add-Content -Path $path -Value "[$(Get-Date -Format "yyyy-MM-dd HH:mm:ss")]`t[$($type)]`t`t$($message)";
+}
+
+function CloseLogFile {
+    $path = "$($script:logPath)\$($script:logFile)";
+    $type = $type.ToUpper();
+
+    Add-Content -Path $path -Value "[END OF LOG - $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")]";
+}
+
+function EmptyLineLogFile {
+    $path = "$($script:logPath)\$($script:logFile)";
+    $type = $type.ToUpper();
+
+    Add-Content -Path $path -Value "";
+}
+
+Clear-Host;
+
+CreateLogFile -path $logPath -file $logFile;
+
+$items = GatherItems;
+
+if ($items.items.Length -gt 0) {
+    WriteLogFile -type "warn" -message "Item count: $($items.items.Length) - Start running loop..."; 
+    EmptyLineLogFile;
+    LoopItems -items $items.items;
+}
+else {
+    WriteLogFile -type "info" -message "Item count: $($items.items.Length) - Nothing to do, exit...";
+}
+
+CloseLogFile;

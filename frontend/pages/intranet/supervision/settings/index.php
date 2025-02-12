@@ -8,7 +8,7 @@
                         <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                         <input role="datepicker" class="form-control" id="lastPayDate" name="lastPayDate" required>
                     </div>
-                    <div class="invalid-feedback" data-feedback-input="lastPayDate"></div>
+
                 </div>
 
                 <div class="col-12">
@@ -58,7 +58,7 @@
                             <option value="3 year">3 jaren</option>
                         </optgroup>
                     </select>
-                    <div class="invalid-feedback" data-feedback-input="block.past.amount"></div>
+
                 </div>
 
                 <div class="col-12">
@@ -109,25 +109,25 @@
                             <option value="3 year">3 jaren</option>
                         </optgroup>
                     </select>
-                    <div class="invalid-feedback" data-feedback-input="block.future.amount"></div>
+
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.duration">Registratie per (minuten)</label>
                     <input role="text" class="form-control" id="slot.duration" name="slot.duration" required>
-                    <div class="invalid-feedback" data-feedback-input="slot.duration"></div>
+
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.min">Registratie vanaf</label>
                     <input role="text" class="form-control" id="slot.min" name="slot.min" required>
-                    <div class="invalid-feedback" data-feedback-input="slot.min"></div>
+
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.max">Registratie tot en met</label>
                     <input role="text" class="form-control" id="slot.max" name="slot.max" required>
-                    <div class="invalid-feedback" data-feedback-input="slot.max"></div>
+
                 </div>
             </div>
         </div>

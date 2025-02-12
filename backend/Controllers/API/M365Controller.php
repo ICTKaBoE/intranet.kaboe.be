@@ -5,8 +5,11 @@ namespace Controllers\API;
 use Router\Helpers;
 use Security\Session;
 use Controllers\ApiController;
+use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
 use M365\AuthenticationManager;
 use Database\Repository\Setting;
+use Database\Repository\User;
+use Database\Repository\UserLoginHistory;
 
 class M365Controller extends ApiController
 {
@@ -27,6 +30,15 @@ class M365Controller extends ApiController
                     'method' => SECURITY_SESSION_SIGNINMETHOD_M365,
                     'id' => Session::get("oid")
                 ]);
+
+                $loginUser = (new User)->getByEntraId(Session::get("oid"));
+
+                $userLoginHistory = new ObjectUserLoginHistory([
+                    "userId" => $loginUser->id,
+                    "source" => SECURITY_SESSION_SIGNINMETHOD_M365
+                ]);
+
+                (new UserLoginHistory)->set($userLoginHistory);
 
                 header('Location: ' . (new Setting)->get(id: "page.default.afterLogin")[0]->value);
                 exit();

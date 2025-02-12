@@ -3,6 +3,5 @@
 use Router\Router;
 
 require_once __DIR__ . "/backend/autoload.php";
-Security\Code::errors(true);
-
+Security\Code::errors(false);
 Router::start();

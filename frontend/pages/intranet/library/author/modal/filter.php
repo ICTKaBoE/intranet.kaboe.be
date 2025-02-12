@@ -11,7 +11,7 @@
                     <div class="col">
                         <label class="form-label" for="schoolId">School</label>
                         <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
-                        <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                     </div>
                 </div>
             </div>

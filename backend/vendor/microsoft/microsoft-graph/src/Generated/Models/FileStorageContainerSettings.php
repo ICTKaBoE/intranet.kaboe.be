@@ -62,13 +62,27 @@ class FileStorageContainerSettings implements AdditionalDataHolder, BackedModel,
     public function getFieldDeserializers(): array {
         $o = $this;
         return  [
+            'isItemVersioningEnabled' => fn(ParseNode $n) => $o->setIsItemVersioningEnabled($n->getBooleanValue()),
             'isOcrEnabled' => fn(ParseNode $n) => $o->setIsOcrEnabled($n->getBooleanValue()),
+            'itemMajorVersionLimit' => fn(ParseNode $n) => $o->setItemMajorVersionLimit($n->getIntegerValue()),
             '@odata.type' => fn(ParseNode $n) => $o->setOdataType($n->getStringValue()),
         ];
     }
 
     /**
-     * Gets the isOcrEnabled property value. Indicates whether optical character recognition (OCR) is enabled for a given container. When OCR is enabled on a container, OCR extraction is performed for new and updated documents of supported types. The extracted fields are added to the metadata of the document, enabling end-user search and search-driven solutions. Changing this property from true to false doesn't remove OCR metadata that was created while it was true. Default value is false.
+     * Gets the isItemVersioningEnabled property value. Indicates whether versioning is enabled for items in the container. Optional. Read-write.
+     * @return bool|null
+    */
+    public function getIsItemVersioningEnabled(): ?bool {
+        $val = $this->getBackingStore()->get('isItemVersioningEnabled');
+        if (is_null($val) || is_bool($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'isItemVersioningEnabled'");
+    }
+
+    /**
+     * Gets the isOcrEnabled property value. Indicates whether Optical Character Recognition (OCR) is enabled for the container. The default value is false. When set to true, OCR extraction is performed for new and updated documents of supported document types, and the extracted fields in the metadata of the document enable end-user search and search-driven solutions. When set to false, existing OCR metadata is not impacted. Optional. Read-write.
      * @return bool|null
     */
     public function getIsOcrEnabled(): ?bool {
@@ -77,6 +91,18 @@ class FileStorageContainerSettings implements AdditionalDataHolder, BackedModel,
             return $val;
         }
         throw new \UnexpectedValueException("Invalid type found in backing store for 'isOcrEnabled'");
+    }
+
+    /**
+     * Gets the itemMajorVersionLimit property value. The maximum major versions allowed for items in the container. Optional. Read-write.
+     * @return int|null
+    */
+    public function getItemMajorVersionLimit(): ?int {
+        $val = $this->getBackingStore()->get('itemMajorVersionLimit');
+        if (is_null($val) || is_int($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'itemMajorVersionLimit'");
     }
 
     /**
@@ -96,7 +122,9 @@ class FileStorageContainerSettings implements AdditionalDataHolder, BackedModel,
      * @param SerializationWriter $writer Serialization writer to use to serialize this model
     */
     public function serialize(SerializationWriter $writer): void {
+        $writer->writeBooleanValue('isItemVersioningEnabled', $this->getIsItemVersioningEnabled());
         $writer->writeBooleanValue('isOcrEnabled', $this->getIsOcrEnabled());
+        $writer->writeIntegerValue('itemMajorVersionLimit', $this->getItemMajorVersionLimit());
         $writer->writeStringValue('@odata.type', $this->getOdataType());
         $writer->writeAdditionalData($this->getAdditionalData());
     }
@@ -118,11 +146,27 @@ class FileStorageContainerSettings implements AdditionalDataHolder, BackedModel,
     }
 
     /**
-     * Sets the isOcrEnabled property value. Indicates whether optical character recognition (OCR) is enabled for a given container. When OCR is enabled on a container, OCR extraction is performed for new and updated documents of supported types. The extracted fields are added to the metadata of the document, enabling end-user search and search-driven solutions. Changing this property from true to false doesn't remove OCR metadata that was created while it was true. Default value is false.
+     * Sets the isItemVersioningEnabled property value. Indicates whether versioning is enabled for items in the container. Optional. Read-write.
+     * @param bool|null $value Value to set for the isItemVersioningEnabled property.
+    */
+    public function setIsItemVersioningEnabled(?bool $value): void {
+        $this->getBackingStore()->set('isItemVersioningEnabled', $value);
+    }
+
+    /**
+     * Sets the isOcrEnabled property value. Indicates whether Optical Character Recognition (OCR) is enabled for the container. The default value is false. When set to true, OCR extraction is performed for new and updated documents of supported document types, and the extracted fields in the metadata of the document enable end-user search and search-driven solutions. When set to false, existing OCR metadata is not impacted. Optional. Read-write.
      * @param bool|null $value Value to set for the isOcrEnabled property.
     */
     public function setIsOcrEnabled(?bool $value): void {
         $this->getBackingStore()->set('isOcrEnabled', $value);
+    }
+
+    /**
+     * Sets the itemMajorVersionLimit property value. The maximum major versions allowed for items in the container. Optional. Read-write.
+     * @param int|null $value Value to set for the itemMajorVersionLimit property.
+    */
+    public function setItemMajorVersionLimit(?int $value): void {
+        $this->getBackingStore()->set('itemMajorVersionLimit', $value);
     }
 
     /**

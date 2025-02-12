@@ -5,13 +5,11 @@
                 <div class="col-12 mb-3">
                     <label class="form-label" for="name">Naam</label>
                     <input type="text" name="name" id="name" class="form-control" required />
-                    <div class="invalid-feedback" data-feedback-input="name"></div>
                 </div>
 
                 <div class="col-12 mb-3">
                     <label class="form-label" for="m365GroupId">M365 Group Id</label>
                     <input type="text" name="m365GroupId" id="m365GroupId" class="form-control" />
-                    <div class="invalid-feedback" data-feedback-input="m365GroupId"></div>
                 </div>
             </div>
 
@@ -29,7 +27,6 @@
                 <div class="col-12 mb-3">
                     <label class="form-label" for="members">Leden</label>
                     <select name="members" id="members" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" multiple data-search></select>
-                    <div class="invalid-feedback" data-feedback-input="members"></div>
                 </div>
             </div>
         </div>

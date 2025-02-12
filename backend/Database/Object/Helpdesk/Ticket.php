@@ -54,7 +54,7 @@ class Ticket extends CustomObject
 
         $category = explode("-", $this->category);
         $this->formatted->subject = $settings['category'][$category[0]]['name'];
-        if (isset($category[1])) $this->formatted->subject .= " - " . $settings['category'][$category[0]]['sub'][$category[1]];
+        if (!is_null($category[1])) $this->formatted->subject .= " - " . $settings['category'][$category[0]]['sub'][$category[1]];
 
         if (Strings::equal($category[0], "L") || Strings::equal($category[0], "D")) $this->formatted->subject = $this->linked->computer->name . " - " . $this->formatted->subject;
         else if (Strings::equal($category[0], "I")) $this->formatted->subject = $this->linked->ipad->name . " - " . $this->formatted->subject;
@@ -64,8 +64,8 @@ class Ticket extends CustomObject
         else if (Strings::equal($category[0], "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
         else if (Strings::equal($category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
 
-        $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/helpdesk/mine/{$this->guid}";
-        $this->formatted->assignedLink = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/helpdesk/assigned/{$this->guid}";
+        $this->formatted->link = "https://intranet.kaboe.be/helpdesk/mine/{$this->guid}";
+        $this->formatted->assignedLink = "https://intranet.kaboe.be/helpdesk/assigned/{$this->guid}";
 
         $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || Strings::equal($this->status, 'C'));
 

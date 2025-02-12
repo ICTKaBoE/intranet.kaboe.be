@@ -32,6 +32,11 @@ class CronController extends ApiController
             else $this->appendToJson('importM365Computers', 'failed');
         }
 
+        if (Strings::equalsIgnoreCase($action, "importM365SignIns")) {
+            if (\Controllers\API\Cron\M365::ImportSignInTimes()) $this->appendToJson('importM365SignIns', 'passed');
+            else $this->appendToJson('importM365SignIns', 'failed');
+        }
+
         if (Strings::equalsIgnoreCase($action, "local")) {
             if (\Controllers\API\Cron\Local::Prepare()) $this->appendToJson('local', 'passed');
             else $this->appendToJson('local', 'failed');
@@ -52,9 +57,14 @@ class CronController extends ApiController
             else $this->appendToJson('sendMails', 'failed');
         }
 
-        if (Strings::equalsIgnoreCase($action, "m365ExpiredPasswords")) {
-            if (\Controllers\API\Cron\M365::ExpiredPasswords()) $this->appendToJson('m365ExpiredPasswords', 'passed');
-            else $this->appendToJson('m365ExpiredPasswords', 'failed');
+        if (Strings::equalsIgnoreCase($action, "m365SyncClassTeams")) {
+            if (\Controllers\API\Cron\M365::SyncClassTeams()) $this->appendToJson('m365SyncClassTeams', 'passed');
+            else $this->appendToJson('m365SyncClassTeams', 'failed');
+        }
+
+        if (Strings::equalsIgnoreCase($action, "m365SyncSchoolTeams")) {
+            if (\Controllers\API\Cron\M365::SyncSchoolTeams()) $this->appendToJson('m365SyncSchoolTeams', 'passed');
+            else $this->appendToJson('m365SyncSchoolTeams', 'failed');
         }
 
         $this->handle();

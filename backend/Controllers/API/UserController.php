@@ -4,7 +4,9 @@ namespace Controllers\API;
 
 use Router\Helpers;
 use Security\Input;
+use Helpers\General;
 use Security\Session;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\User;
@@ -14,7 +16,6 @@ use Security\User as SecurityUser;
 use Database\Repository\UserAddress;
 use Database\Repository\UserLoginHistory;
 use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
-use Helpers\General;
 
 class UserController extends ApiController
 {
@@ -119,6 +120,7 @@ class UserController extends ApiController
     protected function getList($view, $id)
     {
         $repo = new User;
+        $loginRepo = new UserLoginHistory;
         $filters = [
             'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
         ];
@@ -147,11 +149,22 @@ class UserController extends ApiController
                     [
                         "title" => "Gebruikersnaam",
                         "data" => "username"
+                    ],
+                    [
+                        "title" => "Laatste aanmelding",
+                        "data" => "formatted.lastLogin",
+                        "width" => "250px"
                     ]
                 ]
             );
 
             $items = $repo->get();
+            Arrays::each($items, function ($i) use ($loginRepo) {
+                $lastLogin = $loginRepo->getByUserId($i->id);
+                $lastLogin = Arrays::firstOrNull($lastLogin);
+
+                $i->formatted->lastLogin = $lastLogin ? Clock::at($lastLogin->timestamp)->plusHours(1)->format("d/m/Y H:i:s") . " (" . (Strings::equal($lastLogin->source, "local") ? "Lokaal" : "Office 365") . ")" : null;
+            });
             $this->appendToJson("rows", array_values($items));
         }
     }

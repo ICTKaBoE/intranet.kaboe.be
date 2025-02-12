@@ -55,4 +55,13 @@ class EmployeeOwnfield extends Repository
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getBySectionAndName($section, $name)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('section', $section);
+        $statement->where('name', $name);
+
+        return $this->executeSelect($statement);
+    }
 }

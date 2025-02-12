@@ -4,9 +4,7 @@ namespace Database\Object;
 
 use stdClass;
 use Helpers\HTML;
-use Router\Helpers;
 use Security\Session;
-use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
@@ -24,6 +22,11 @@ class Accident extends CustomObject
         "creatorUserId" => "int",
         "informatSubgroupId" => "int",
         "informatStudentId" => "int",
+        "informatStudentRelationId" => "int",
+        "informatStudentEmailId" => "int",
+        "informatStudentNumberId" => "int",
+        "informatStudentBankId" => "int",
+        "informatStudentAddressId" => "int",
         "datetime" => "datetime",
         "description" => "string",
         "location" => "string",
@@ -66,6 +69,21 @@ class Accident extends CustomObject
         ],
         "informatStudent" => [
             "informatStudentId" => \Database\Repository\Informat\Student::class
+        ],
+        "informatStudentRelation" => [
+            "informatStudentRelationId" => \Database\Repository\Informat\StudentRelation::class
+        ],
+        "informatStudentEmail" => [
+            "informatStudentEmailId" => \Database\Repository\Informat\StudentEmail::class
+        ],
+        "informatStudentNumber" => [
+            "informatStudentNumberId" => \Database\Repository\Informat\StudentNumber::class
+        ],
+        "informatStudentBank" => [
+            "informatStudentBankId" => \Database\Repository\Informat\StudentBank::class
+        ],
+        "informatStudentAddress" => [
+            "informatStudentAddressId" => \Database\Repository\Informat\StudentAddress::class
         ],
         "supervisor" => [
             "informatSupervisorId" => \Database\Repository\Informat\Employee::class

@@ -42,19 +42,25 @@ use Helpers\General;
 use Informat\Repository\Employee;
 use Informat\Repository\EmployeeOwnfield as RepositoryEmployeeOwnfield;
 use Informat\Repository\EmployeePhoto;
+use Router\Helpers;
 
 abstract class Informat
 {
     static public function Import()
     {
-        $student = self::Students();
-        $registration = self::Registrations();
-        $employee = self::Employees();
-        $employeeOwnfield = self::EmployeeOwnfields();
-        $employeePhoto = self::EmployeePhotos();
+        if (Helpers::url()->hasParam("image")) {
+            $studentPhoto = self::StudentPhotos();
+            $employeePhoto = self::EmployeePhotos();
 
-        return ($student && $registration && $employee && $employeeOwnfield && $employeePhoto);
-        // return true;
+            return ($studentPhoto && $employeePhoto);
+        } else {
+            $student = self::Students();
+            $registration = self::Registrations();
+            $employee = self::Employees();
+            $employeeOwnfield = self::EmployeeOwnfields();
+
+            return ($student && $registration && $employee && $employeeOwnfield);
+        }
     }
 
     // Main Functions
@@ -63,7 +69,6 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new Student;
-        $informatPhotoRepo = new StudentPhoto;
         $schoolInstitutes = (new SchoolInstitute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
@@ -77,8 +82,8 @@ abstract class Informat
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->persoonId) ?? new InformatStudent;
                     $item->informatId = $iItem->pPersoon;
                     $item->informatGuid = $iItem->persoonId;
-                    $item->name = $iItem->naam;
-                    $item->firstName = $iItem->voornaam;
+                    $item->name = trim($iItem->naam);
+                    $item->firstName = trim($iItem->voornaam);
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
                     $item->birthPlace = $iItem->geboorteplaats;
@@ -92,9 +97,6 @@ abstract class Informat
                     foreach ($iItem->emails as $email) self::CreateStudentEmail($item->id, $email);
                     foreach ($iItem->bankrek as $bankr) self::CreateStudentBank($item->id, $bankr);
                     foreach ($iItem->relaties as $relatie) self::CreateStudentRelation($item->id, $relatie);
-
-                    // $photo = $informatPhotoRepo->get($institute->numberNewFormat, $item->informatGuid, true);
-                    // FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$item->informatGuid}.jpg", $photo['foto']);
                 } catch (\Exception) {
                     $_error_ = true;
                     continue;
@@ -103,6 +105,43 @@ abstract class Informat
         }
 
         return !$_error_;
+    }
+
+    private static function StudentPhotos()
+    {
+        $_error = false;
+        $informatRepo = new Student;
+        $informatPhotoRepo = new StudentPhoto;
+        $schoolInstitutes = (new SchoolInstitute)->get();
+        FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
+
+        foreach ($schoolInstitutes as $institute) {
+            $iItems = $informatRepo->get($institute->numberNewFormat);
+
+            foreach ($iItems as $iItem) {
+                $photo = $informatPhotoRepo->get($institute->numberNewFormat, $iItem->persoonId, true);
+                if (Strings::isBlank($photo['foto'])) continue;
+
+                try {
+                    $b64Photo = base64_decode($photo['foto']);
+
+                    if (FileSystem::PathExists(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg")) {
+                        $currentPhoto = file_get_contents(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg");
+
+                        if (!Strings::equal($b64Photo, $currentPhoto)) {
+                            FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg", $b64Photo);
+                        }
+                    } else FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg", $b64Photo);
+
+                    $photo = null;
+                } catch (\Exception $e) {
+                    $_error_ = true;
+                    continue;
+                }
+            }
+        }
+
+        return !$_error;
     }
 
     private static function Registrations()
@@ -139,7 +178,7 @@ abstract class Informat
                     if (!$item->id) $item->id = $nId;
 
                     foreach ($iItem->inschrKlassen as $inschr) {
-                        $classgroupId = self::CreateClassGroup($institute->id, $inschr);
+                        $classgroupId = self::CreateClassGroup($institute->id, $inschr, $item->departmentCode, $item->grade, $item->year);
                         self::CreateRegistrationClass($item->id, $classgroupId, $inschr);
                     }
                 } catch (\Exception $e) {
@@ -169,9 +208,9 @@ abstract class Informat
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->personId) ?? new InformatEmployee;
                     $item->informatId = $iItem->pPersoon;
                     $item->informatGuid = $iItem->personId;
-                    $item->name = $iItem->naam;
-                    $item->firstName = $iItem->voornaam;
-                    $item->extraFirstName = $iItem->bijkomendeVoornamen;
+                    $item->name = trim($iItem->naam);
+                    $item->firstName = trim($iItem->voornaam);
+                    $item->extraFirstName = trim($iItem->bijkomendeVoornamen);
                     $item->basenumber = $iItem->stamnr;
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
@@ -246,8 +285,16 @@ abstract class Informat
             $iItems = $informatRepo->get($institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
+                if (Strings::isBlank($iItem->photo)) continue;
+
                 try {
-                    FileSystem::WriteFile(LOCATION_IMAGE . "/informat/employee/{$iItem->personId}.jpg", $iItem->photo);
+                    if (FileSystem::PathExists(LOCATION_IMAGE . "/informat/employee/{$iItem->personId}.jpg")) {
+                        $currentPhoto = file_get_contents(LOCATION_IMAGE . "/informat/employee/{$iItem->personId}.jpg");
+
+                        if (!Strings::equal($iItem->photo, $currentPhoto)) {
+                            FileSystem::WriteFile(LOCATION_IMAGE . "/informat/employee/{$iItem->personId}.jpg", $iItem->photo);
+                        }
+                    } else FileSystem::WriteFile(LOCATION_IMAGE . "/informat/employee/{$iItem->personId}.jpg", $iItem->photo);
                 } catch (\Exception $e) {
                     $_error_ = true;
                     continue;
@@ -338,7 +385,7 @@ abstract class Informat
         foreach ($relatie->emails as $email) self::CreateStudentEmail($studentId, General::convertToObject($email));
     }
 
-    private static function CreateClassGroup($instituteId, $inschr)
+    private static function CreateClassGroup($instituteId, $inschr, $departmentCode, $grade, $year)
     {
         $classgroupRepo = new InformatClassGroup;
         $classgroup = $classgroupRepo->getByInformatId($inschr->pKlas) ?? $classgroupRepo->getByInformatGuid($inschr->klasId) ?? new ClassGroup;
@@ -346,6 +393,9 @@ abstract class Informat
         $classgroup->informatGuid = $inschr->klasId;
         $classgroup->schoolInstituteId = $instituteId;
         $classgroup->schoolyear = INFORMAT_CURRENT_SCHOOLYEAR;
+        $classgroup->departmentCode = $departmentCode;
+        $classgroup->grade = $grade;
+        $classgroup->year = $year;
         $classgroup->code = $inschr->klasCode;
         $classgroup->name = $inschr->klas;
         $classgroup->type = $inschr->groepType == 0 ? 'C' : 'S';

@@ -5,13 +5,13 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="status">Status</label>
                     <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N" required></select>
-                    <div class="invalid-feedback" data-feedback-input="status"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="schoolId">School</label>
                     <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
-                    <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                 </div>
             </div>
 
@@ -19,13 +19,13 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="acceptorUserId">Goed te keuren door</label>
                     <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" data-search multiple required></select>
-                    <div class="invalid-feedback" data-feedback-input="acceptorUserId"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="supplierId">Leverancier</label>
                     <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-load-value="id" data-load-label="name" data-search required></select>
-                    <div class="invalid-feedback" data-feedback-input="supplierId"></div>
+
                 </div>
             </div>
         </div>
@@ -57,31 +57,31 @@
                     <div class="mb-3">
                         <label class="form-label" for="status">Status</label>
                         <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N" data-no-lock></select>
-                        <div class="invalid-feedback" data-feedback-input="status"></div>
+
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="schoolId">School</label>
                         <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" required></select>
-                        <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="creatorUserId">Aangemaakt door</label>
                         <select name="creatorUserId" id="creatorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" disabled></select>
-                        <div class="invalid-feedback" data-feedback-input="creatorUserId"></div>
+
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="acceptorUserId">Goed te keuren door</label>
                         <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" required></select>
-                        <div class="invalid-feedback" data-feedback-input="acceptorUserId"></div>
+
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="supplierId">Leverancier</label>
                         <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-load-value="id" data-load-label="name" required></select>
-                        <div class="invalid-feedback" data-feedback-input="supplierId"></div>
+
                     </div>
                 </div>
             </div>

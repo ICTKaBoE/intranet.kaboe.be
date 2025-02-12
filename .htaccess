@@ -22,4 +22,8 @@ Header merge Vary Origin
 Header always set Access-Control-Allow-Methods "*"
 Header always set Access-Control-Allow-Credentials: true
 Header always set Access-Control-Allow-Headers "*"
-php_value session.cookie_domain .kaboe.be
+
+<Files .user.ini>
+	Order allow,deny
+	Deny from all
+</Files>

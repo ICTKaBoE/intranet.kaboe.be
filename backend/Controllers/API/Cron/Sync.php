@@ -25,6 +25,7 @@ use Database\Repository\Sync as RepositorySync;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Repository\Informat\RegistrationClass;
+use Security\FileSystem;
 
 abstract class Sync
 {
@@ -48,10 +49,12 @@ abstract class Sync
         $_settings = Arrays::first($navRepo->getByParentIdAndLink(0, 'sync'))->settings;
         $_status = $_settings['informat']['ownfield']['status'];
         $_firstName = $_settings['informat']['ownfield']['createEmailWith'];
+        $_photo = General::convert($_settings['photo']['employee'], 'bool');
 
         $currentEmployees = $m365UserRepo->getAllEmployees(['id', 'employeeId', 'mail', 'accountEnabled', 'signInActivity', 'givenName', 'surname', 'displayName', 'onPremisesSamAccountName', 'onPremisesUserPrincipalName', 'companyName', 'department', 'jobTitle', 'memberOf', 'onPremisesExtensionAttributes']);
         $currentEmployees = Arrays::filter($currentEmployees, fn($ce) => Strings::equal($ce::class, \Microsoft\Graph\Generated\Models\User::class));
         $informatEmployees = $informatEmployeeRepo->get();
+        $informatEmployees = Arrays::filter($informatEmployees, fn($e) => $e->informatId == 15045);
 
         foreach ($informatEmployees as $informatEmployee) {
             $sync = $syncRepo->getByEmployeeId($informatEmployee->informatId) ?? new ObjectSync;
@@ -62,6 +65,7 @@ abstract class Sync
             $sync->userPrincipalName = null;
             $sync->ou = null;
             $sync->password = null;
+            $sync->thumbnailPhoto = null;
 
             $m365User = Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($cs) => Strings::equal($cs->getEmployeeId(), $informatEmployee->informatId) || Strings::equal($cs->getEmployeeId(), "P{$informatEmployee->informatId}")));
             $inService = Strings::equal(($informatEmployeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($informatEmployee->id, 2, $_status))->value, "IN DIENST");
@@ -134,6 +138,11 @@ abstract class Sync
                 if (Strings::equal($OtherAttributes["extensionAttribute1"], $m365User?->getOnPremisesExtensionAttributes()->getExtensionAttribute1()) || Strings::isBlank($OtherAttributes['extensionAttribute1'])) unset($OtherAttributes["extensionAttribute1"]);
             }
 
+            if ($_photo && FileSystem::PathExists(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg")) {
+                if ((time() - filemtime(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg")) < 1200)
+                    $sync->thumbnailPhoto = FileSystem::GetDownloadLink(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg");
+            }
+
             $CompanyName = $_settings['default']['companyName']["employee"];
             if (Strings::contains($m365User?->getCompanyName(), "COLTD")) $CompanyName = "COLTD, {$CompanyName}";
 
@@ -147,8 +156,8 @@ abstract class Sync
                 $Email = explode("@", $EmailAddress);
 
                 while (Arrays::filter($currentEmployees, fn($ce) => Strings::equalsIgnoreCase($ce->getMail(), $EmailAddress))) {
-                    $Email[0] = $Email[0] . $postfix;
-                    $EmailAddress = implode("@", $Email);
+                    $_Email = $Email[0] . $postfix;
+                    $EmailAddress = "{$_Email}@{$Email[1]}";
                     $postfix++;
                 }
                 $SamAccountName = substr(Arrays::first(explode("@", $EmailAddress)), 0, 20);
@@ -222,9 +231,10 @@ abstract class Sync
                 $sync->companyName = null;
                 $sync->department = null;
                 $sync->memberOf = null;
+                $sync->thumbnailPhoto = null;
             } else $sync->action = null;
 
-            if ($sync->noUpdate()) $sync->action = null;
+            if (!Strings::equal($sync->action, "D") && $sync->noUpdate()) $sync->action = null;
             $sync->setEmail = $sync->emailAddress ?: $m365User?->getMail();
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
@@ -252,6 +262,7 @@ abstract class Sync
         $_minDepartmentCodes = $_settings['minimum']['departmentCode'];
         $_minGrade = General::convert($_settings['minimum']['grade'], 'int');
         $_minYear = General::convert($_settings['minimum']['year'], 'int');
+        $_photo = General::convert($_settings['photo']['student'], 'bool');
 
         $create = $update = $enable = $disable = [];
 
@@ -269,6 +280,7 @@ abstract class Sync
             $sync->jobTitle = null;
             $sync->otherAttributes = null;
             $sync->password = null;
+            $sync->thumbnailPhoto = null;
 
             $m365User = Arrays::firstOrNull(Arrays::filter($currentStudents, fn($cs) => Strings::equal($cs->getEmployeeId(), $informatStudent->informatId) || Strings::equal($cs->getEmployeeId(), "L{$informatStudent->informatId}")));
             $currentRegistration = $informatRegistrationRepo->getByInformatStudentId($informatStudent->id);
@@ -320,6 +332,11 @@ abstract class Sync
             }
             $MemberOf = array_unique($MemberOf);
 
+            if ($_photo && FileSystem::PathExists(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg")) {
+                if ((time() - filemtime(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg")) < 1200)
+                    $sync->thumbnailPhoto = FileSystem::GetDownloadLink(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg");
+            }
+
             if (
                 $currentRegistration &&
                 Arrays::contains($_minDepartmentCodes, $currentRegistration->departmentCode) &&
@@ -333,8 +350,8 @@ abstract class Sync
                     $Email = explode("@", $EmailAddress);
 
                     while (Arrays::filter($currentStudents, fn($cs) => Strings::equalsIgnoreCase($cs->getMail(), $EmailAddress))) {
-                        $Email[0] = $Email[0] . $postfix;
-                        $EmailAddress = implode("@", $Email);
+                        $_Email = $Email[0] . $postfix;
+                        $EmailAddress = "{$_Email}@{$Email[1]}";
                         $postfix++;
                     }
                     $SamAccountName = substr(Arrays::first(explode("@", $EmailAddress)), 0, 20);
@@ -391,6 +408,7 @@ abstract class Sync
                     $sync->companyName = null;
                     $sync->department = null;
                     $sync->memberOf = null;
+                    $sync->thumbnailPhoto = null;
                 } else $sync->action = null;
             }
 

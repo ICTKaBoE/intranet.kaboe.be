@@ -8,23 +8,19 @@
             <div class="col-12 mb-3">
                 <label class="form-label" for="who.DeMeidoorn">De Meidoorn</label>
                 <textarea name="who.DeMeidoorn" id="who.DeMeidoorn" rows="3" class="form-control"></textarea>
-                <div class="invalid-feedback" data-feedback-input="who.DeMeidoorn"></div>
             </div>
 
             <div class="col-12 mb-3">
                 <label class="form-label" for="who.DeWegel">De Wegel</label>
                 <textarea name="who.DeWegel" id="who.DeWegel" rows="3" class="form-control"></textarea>
-                <div class="invalid-feedback" data-feedback-input="who.DeWegel"></div>
             </div>
             <div class="col-12 mb-3">
                 <label class="form-label" for="who.SintAntonius">Sint-Antonius</label>
                 <textarea name="who.SintAntonius" id="who.SintAntonius" rows="3" class="form-control"></textarea>
-                <div class="invalid-feedback" data-feedback-input="who.SintAntonius"></div>
             </div>
             <div class="col-12 mb-3">
                 <label class="form-label" for="who.SintJozef">Sint-Jozef</label>
                 <textarea name="who.SintJozef" id="who.SintJozef" rows="3" class="form-control"></textarea>
-                <div class="invalid-feedback" data-feedback-input="who.SintJozef"></div>
             </div>
         </div>
     </div>

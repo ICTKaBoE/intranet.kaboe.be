@@ -35,4 +35,12 @@ class ClassGroup extends Repository
 
         return $this->executeSelect($statement);
     }
+
+    public function getBySchoolyear($schoolyear)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('schoolyear', $schoolyear);
+
+        return $this->executeSelect($statement);
+    }
 }

@@ -11,7 +11,7 @@
                     <div class="col mb-lg-3">
                         <label class="form-label mb-1" for="schoolId">School</label>
                         <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:mainSchoolId}}"></select>
-                        <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                     </div>
                 </div>
 
@@ -22,7 +22,7 @@
                             <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                             <input role="datepicker" name="date" id="date" class="form-control" required disabled />
                         </div>
-                        <div class="invalid-feedback" data-feedback-input="date"></div>
+
                     </div>
 
                     <div class="col-lg-3 mb-lg-3">
@@ -31,7 +31,7 @@
                             <span class="input-icon-addon"><i class="icon ti ti-clock"></i></span>
                             <input type="time" name="start" id="start" class="form-control" required disabled />
                         </div>
-                        <div class="invalid-feedback" data-feedback-input="start"></div>
+
                     </div>
 
                     <div class="col-lg-3 mb-lg-3">
@@ -40,7 +40,7 @@
                             <span class="input-icon-addon"><i class="icon ti ti-clock"></i></span>
                             <input type="time" name="end" id="end" class="form-control" required disabled />
                         </div>
-                        <div class="invalid-feedback" data-feedback-input="end"></div>
+
                     </div>
                 </div>
             </div>

@@ -94,7 +94,7 @@ class DefaultController extends stdClass
 			}
 		}
 
-		if (!$file) $file = $domain . "/" . $layout['overwrite'][$domain]['_'];
+		if (!$file && $layout['overwrite'][$domain]['_']) $file = $domain . "/" . $layout['overwrite'][$domain]['_'];
 		if (!$file) $file = $layout['_'];
 
 		ob_start();
@@ -119,7 +119,7 @@ class DefaultController extends stdClass
 			}
 		}
 
-		if (!$theme) $theme = $layout['overwrite'][$domain]['_'];
+		if (!$theme && $layout['overwrite'][$domain]['_']) $theme = $layout['overwrite'][$domain]['_'];
 		if (!$theme) $theme = $layout['_'];
 
 		$this->layout = str_replace("{{layout:theme}}", $theme, $this->layout);

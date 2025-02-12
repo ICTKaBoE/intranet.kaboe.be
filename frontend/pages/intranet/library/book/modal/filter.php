@@ -11,7 +11,7 @@
                     <div class="col">
                         <label class="form-label" for="schoolId">School</label>
                         <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
-                        <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                     </div>
                 </div>
 
@@ -19,7 +19,7 @@
                     <div class="col">
                         <label class="form-label" for="authorId">Auteur</label>
                         <select name="authorId" id="authorId" data-load-source="{{select:url:short}}/{{url:part.module}}/author" data-load-value="id" data-load-label="name" multiple required></select>
-                        <div class="invalid-feedback" data-feedback-input="authorId"></div>
+
                     </div>
                 </div>
 
@@ -27,7 +27,7 @@
                     <div class="col">
                         <label class="form-label" for="categoryId">Categorie</label>
                         <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" multiple required></select>
-                        <div class="invalid-feedback" data-feedback-input="categoryId"></div>
+
                     </div>
                 </div>
             </div>

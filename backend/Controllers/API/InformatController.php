@@ -12,6 +12,11 @@ use Database\Repository\Informat\Employee;
 use Database\Repository\Informat\Registration;
 use Database\Repository\Informat\RegistrationClass;
 use Database\Repository\Informat\Student;
+use Database\Repository\Informat\StudentAddress;
+use Database\Repository\Informat\StudentBank;
+use Database\Repository\Informat\StudentEmail;
+use Database\Repository\Informat\StudentNumber;
+use Database\Repository\Informat\StudentRelation;
 use Database\Repository\Informat\Subgroup;
 use Database\Repository\Informat\SubgroupStudent;
 use Database\Repository\Informat\Teacher;
@@ -75,7 +80,7 @@ class InformatController extends ApiController
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = Arrays::orderBy($subgroups, "code");
-            General::filter($items, ['schoolyear' => INFORMAT_CURRENT_SCHOOLYEAR]);
+            General::filter($items, ['schoolyear' => INFORMAT_CURRENT_SCHOOLYEAR, 'type' => "C"]);
             $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
@@ -122,8 +127,7 @@ class InformatController extends ApiController
         $students = [];
         $registrationRepo = new Registration;
         foreach ($registrationClasses as $rc) {
-            if (!is_null($rc->end)) continue;
-            if (Clock::at($rc->start)->isAfter(Clock::now())) continue;
+            if (!$rc->current) continue;
 
             $registration = Arrays::firstOrNull($registrationRepo->get($rc->informatRegistrationId));
             if (!$registration) continue;
@@ -134,6 +138,70 @@ class InformatController extends ApiController
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = Arrays::orderBy($students, "name");
             $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
+    protected function getStudentAddress($view, $id = null)
+    {
+        $repo = new StudentAddress;
+        $informatStudentId = Helpers::url()->getParam("informatStudentId");
+
+        $items = $repo->getByInformatStudentId($informatStudentId);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
+    protected function getStudentRelation($view, $id = null)
+    {
+        $repo = new StudentRelation;
+        $informatStudentId = Helpers::url()->getParam("informatStudentId");
+
+        $items = $repo->getByInformatStudentId($informatStudentId);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = Arrays::orderBy($items, "type");
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
+    protected function getStudentEmail($view, $id = null)
+    {
+        $repo = new StudentEmail;
+        $informatStudentId = Helpers::url()->getParam("informatStudentId");
+
+        $items = $repo->getByInformatStudentId($informatStudentId);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = Arrays::orderBy($items, "type");
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
+    protected function getStudentNumber($view, $id = null)
+    {
+        $repo = new StudentNumber;
+        $informatStudentId = Helpers::url()->getParam("informatStudentId");
+
+        $items = $repo->getByInformatStudentId($informatStudentId);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = Arrays::orderBy($items, "type");
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
+    }
+
+    protected function getStudentBank($view, $id = null)
+    {
+        $repo = new StudentBank;
+        $informatStudentId = Helpers::url()->getParam("informatStudentId");
+
+        $items = $repo->getByInformatStudentId($informatStudentId);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = Arrays::orderBy($items, "type");
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
 }

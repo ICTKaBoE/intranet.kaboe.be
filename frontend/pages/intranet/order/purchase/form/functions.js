@@ -5,7 +5,11 @@ import Component from "../../../../../shared/default/js/object/Component.js";
 import Select from "../../../../../shared/default/js/object/Select.js";
 
 window.renderOptgroupItem = (data, escape) => {
-	return `<div>${data.optgroupName} - ${data.name}</div>`;
+	return (
+		"<div>" +
+		(data.optgroupName ? `${data.optgroupName} - ` : "") +
+		`${data.name}</div>`
+	);
 };
 
 window.deviceView = (info) => {

@@ -7,7 +7,6 @@
                     <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                     <input role="datepicker" class="form-control" id="lastPayDate" name="lastPayDate" required>
                 </div>
-                <div class="invalid-feedback" data-feedback-input="lastPayDate"></div>
             </div>
 
             <div class="col-12">
@@ -57,7 +56,6 @@
                         <option value="3 year">3 jaren</option>
                     </optgroup>
                 </select>
-                <div class="invalid-feedback" data-feedback-input="block.past.amount"></div>
             </div>
 
             <div class="col-12">
@@ -108,7 +106,6 @@
                         <option value="3 year">3 jaren</option>
                     </optgroup>
                 </select>
-                <div class="invalid-feedback" data-feedback-input="block.future.amount"></div>
             </div>
         </div>
     </div>

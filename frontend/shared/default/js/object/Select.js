@@ -26,6 +26,7 @@ export default class Select {
 		this.optgroupValue = this.element.dataset.optgroupValue || false;
 		this.optgroupLabel = this.element.dataset.optgroupLabel || false;
 		this.limit = this.element.dataset.limit || 200;
+		this.defaultNoLoad = this.element.hasAttribute("data-default-no-load");
 
 		this.eventListeners = [];
 		this.selectedDetails = false;
@@ -130,7 +131,7 @@ export default class Select {
 		if (!this.element.classList.contains("form-select"))
 			this.element.classList.add("form-select");
 
-		if (this.loadSource) {
+		if (!this.defaultNoLoad && this.loadSource) {
 			this.loadParams.page = 0;
 			await this.getData();
 			if (!this.stopCheckNext) await this.checkNext();
@@ -264,6 +265,7 @@ export default class Select {
 	};
 
 	setValue = (value, silent = false) => {
+		this.defaultValue = value;
 		Helpers.CheckAllLoaded(() => {
 			value = String(value)
 				.split(";")
@@ -340,6 +342,7 @@ export default class Select {
 
 			if (this.parentSelect) {
 				this.parentSelect.setEventListener("change", (value) => {
+					this.data.items = [];
 					this.setExtraLoadParam(this.parentSelect.id, value);
 					this.reload();
 				});

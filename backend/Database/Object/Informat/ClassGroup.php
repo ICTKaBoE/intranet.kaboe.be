@@ -12,8 +12,17 @@ class ClassGroup extends CustomObject
         "informatGuid" => "string",
         "schoolInstituteId" => "int",
         "schoolyear" => "string",
+        "departmentCode" => "string",
+        "grade" => "int",
+        "year" => "int",
         "code" => "string",
         "name" => "string",
         "type" => "string"
+    ];
+
+    protected $linkedAttributes = [
+        "schoolInstitute" => [
+            "schoolInstituteId" => \Database\Repository\SchoolInstitute::class
+        ]
     ];
 }

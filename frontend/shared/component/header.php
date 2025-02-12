@@ -4,7 +4,7 @@
 			<div class="container-fluid">
 				<h1 class="navbar-brand navbar-brand-autodark">
 					<a href="{{site:url}}">
-						<img src="{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
+						<img src="https://kaboe.be/frontend/shared/default/images/SGKaBoE blad.png" alt="" class="navbar-brand-image">
 						<span class="ms-2">{{setting:site.title.intranet}}</span>
 					</a>
 				</h1>

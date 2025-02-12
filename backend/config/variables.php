@@ -1,6 +1,7 @@
 <?php
 
 // Security group permissions: read, create, update, delete, export, changeSettings
+define("URL_MAIN", "kaboe.be");
 
 define("LOCATION_ROOT", dirname(dirname(__DIR__)));
 define("LOCATION_FRONTEND", LOCATION_ROOT . "/frontend");
@@ -28,10 +29,10 @@ if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
 	define("DB_PASSWORD", "");
 	define("DB_CHARSET", "utf8mb4");
 } else {
-	define("DB_SERVER", "ID75803_intranet.db.webhosting.be");
-	define("DB_DATABASE", "ID75803_intranet");
-	define("DB_USERNAME", "ID75803_intranet");
-	define("DB_PASSWORD", "PianomanPA125");
+	define("DB_SERVER", "ID459940_kaboebe.db.webhosting.be");
+	define("DB_DATABASE", "ID459940_kaboebe");
+	define("DB_USERNAME", "ID459940_kaboebe");
+	define("DB_PASSWORD", "kaboebe2025");
 	define("DB_CHARSET", "utf8mb4");
 }
 

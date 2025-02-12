@@ -11,7 +11,7 @@
                     <div class="col">
                         <label class="form-label" for="schoolId">School</label>
                         <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
-                        <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                     </div>
                 </div>
 
@@ -22,7 +22,7 @@
                             <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                             <input role="datepicker" name="start" id="start" class="form-control" required />
                         </div>
-                        <div class="invalid-feedback" data-feedback-input="start"></div>
+                        
                     </div>
                 </div>
 
@@ -33,7 +33,7 @@
                             <span class="input-icon-addon"><i class="icon ti ti-calendar"></i></span>
                             <input role="datepicker" name="end" id="end" class="form-control" required />
                         </div>
-                        <div class="invalid-feedback" data-feedback-input="end"></div>
+                        
                     </div>
                 </div> -->
             </div>

@@ -46,7 +46,7 @@ const LIST_TEMPLATE_NUMBER = "  <div>#number#</div>";
 const LIST_TEMPLATE_EMAIL = "  <div>#email#</div>";
 const LIST_TEMPLATE_BANK = "<div>#bank#</div>";
 const LIST_TEMPLATE_HISTORY = " <div>#history#</div>";
-const LIST_IMAGE = "<img class='img-fluid rounded' src='{{site:url}}/frontend/shared/default/images/informat/student/#informatGuid#.jpg' alt='#fullNameReversed#'>";
+const LIST_IMAGE = "<img class='img-fluid rounded' src='https://kaboe.be/frontend/shared/default/images/informat/student/#informatGuid#.jpg' alt='#fullNameReversed#'>";
 ?>
 
 <div class="row">

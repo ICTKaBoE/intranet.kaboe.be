@@ -5,13 +5,13 @@
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
                     <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" required></select>
-                    <div class="invalid-feedback" data-feedback-input="schoolId"></div>
+
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="buildingId">Gebouw</label>
                     <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/{{url:part.module}}/building/" data-load-value="id" data-load-label="name" required data-parent-select="schoolId"></select>
-                    <div class="invalid-feedback" data-feedback-input="buildingId"></div>
+
                 </div>
             </div>
 
@@ -19,13 +19,13 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="roomId">Lokaal</label>
                     <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/{{url:part.module}}/room/" data-load-value="id" data-load-label="formatted.name" required data-parent-select="buildingId"></select>
-                    <div class="invalid-feedback" data-feedback-input="roomId"></div>
+
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="name">Naam</label>
                     <input type="text" name="name" id="name" class="form-control" required />
-                    <div class="invalid-feedback" data-feedback-input="name"></div>
+
                 </div>
             </div>
         </div>

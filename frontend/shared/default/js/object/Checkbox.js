@@ -12,6 +12,7 @@ export default class Checkbox {
 		this.value = this.element.dataset.value?.split("|") || "true";
 		this.text = this.element.dataset.text?.split("|") || false;
 		this.defaultValue = this.element.dataset.defaultValue || false;
+		this.onChange = this.element.dataset.onChange || false;
 
 		if (typeof this.value === "string") this.value = [this.value];
 
@@ -50,6 +51,14 @@ export default class Checkbox {
 			this.inputs[value].type = this.type;
 			this.inputs[value].dataset.value = value;
 			this.inputs[value].classList.add("form-check-input");
+
+			if (this.onChange) {
+				this.inputs[value].addEventListener("change", () => {
+					if (this.onChange instanceof Function) this.onChange();
+					else window[this.onChange]();
+				});
+			}
+
 			if (this.type === "checkbox") this.inputs[value].id = this.name;
 			label.appendChild(this.inputs[value]);
 

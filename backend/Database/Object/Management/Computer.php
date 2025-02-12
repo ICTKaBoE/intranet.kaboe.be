@@ -25,7 +25,6 @@ class Computer extends CustomObject
         "osVersion" => "string",
         "manufacturer" => "string",
         "model" => "string",
-        "batteryError" => "boolean",
         "deleted" => "boolean"
     ];
 
@@ -53,12 +52,18 @@ class Computer extends CustomObject
 
     private function getLastUsage()
     {
-        $lastOnOff = Arrays::firstOrNull(array_reverse((new ComputerUsageOnOff)->getByComputerId($this->id)));
+        $lastOnOff = array_reverse((new ComputerUsageOnOff)->getByComputerId($this->id));
+
         if (!$lastOnOff) $this->formatted->lastUsage = null;
         else {
-            $lastLogOn = Arrays::last((new ComputerUsageLogOn)->getByComputerIdAndLogonBetweenStartupAndShutdown($this->id, $lastOnOff->startup, $lastOnOff->shutdown));
+            $lastOnOff = Arrays::firstOrNull($lastOnOff);
+            $lastLogOn = (new ComputerUsageLogOn)->getByComputerIdAndLogonBetweenStartupAndShutdown($this->id, $lastOnOff->startup, $lastOnOff->shutdown);
+
             if (!$lastLogOn) $this->formatted->lastUsage = null;
-            else $this->formatted->lastUsage = Clock::at($lastOnOff->startup)->format("d/m/Y") . " - {$lastLogOn->username}";
+            else {
+                $lastLogOn = Arrays::firstOrNull(array_reverse($lastLogOn));
+                $this->formatted->lastUsage = Clock::at($lastOnOff->startup)->format("d/m/Y") . " - {$lastLogOn->username}";
+            }
         }
     }
 }

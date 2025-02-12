@@ -37,7 +37,12 @@ class ComputerUsageLogOn extends Repository
 
         $items = $this->executeSelect($statement);
 
-        $items = Arrays::filter($items, fn($i) => Clock::at($i->logon)->isAfterOrEqualTo(Clock::at($startup)) && Clock::at($i->logon)->isBeforeOrEqualTo(Clock::at($shutdown)));
+        $items = Arrays::filter($items, fn($i) => Clock::at($i->logon)->isAfterOrEqualTo(Clock::at($startup)));
+        
+        if ($items) {
+            if (is_null($shutdown)) $items = Arrays::filter($items, fn($i) => Clock::at($i->logon)->isAfter(Clock::at($startup)));
+            else $items = Arrays::filter($items, fn ($i) =>  Clock::at($i->logon)->isBeforeOrEqualTo(Clock::at($shutdown)));
+        }
 
         return $items;
     }

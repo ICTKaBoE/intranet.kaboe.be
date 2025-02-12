@@ -11,7 +11,7 @@
                     <div class="col">
                         <label class="form-label" for="lenderType">Type persoon</label>
                         <select name="lenderType" id="lenderType" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-load-value="id" data-load-label="name" data-on-change="setLender" required></select>
-                        <div class="invalid-feedback" data-feedback-input="lenderType"></div>
+
                     </div>
                 </div>
 
@@ -19,7 +19,7 @@
                     <div class="col">
                         <label class="form-label" for="lenderInformatId">Persoon</label>
                         <select name="lenderInformatId" id="lenderInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-search required></select>
-                        <div class="invalid-feedback" data-feedback-input="lenderInformatId"></div>
+
                     </div>
                 </div>
             </div>

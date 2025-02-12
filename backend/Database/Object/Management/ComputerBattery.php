@@ -36,8 +36,8 @@ class ComputerBattery extends CustomObject
 
     private function createCapacityBadge()
     {
-        $settings = Arrays::first((new Navigation)->getByParentIdAndLink(0, "management"))->settings['computer']['batteryTreshhold'];
-        $level = Arrays::first(Arrays::filter($settings, fn($s) => $this->capacity <= $s['max'] && $this->capacity >= $s['min']));
+        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "management"))->settings['computer']['batteryTreshhold'];
+        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->capacity <= $s['max'] && $this->capacity >= $s['min']));
 
         $this->formatted->badge->capacity = HTML::Badge($this->formatted->capacity, backgroundColor: $level['color']);
     }
