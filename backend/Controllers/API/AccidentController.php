@@ -17,6 +17,7 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\Accident as ObjectAccident;
 use Database\Repository\Accident;
+use Database\Repository\Informat\Employee;
 use Database\Repository\Navigation;
 use Database\Repository\SchoolAddress;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -354,7 +355,7 @@ class AccidentController extends ApiController
             $accident->transport = $transport;
             $accident->supervision = $supervision;
             $accident->informatSupervisorId = $informatSupervisorId;
-            $accident->witnessId = $witnessId?->getValue() ?: $accident->creatorUserId;
+            $accident->witnessId = $witnessId?->getValue() ?: (new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId);
             $accident->party = $party;
             $accident->partyExternalName = $partyExternalName;
             $accident->partyExternalFirstName = $partyExternalFirstName;
