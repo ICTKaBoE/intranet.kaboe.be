@@ -29,7 +29,10 @@ export default class Checkbox {
 	};
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("chb")) id = `chb${id}`;
+		if (!id.startsWith("chb"))
+			id = `chb${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Checkbox.INSTANCES[id] || false;
 	};
 
@@ -51,6 +54,7 @@ export default class Checkbox {
 			this.inputs[value].type = this.type;
 			this.inputs[value].dataset.value = value;
 			this.inputs[value].classList.add("form-check-input");
+			this.inputs[value].role = "checkbox";
 
 			if (this.onChange) {
 				this.inputs[value].addEventListener("change", () => {
@@ -81,9 +85,14 @@ export default class Checkbox {
 
 	setValue = (value) => {
 		Object.keys(this.inputs).forEach((item) => {
-			if (value === item) this.inputs[item].checked = true;
+			if (String(value) === item) this.inputs[item].checked = true;
 			else this.inputs[item].checked = false;
 		});
+
+		if (this.onChange) {
+			if (this.onChange instanceof Function) this.onChange();
+			else window[this.onChange]();
+		}
 	};
 
 	getValue = () => {

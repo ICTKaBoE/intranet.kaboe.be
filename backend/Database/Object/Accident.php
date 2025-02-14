@@ -53,6 +53,7 @@ class Accident extends CustomObject
         "police" => "boolean",
         "policeName" => "string",
         "policePVNumber" => "string",
+        "witnessId" => "int",
         "creationDateTime" => "datetime",
         "deleted" => "boolean"
     ];
@@ -90,6 +91,9 @@ class Accident extends CustomObject
         ],
         "partyExternalCountry" => [
             "partyExternalCountryId" => \Database\Repository\Country::class
+        ],
+        "witness" => [
+            "witnessId" => \Database\Repository\Informat\Employee::class
         ]
     ];
 

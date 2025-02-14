@@ -18,7 +18,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="authorId">Auteur</label>
-                        <select name="authorId" id="authorId" data-load-source="{{select:url:short}}/{{url:part.module}}/author" data-load-value="id" data-load-label="name" multiple required></select>
+                        <select name="authorId" id="authorId" data-load-source="{{select:url:short}}/{{url:part.module}}/author" data-load-value="id" data-load-label="name" data-search multiple required></select>
 
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="categoryId">Categorie</label>
-                        <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" multiple required></select>
+                        <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" data-search multiple required></select>
 
                     </div>
                 </div>

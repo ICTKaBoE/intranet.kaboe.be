@@ -18,8 +18,6 @@
                 </div>
             </div>
 
-
-
             <div class="card-body">
                 <div class="row">
                     <h1 class="card-title">Tijd en locatie</h1>
@@ -198,7 +196,7 @@
                 <div class="row d-none" id="supervision-Y">
                     <div class="col mb-3">
                         <label class="form-label" for="informatSupervisorId">Naam toezichter</label>
-                        <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" required></select>
+                        <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" data-search required></select>
                     </div>
                 </div>
             </div>
@@ -240,6 +238,19 @@
                     <div class="col-lg-6 mb-3">
                         <label class="form-label" for="informatStudentBankId">Bank</label>
                         <select name="informatStudentBankId" id="informatStudentBankId" data-load-source="{{select:url:short}}/informat/studentBank" data-load-value="id" data-load-label="formatted.details" required></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <h1 class="card-title">Getuige</h1>
+                </div>
+
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label" for="witnessId">Naam getuige</label>
+                        <select name="witnessId" id="witnessId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" data-search required></select>
                     </div>
                 </div>
             </div>

@@ -22,31 +22,26 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                 <div class="col-lg-4 mb-3">
                     <label class="form-label" for="schoolId">School</label>
                     <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-on-change="deviceView" data-default-value="{{user:mainSchoolId}}" required></select>
-
                 </div>
 
                 <div class="col-lg-4 mb-3">
                     <label class="form-label" for="priority">Prioriteit</label>
                     <select name="priority" id="priority" data-load-source="{{select:url:short}}/{{url:part.module}}/priority" data-load-value="id" data-load-label="name" data-default-value="L" required></select>
-
                 </div>
 
                 <div class="col-lg-4 mb-3">
                     <label class="form-label" for="category">Categorie</label>
-                    <select name="category" id="category" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required data-on-change="deviceView" data-render-item="renderOptgroupItem" data-default-value="O"></select>
-
+                    <select name="category" id="category" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-on-change="deviceView" data-render-item="renderOptgroupItem" data-default-value="O" required></select>
                 </div>
 
                 <div class="col-lg-4 mb-3">
                     <label class="form-label" for="roomId">Lokaal</label>
-                    <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room" data-load-value="id" data-load-label="formatted.full" data-parent-select="schoolId" data-on-change="deviceView" data-default-no-load></select>
-
+                    <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room" data-load-value="id" data-load-label="formatted.full" data-parent-select="schoolId" data-on-change="deviceView" data-default-no-load data-search></select>
                 </div>
 
                 <div class="col-lg-8 mb-3">
                     <label class="form-label" for="assetId">Toestel</label>
-                    <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" data-default-no-load required></select>
-
+                    <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" data-default-no-load data-search required></select>
                 </div>
             </div>
         </div>
@@ -144,7 +139,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
 
                     <div class="mb-2">
                         <label class="form-label mb-1" for="assetId">Toestel</label>
-                        <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" data-default-no-load required></select>
+                        <select name="assetId" id="assetId" data-load-source="[L@{{select:url:short}}/management/laptop;D@{{select:url:short}}/management/desktop;I@{{select:url:short}}/management/ipad;B@{{select:url:short}}/management/beamer;P@{{select:url:short}}/management/printer;F@{{select:url:short}}/management/firewall;S@{{select:url:short}}/management/switch;A@{{select:url:short}}/management/accesspoint]" data-load-value="id" data-load-label="[L@name;D@name;I@name;B@serialnumber;P@name;F@hostname;S@name;A@name]" data-default-no-load data-search required></select>
 
                     </div>
 

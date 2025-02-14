@@ -12,12 +12,12 @@
 
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="informatSubgroupId">Klas</label>
-                <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-load-value="id" data-load-label="name" data-parent-select="schoolId" data-extra="[schoolId={{user:mainSchoolId}}]" required></select>
+                <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-load-value="id" data-load-label="name" data-parent-select="schoolId" data-extra="[schoolId={{user:mainSchoolId}}]" data-search required></select>
             </div>
 
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="informatStudentId">Leerling</label>
-                <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-load-value="id" data-load-label="formatted.fullNameReversed" data-parent-select="informatSubgroupId" required></select>
+                <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-load-value="id" data-load-label="formatted.fullNameReversed" data-parent-select="informatSubgroupId" data-search required></select>
             </div>
         </div>
 
@@ -185,7 +185,7 @@
         <div class="row d-none" id="supervision-Y">
             <div class="col mb-3">
                 <label class="form-label" for="informatSupervisorId">Naam toezichter</label>
-                <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" required></select>
+                <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" data-search required></select>
             </div>
         </div>
     </div>

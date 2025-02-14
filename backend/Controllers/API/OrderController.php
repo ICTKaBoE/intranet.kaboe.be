@@ -407,11 +407,11 @@ class OrderController extends ApiController
 
             $item = $id ? Arrays::first($repo->get($id)) : new OrderPurchase;
             if (!$item->number) $item->number = $settings['lastNumber'] + 1;
+            if (!$id) $item->creatorUserId = User::getLoggedInUser()->id;
             $item->status = $status;
             $item->schoolId = $schoolId;
             $item->acceptorUserId = $acceptorUserId;
             $item->supplierId = $supplierId;
-            $item->creatorUserId = User::getLoggedInUser()->id;
 
             $newId = $repo->set($item);
             if (!$id) $item->id = $newId;

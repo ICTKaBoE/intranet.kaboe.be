@@ -283,6 +283,7 @@ class AccidentController extends ApiController
         $informatStudentNumberId = Helpers::input()->post("informatStudentNumberId");
         $informatStudentBankId = Helpers::input()->post("informatStudentBankId");
         $informatStudentAddressId = Helpers::input()->post("informatStudentAddressId");
+        $witnessId = Helpers::input()->post('witnessId');
 
         if (!$id) {
             if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
@@ -337,7 +338,7 @@ class AccidentController extends ApiController
             $accident = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectAccident);
             if (!$accident->number) $accident->number = $settings['lastNumber'] + 1;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
-            if ($status) $accident->status = $status->getValue();
+            $accident->status = $status?->getValue() ?: "N";
             $accident->schoolId = $schoolId;
             $accident->informatSubgroupId = $informatSubgroupId;
             $accident->informatStudentId = $informatStudentId;
@@ -353,6 +354,7 @@ class AccidentController extends ApiController
             $accident->transport = $transport;
             $accident->supervision = $supervision;
             $accident->informatSupervisorId = $informatSupervisorId;
+            $accident->witnessId = $witnessId?->getValue() ?: $accident->creatorUserId;
             $accident->party = $party;
             $accident->partyExternalName = $partyExternalName;
             $accident->partyExternalFirstName = $partyExternalFirstName;
@@ -408,6 +410,7 @@ class AccidentController extends ApiController
                 foreach ($item->linked->school->toArray(true) as $key => $value) $template->setValue("school:{$key}", $value);
                 foreach ($item->linked->informatStudent->toArray(true) as $key => $value) $template->setValue("student:{$key}", $value);
                 foreach ($item->linked?->supervisor?->toArray(true) ?: [] as $key => $value) $template->setValue("supervisor:{$key}", $value);
+                foreach ($item->linked?->witness?->toArray(true) ?: [] as $key => $value) $template->setValue("witness:{$key}", $value);
                 foreach ($item->linked?->informatStudentAddress?->toArray(true) ?: [] as $key => $value) $template->setValue("student:address.{$key}", $value);
                 foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) $template->setValue("setting:{$key}", $value);
                 foreach (User::getLoggedInUser()->toArray(true) as $key => $value) $template->setValue("user:{$key}", $value);
@@ -472,7 +475,7 @@ class AccidentController extends ApiController
 
                 $template->setValue("date:now", Clock::nowAsString("d/m/Y H:i:s"));
 
-                foreach ($template->getVariables() as $var) $template->setValue($var, '');
+                foreach ($template->getVariables() as $var) $template->setValue($var, '/');
                 $template->saveAs($saveFilename);
 
                 $convert = (new Convert)->convert($saveFilename, $folder . "/{$_id}.pdf");

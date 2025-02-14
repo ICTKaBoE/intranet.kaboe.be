@@ -90,7 +90,7 @@ class InformatController extends ApiController
         $repo = new Student;
         $regRepo = new Registration;
         $schoolId = Helpers::url()->getParam("schoolId");
-        $institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
+        $institutes = $schoolId ? (new SchoolInstitute)->getBySchoolId($schoolId) : (new SchoolInstitute)->get();
 
         $items = [];
         foreach ($institutes as $institute) {

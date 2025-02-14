@@ -10,7 +10,7 @@
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="categoryId">Categorie</label>
-                    <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" required></select>
+                    <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" data-search required></select>
 
                 </div>
             </div>

@@ -296,7 +296,6 @@ export default class Form {
 				} else if (el.role === "tinymce")
 					data[name] = TinyMCE.INSTANCES[el.id].getValue();
 				else if (el.role === "checkbox") {
-					console.log(Checkbox.GetInstance(el.id).getValue());
 					name = Checkbox.GetInstance(el.id).getName();
 					data[name] = Checkbox.GetInstance(el.id).getValue();
 				} else if (el.role === "colorinput") {
@@ -447,23 +446,9 @@ export default class Form {
 		let field = $(`[name='${name}']`);
 
 		if (field === undefined || field.length === 0) return;
-		else if (field.length === 1) {
-			field = field[0];
 
-			switch (field.type) {
-				case "checkbox":
-					String(value) == "true" ||
-					String(value) == "on" ||
-					String(value) == "1"
-						? field.setAttribute("checked", "")
-						: field.removeAttribute("checked");
-					break;
-
-				default:
-					this.setFieldValue(field, value);
-					break;
-			}
-		} else this.setCheckedField(field, value);
+		field = field[0];
+		this.setFieldValue(field, value);
 	};
 
 	setFieldValue = (field, value) => {
@@ -478,6 +463,10 @@ export default class Form {
 
 			case "tinymce":
 				TinyMCE.INSTANCES[field.id].setValue(value);
+				break;
+
+			case "checkbox":
+				Checkbox.GetInstance(field.name).setValue(value);
 				break;
 
 			case "file":
