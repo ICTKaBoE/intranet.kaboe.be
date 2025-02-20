@@ -67,6 +67,11 @@ class CronController extends ApiController
             else $this->appendToJson('m365SyncSchoolTeams', 'failed');
         }
 
+        if (Strings::equalsIgnoreCase($action, "m365WarnUserPasswordExpiration")) {
+            if (\Controllers\API\Cron\M365::WarnUserPasswordExpiration()) $this->appendToJson('m365WarnUserPasswordExpiration', 'passed');
+            else $this->appendToJson('m365WarnUserPasswordExpiration', 'failed');
+        }
+
         $this->handle();
     }
 }

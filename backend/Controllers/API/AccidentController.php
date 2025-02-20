@@ -355,7 +355,7 @@ class AccidentController extends ApiController
             $accident->transport = $transport;
             $accident->supervision = $supervision;
             $accident->informatSupervisorId = $informatSupervisorId;
-            $accident->witnessId = $witnessId?->getValue() ?: (new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId);
+            $accident->witnessId = $witnessId?->getValue() ?: ((new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId))->id;
             $accident->party = $party;
             $accident->partyExternalName = $partyExternalName;
             $accident->partyExternalFirstName = $partyExternalFirstName;

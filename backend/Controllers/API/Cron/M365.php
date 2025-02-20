@@ -2,34 +2,38 @@
 
 namespace Controllers\API\Cron;
 
+use Database\Object\Mail\Mail as MailMail;
+use Database\Object\Mail\Receiver as MailReceiver;
 use Security\GUID;
+use Security\Input;
 use Helpers\General;
 use M365\Repository\Team;
 use M365\Repository\User;
 use Ouzo\Utilities\Clock;
+use M365\Repository\Group;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use function Ramsey\Uuid\v1;
+use M365\Repository\AuditLog;
 use Database\Repository\School;
 use Database\Repository\Setting;
+use Database\Repository\Mail\Mail;
 use Database\Repository\Navigation;
+use Database\Repository\Mail\Receiver;
 use Database\Repository\SecurityGroup;
 use Database\Object\User as ObjectUser;
+
+use Database\Repository\Informat\Employee;
 use Database\Repository\SecurityGroupUser;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Management\Computer;
 use Database\Repository\User as RepositoryUser;
-use M365\Repository\Computer as RepositoryComputer;
-
-use Database\Object\Management\Computer as ManagementComputer;
-use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
-use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
-use Database\Repository\Informat\Employee;
 use Database\Repository\Informat\EmployeeOwnfield;
+use M365\Repository\Computer as RepositoryComputer;
 use Database\Repository\Management\ComputerUsageLogOn;
-use M365\Repository\AuditLog;
-use M365\Repository\Group;
-use Security\Input;
+use Database\Object\Management\Computer as ManagementComputer;
+use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
+use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 
 abstract class M365
 {
@@ -256,5 +260,66 @@ abstract class M365
                 $teamsRepo->setChannelMembers($team->getId(), $channel->getId(), $sgGroupMembers);
             }
         }
+
+        return true;
+    }
+
+    static public function WarnUserPasswordExpiration()
+    {
+        $navRepo = new Navigation;
+        $_settings = Arrays::first($navRepo->getByParentIdAndLink(0, 'sync'))->settings;
+        $_days = $_settings['default']['password']['expiration']['days'];
+        $_startFrom = $_settings['default']['password']['expiration']['start'];
+        $_subject = $_settings['mail']['template']['password']['subject'];
+        $_body = $_settings['mail']['template']['password']['body'];
+        $employeeRepo = new Employee;
+
+        $mailRepo = new Mail;
+        $mailReceiverRepo = new Receiver;
+
+        $groupId = Arrays::firstOrNull((new Setting)->get("m365.employee.groupId"))->value;
+        $members = (new User)->getGroupMembersByGroupId($groupId, ['id', 'accountEnabled', 'employeeId', 'lastPasswordChangeDateTime', 'onPremisesExtensionAttributes']);
+
+        foreach ($members as $member) {
+            if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
+            if (!$member->getAccountEnabled()) continue;
+            if (Strings::contains($member->getOnPremisesExtensionAttributes()->getExtensionAttribute2(), "passreset:false")) continue;
+
+            $startWarnFrom = Clock::at(Clock::at($member->getLastPasswordChangeDateTime()->format("Y-m-d H:i:s"))->toDateTime()->modify("+{$_days}-{$_startFrom}")->format("Y-m-d H:i:s"));
+            if (!Clock::now()->isAfterOrEqualTo($startWarnFrom)) continue;
+
+            $passwordExpirationDate = Clock::at(Clock::at($member->getLastPasswordChangeDateTime()->format("Y-m-d H:i:s"))->toDateTime()->modify("+{$_days}")->format("Y-m-d H:i:s"));
+            $difference = Clock::now()->toDateTime()->diff($passwordExpirationDate->toDateTime());
+
+            $employee = $employeeRepo->getByInformatId($member->getEmployeeId());
+            if (!$employee) continue;
+
+            $subject = str_replace("{{days}}", ($difference->invert ? "-" : "") . $difference->days, $_subject);
+            $subject = str_replace("{{expirationDate}}", $passwordExpirationDate->format("d/m/Y"), $subject);
+            $subject = str_replace("{{passwordLastSetDate}}", $member->getLastPasswordChangeDateTime()->format("d/m/Y H:i:s"), $subject);
+
+            $body = str_replace("{{days}}", $difference->days, $_body);
+            $body = str_replace("{{expirationDate}}", $passwordExpirationDate->format("d/m/Y"), $body);
+            $body = str_replace("{{passwordLastSetDate}}", $member->getLastPasswordChangeDateTime()->format("d/m/Y H:i:s"), $body);
+
+            foreach ($employee->toArray(true) as $k => $v) {
+                $subject = str_replace("{{employee:{$k}}}", $v, $subject);
+                $body = str_replace("{{employee:{$k}}}", $v, $body);
+            }
+
+            $mail = new MailMail;
+            $mail->subject = $subject;
+            $mail->body = $body;
+
+            $mId = $mailRepo->set($mail);
+
+            $receiver = new MailReceiver;
+            $receiver->mailId = $mId;
+            $receiver->email = "ict.kaboe@coltd.be";
+            $receiver->name = $employee->formatted->fullNameReversed;
+            $mailReceiverRepo->set($receiver);
+        }
+
+        return true;
     }
 }
