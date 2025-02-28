@@ -14,7 +14,7 @@ class AuditLog extends Repository
         $config = new SignInsRequestBuilderGetRequestConfiguration();
         $config->queryParameters = SignInsRequestBuilderGetRequestConfiguration::createQueryParameters();
         $config->queryParameters->top = 999;
-        $config->queryParameters->filter = "((appDisplayName eq 'Windows Sign In') and (createdDateTime ge " . Clock::now()->minusDays($days)->format("Y-m-d") . "))";
+        $config->queryParameters->filter = "((appDisplayName eq 'Windows Sign In') and (status/errorCode eq 0) and (createdDateTime ge " . Clock::now()->minusDays($days)->format("Y-m-d") . ") and ((startswith(deviceDetail/displayName, 'MEI')) or (startswith(deviceDetail/displayName, 'WEG')) or (startswith(deviceDetail/displayName, 'BSA')) or (startswith(deviceDetail/displayName, 'STJ'))))";
         if ($select) $config->queryParameters->select = $select;
 
         return $this->iterate(GraphHelper::$appClient->auditLogs()->signIns()->get($config)->wait());

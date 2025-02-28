@@ -422,7 +422,7 @@ abstract class Sync
             if ($sync->action == "C") $create[$school->id][] = $sync;
             else if ($sync->action == "U") $update[$school->id][] = $sync;
             else if ($sync->action == "E") $enable[$school->id][] = $sync;
-            else if ($sync->action == "D") $enable[$school->id][] = $sync;
+            else if ($sync->action == "D") $disable[$school->id][] = $sync;
         }
 
         self::createStudentMail($create, $update, $enable, $disable);

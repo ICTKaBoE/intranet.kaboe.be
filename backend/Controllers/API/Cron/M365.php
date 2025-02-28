@@ -115,7 +115,7 @@ abstract class M365
     {
         $computerRepo = new Computer;
         $computerLogonRepo = new ComputerUsageLogOn;
-        $signIns = (new AuditLog)->getWindowsSignIn(7, ["deviceDetail", "createdDateTime", "userPrincipalName", "userId", "ipAddress"]);
+        $signIns = (new AuditLog)->getWindowsSignIn(30, ["deviceDetail", "createdDateTime", "userPrincipalName", "userId", "ipAddress"]);
 
         foreach ($signIns as $signIn) {
             $computer = $computerRepo->getByName($signIn->getDeviceDetail()->getDisplayName());
