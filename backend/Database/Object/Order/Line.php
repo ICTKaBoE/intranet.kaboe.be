@@ -11,11 +11,11 @@ use Database\Interface\CustomObject;
 use Helpers\CString;
 use Helpers\HTML;
 
-class PurchaseLine extends CustomObject
+class Line extends CustomObject
 {
     protected $objectAttributes = [
         "id" => "int",
-        "purchaseId" => "int",
+        "orderId" => "int",
         "amount" => "int",
         "category" => "string",
         "assetId" => "int",
@@ -27,7 +27,7 @@ class PurchaseLine extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "purchase" => ['purchaseId' => \Database\Repository\Order\Purchase::class],
+        "order" => ['orderId' => \Database\Repository\Order\Order::class],
         "computer" => ['assetId' => \Database\Repository\Management\Computer::class],
         "ipad" => ['assetId' => \Database\Repository\Management\IPad::class],
         "beamer" => ['assetId' => \Database\Repository\Management\Beamer::class],

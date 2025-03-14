@@ -13,15 +13,14 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Object\Mail\Receiver as MailReceiver;
+use Database\Object\Order\Line as OrderLine;
 use Database\Repository\Navigation;
 use Database\Repository\Mail\Receiver;
-use Database\Repository\Order\Purchase;
 use Database\Repository\Order\Supplier;
-use Database\Repository\Order\PurchaseLine;
-use Database\Object\Order\Purchase as OrderPurchase;
 use Database\Object\Order\Supplier as OrderSupplier;
-use Database\Object\Order\PurchaseLine as OrderPurchaseLine;
 use Database\Repository\Mail\Mail;
+use Database\Repository\Order\Line;
+use Database\Repository\Order\Order;
 
 class OrderController extends ApiController
 {
@@ -65,9 +64,9 @@ class OrderController extends ApiController
         }
     }
 
-    protected function getPurchase($view, $id = null)
+    protected function getOrder($view, $id = null)
     {
-        $repo = new Purchase;
+        $repo = new Order;
         $filters = [
             'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
             'acceptorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("acceptorUserId")), fn($i) => Strings::isNotBlank($i)),
@@ -135,15 +134,15 @@ class OrderController extends ApiController
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
 
-    protected function getPurchaseLine($view, $id = null)
+    protected function getOrderLine($view, $id = null)
     {
-        $pRepo = new Purchase;
-        $purchaseIds = Arrays::filter(explode(";", Helpers::url()->getParam("purchaseId")), fn($i) => Strings::isNotBlank($i));
-        $purchaseIds = Arrays::map($purchaseIds, fn($p) => Arrays::first($pRepo->get($p))->id);
+        $pRepo = new Order;
+        $orderIds = Arrays::filter(explode(";", Helpers::url()->getParam("orderId")), fn($i) => Strings::isNotBlank($i));
+        $orderIds = Arrays::map($orderIds, fn($p) => Arrays::first($pRepo->get($p))->id);
 
-        $repo = new PurchaseLine;
+        $repo = new Line;
         $filters = [
-            'purchaseId' => $purchaseIds,
+            'orderId' => $orderIds,
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
@@ -199,7 +198,7 @@ class OrderController extends ApiController
 
     protected function getAccept($view, $id = null)
     {
-        $repo = new Purchase;
+        $repo = new Order;
         $filters = [
             'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
             'acceptorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("acceptorUserId")), fn($i) => Strings::isNotBlank($i)),
@@ -269,13 +268,13 @@ class OrderController extends ApiController
 
     protected function getAcceptLine($view, $id = null)
     {
-        $pRepo = new Purchase;
-        $purchaseIds = Arrays::filter(explode(";", Helpers::url()->getParam("purchaseId")), fn($i) => Strings::isNotBlank($i));
-        $purchaseIds = Arrays::map($purchaseIds, fn($p) => Arrays::first($pRepo->get($p))->id);
+        $pRepo = new Order;
+        $orderIds = Arrays::filter(explode(";", Helpers::url()->getParam("orderId")), fn($i) => Strings::isNotBlank($i));
+        $orderIds = Arrays::map($orderIds, fn($p) => Arrays::first($pRepo->get($p))->id);
 
-        $repo = new PurchaseLine;
+        $repo = new Line;
         $filters = [
-            'purchaseId' => $purchaseIds,
+            'orderId' => $orderIds,
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
@@ -291,7 +290,7 @@ class OrderController extends ApiController
                     ],
                     [
                         "title" => "Wat",
-                        "data" => "formatted.subject"
+                        "data" => "formatted.category"
                     ],
                     [
                         "title" => "Verduidelijking",
@@ -384,10 +383,10 @@ class OrderController extends ApiController
     // Post functions
     protected function postAccept($view, $id = null)
     {
-        $this->postPurchase($view, $id);
+        $this->postOrder($view, $id);
     }
 
-    protected function postPurchase($view, $id = null)
+    protected function postOrder($view, $id = null)
     {
         if ($id == "add") $id = null;
 
@@ -403,9 +402,9 @@ class OrderController extends ApiController
         if (!Input::check($acceptorUserId) || Input::empty($acceptorUserId)) $this->setValidation("acceptorUserId", "Goed te keuren door moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
-            $repo = new Purchase;
+            $repo = new Order;
 
-            $item = $id ? Arrays::first($repo->get($id)) : new OrderPurchase;
+            $item = $id ? Arrays::first($repo->get($id)) : new Order;
             if (!$item->number) $item->number = $settings['lastNumber'] + 1;
             if (!$id) $item->creatorUserId = User::getLoggedInUser()->id;
             $item->status = $status;
@@ -437,9 +436,9 @@ class OrderController extends ApiController
         }
     }
 
-    protected function postPurchaseLine($view, $id = null)
+    protected function postOrderLine($view, $id = null)
     {
-        $purchaseId = Helpers::input()->post('purchaseId')->getValue();
+        $orderId = Helpers::input()->post('orderId')->getValue();
         $amount = Helpers::input()->post('amount')->getValue();
         $category = Helpers::input()->post('category')->getValue();
         $assetId = Helpers::input()->post('assetId')->getValue();
@@ -459,12 +458,12 @@ class OrderController extends ApiController
             }
 
             if ($this->validationIsAllGood()) {
-                $pRepo = new Purchase;
-                $purchase = Arrays::firstOrNull($pRepo->get($purchaseId));
+                $pRepo = new Order;
+                $order = Arrays::firstOrNull($pRepo->get($orderId));
 
-                $repo = new PurchaseLine;
-                $line = $id ? Arrays::firstOrNull($repo->get($id)) : new OrderPurchaseLine;
-                $line->purchaseId = $purchase->id;
+                $repo = new Line;
+                $line = $id ? Arrays::firstOrNull($repo->get($id)) : new OrderLine;
+                $line->orderId = $order->id;
                 $line->amount = $amount;
                 $line->category = $category;
                 $line->assetId = Arrays::contains(["O"], Arrays::first(explode("-", $category))) ? "" : $assetId;
@@ -531,10 +530,10 @@ class OrderController extends ApiController
     }
 
     // Delete functions     
-    protected function deletePurchase($view, $id = null)
+    protected function deleteOrder($view, $id = null)
     {
         $id = explode("_", $id);
-        $repo = new Purchase;
+        $repo = new Order;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
@@ -545,10 +544,10 @@ class OrderController extends ApiController
         }
     }
 
-    protected function deletePurchaseLine($view, $id = null)
+    protected function deleteOrderLine($view, $id = null)
     {
         $id = explode("_", $id);
-        $repo = new PurchaseLine;
+        $repo = new Line;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
@@ -563,7 +562,7 @@ class OrderController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new Supplier;
-        $pRepo = new Purchase;
+        $pRepo = new Order;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
@@ -586,7 +585,8 @@ class OrderController extends ApiController
     // Mail functions
     protected function mailQuote($id)
     {
-        $repo = new Purchase;
+        $repo = new Order;
+        $lRepo = new Line;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
         $navRepo = new Navigation;
@@ -603,8 +603,7 @@ class OrderController extends ApiController
         }
 
         if (Strings::contains($body, "{{table}}")) {
-            $lRepo = new PurchaseLine;
-            $lines = $lRepo->getByPurchaseId($h->id);
+            $lines = $lRepo->getByOrderId($h->id);
 
             $table = "  <table border='1' style='border-collapse: collapse; width: 100%'>
                             <thead>
@@ -648,8 +647,8 @@ class OrderController extends ApiController
 
     protected function mailOrder($id)
     {
-        $repo = new Purchase;
-        $lRepo = new PurchaseLine;
+        $repo = new Order;
+        $lRepo = new Line;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
         $navRepo = new Navigation;
@@ -666,8 +665,7 @@ class OrderController extends ApiController
         }
 
         if (Strings::contains($body, "{{table}}")) {
-            $lRepo = new PurchaseLine;
-            $lines = $lRepo->getByPurchaseId($h->id);
+            $lines = $lRepo->getByOrderId($h->id);
 
             $table = "  <table border='1' style='border-collapse: collapse; width: 100%'>
                             <thead>
@@ -711,7 +709,7 @@ class OrderController extends ApiController
 
     protected function mailAccept($id)
     {
-        $repo = new Purchase;
+        $repo = new Order;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
         $navRepo = new Navigation;
@@ -742,7 +740,7 @@ class OrderController extends ApiController
 
     protected function mailStatus($id)
     {
-        $repo = new Purchase;
+        $repo = new Order;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
         $navRepo = new Navigation;

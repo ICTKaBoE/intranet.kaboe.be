@@ -43,7 +43,7 @@
                     <h2 class="card-title">Items</h2>
                 </div>
 
-                <table role="table" id="tbl{{page:id}}Line" data-source="{{table:url:full}}Line" data-no-paging data-no-info data-double-click-action="edit" data-extra="[purchaseId={{url:part.id}}]"></table>
+                <table role="table" id="tbl{{page:id}}Line" data-source="{{table:url:full}}Line" data-no-paging data-no-info data-double-click-action="edit" data-extra="[orderId={{url:part.id}}]"></table>
             </div>
         </div>
 
@@ -91,5 +91,5 @@
 
 <script>
     let add = "<?= (\Router\Helpers::getId() === "add"); ?>";
-    let purchaseId = "<?= \Router\Helpers::getId(); ?>";
+    let orderId = "<?= \Router\Helpers::getId(); ?>";
 </script>

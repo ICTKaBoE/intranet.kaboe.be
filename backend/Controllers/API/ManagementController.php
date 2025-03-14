@@ -34,10 +34,12 @@ use Database\Object\Management\Building as ManagementBuilding;
 use Database\Object\Management\Firewall as ManagementFirewall;
 use Database\Object\Management\Patchpanel as ManagementPatchpanel;
 use Database\Object\Management\AccessPoint as ManagementAccessPoint;
+use Database\Object\Management\CCTV as ManagementCCTV;
 use Database\Object\Management\ComputerBattery as ManagementComputerBattery;
 use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 use Database\Object\Management\ComputerUsageOnOff as ManagementComputerUsageOnOff;
 use Database\Repository\Helpdesk\Ticket;
+use Database\Repository\Management\CCTV;
 use Helpers\General;
 use Helpers\HTML;
 
@@ -1010,6 +1012,85 @@ class ManagementController extends ApiController
         }
     }
 
+    protected function getCctv($view, $id = null)
+    {
+        $repo = new CCTV;
+        $filters = [
+            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
+            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i))
+        ];
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            $this->appendToJson("checkbox", true);
+            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
+            $this->appendToJson(
+                key: 'columns',
+                data: [
+                    [
+                        "type" => "checkbox",
+                        "data" => null,
+                        "orderable" => false,
+                        "searchable" => false,
+                        "width" => "20px"
+                    ],
+                    [
+                        "title" => "School",
+                        "data" => "linked.school.formatted.badge.name",
+                        "orderable" => false,
+                        "searchable" => false,
+                        "width" => "100px"
+                    ],
+                    [
+                        "title" => "Gebouw",
+                        "data" => "linked.building.name",
+                        "width" => "100px"
+                    ],
+                    [
+                        "title" => "Naam",
+                        "data" => "name"
+                    ],
+                    [
+                        "title" => "Merk",
+                        "data" => "manufacturer",
+                        "width" => "150px"
+                    ],
+                    [
+                        "title" => "Model",
+                        "data" => "model",
+                        "width" => "200px"
+                    ],
+                    [
+                        "title" => "Serienummer",
+                        "data" => "serialnumber",
+                        "width" => "200px"
+                    ],
+                    [
+                        "title" => "MAC Adres",
+                        "data" => "formatted.macaddress",
+                        "width" => "150px"
+                    ],
+                    [
+                        "title" => "Beheerslink",
+                        "data" => "formatted.ip",
+                        "width" => "150px"
+                    ],
+                ]
+            );
+
+            $items = $repo->get();
+            General::filter($items, $filters);
+            $items = array_values($items);
+
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = $repo->get($id);
+            General::filter($items, $filters);
+            $items = array_values($items);
+
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+    }
+
     // Post functions
     protected function postComputerBattery($view, $id = null)
     {
@@ -1440,6 +1521,46 @@ class ManagementController extends ApiController
         }
     }
 
+    protected function postCctv($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $schoolId = Helpers::input()->post('schoolId')->getValue();
+        $buildingId = Helpers::input()->post('buildingId')->getValue();
+        $name = Helpers::input()->post('name')->getValue();
+        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
+        $macaddress = Helpers::input()->post('macaddress')->getValue();
+        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
+        $model = Helpers::input()->post('model')->getValue();
+        $ip = Helpers::input()->post('ip')->getValue();
+
+        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+
+        if ($this->validationIsAllGood()) {
+            $repo = new CCTV;
+
+            if ($this->validationIsAllGood()) {
+                $item = $id ? Arrays::first($repo->get($id)) : new ManagementCCTV;
+                $item->schoolId = $schoolId;
+                $item->buildingId = $buildingId;
+                $item->name = $name;
+                $item->serialnumber = $serialnumber;
+                $item->macaddress = $macaddress;
+                $item->manufacturer = $manufacturer;
+                $item->model = $model;
+                $item->ip = $ip;
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) {
+            $this->setToast("De CCTV-camera is opgeslagen!");
+            $this->setReturn();
+        }
+    }
+
     // Delete functions    
     protected function deleteBuilding($view, $id = null)
     {
@@ -1683,6 +1804,30 @@ class ManagementController extends ApiController
             $repo->set($item);
 
             $this->setToast("De printer '{$item->name}' is verwijderd!");
+        }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
+    }
+
+    protected function deleteCctv($view, $id = null)
+    {
+        $id = explode("_", $id);
+        $repo = new CCTV;
+        $ticketRepo = new Ticket;
+
+        foreach ($id as $_id) {
+            $item = Arrays::first($repo->get($_id));
+
+            if (count($ticketRepo->getByMainCategoryAndAssetId("A", $item->id))) {
+                $this->setToast("De CCTV-camera '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
+                continue;
+            }
+
+            $item->deleted = 1;
+            $repo->set($item);
+
+            $this->setToast("De CCTV-camera '{$item->name}' is verwijderd!");
         }
 
         $this->setReloadTable();

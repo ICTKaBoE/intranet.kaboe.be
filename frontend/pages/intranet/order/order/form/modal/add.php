@@ -1,7 +1,7 @@
 <div class="modal modal-blur fade show" id="modal-add" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <form action="{{form:url:full}}Line" method="post" autocomplete="off" id="frm{{page:id}}Line" class="modal-content">
-            <input type="hidden" name="purchaseId" id="purchaseId" value="{{url:part.id}}" />
+            <input type="hidden" name="orderId" id="orderId" value="{{url:part.id}}" />
 
             <div class="modal-header">
                 <h5 class="modal-title">Lijn</h5>

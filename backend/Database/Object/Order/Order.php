@@ -11,7 +11,7 @@ use Ouzo\Utilities\Strings;
 use Database\Repository\Navigation;
 use Database\Interface\CustomObject;
 
-class Purchase extends CustomObject
+class Order extends CustomObject
 {
     protected $objectAttributes = [
         "id" => "int",

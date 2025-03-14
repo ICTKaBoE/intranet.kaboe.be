@@ -2,6 +2,7 @@
 
 use Database\Database;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 use Router\Helpers;
 use Security\Code;
 
@@ -15,6 +16,7 @@ $version = Helpers::url()->getParam("v");
 $file = file_get_contents("./sql/v{$version}.sql");
 $lines = explode(";", $file);
 $lines = Arrays::filterNotBlank($lines);
+$lines = Arrays::filter($lines, fn($l) => !Strings::startsWith($l, "--"));
 $lines = Arrays::map($lines, fn($l) => trim($l) . ";");
 $lines = array_values($lines);
 
