@@ -463,7 +463,7 @@ class HelpdeskController extends ApiController
                 $thread->content = $content;
 
                 $threadRepo->set($thread);
-                
+
                 if ($helpdesk->status == "C" && $thread->creatorId != $helpdesk->assignedToUserId) {
                     $helpdesk->status = "O";
                     $repo->set($helpdesk);

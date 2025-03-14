@@ -50,6 +50,24 @@
         <div class="col-12 col-lg-3">
             <div class="card mb-3">
                 <div class="card-header">
+                    <h2 class="card-title">Offerte</h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="quoteLink">Link</label>
+                        <input type="text" class="form-control" id="quoteLink" name="quoteLink">
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="quoteFile" class="form-label">Bestand</label>
+                        <input type="file" role="file" name="quoteFile" id="quoteFile" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
                     <h2 class="card-title">Details</h2>
                 </div>
 

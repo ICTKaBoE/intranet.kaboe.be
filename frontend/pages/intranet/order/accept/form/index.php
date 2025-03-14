@@ -1,3 +1,9 @@
+<?php
+const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
+                                    <div>@link@</div>
+                                </div>";
+?>
+
 <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="row" data-prefill-id="{{url:part.id}}">
     <div class="col-12 col-lg-9">
         <div class="card mb-3">
@@ -10,6 +16,14 @@
     </div>
 
     <div class="col-12 col-lg-3">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Offerte</h2>
+            </div>
+
+            <div class="card-body" role="list" id="lstQuotes{{page:id}}" data-source="{{list:url:short}}/{{url:part.module}}/quotes" data-template="<?= ATTACHMENT_TEMPLATE; ?>" data-extra="[orderId={{url:part.id}}]"></div>
+        </div>
+
         <div class="card mb-3">
             <div class="card-header">
                 <h2 class="card-title">Details</h2>

@@ -20,6 +20,10 @@ RENAME TABLE tbl_order_purchase_line TO tbl_order_line;
 
 --ALTER
 ALTER TABLE tbl_order_line CHANGE purchaseId orderId int(11) NOT NULL;
+ALTER TABLE tbl_order ADD quoteLink TEXT NULL;
+ALTER TABLE tbl_order CHANGE quoteLink quoteLink TEXT NULL AFTER supplierId;
+ALTER TABLE tbl_order ADD quoteFile varchar(40) NULL;
+ALTER TABLE tbl_order CHANGE quoteFile quoteFile varchar(40) NULL AFTER quoteLink;
 
 --INSERT
 INSERT INTO tbl_navigation (routeGroupId, parentId, `order`, redirect, link, name, icon, color, minimumRights, settings, deleted) VALUES('1', 26, 13, 0, 'cctv', 'CCTV-Camera', 'device-cctv', 'blue', '0000001', NULL, 0);

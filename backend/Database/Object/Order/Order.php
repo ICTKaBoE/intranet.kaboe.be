@@ -21,6 +21,8 @@ class Order extends CustomObject
         "creatorUserId" => "int",
         "acceptorUserId" => "string",
         "supplierId" => "int",
+        "quoteLink" => "string",
+        "quoteFile" => "string",
         "status" => "string",
         "deleted" => "boolean"
     ];

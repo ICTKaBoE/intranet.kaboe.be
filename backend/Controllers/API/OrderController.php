@@ -2,25 +2,27 @@
 
 namespace Controllers\API;
 
+use stdClass;
 use Helpers\HTML;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
 use Security\Session;
+use Security\FileSystem;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Mail\Mail as MailMail;
-use Database\Object\Mail\Receiver as MailReceiver;
-use Database\Object\Order\Line as OrderLine;
-use Database\Repository\Navigation;
-use Database\Repository\Mail\Receiver;
-use Database\Repository\Order\Supplier;
-use Database\Object\Order\Supplier as OrderSupplier;
 use Database\Repository\Mail\Mail;
+use Database\Repository\Navigation;
 use Database\Repository\Order\Line;
 use Database\Repository\Order\Order;
+use Database\Repository\Mail\Receiver;
+use Database\Repository\Order\Supplier;
+use Database\Object\Mail\Mail as MailMail;
+use Database\Object\Order\Line as OrderLine;
+use Database\Object\Mail\Receiver as MailReceiver;
+use Database\Object\Order\Supplier as OrderSupplier;
 
 class OrderController extends ApiController
 {
@@ -380,6 +382,31 @@ class OrderController extends ApiController
         $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
     }
 
+    protected function getQuotes($view, $id = null)
+    {
+        $repo = new Order;
+        if (!$id) $id = Helpers::url()->getParam('orderId');
+
+        if (Strings::equal($view, self::VIEW_LIST)) {
+            $order = Arrays::first($repo->get($id));
+            $quotes = [];
+            if ($order->quoteLink) $quotes[] = $order->quoteLink;
+            if (FileSystem::PathExists(LOCATION_UPLOAD . "/order/{$order->guid}.pdf")) $quotes[] = "{$order->guid}.pdf";
+
+            if (!$quotes) $this->appendToJson('raw', 'Geen bestanden!');
+            else {
+                $items = Arrays::map($quotes, function ($a) use ($order) {
+                    $item = new stdClass;
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/order/{$order->guid}.pdf"), $a, HTML::LINK_TARGET_BLANK);
+
+                    return $item;
+                });
+
+                $this->appendToJson('raw', General::processTemplate($items));
+            }
+        }
+    }
+
     // Post functions
     protected function postAccept($view, $id = null)
     {
@@ -397,6 +424,8 @@ class OrderController extends ApiController
         $schoolId = Helpers::input()->post('schoolId')->getValue();
         $acceptorUserId = Helpers::input()->post('acceptorUserId')->getValue();
         $supplierId = Helpers::input()->post('supplierId')->getValue();
+        $quoteLink = Helpers::input()->post("quoteLink")->getValue();
+        $quoteFile = Helpers::input()->file("quoteFile")[0];
 
         if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
         if (!Input::check($acceptorUserId) || Input::empty($acceptorUserId)) $this->setValidation("acceptorUserId", "Goed te keuren door moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
@@ -411,9 +440,21 @@ class OrderController extends ApiController
             $item->schoolId = $schoolId;
             $item->acceptorUserId = $acceptorUserId;
             $item->supplierId = $supplierId;
+            $item->quoteLink = $quoteLink;
 
             $newId = $repo->set($item);
             if (!$id) $item->id = $newId;
+            $item = Arrays::first($repo->get($item->id));
+
+            if ($quoteFile && $quoteFile->getSize() > 0) {
+                $location = LOCATION_UPLOAD . "/order";
+                FileSystem::CreateFolder($location);
+
+                if ($quoteFile->move("{$location}/{$item->guid}." . $quoteFile->getExtension())) {
+                    $item->quoteFile = "{$item->guid}." . $quoteFile->getExtension();
+                    $repo->set($item);
+                }
+            }
 
             // Update settings
             if (!$id) {
