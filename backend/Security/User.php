@@ -6,10 +6,10 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
-use Database\Repository\SecurityGroup;
-use Database\Repository\SecurityGroupUser;
-use Database\Repository\Setting;
-use Database\Repository\User as RepositoryUser;
+use Database\Repository\Security\Group;
+use Database\Repository\Security\GroupUser;
+use Database\Repository\Setting\Setting;
+use Database\Repository\User\User as RepositoryUser;
 
 abstract class User
 {
@@ -44,12 +44,12 @@ abstract class User
     static public function canAccess($minimumRights)
     {
         $user = self::getLoggedInUser();
-        $userSecurityGroup = (new SecurityGroupUser)->getByUserId($user->id);
+        $userSecurityGroup = (new GroupUser)->getByUserId($user->id);
         if (!$userSecurityGroup) return false;
 
         $permissions = [];
         foreach ($userSecurityGroup as $usg) {
-            $securityGroup = Arrays::firstOrNull((new SecurityGroup)->get($usg->securityGroupId));
+            $securityGroup = Arrays::firstOrNull((new Group)->get($usg->securityGroupId));
             if (!$securityGroup) continue;
 
             if (empty($permissions)) $permissions = $securityGroup->permission;

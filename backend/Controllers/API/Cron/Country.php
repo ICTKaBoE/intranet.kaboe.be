@@ -4,7 +4,7 @@ namespace Controllers\API\Cron;
 
 use Database\Object\Country as ObjectCountry;
 use Database\Repository\Country as RepositoryCountry;
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use GuzzleHttp\Client;
 
 abstract class Country

@@ -6,8 +6,8 @@ use Security\User;
 use Router\Helpers;
 use Controllers\ApiController;
 use Database\Repository\Navigation;
-use Database\Repository\RouteGroup;
-use Database\Repository\Setting;
+use Database\Repository\Route\Group;
+use Database\Repository\Setting\Setting;
 use Helpers\General;
 use Ouzo\Utilities\Arrays;
 
@@ -18,7 +18,7 @@ class IndexController extends ApiController
     {
         $mode = (new Setting)->get("site.mode")[0]->value;
         $navigationRepo = new Navigation;
-        $routeGroup = (new RouteGroup)->getByDomain(($mode == "dev" ? "dev.intranet.kaboe.be" : "intranet.kaboe.be"));
+        $routeGroup = (new Group)->getByDomain(($mode == "dev" ? "dev.intranet.kaboe.be" : "intranet.kaboe.be"));
         $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0);
 
         $items = [];

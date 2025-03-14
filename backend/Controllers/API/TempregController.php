@@ -15,7 +15,7 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Database\Repository\TempReg;
 use Database\Repository\Navigation;
 use Database\Repository\Informat\Teacher;

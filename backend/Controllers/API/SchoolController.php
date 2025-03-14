@@ -6,8 +6,8 @@ use Router\Helpers;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School;
-use Database\Repository\SchoolAddress;
+use Database\Repository\School\School;
+use Database\Repository\School\Address;
 use Helpers\General;
 
 class SchoolController extends ApiController
@@ -31,7 +31,7 @@ class SchoolController extends ApiController
 
     protected function getAddress($view, $id = null)
     {
-        $repo = new SchoolAddress;
+        $repo = new Address;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
         } else if (Strings::equal($view, self::VIEW_SELECT)) {

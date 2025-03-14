@@ -9,7 +9,7 @@ use Pecee\Http\Response;
 use Security\FileSystem;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Pecee\SimpleRouter\SimpleRouter;
 
 abstract class Helpers
@@ -95,5 +95,10 @@ abstract class Helpers
 	{
 		if (!self::getModule()) return "/" . (self::getDomainFolder() ?: "public") . self::getReletiveUrl();
 		else return "/" . (self::getDomainFolder() ?: "public") . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getId() ? "/form" : "");
+	}
+
+	static function isErrorPage()
+	{
+		return Strings::contains(self::getReletiveUrl(), "/error/");
 	}
 }

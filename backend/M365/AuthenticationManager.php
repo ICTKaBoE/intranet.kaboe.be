@@ -19,7 +19,7 @@
 
 namespace M365;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Security\Session;
 use M365\RequestManager;
 use Router\Helpers;

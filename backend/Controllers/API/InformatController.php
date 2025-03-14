@@ -17,10 +17,7 @@ use Database\Repository\Informat\StudentBank;
 use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
-use Database\Repository\Informat\Subgroup;
-use Database\Repository\Informat\SubgroupStudent;
-use Database\Repository\Informat\Teacher;
-use Database\Repository\SchoolInstitute;
+use Database\Repository\School\Institute;
 use Ouzo\Utilities\Clock;
 
 class InformatController extends ApiController
@@ -69,7 +66,7 @@ class InformatController extends ApiController
     {
         $repo = new ClassGroup;
         $schoolId = Helpers::url()->getParam("schoolId");
-        $institutes = (new SchoolInstitute)->getBySchoolId($schoolId);
+        $institutes = (new Institute)->getBySchoolId($schoolId);
 
         $subgroups = [];
         foreach ($institutes as $institute) {
@@ -90,7 +87,7 @@ class InformatController extends ApiController
         $repo = new Student;
         $regRepo = new Registration;
         $schoolId = Helpers::url()->getParam("schoolId");
-        $institutes = $schoolId ? (new SchoolInstitute)->getBySchoolId($schoolId) : (new SchoolInstitute)->get();
+        $institutes = $schoolId ? (new Institute)->getBySchoolId($schoolId) : (new Institute)->get();
 
         $items = [];
         foreach ($institutes as $institute) {

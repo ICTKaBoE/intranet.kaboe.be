@@ -16,16 +16,16 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School;
-use Database\Repository\BikeEvent;
+use Database\Repository\School\School;
+use Database\Repository\Bike\Event;
 use Database\Repository\Navigation;
-use Database\Repository\UserAddress;
-use Database\Repository\BikeDistance;
+use Database\Repository\Bike\Distance;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use Database\Repository\User as RepositoryUser;
-use Database\Object\BikeEvent as ObjectBikeEvent;
-use Database\Object\BikeDistance as ObjectBikeDistance;
-use Database\Repository\BikePrice;
+use Database\Repository\User\User as RepositoryUser;
+use Database\Object\Bike\Event as ObjectBikeEvent;
+use Database\Object\Bike\Distance as ObjectBikeDistance;
+use Database\Repository\Bike\Price;
+use Database\Repository\User\Address;
 
 class BikeController extends ApiController
 {
@@ -42,7 +42,7 @@ class BikeController extends ApiController
 
     protected function getDistance($view, $id)
     {
-        $repo = new BikeDistance;
+        $repo = new Distance;
         $currentUserId = User::getLoggedInUser()->id;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
@@ -131,7 +131,7 @@ class BikeController extends ApiController
 
     protected function getEvent($view, $id, $type)
     {
-        $repo = new BikeEvent;
+        $repo = new Event;
         $currentUserId = User::getLoggedInUser()->id;
 
         if (Strings::equal($view, self::VIEW_CALENDAR)) {
@@ -190,7 +190,7 @@ class BikeController extends ApiController
         if (!Input::check($color) || Input::empty($color)) $this->setValidation("color", state: self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
-            $repo = new BikeDistance;
+            $repo = new Distance;
 
             foreach ($repo->getByUserId(User::getLoggedInUser()->id) as $_distance) {
                 if (Strings::equal($_distance->id, $id) || Strings::equal($_distance->guid, $id)) continue;
@@ -253,8 +253,8 @@ class BikeController extends ApiController
             $rDate = Clock::at($date)->format("d/m/Y");
 
             $currentUserId = User::getLoggedInUser()->id;
-            $repo = new BikeEvent;
-            $dRepo = new BikeDistance;
+            $repo = new Event;
+            $dRepo = new Distance;
 
             $item = $repo->getByUserIdTypeAndDate($currentUserId, $type, $date) ?? new ObjectBikeEvent;
             $distances = $dRepo->getByUserIdAndType($currentUserId, $type);
@@ -284,7 +284,7 @@ class BikeController extends ApiController
             $item->alias = $distance->alias;
             $item->color = $distance->color;
             $item->userMainSchoolId = User::getLoggedInUser()->mainSchoolId;
-            $item->pricePerKm = (new BikePrice)->getBetween($date)->amount;
+            $item->pricePerKm = (new Price)->getBetween($date)->amount;
 
             $repo->set($item);
             if ($distance == null) $this->setToast("Rit op datum {$rDate} verwijderd!");
@@ -344,8 +344,8 @@ class BikeController extends ApiController
     protected function deleteDistance($view, $id = null)
     {
         $id = explode("_", $id);
-        $repo = new BikeDistance;
-        $bikeEventRepo = new BikeEvent;
+        $repo = new Distance;
+        $bikeEventRepo = new Event;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
@@ -838,7 +838,7 @@ class BikeController extends ApiController
     // Other functions
     protected function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type)
     {
-        $eventRepo = new BikeEvent;
+        $eventRepo = new Event;
         $userRepo = new RepositoryUser();
         $eventsGrouped = [];
 
@@ -859,9 +859,9 @@ class BikeController extends ApiController
 
     protected function getEventsGroupedByMonthByTeacherBySchool($start, $end, $allowedSchoolIds, $type)
     {
-        $eventRepo = new BikeEvent;
+        $eventRepo = new Event;
         $userRepo = new RepositoryUser;
-        $userAddressRepo = new UserAddress;
+        $userAddressRepo = new Address;
         $eventsGrouped = [];
 
         $users = Arrays::orderBy($userRepo->get(), "name");

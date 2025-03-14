@@ -5,7 +5,7 @@ namespace Controllers\API\Cron;
 use Ouzo\Utilities\Arrays;
 use JAMF\Repository\Device;
 use Ouzo\Utilities\Strings;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Database\Repository\Navigation;
 use Database\Repository\Management\IPad;
 use Database\Object\Management\IPad as ManagementIPad;

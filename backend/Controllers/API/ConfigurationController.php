@@ -11,16 +11,16 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Object\GeneralMessage as ObjectGeneralMessage;
-use Database\Object\School as ObjectSchool;
-use Database\Repository\Setting;
+use Database\Object\Route\Group as ObjectSchool;
+use Database\Repository\Setting\Setting;
 use Database\Repository\Navigation;
-use Database\Repository\SecurityGroup;
+use Database\Repository\Security\Group;
 use Database\Repository\GeneralMessage;
-use Database\Repository\SecurityGroupUser;
-use Database\Object\SecurityGroup as ObjectSecurityGroup;
-use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
-use Database\Repository\School;
-use Database\Repository\SettingTab;
+use Database\Repository\Security\GroupUser;
+use Database\Object\Security\Group as ObjectSecurityGroup;
+use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
+use Database\Repository\School\School;
+use Database\Repository\Setting\Tab;
 
 class ConfigurationController extends ApiController
 {
@@ -37,7 +37,7 @@ class ConfigurationController extends ApiController
 
             $this->appendToJson('fields', $settings);
         } else if (Strings::equal($view, self::VIEW_LIST)) {
-            $settingTabs = (new SettingTab)->get();
+            $settingTabs = (new Tab)->get();
 
             $tabs = Arrays::map($settingTabs, fn($t) => $t->formatted->html);
             $tabs = implode("", $tabs);
@@ -99,7 +99,7 @@ class ConfigurationController extends ApiController
 
     protected function getGroups($view, $id = null)
     {
-        $repo = new SecurityGroup;
+        $repo = new Group;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
@@ -177,7 +177,7 @@ class ConfigurationController extends ApiController
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $group = Arrays::firstOrNull($repo->get($id));
-            $members = (new SecurityGroupUser)->getBySecurityGroupId($group->id);
+            $members = (new GroupUser)->getBySecurityGroupId($group->id);
 
             $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
             $this->appendToJson('fields', $group);
@@ -330,7 +330,7 @@ class ConfigurationController extends ApiController
         if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
 
         if ($this->validationIsAllGood()) {
-            $repo = new SecurityGroup;
+            $repo = new Group;
 
             if ($this->validationIsAllGood()) {
                 $item = $id ? Arrays::first($repo->get($id)) : new ObjectSecurityGroup;
@@ -341,7 +341,7 @@ class ConfigurationController extends ApiController
                 $newId = $repo->set($item);
                 if (!$item->id) $item->id = $newId;
 
-                $sguRepo = new SecurityGroupUser;
+                $sguRepo = new GroupUser;
                 $sguRepo->delete(["securityGroupId" => $item->id]);
 
                 foreach (explode(";", $members) as $member) {
@@ -398,7 +398,7 @@ class ConfigurationController extends ApiController
     protected function deleteGroups($view, $id)
     {
         $id = explode("_", $id);
-        $repo = new SecurityGroup;
+        $repo = new Group;
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));

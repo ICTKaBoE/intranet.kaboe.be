@@ -7,7 +7,7 @@ use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Module;
 use Database\Repository\Navigation;
-use Database\Repository\RouteGroup;
+use Database\Repository\Route\Group;
 use Controllers\ComponentController;
 use Database\Repository\GeneralMessage;
 
@@ -35,7 +35,7 @@ class GeneralMessageComponentController extends ComponentController
     {
         $repo = new Navigation;
         $domain = Helpers::url()->getHost();
-        $routeGroup = (new RouteGroup)->getByDomain($domain);
+        $routeGroup = (new Group)->getByDomain($domain);
         $module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 
         $messages = (new GeneralMessage)->getByNavigationId($module->id ?: 0);

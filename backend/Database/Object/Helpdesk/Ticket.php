@@ -33,9 +33,9 @@ class Ticket extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "creatorUser" => ["creatorUserId" => \Database\Repository\User::class],
-        "assignedToUser" => ["assignedToUserId" => \Database\Repository\User::class],
-        "school" => ["schoolId" => \Database\Repository\School::class],
+        "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
+        "assignedToUser" => ["assignedToUserId" => \Database\Repository\User\User::class],
+        "school" => ["schoolId" => \Database\Repository\School\School::class],
         "computer" => ['assetId' => \Database\Repository\Management\Computer::class],
         "ipad" => ['assetId' => \Database\Repository\Management\IPad::class],
         "beamer" => ['assetId' => \Database\Repository\Management\Beamer::class],

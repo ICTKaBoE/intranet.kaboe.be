@@ -2,7 +2,7 @@
 
 namespace M365;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Microsoft\Graph\Core\Authentication\GraphPhpLeagueAccessTokenProvider;
 use Microsoft\Graph\GraphServiceClient;
 use Microsoft\Kiota\Authentication\Oauth\ClientCredentialContext;

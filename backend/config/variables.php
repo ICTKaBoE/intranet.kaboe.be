@@ -1,6 +1,7 @@
 <?php
 
 // Security group permissions: read, create, update, delete, export, changeSettings
+define("VERSION_DB", "4.1.0");
 define("URL_MAIN", "kaboe.be");
 
 define("LOCATION_ROOT", dirname(dirname(__DIR__)));

@@ -23,7 +23,7 @@ class AccessPoint extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "school" => ["schoolId" => \Database\Repository\School::class],
+        "school" => ["schoolId" => \Database\Repository\School\School::class],
         "building" => ["buildingId" => \Database\Repository\Management\Building::class],
         "room" => ["roomId" => \Database\Repository\Management\Room::class]
     ];

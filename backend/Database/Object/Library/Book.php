@@ -21,7 +21,7 @@ class Book extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "school" => ['schoolId' => \Database\Repository\School::class],
+        "school" => ['schoolId' => \Database\Repository\School\School::class],
         "author" => ['authorId' => \Database\Repository\Library\Author::class],
         "category" => ["categoryId" => \Database\Repository\Library\Category::class]
     ];

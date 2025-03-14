@@ -2,7 +2,7 @@
 
 namespace Security;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 

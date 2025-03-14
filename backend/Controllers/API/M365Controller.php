@@ -5,11 +5,11 @@ namespace Controllers\API;
 use Router\Helpers;
 use Security\Session;
 use Controllers\ApiController;
-use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
+use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 use M365\AuthenticationManager;
-use Database\Repository\Setting;
-use Database\Repository\User;
-use Database\Repository\UserLoginHistory;
+use Database\Repository\Setting\Setting;
+use Database\Repository\User\LoginHistory;
+use Database\Repository\User\User;
 
 class M365Controller extends ApiController
 {
@@ -32,16 +32,17 @@ class M365Controller extends ApiController
                 ]);
 
                 $loginUser = (new User)->getByEntraId(Session::get("oid"));
+                if ($loginUser) {
+                    $userLoginHistory = new ObjectUserLoginHistory([
+                        "userId" => $loginUser->id,
+                        "source" => SECURITY_SESSION_SIGNINMETHOD_M365
+                    ]);
 
-                $userLoginHistory = new ObjectUserLoginHistory([
-                    "userId" => $loginUser->id,
-                    "source" => SECURITY_SESSION_SIGNINMETHOD_M365
-                ]);
+                    (new LoginHistory)->set($userLoginHistory);
 
-                (new UserLoginHistory)->set($userLoginHistory);
-
-                header('Location: ' . (new Setting)->get(id: "page.default.afterLogin")[0]->value);
-                exit();
+                    header('Location: ' . (new Setting)->get(id: "page.default.afterLogin")[0]->value);
+                    exit();
+                }
             } catch (\RuntimeException $e) {
                 echo 'Something went wrong, couldn\'t get tokens: ' . $e->getMessage();
             }

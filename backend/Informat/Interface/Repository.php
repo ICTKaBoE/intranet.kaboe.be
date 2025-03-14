@@ -2,7 +2,7 @@
 
 namespace Informat\Interface;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use GuzzleHttp\Client;
 use stdClass;
 use Informat\Connection;

@@ -2,10 +2,8 @@
 
 namespace Controllers\API;
 
-use Helpers\HTML;
 use Router\Helpers;
 use Helpers\General;
-use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
@@ -17,19 +15,14 @@ use Database\Repository\Informat\EmployeeNumber;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Repository\Informat\Registration;
 use Database\Repository\Informat\RegistrationClass;
-use Database\Repository\School;
-use Database\Repository\Sync\AD\Staff;
-use Database\Repository\SchoolInstitute;
+use Database\Repository\School\School;
+use Database\Repository\School\Institute;
 use Database\Repository\Informat\Student;
 use Database\Repository\Informat\StudentAddress;
 use Database\Repository\Informat\StudentBank;
 use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
-use Database\Repository\Informat\Teacher;
-use Database\Repository\Informat\Subgroup;
-use Database\Repository\Informat\SubgroupStudent;
-use Database\Repository\Informat\TeacherFreefield;
 
 class ContactController extends ApiController
 {
@@ -176,7 +169,7 @@ class ContactController extends ApiController
         $registrationRepo = new Registration;
         $registrationClassRepo = new RegistrationClass;
         $classgroupRepo = new ClassGroup;
-        $instituteRepo = new SchoolInstitute;
+        $instituteRepo = new Institute;
         $schoolRepo = new School;
 
         if (Strings::equal($view, self::VIEW_LIST)) {

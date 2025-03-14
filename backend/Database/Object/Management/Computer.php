@@ -29,7 +29,7 @@ class Computer extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "school" => ["schoolId" => \Database\Repository\School::class]
+        "school" => ["schoolId" => \Database\Repository\School\School::class]
     ];
 
     public function init()
@@ -52,18 +52,12 @@ class Computer extends CustomObject
 
     private function getLastUsage()
     {
-        $lastOnOff = array_reverse((new ComputerUsageOnOff)->getByComputerId($this->id));
+        $lastLogOn = (new ComputerUsageLogOn)->getByComputerId($this->id);
 
-        if (!$lastOnOff) $this->formatted->lastUsage = null;
+        if (!$lastLogOn) $this->formatted->lastUsage = null;
         else {
-            $lastOnOff = Arrays::firstOrNull($lastOnOff);
-            $lastLogOn = (new ComputerUsageLogOn)->getByComputerIdAndLogonBetweenStartupAndShutdown($this->id, $lastOnOff->startup, $lastOnOff->shutdown);
-
-            if (!$lastLogOn) $this->formatted->lastUsage = null;
-            else {
-                $lastLogOn = Arrays::firstOrNull(array_reverse($lastLogOn));
-                $this->formatted->lastUsage = Clock::at($lastOnOff->startup)->format("d/m/Y") . " - {$lastLogOn->username}";
-            }
+            $lastLogOn = Arrays::firstOrNull(array_reverse($lastLogOn));
+            $this->formatted->lastUsage = Clock::at($lastLogOn->logon)->format("d/m/Y") . " - {$lastLogOn->username}";
         }
     }
 }

@@ -44,21 +44,8 @@
 
                     </div>
 
-                    <div class="col mb-lg-3 mb-3 pt-5">
-                        <label class="form-check">
-                            <input type="checkbox" name="quoteVatIncluded" id="quoteVatIncluded" class="form-check-input">
-                            <span class="form-check-label">btw. inbegrepen</span>
-                        </label>
-
-                    </div>
-
-                    <div class="col mb-lg-3 mb-3 pt-5">
-                        <label class="form-check">
-                            <input type="checkbox" name="warrenty" id="warrenty" class="form-check-input">
-                            <span class="form-check-label">Garantie?</span>
-                        </label>
-
-                    </div>
+                    <div class="col mb-lg-3 mb-3 pt-5" id="chbQuoteVatIncluded" role="checkbox" data-type="checkbox" data-name="quoteVatIncluded" data-text="btw. inbegrepen"></div>
+                    <div class="col mb-lg-3 mb-3 pt-5" id="chbWarrenty" role="checkbox" data-type="checkbox" data-name="warrenty" data-text="Garantie?"></div>
                 </div>
             </div>
 

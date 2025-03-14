@@ -16,7 +16,7 @@ use Ouzo\Utilities\Strings;
 use Informat\Repository\Student;
 use Informat\Repository\Registration;
 use Informat\Repository\StudentPhoto;
-use Database\Repository\SchoolInstitute;
+use Database\Repository\School\Institute;
 use Database\Object\Informat\StudentBank;
 use Database\Object\Informat\StudentEmail;
 use Database\Object\Informat\StudentNumber;
@@ -69,7 +69,7 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new Student;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
         foreach ($schoolInstitutes as $institute) {
@@ -112,7 +112,7 @@ abstract class Informat
         $_error = false;
         $informatRepo = new Student;
         $informatPhotoRepo = new StudentPhoto;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
         foreach ($schoolInstitutes as $institute) {
@@ -150,7 +150,7 @@ abstract class Informat
 
         $informatRepo = new Registration;
         $studentRepo = new RepositoryInformatStudent;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
 
         foreach ($schoolInstitutes as $institute) {
             $iItems = $informatRepo->get($institute->numberNewFormat);
@@ -196,7 +196,7 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new Employee;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
         $cRepo = new Country;
 
         foreach ($schoolInstitutes as $institute) {
@@ -245,7 +245,7 @@ abstract class Informat
 
         $informatRepo = new RepositoryEmployeeOwnfield;
         $employeeRepo = new RepositoryInformatEmployee;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
 
         foreach ($schoolInstitutes as $institute) {
             $iItems = $informatRepo->get($institute->numberNewFormat);
@@ -278,7 +278,7 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new EmployeePhoto;
-        $schoolInstitutes = (new SchoolInstitute)->get();
+        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/employee");
 
         foreach ($schoolInstitutes as $institute) {

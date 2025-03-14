@@ -21,7 +21,7 @@ class Holliday extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "school" => ['schoolId' => \Database\Repository\School::class]
+        "school" => ['schoolId' => \Database\Repository\School\School::class]
     ];
 
     public function init()

@@ -4,7 +4,7 @@ namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
 use Database\Repository\Navigation;
-use Database\Repository\RouteGroup;
+use Database\Repository\Route\Group;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
@@ -53,7 +53,7 @@ class NavbarComponentController extends ComponentController
 	{
 		$navigationRepo = new Navigation;
 		$domain = Helpers::url()->getHost();
-		$routeGroup = (new RouteGroup)->getByDomain($domain);
+		$routeGroup = (new Group)->getByDomain($domain);
 
 		$activeItem = Arrays::firstOrNull(Arrays::filter($navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0), fn($tli) => $tli->order >= 0 && User::canAccess($tli->minimumRights) && $tli->formatted->active));
 

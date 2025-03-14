@@ -16,14 +16,14 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Database\Repository\Holliday;
 use Database\Repository\Navigation;
-use Database\Repository\UserAddress;
 use Database\Repository\SupervisionEvent;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use Database\Repository\User as RepositoryUser;
+use Database\Repository\User\User as RepositoryUser;
 use Database\Object\SupervisionEvent as ObjectSupervisionEvent;
+use Database\Repository\User\Address;
 
 class SupervisionController extends ApiController
 {
@@ -698,7 +698,7 @@ class SupervisionController extends ApiController
     {
         $eventsRepo = new SupervisionEvent;
         $userRepo = new RepositoryUser;
-        $userAddressRepo = new UserAddress;
+        $userAddressRepo = new Address;
         $schoolRepo = new School;
         $eventsGrouped = [];
         $users = Arrays::orderBy($userRepo->get(), "name");

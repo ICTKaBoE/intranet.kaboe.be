@@ -26,9 +26,9 @@ class Purchase extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "creatorUser" => ["creatorUserId" => \Database\Repository\User::class],
-        "acceptorUser" => ["acceptorUserId" => \Database\Repository\User::class],
-        "school" => ["schoolId" => \Database\Repository\School::class],
+        "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
+        "acceptorUser" => ["acceptorUserId" => \Database\Repository\User\User::class],
+        "school" => ["schoolId" => \Database\Repository\School\School::class],
         "supplier" => ['supplierId' => \Database\Repository\Order\Supplier::class]
     ];
 

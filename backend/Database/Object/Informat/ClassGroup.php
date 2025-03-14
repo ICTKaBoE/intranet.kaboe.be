@@ -22,7 +22,7 @@ class ClassGroup extends CustomObject
 
     protected $linkedAttributes = [
         "schoolInstitute" => [
-            "schoolInstituteId" => \Database\Repository\SchoolInstitute::class
+            "schoolInstituteId" => \Database\Repository\School\Institute::class
         ]
     ];
 }

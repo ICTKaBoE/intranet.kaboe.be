@@ -2,7 +2,7 @@
 
 namespace Informat;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use GuzzleHttp\Client;
 use Helpers\CString;
 use Ouzo\Utilities\Arrays;

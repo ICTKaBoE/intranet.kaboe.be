@@ -15,24 +15,24 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use function Ramsey\Uuid\v1;
 use M365\Repository\AuditLog;
-use Database\Repository\School;
-use Database\Repository\Setting;
+use Database\Repository\School\School;
+use Database\Repository\Setting\Setting;
 use Database\Repository\Mail\Mail;
 use Database\Repository\Navigation;
 use Database\Repository\Mail\Receiver;
-use Database\Repository\SecurityGroup;
-use Database\Object\User as ObjectUser;
+use Database\Repository\Security\Group as SecurityGroup;
+use Database\Object\User\User as ObjectUser;
 
 use Database\Repository\Informat\Employee;
-use Database\Repository\SecurityGroupUser;
+use Database\Repository\Security\GroupUser;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Management\Computer;
-use Database\Repository\User as RepositoryUser;
+use Database\Repository\User\User as RepositoryUser;
 use Database\Repository\Informat\EmployeeOwnfield;
 use M365\Repository\Computer as RepositoryComputer;
 use Database\Repository\Management\ComputerUsageLogOn;
 use Database\Object\Management\Computer as ManagementComputer;
-use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
+use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 
 abstract class M365
@@ -41,7 +41,7 @@ abstract class M365
     {
         $settings = new Setting;
         $securityGroupRepo = new SecurityGroup;
-        $sguRepo = new SecurityGroupUser;
+        $sguRepo = new GroupUser;
         $userRepo = new RepositoryUser;
 
         $securityGroups = Arrays::filter($securityGroupRepo->get(), fn($s) => Strings::isNotBlank($s->m365GroupId));

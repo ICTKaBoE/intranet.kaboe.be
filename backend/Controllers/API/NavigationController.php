@@ -2,21 +2,10 @@
 
 namespace Controllers\API;
 
-use Helpers\HTML;
-use Router\Helpers;
-use Security\Input;
-use Helpers\General;
-use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Setting;
 use Database\Repository\Navigation;
-use Database\Repository\SecurityGroup;
-use Database\Repository\GeneralMessage;
-use Database\Repository\SecurityGroupUser;
-use Database\Object\SecurityGroup as ObjectSecurityGroup;
-use Database\Object\SecurityGroupUser as ObjectSecurityGroupUser;
 
 class NavigationController extends ApiController
 {

@@ -6,16 +6,16 @@ use Security\Input;
 use Helpers\General;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\User;
-use Database\Repository\School;
+use Database\Repository\User\User;
+use Database\Repository\School\School;
 use Database\Repository\Country;
-use Database\Repository\UserAddress;
-use Database\Object\User as ObjectUser;
+use Database\Object\User\User as ObjectUser;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Informat\EmployeeAddress;
 use Database\Repository\Informat\EmployeeOwnfield;
-use Database\Object\UserAddress as ObjectUserAddress;
+use Database\Object\User\Address as ObjectUserAddress;
 use Database\Repository\Navigation;
+use Database\Repository\User\Address;
 
 abstract class Local
 {
@@ -92,7 +92,7 @@ abstract class Local
         $employeeRepo = new Employee;
         $employeeAddressRepo = new EmployeeAddress;
         $userRepo = new User;
-        $userAddressRepo = new UserAddress;
+        $userAddressRepo = new Address;
         $countryRepo = new Country;
 
         // Set all addresses as not current

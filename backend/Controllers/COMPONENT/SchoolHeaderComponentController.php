@@ -3,7 +3,7 @@
 namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Router\Helpers;
 use Security\User;
 

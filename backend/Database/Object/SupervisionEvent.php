@@ -17,8 +17,8 @@ class SupervisionEvent extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "user" => ['userId' => \Database\Repository\User::class],
-        "school" => ["schoolId" => \Database\Repository\School::class]
+        "user" => ['userId' => \Database\Repository\User\User::class],
+        "school" => ["schoolId" => \Database\Repository\School\School::class]
     ];
 
     public function init()

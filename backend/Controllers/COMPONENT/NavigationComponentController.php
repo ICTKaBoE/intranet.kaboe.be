@@ -4,7 +4,7 @@ namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
 use Database\Repository\Navigation;
-use Database\Repository\RouteGroup;
+use Database\Repository\Route\Group;
 use Router\Helpers;
 
 class NavigationComponentController extends ComponentController
@@ -50,7 +50,7 @@ class NavigationComponentController extends ComponentController
     {
         $navigationRepo = new Navigation;
         $domain = Helpers::url()->getHost();
-        $routeGroup = (new RouteGroup)->getByDomain($domain);
+        $routeGroup = (new Group)->getByDomain($domain);
         $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0);
 
         foreach ($topLevelItems as $tli) {

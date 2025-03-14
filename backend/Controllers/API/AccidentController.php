@@ -19,7 +19,7 @@ use Database\Object\Accident as ObjectAccident;
 use Database\Repository\Accident;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Navigation;
-use Database\Repository\SchoolAddress;
+use Database\Repository\School\Address;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class AccidentController extends ApiController
@@ -402,7 +402,7 @@ class AccidentController extends ApiController
 
             foreach ($id as $_id) {
                 $item = $arepo->get($_id)[0];
-                $item->linked->school->linked->address = Arrays::firstOrNull((new SchoolAddress)->getBySchoolId($item->schoolId));
+                $item->linked->school->linked->address = Arrays::firstOrNull((new Address)->getBySchoolId($item->schoolId));
 
                 $saveFilename = $folder . "/{$_id}." . $settings['blancoForm']['ext'];
                 $template = new TemplateProcessor(LOCATION_UPLOAD . "/" . $settings['blancoForm']['file']);

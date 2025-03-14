@@ -9,13 +9,13 @@ use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\User;
+use Database\Repository\User\User;
 use Controllers\ApiController;
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Security\User as SecurityUser;
-use Database\Repository\UserAddress;
-use Database\Repository\UserLoginHistory;
-use Database\Object\UserLoginHistory as ObjectUserLoginHistory;
+use Database\Repository\User\Address;
+use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
+use Database\Repository\User\LoginHistory;
 
 class UserController extends ApiController
 {
@@ -65,7 +65,7 @@ class UserController extends ApiController
                             "source" => SECURITY_SESSION_SIGNINMETHOD_LOCAL
                         ]);
 
-                        (new UserLoginHistory)->set($userLoginHistory);
+                        (new LoginHistory)->set($userLoginHistory);
 
                         if ($redirect) $this->setRedirect($redirect);
                         else $this->setRedirect((new Setting)->get(id: "page.default.afterLogin")[0]->value);
@@ -120,7 +120,7 @@ class UserController extends ApiController
     protected function getList($view, $id)
     {
         $repo = new User;
-        $loginRepo = new UserLoginHistory;
+        $loginRepo = new LoginHistory;
         $filters = [
             'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
         ];
@@ -171,7 +171,7 @@ class UserController extends ApiController
 
     protected function getAddress($view, $id)
     {
-        $repo = new UserAddress;
+        $repo = new Address;
         $currentUserId = SecurityUser::getLoggedInUser()->id;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {

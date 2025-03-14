@@ -2,7 +2,7 @@
 
 namespace JAMF\Interface;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Path;
 

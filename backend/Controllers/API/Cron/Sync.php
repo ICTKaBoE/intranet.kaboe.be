@@ -8,12 +8,12 @@ use Helpers\General;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Database\Repository\Mail\Mail;
 use Database\Repository\Navigation;
 use Database\Repository\Mail\Receiver;
 use Database\Object\Sync as ObjectSync;
-use Database\Repository\SchoolInstitute;
+use Database\Repository\School\Institute;
 use Database\Repository\Informat\Student;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Repository\Informat\Employee;
@@ -54,7 +54,7 @@ abstract class Sync
         $currentEmployees = $m365UserRepo->getAllEmployees(['id', 'employeeId', 'mail', 'accountEnabled', 'signInActivity', 'givenName', 'surname', 'displayName', 'onPremisesSamAccountName', 'onPremisesUserPrincipalName', 'companyName', 'department', 'jobTitle', 'memberOf', 'onPremisesExtensionAttributes']);
         $currentEmployees = Arrays::filter($currentEmployees, fn($ce) => Strings::equal($ce::class, \Microsoft\Graph\Generated\Models\User::class));
         $informatEmployees = $informatEmployeeRepo->get();
-        $informatEmployees = Arrays::filter($informatEmployees, fn($e) => $e->informatId == 15045);
+        // $informatEmployees = Arrays::filter($informatEmployees, fn($e) => $e->informatId == 15045);
 
         foreach ($informatEmployees as $informatEmployee) {
             $sync = $syncRepo->getByEmployeeId($informatEmployee->informatId) ?? new ObjectSync;
@@ -252,7 +252,7 @@ abstract class Sync
         $navRepo = new Navigation;
         $syncRepo = new RepositorySync;
         $schoolRepo = new School;
-        $instituteRepo = new SchoolInstitute;
+        $instituteRepo = new Institute;
         $m365UserRepo = new RepositoryUser;
         $informatStudentRepo = new Student;
         $informatRegistrationRepo = new Registration;

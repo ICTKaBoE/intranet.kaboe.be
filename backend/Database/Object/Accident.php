@@ -60,10 +60,10 @@ class Accident extends CustomObject
 
     protected $linkedAttributes = [
         "school" => [
-            "schoolId" => \Database\Repository\School::class
+            "schoolId" => \Database\Repository\School\School::class
         ],
         "creatorUser" => [
-            "creatorUserId" => \Database\Repository\User::class
+            "creatorUserId" => \Database\Repository\User\User::class
         ],
         "informatClass" => [
             "informatSubgroupId" => \Database\Repository\Informat\ClassGroup::class

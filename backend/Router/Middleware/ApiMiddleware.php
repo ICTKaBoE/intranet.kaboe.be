@@ -3,7 +3,7 @@
 namespace Router\Middleware;
 
 use Controllers\API\UserController;
-use Database\Repository\Route;
+use Database\Repository\Route\Route;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Pecee\Http\Middleware\IMiddleware;

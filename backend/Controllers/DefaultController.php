@@ -10,9 +10,9 @@ use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use M365\AuthenticationManager;
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use Database\Repository\Navigation;
-use Database\Repository\RouteGroup;
+use Database\Repository\Route\Group;
 use Helpers\CString;
 
 use function Ramsey\Uuid\v1;
@@ -344,7 +344,7 @@ class DefaultController extends stdClass
 	{
 		$repo = new Navigation;
 		$domain = Helpers::url()->getHost();
-		$routeGroup = (new RouteGroup)->getByDomain($domain);
+		$routeGroup = (new Group)->getByDomain($domain);
 		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 		if (!$module) return [];
 

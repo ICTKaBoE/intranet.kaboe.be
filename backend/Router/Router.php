@@ -2,8 +2,8 @@
 
 namespace Router;
 
-use Database\Repository\Route;
-use Database\Repository\RouteGroup;
+use Database\Repository\Route\Route;
+use Database\Repository\Route\Group;
 use Pecee\SimpleRouter\SimpleRouter;
 
 class Router extends SimpleRouter
@@ -25,7 +25,7 @@ class Router extends SimpleRouter
     private static function createRoutes()
     {
         $routeRepo = new Route;
-        $routeGroups = (new RouteGroup)->get();
+        $routeGroups = (new Group)->get();
 
         foreach ($routeGroups as $rg) {
             SimpleRouter::group(['domain' => $rg->domain, 'prefix' => $rg->prefix, 'controller' => $rg->controller, 'middleware' => $rg->middleware], function () use ($routeRepo, $rg) {

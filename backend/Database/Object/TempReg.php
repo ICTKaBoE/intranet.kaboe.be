@@ -28,7 +28,7 @@ class TempReg extends CustomObject
 
     protected $linkedAttributes = [
         "school" => [
-            "schoolId" => \Database\Repository\School::class
+            "schoolId" => \Database\Repository\School\School::class
         ]
     ];
 

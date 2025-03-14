@@ -1,0 +1,1 @@
+INSERT INTO tbl_setting (id, settingTabId, name, `type`, `options`, value, readonly, `order`, deleted) VALUES('db.version', 1, 'DB Versie', 'input', NULL, 0x342E312E30, 1, 99, 0);

@@ -23,8 +23,8 @@ class BookHistory extends CustomObject
 
     protected $linkedAttributes = [
         "book" => ['bookId' => \Database\Repository\Library\Book::class],
-        "lenderUser" => ['lenderUserId' => \Database\Repository\User::class],
-        "receiverUser" => ['receiverUserId' => \Database\Repository\User::class],
+        "lenderUser" => ['lenderUserId' => \Database\Repository\User\User::class],
+        "receiverUser" => ['receiverUserId' => \Database\Repository\User\User::class],
         "lenderTeacher" => ['lenderInformatId' => \Database\Repository\Informat\Employee::class],
         "returnerTeacher" => ['returnerInformatId' => \Database\Repository\Informat\Employee::class],
         "lenderStudent" => ['lenderInformatId' => \Database\Repository\Informat\Student::class],
