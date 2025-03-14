@@ -1,3 +1,17 @@
+RewriteEngine on
+RewriteBase /
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Route all non-file, non-directory requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
+
+# Cache-Control for JS & CSS
 <filesMatch "\.(js|css)$">
 	FileETag None
 	Header unset ETag
@@ -6,23 +20,16 @@
 	Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
 </filesMatch>
 
-RewriteEngine On
-
-RewriteCond %{SCRIPT_FILENAME} !-f
-RewriteCond %{SCRIPT_FILENAME} !-d
-RewriteCond %{SCRIPT_FILENAME} !-l
-RewriteRule ^(.*)$ index.php/$1
-
-RewriteCond %{HTTPS} !=on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
+# CORS Headers
 SetEnvIf Origin "http(s)?://(www\.)?(dev.intranet.kaboe.be|dev.extranet.kaboe.be|dev.api.kaboe.be|dev.kaboe.be|intranet.kaboe.be|extranet.kaboe.be|api.kaboe.be|kaboe.be)$" AccessControlAllowOrigin=$0
 Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
 Header merge Vary Origin
+
 Header always set Access-Control-Allow-Methods "*"
 Header always set Access-Control-Allow-Credentials: true
 Header always set Access-Control-Allow-Headers "*"
 
+# Block .user.ini
 <Files .user.ini>
 	Order allow,deny
 	Deny from all
