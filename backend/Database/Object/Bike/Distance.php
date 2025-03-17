@@ -43,7 +43,6 @@ class Distance extends CustomObject
         $this->formatted->distance = CString::formatNumber($this->distance, 2) . "km";
         $this->formatted->distanceWithDouble = $this->formatted->distance . " (" . CString::formatNumber($this->distance * 2, 2) . "km)";
         $this->formatted->badge->color = HTML::Badge("", null, $this->color, ["rounded-circle", "p-2"], ["margin-top" => "2px"]);
-        // $this->formatted->badge->color = "<span class=\"badge p-2 bg-{$this->color} rounded-circle\" style=\"margin-top: 2px\"></span>";
 
         $this->borderColor = $this->color;
         $this->textColor = "black";

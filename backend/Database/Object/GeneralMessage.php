@@ -23,7 +23,7 @@ class GeneralMessage extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "navigation" => ["navigationId" => \Database\Repository\Navigation::class]
+        // "navigation" => ["navigationId" => \Database\Repository\Navigation::class]
     ];
 
     public function init()

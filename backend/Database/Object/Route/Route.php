@@ -19,7 +19,7 @@ class Route extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "routeGroup" => ['routeGroupId' => \Database\Repository\Route\Group::class]
+        // "routeGroup" => ['routeGroupId' => \Database\Repository\Route\Group::class]
     ];
 
     public function init()

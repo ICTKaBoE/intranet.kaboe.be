@@ -27,7 +27,7 @@ class Line extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "order" => ['orderId' => \Database\Repository\Order\Order::class],
+        // "order" => ['orderId' => \Database\Repository\Order\Order::class],
         "computer" => ['assetId' => \Database\Repository\Management\Computer::class],
         "ipad" => ['assetId' => \Database\Repository\Management\IPad::class],
         "beamer" => ['assetId' => \Database\Repository\Management\Beamer::class],

@@ -17,7 +17,7 @@ class Thread extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "ticket" => ["ticketId" => \Database\Repository\Helpdesk\Ticket::class],
+        // "ticket" => ["ticketId" => \Database\Repository\Helpdesk\Ticket::class],
         "creator" => ["creatorId" => \Database\Repository\User\User::class],
     ];
 
