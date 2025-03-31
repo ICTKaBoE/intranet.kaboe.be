@@ -1,3 +1,9 @@
+<?php
+const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
+                                    <div>@link@</div>
+                                </div>";
+?>
+
 <?php if (\Router\Helpers::getId() === "add"): ?>
     <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto">
         <div class="card-body">
@@ -64,6 +70,8 @@
                         <input type="file" role="file" name="quoteFile" id="quoteFile" class="form-control">
                     </div>
                 </div>
+
+                <div class="card-body" role="list" id="lstQuotes{{page:id}}" data-source="{{list:url:short}}/{{url:part.module}}/quotes" data-template="<?= ATTACHMENT_TEMPLATE; ?>" data-extra="[orderId={{url:part.id}}]"></div>
             </div>
 
             <div class="card mb-3">

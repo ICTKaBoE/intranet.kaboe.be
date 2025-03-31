@@ -47,7 +47,8 @@ class Computer extends CustomObject
         $batteries = (new ComputerBattery)->getByComputerId($this->id);
         $this->linked->batteries = $batteries;
 
-        $this->formatted->badge->capacity = join("<br />", Arrays::map($batteries, fn($b) => $b->formatted->badge->capacity));
+        $lastBattery = Arrays::firstOrNull(array_reverse(Arrays::orderBy($batteries, "lastCheck")));
+        $this->formatted->badge->capacity = $lastBattery ? $lastBattery->formatted->badge->capacity : "";
     }
 
     private function getLastUsage()

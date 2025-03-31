@@ -9,7 +9,8 @@
 			"minimal": ["/index"]
 		},
 		"extranet": {
-			"_": "extranet"
+			"_": "extranet",
+			"nocomponents": ["/signage"]
 		}
 	}
 }

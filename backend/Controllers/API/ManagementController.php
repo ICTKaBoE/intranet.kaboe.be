@@ -1105,7 +1105,7 @@ class ManagementController extends ApiController
             $batteryRepo = new ComputerBattery;
 
             foreach ($body as $bat) {
-                if (!$bat['id']) continue;
+                if (!$bat['id'] || is_null($bat['id'])) continue;
                 $battery = $batteryRepo->getByComputerIdAndBatteryId($computer->id, $bat['id']) ?? (new ManagementComputerBattery);
                 $battery->computerId = $computer->id;
                 $battery->batteryId = $bat["id"];

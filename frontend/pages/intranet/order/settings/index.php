@@ -69,7 +69,7 @@
 
                 </div>
 
-                <div class="col-12 mb-3" id="chbMailTemplateQuoteReploy" role="checkbox" data-type="checkbox" data-name="mail.template.quote.reply" data-text="Mag antwoorden op de mail?"></div>
+                <div class="col-12 mb-3" id="chbMailTemplateQuoteReply" role="checkbox" data-type="checkbox" data-name="mail.template.quote.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -91,7 +91,7 @@
 
                 </div>
 
-                <div class="col-12 mb-3" id="chbMailTemplateOrderReploy" role="checkbox" data-type="checkbox" data-name="mail.template.order.reply" data-text="Mag antwoorden op de mail?"></div>
+                <div class="col-12 mb-3" id="chbMailTemplateOrderReply" role="checkbox" data-type="checkbox" data-name="mail.template.order.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -113,7 +113,7 @@
 
                 </div>
 
-                <div class="col-12 mb-3" id="chbMailTemplateAcceptReploy" role="checkbox" data-type="checkbox" data-name="mail.template.accept.reply" data-text="Mag antwoorden op de mail?"></div>
+                <div class="col-12 mb-3" id="chbMailTemplateAcceptReply" role="checkbox" data-type="checkbox" data-name="mail.template.accept.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
 
@@ -135,7 +135,7 @@
 
                 </div>
 
-                <div class="col-12 mb-3" id="chbMailTemplateStatusReploy" role="checkbox" data-type="checkbox" data-name="mail.template.status.reply" data-text="Mag antwoorden op de mail?"></div>
+                <div class="col-12 mb-3" id="chbMailTemplateStatusReply" role="checkbox" data-type="checkbox" data-name="mail.template.status.reply" data-text="Mag antwoorden op de mail?"></div>
             </div>
         </div>
     </div>

@@ -9,5 +9,8 @@
 		"\\Controllers\\PAGE\\INTRANET\\ContactStudentIdController": [
 			"/contact/student/*"
 		]
+	},
+	"extranet": {
+		"\\Controllers\\PAGE\\EXTRANET\\SignageController": ["/signage"]
 	}
 }

@@ -108,10 +108,11 @@ let btnSave = new Button({
 	},
 });
 
-if (add == "")
+if (add == "") {
 	Component.addActionButton(btnCancel, btnSave, btnAdd, btnEdit, btnDelete);
 
-$(document).ready(() => {
-	Table.GetInstance(pageId + "Line").attachButton(btnEdit, "==1");
-	Table.GetInstance(pageId + "Line").attachButton(btnDelete, ">0");
-});
+	$(document).ready(() => {
+		Table.GetInstance(pageId + "Line").attachButton(btnEdit, "==1");
+		Table.GetInstance(pageId + "Line").attachButton(btnDelete, ">0");
+	});
+}

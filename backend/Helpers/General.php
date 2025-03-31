@@ -149,4 +149,17 @@ abstract class General
     {
         return preg_replace('/^0+/', '', $string);
     }
+
+    static public function generateCode($length = 16)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $index = random_int(0, strlen($characters) - 1);
+            $randomString .= $characters[$index];
+        }
+
+        return $randomString;
+    }
 }

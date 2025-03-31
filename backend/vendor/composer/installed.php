@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => '4.0.0.x-dev',
-        'version' => '4.0.0.9999999-dev',
-        'reference' => 'f60f4871c47643e5b41b8eae91ac573ae26f8ba9',
+        'pretty_version' => '4.2.0.x-dev',
+        'version' => '4.2.0.9999999-dev',
+        'reference' => 'e60edb68019f1b963914b4600422cf6b9c0186ef',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '4.0.0.x-dev',
-            'version' => '4.0.0.9999999-dev',
-            'reference' => 'f60f4871c47643e5b41b8eae91ac573ae26f8ba9',
+            'pretty_version' => '4.2.0.x-dev',
+            'version' => '4.2.0.9999999-dev',
+            'reference' => 'e60edb68019f1b963914b4600422cf6b9c0186ef',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -124,6 +124,15 @@
             'reference' => 'a70f5c95fb43bc83f07c9c948baa0dc1829bf201',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/psr7',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'james-heinrich/getid3' => array(
+            'pretty_version' => 'v1.9.23',
+            'version' => '1.9.23.0',
+            'reference' => '06c7482532ff2b3f9111b011d880ca6699c8542b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../james-heinrich/getid3',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

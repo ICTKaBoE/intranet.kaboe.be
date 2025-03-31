@@ -424,7 +424,7 @@ class OrderController extends ApiController
         $schoolId = Helpers::input()->post('schoolId')->getValue();
         $acceptorUserId = Helpers::input()->post('acceptorUserId')->getValue();
         $supplierId = Helpers::input()->post('supplierId')->getValue();
-        $quoteLink = Helpers::input()->post("quoteLink")->getValue();
+        $quoteLink = Helpers::input()->post("quoteLink")?->getValue();
         $quoteFile = Helpers::input()->file("quoteFile")[0];
 
         if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
@@ -521,6 +521,49 @@ class OrderController extends ApiController
             $this->setCloseModal();
             $this->setReloadTable();
         }
+    }
+
+    protected function postOrderRequestQuote($view, $id = null)
+    {
+        $id = explode("_", $id);
+        $repo = new Order;
+
+        foreach ($id as $_id) {
+            $item = Arrays::first($repo->get($_id));
+            $this->mailQuote($item->id);
+            $this->setToast("Offerte aangevraagd voor bon #{$item->formatted->number}");
+        }
+
+        $this->setCloseModal();
+    }
+
+
+    protected function postOrderRequestAccept($view, $id = null)
+    {
+        $id = explode("_", $id);
+        $repo = new Order;
+
+        foreach ($id as $_id) {
+            $item = Arrays::first($repo->get($_id));
+            $this->mailAccept($item->id);
+            $this->setToast("Goedkeuring aangevraagd voor bon #{$item->formatted->number}");
+        }
+
+        $this->setCloseModal();
+    }
+
+    protected function postOrderOrder($view, $id = null)
+    {
+        $id = explode("_", $id);
+        $repo = new Order;
+
+        foreach ($id as $_id) {
+            $item = Arrays::first($repo->get($_id));
+            $this->mailOrder($item->id);
+            $this->setToast("Bestelling geplaatst voor bon #{$item->formatted->number}");
+        }
+
+        $this->setCloseModal();
     }
 
     protected function postSupplier($view, $id = null)

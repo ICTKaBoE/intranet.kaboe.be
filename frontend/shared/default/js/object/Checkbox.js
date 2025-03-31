@@ -55,6 +55,7 @@ export default class Checkbox {
 			this.inputs[value].dataset.value = value;
 			this.inputs[value].classList.add("form-check-input");
 			this.inputs[value].role = "checkbox";
+			this.inputs[value].dataset.id = this.id;
 
 			if (this.onChange) {
 				this.inputs[value].addEventListener("change", () => {
@@ -84,6 +85,9 @@ export default class Checkbox {
 	};
 
 	setValue = (value) => {
+		if (value == "1") value = true;
+		if (value == "0") value = false;
+
 		Object.keys(this.inputs).forEach((item) => {
 			if (String(value) === item) this.inputs[item].checked = true;
 			else this.inputs[item].checked = false;

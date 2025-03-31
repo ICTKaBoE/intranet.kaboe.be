@@ -182,6 +182,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
 		$this->layout = str_replace("{{list:url:short}}", "{{api:url}}/list", $this->layout);
+		$this->layout = str_replace("{{signage:url:short}}", "{{api:url}}/signage", $this->layout);
 
 		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
@@ -191,6 +192,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{list:url:full}}", "{{api:url}}/list/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{signage:url:full}}", "{{api:url}}/signage/{{url:part.module}}/{{url:part.page}}", $this->layout);
 
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(), $this->layout);
 

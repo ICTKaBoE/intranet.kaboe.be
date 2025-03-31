@@ -12,6 +12,7 @@ import ColorInput from "./object/ColorInput.js";
 import SearchField from "./object/SearchField.js";
 import List from "./object/List.js";
 import Checkbox from "./object/Checkbox.js";
+import Signage from "./object/Signage.js";
 
 $.ajaxSetup({
 	xhrFields: {
@@ -36,6 +37,7 @@ window.checkAllLoadedCallback = () => {
 	setTimeout(() => {
 		ColorInput.ScanAndCreate();
 		Form.ScanAndCreate();
+		Signage.ScanAndCreate();
 	}, 250);
 };
 

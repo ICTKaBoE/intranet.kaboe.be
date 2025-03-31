@@ -292,7 +292,6 @@ class AccidentController extends ApiController
             if (!Input::check($informatStudentId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentId)) $this->setValidation("informatStudentId", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($datetime) || Input::empty($datetime)) $this->setValidation("datetime", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($location) || Input::empty($location)) $this->setValidation("location", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($party) || Input::empty($party)) $this->setValidation("party", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($description) || Input::empty($description)) $this->setValidation("description", state: self::VALIDATION_STATE_INVALID);
         }
 

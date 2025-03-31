@@ -20,6 +20,7 @@ class ApiController extends stdClass
 	const VIEW_CHART = "chart";
 	const VIEW_LIST = "list";
 	const VIEW_PS = "ps";
+	const VIEW_SIGNAGE = "signage";
 
 	private $httpCode = 200;
 	private $validation = [];

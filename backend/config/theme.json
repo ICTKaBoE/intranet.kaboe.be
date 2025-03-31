@@ -6,6 +6,9 @@
 		},
 		"intranet": {
 			"dark": ["/index"]
+		},
+		"extranet": {
+			"dark": ["/signage"]
 		}
 	}
 }

@@ -239,7 +239,7 @@ export default class Form {
 		this.element.reset();
 		this.lastLoadedId = null;
 		this.resetValidation();
-		this.setActiveStep(0);
+		// this.setActiveStep(0);
 
 		$(this.element)
 			.find(":input")
@@ -448,11 +448,7 @@ export default class Form {
 		if (field === undefined || field.length === 0) return;
 
 		field = field[0];
-		this.setFieldValue(field, value);
-	};
-
-	setFieldValue = (field, value) => {
-		switch (field.role) {
+		switch (field.role || field.type) {
 			case "select":
 				Select.INSTANCES[field.id].setValue(value);
 				break;
@@ -466,7 +462,9 @@ export default class Form {
 				break;
 
 			case "checkbox":
-				Checkbox.GetInstance(field.name).setValue(value);
+				Checkbox.GetInstance(field.dataset.id || field.name).setValue(
+					value
+				);
 				break;
 
 			case "file":

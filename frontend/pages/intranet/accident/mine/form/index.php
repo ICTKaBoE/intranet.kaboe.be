@@ -67,7 +67,7 @@
         <div class="row">
             <div class="col mb-3">
                 <label class="form-label" for="party">Ongeval te wijten aan...</label>
-                <select name="party" id="party" data-load-source="{{select:url:short}}/{{url:part.module}}/party" data-load-value="id" data-load-label="name" required data-on-change="partyView"></select>
+                <select name="party" id="party" data-load-source="{{select:url:short}}/{{url:part.module}}/party" data-load-value="id" data-load-label="name" data-on-change="partyView"></select>
             </div>
         </div>
 
