@@ -1,7 +1,8 @@
 **/downloads
 **/uploads
 **/powershell
+**/backend/vendor
 **/*.old
 **/*.bak
 info.php
-frontend/shared/default/images/informat/
+**/frontend/shared/default/images/informat/
