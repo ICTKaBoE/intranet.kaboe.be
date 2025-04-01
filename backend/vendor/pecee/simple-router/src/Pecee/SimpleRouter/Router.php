@@ -243,7 +243,6 @@ class Router
                             foreach ($route->getExceptionHandlers() as $handler) {
                                 $this->exceptionHandlers[] = $handler;
                             }
-
                         } else {
                             $this->exceptionHandlers = $route->getExceptionHandlers();
                         }
@@ -254,7 +253,6 @@ class Router
                         $this->renderAndProcess($route);
                         continue;
                     }
-
                 }
 
                 if ($route instanceof IPartialGroupRoute === false) {
@@ -374,6 +372,7 @@ class Router
 
                 /* If the route matches */
                 if ($route->matchRoute($url, $this->request) === true) {
+                    $this->request->addLoadedRoute($route);
 
                     $this->fireEvents(EventHandler::EVENT_MATCH_ROUTE, [
                         'route' => $route,
@@ -405,8 +404,6 @@ class Router
 
                     $methodNotAllowed = false;
 
-                    $this->request->addLoadedRoute($route);
-
                     $this->fireEvents(EventHandler::EVENT_RENDER_ROUTE, [
                         'route' => $route,
                     ]);
@@ -429,7 +426,6 @@ class Router
                     }
                 }
             }
-
         } catch (Exception $e) {
             $this->handleException($e);
         }
@@ -553,9 +549,7 @@ class Router
 
                     return $this->routeRequest();
                 }
-
             } catch (Exception $e) {
-
             }
 
             $this->debug('Finished processing');
@@ -719,7 +713,6 @@ class Router
                         ->setPath($processedRoute->findUrl($method, $parameters, $name))
                         ->setParams($getParams);
                 }
-
             }
         }
 
@@ -949,5 +942,4 @@ class Router
 
         return $this;
     }
-
 }

@@ -30,6 +30,17 @@ class Excel
 		$sheet->setTitle($title);
 	}
 
+	public function removeSheetByName($name)
+	{
+		$sheetIndex = $this->spreadsheet->getIndex($this->spreadsheet->getSheetByName($name));
+		$this->removeSheetByIndex($sheetIndex);
+	}
+
+	public function removeSheetByIndex($index)
+	{
+		$this->spreadsheet->removeSheetByIndex($index);
+	}
+
 	public function setCellValue($sheetIndex, $range, $value, $bold = false, $size = 11, $border = "", $borderStyle = Border::BORDER_THIN, $link = false)
 	{
 		$sheet = $this->spreadsheet->getSheet($sheetIndex);

@@ -1,0 +1,7 @@
+**/downloads
+**/uploads
+**/powershell
+**/*.old
+**/*.bak
+info.php
+frontend/shared/default/images/informat/

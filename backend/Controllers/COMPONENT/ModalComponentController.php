@@ -6,8 +6,8 @@ use Controllers\ComponentController;
 
 class ModalComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('modal');
+		parent::__construct('modal', $arguments);
 	}
 }

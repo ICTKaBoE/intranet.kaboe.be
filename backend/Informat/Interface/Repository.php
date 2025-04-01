@@ -2,127 +2,78 @@
 
 namespace Informat\Interface;
 
-use Database\Repository\Setting;
+use Database\Repository\Setting\Setting;
 use GuzzleHttp\Client;
+use stdClass;
+use Informat\Connection;
 use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
+use Ouzo\Utilities\Path;
 
-class Repository
+class Repository extends stdClass
 {
-    public function __construct($endpoint, $schoolyear, $instituteNumber, $object, $idField = 'id', $orderField = 'id', $orderDirection = 'ASC')
+    const METHOD_GET = "GET";
+    const METHOD_POST = "POST";
+
+    const ENDPOINT_EMPLOYEE = "https://personeelsapi.informatsoftware.be/employees/<id>/<extend>";
+    const ENDPOINT_STUDENT = "https://leerlingenapi.informatsoftware.be/<version>/";
+    const ENDPOINT_STUDENT_PREREGISTRATION = self::ENDPOINT_STUDENT . "preregistrations/";
+    const ENDPOINT_STUDENT_REGISTRATIONS = self::ENDPOINT_STUDENT . "registrations/";
+    const ENDPOINT_STUDENT_STUDENTS = self::ENDPOINT_STUDENT . "students/<id>/<extend>";
+
+    public function __construct($endpoint, $object, $extend = null, $apiVersion = 1, $shift = null)
     {
         $this->endpoint = $endpoint;
-        $this->schoolyear = $schoolyear;
-        $this->instituteNumber = $instituteNumber;
         $this->object = $object;
-        $this->idField = $idField;
-        $this->orderField = $orderField;
-        $this->orderDirection = $orderDirection;
-
-        $this->extraGetData = [];
+        $this->extend = $extend;
+        $this->apiVersion = $apiVersion;
+        $this->shift = $shift;
     }
 
-    protected function convertRowsToObject($rows)
+    public function get($instituteNumber, $id = null, $raw = false)
     {
-        $objects = [];
-        foreach ($rows as $row) {
-            try {
-                if (!empty($row)) $objects[] = $this->convertRowToObject($row);
-            } catch (\Exception $e) {
-                die(var_dump($e->getMessage()));
-            }
-        }
-        return $objects;
-    }
+        $endpoint = Path::normalize(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint));
+        $endpoint = Path::normalize(str_replace("<extend>", $this->extend ?: "", $endpoint));
+        $endpoint = Path::normalize(str_replace("<id>", $id ?: "", $endpoint));
 
-    protected function shiftKeyAndValue($rows)
-    {
-        $newRows = [];
-
-        foreach ($rows as $row) {
-            if (Arrays::hasNestedKey($row, [$this->_shiftKeyAndValue])) {
-                $value = Arrays::getValue($row, $this->_shiftKeyAndValue);
-                unset($row[$this->_shiftKeyAndValue]);
-
-                if (count($row) == 1) $row = Arrays::first($row);
-                if (count($row) == 1) $row = Arrays::first($row);
-
-                foreach ($row as $i => $r) {
-                    if (is_array($r)) {
-                        $r[$this->_shiftKeyAndValue] = $value;
-                        $newRows[] = $r;
-                    }
-                }
-            }
-        }
-
-        return $newRows;
-    }
-
-    protected function convertRowToObject($row)
-    {
-        return new $this->object($row);
-    }
-
-    protected function setExtraGetData($key, $value)
-    {
-        $this->extraGetData[$key] = $value;
-    }
-
-    public function setInstituteNumber($instituteNumber)
-    {
-        $this->instituteNumber = $instituteNumber;
-    }
-
-    public function setShiftKeyAndValue($key)
-    {
-        $this->_shiftKeyAndValue = $key;
-    }
-
-    public function get($id = null, $order = true)
-    {
-        $rows = $this->performGet();
-        if ($this->_shiftKeyAndValue) $rows = $this->shiftKeyAndValue($rows);
-
-        if ($order && !is_null($this->orderField)) $rows = Strings::equalsIgnoreCase($this->orderDirection, 'asc') ? Arrays::orderBy($rows, $this->orderField) : array_reverse(Arrays::orderBy($rows, $this->orderField));
-        if (!is_null($id)) $rows = Arrays::filter($rows, fn ($r) => Strings::equal($r[$this->idField], $id));
-
-        return $this->convertRowsToObject($rows);
-    }
-
-    private function performGet()
-    {
-        $settingsRepo = new Setting;
-        $host = rtrim($settingsRepo->get("informat.get.host")[0]->value, "/");
-        $username = trim($settingsRepo->get("informat.username")[0]->value);
-        $password = trim($settingsRepo->get("informat.password")[0]->value);
-
-        $url = $host . "/{$this->endpoint}";
-
-        $query = [
-            'login' => $username,
-            'paswoord' => $password,
-            'schooljaar' => $this->schoolyear,
-            'instelnr' => $this->instituteNumber
+        $requestHeaders = [
+            "InstituteNo" => $instituteNumber
         ];
 
-        foreach ($this->extraGetData as $key => $value) $query[$key] = $value;
-        $url .= "?" . http_build_query($query);
+        $requestQuery = [
+            "schoolyear" => INFORMAT_CURRENT_SCHOOLYEAR,
+            "structure" => Arrays::first((new Setting)->get("informat.structure"))->value
+        ];
 
-        try {
-            $client = new Client();
-            $response = $client->get($url, [
-                'headers' => ['Accept' => 'application/xml'],
-            ]);
+        $result = $this->execute($endpoint, $requestHeaders, $requestQuery);
+        if ($this->shift) $result = $result[$this->shift];
 
-            $body = $response->getBody()->getContents();
-            $xml = simplexml_load_string($body);
-            $json = json_encode($xml);
-            $array = json_decode($json, true);
-
-            return count($array) !== 1 ? $array : Arrays::first($array);
-        } catch (\Exception $e) {
-            echo $e->getMessage() . $e->getTraceAsString();
+        $objects = [];
+        if (!$raw && $result) {
+            foreach ($result as $res) $objects[] = new $this->object($res);
         }
+
+        return $raw ? $result : $objects;
+    }
+
+    private function execute($endpoint, $requestHeaders = [], $requestQueryBody = [], $method = self::METHOD_GET)
+    {
+        if (Connection::init()) {
+            $requestHeaders['Api-Version'] = $this->apiVersion;
+            $requestHeaders["Authorization"] = Connection::GetTokenType() . " " . Connection::GetTokenValue();
+
+            $options = [
+                'headers' => $requestHeaders
+            ];
+            if ($method == self::METHOD_GET) $options['query'] = $requestQueryBody;
+            else $options['body'] = $requestQueryBody;
+
+            $response = (new Client())->request($method, $endpoint, $options);
+
+            if ($response->getStatusCode() == 200) {
+                return json_decode($response->getBody()->getContents(), true);
+            }
+        }
+
+        return false;
     }
 }

@@ -2,27 +2,39 @@
 
 namespace Controllers;
 
-use Database\Repository\Setting;
-use Database\Repository\UserProfile;
-use O365\AuthenticationManager;
+use stdClass;
+use Security\User;
 use Router\Helpers;
+use Security\Session;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Security\User;
+use M365\AuthenticationManager;
+use Database\Repository\Setting\Setting;
+use Database\Repository\Navigation;
+use Database\Repository\Route\Group;
+use Helpers\CString;
 
-class DefaultController
+use function Ramsey\Uuid\v1;
+
+class DefaultController extends stdClass
 {
-	public $layout = "";
+	protected $layout = "";
 
 	const SHORT_TAG = ["meta", "link"];
 	const COMPONENTS = [
 		"footer" => \Controllers\COMPONENT\FooterComponentController::class,
 		"header" => \Controllers\COMPONENT\HeaderComponentController::class,
-		"schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
+		// "schoolheader" => \Controllers\COMPONENT\SchoolHeaderComponentController::class,
 		"modal" => \Controllers\COMPONENT\ModalComponentController::class,
 		"navbar" => \Controllers\COMPONENT\NavbarComponentController::class,
-		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class
+		"navigation" => \Controllers\COMPONENT\NavigationComponentController::class,
+		"pagetitle" => \Controllers\COMPONENT\PageTitleComponentController::class,
+		"actionButtons" => \Controllers\COMPONENT\ActionButtonsComponentController::class,
+		"searchField" => \Controllers\COMPONENT\SearchFieldComponentController::class,
+		"extraPageInfo" => \Controllers\COMPONENT\ExtraPageInfoComponentController::class,
+		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
+		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
 	];
 
 	public function index()
@@ -35,49 +47,82 @@ class DefaultController
 	{
 		$this->createGlobalVariables();
 		$this->storeLayout();
+		$this->storeTheme();
+
 		$this->loadLoad();
-		$this->loadComponents();
 		$this->loadContent();
+		$this->loadExtraContent();
+		$this->loadComponents();
 		$this->loadActions();
 		$this->loadOthers();
+		$this->loadUrlParts();
+		$this->loadUrlParams();
 		$this->loadSettings();
+		$this->loadModuleSettings();
 		$this->loadUserDetails();
 	}
 
 	protected function getLayout()
 	{
-		return $this->layout;
+		return preg_replace("/{{.*?}}/", "", $this->layout);
 	}
 
 	private function createGlobalVariables()
 	{
-		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getPageFolder()));
+		$this->pageId = Strings::underscoreToCamelCase(str_replace("/", "_", Helpers::getDirectory()));
 		$this->pageAction = "";
-
-		if (Strings::equal(Helpers::getMethod(), "add")) $this->pageAction = "toevoegen";
-		else if (Strings::equal(Helpers::getMethod(), "edit")) $this->pageAction = "bewerken";
-		else if (Strings::equal(Helpers::getMethod(), "delete")) $this->pageAction = "verwijderen";
 
 		$this->siteUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost();
 	}
 
 	private function storeLayout()
 	{
-		$overrides = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layoutOverride.json"), true);
+		$layout = json_decode(file_get_contents(LOCATION_BACKEND . "/config/layout.json"), true);
+		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		$route = Helpers::getReletiveUrl();
+		$domain = Helpers::getDomainFolder() ?: "public";
 
 		$file = false;
-		foreach ($overrides as $key => $paths) {
-			if (Arrays::contains($paths, Helpers::getPageFolder())) {
-				$file = $key;
+
+		// Domain
+		foreach ($layout['overwrite'][$domain] as $key => $paths) {
+			if ($key == "_") continue;
+
+			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $url)) {
+				$file = "{$domain}/{$key}";
 				break;
 			}
 		}
 
-		if (!$file) $file = "default";
+		if (!$file && $layout['overwrite'][$domain]['_']) $file = $domain . "/" . $layout['overwrite'][$domain]['_'];
+		if (!$file) $file = $layout['_'];
 
 		ob_start();
 		require_once LOCATION_SHARED . "/layout/{$file}.php";
 		$this->layout = ob_get_clean();
+	}
+
+	private function storeTheme()
+	{
+		$layout = json_decode(file_get_contents(LOCATION_BACKEND . "/config/theme.json"), true);
+		$url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		$route = Helpers::getReletiveUrl();
+		$domain = Helpers::getDomainFolder() ?: "public";
+
+		$theme = false;
+
+		// Domain
+		foreach ($layout['overwrite'][$domain] as $key => $paths) {
+			if (Arrays::contains($paths, $route) || Arrays::contains($paths, $url)) {
+				$theme = $key;
+				break;
+			}
+		}
+
+		if (!$theme && $layout['overwrite'][$domain]['_']) $theme = $layout['overwrite'][$domain]['_'];
+		if (!$theme) $theme = $layout['_'];
+
+		$this->layout = str_replace("{{layout:theme}}", $theme, $this->layout);
 	}
 
 	// Loaders
@@ -91,8 +136,33 @@ class DefaultController
 	private function loadComponents()
 	{
 		foreach (self::COMPONENTS as $component => $controller) {
-			if (Strings::contains($this->layout, "{{component:{$component}}}")) $this->layout = str_replace("{{component:{$component}}}", (new $controller())->write(), $this->layout);
+			if (Strings::contains($this->layout, "{{component:{$component}")) {
+				$argumentList = CString::getStringBetween($this->layout, "{{component:{$component}", "}}");
+				parse_str(str_replace("?", "", $argumentList), $arguments);
+				$this->layout = str_replace("{{component:{$component}{$argumentList}}}", (new $controller($arguments))->write(), $this->layout);
+			}
 		}
+	}
+
+	private function loadExtraContent()
+	{
+		// $extraContent = json_decode(file_get_contents(LOCATION_BACKEND . "/config/extraContent.json"), true);
+		// $url = rtrim(Helpers::request()->getLoadedRoute()->getUrl(), "/");
+		// $route = Helpers::getReletiveUrl();
+		// $domain = Helpers::getDomainFolder() ?: "public";
+		// $_route = explode("/", $route);
+		// $_route[count($_route) - 1] = "*";
+		// $_route = implode("/", $_route);
+
+		// foreach ($extraContent[$domain] as $controller => $paths) {
+		// 	if (Arrays::contains($paths, $route) || Arrays::contains($paths, $_route) || Arrays::contains($paths, $url)) {
+		// 		$layout = (new $controller())->write();
+
+		// 		foreach ($layout as $key => $item) {
+		// 			$this->layout = str_replace($item["pattern"], $item["content"], $this->layout);
+		// 		}
+		// 	}
+		// }
 	}
 
 	private function loadContent()
@@ -104,16 +174,31 @@ class DefaultController
 
 	private function loadActions()
 	{
-		$this->layout = str_replace("{{form:action}}", "{{api:url}}/form" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{calendar:action}}", "{{api:url}}/calendar" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{table:action}}", "{{api:url}}/table" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{select:action}}", "{{api:url}}/select" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{chart:action}}", "{{api:url}}/chart" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{notescreen:action}}", "{{api:url}}/notescreen" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{taskboard:action}}", "{{api:url}}/taskboard" . Helpers::getApiPath(), $this->layout);
-		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(autoRedirect: false), $this->layout);
+		$this->layout = str_replace("{{form:url:short}}", "{{api:url}}/form", $this->layout);
+		$this->layout = str_replace("{{calendar:url:short}}", "{{api:url}}/calendar", $this->layout);
+		$this->layout = str_replace("{{table:url:short}}", "{{api:url}}/table", $this->layout);
+		$this->layout = str_replace("{{select:url:short}}", "{{api:url}}/select", $this->layout);
+		$this->layout = str_replace("{{chart:url:short}}", "{{api:url}}/chart", $this->layout);
+		$this->layout = str_replace("{{notescreen:url:short}}", "{{api:url}}/notescreen", $this->layout);
+		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
+		$this->layout = str_replace("{{list:url:short}}", "{{api:url}}/list", $this->layout);
+		$this->layout = str_replace("{{signage:url:short}}", "{{api:url}}/signage", $this->layout);
 
-		$this->layout = str_replace("{{api:url}}", "{{site:url}}/api/v1.0", $this->layout);
+		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{table:url:full}}", "{{api:url}}/table/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{select:url:full}}", "{{api:url}}/select/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{chart:url:full}}", "{{api:url}}/chart/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{notescreen:url:full}}", "{{api:url}}/notescreen/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{list:url:full}}", "{{api:url}}/list/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{signage:url:full}}", "{{api:url}}/signage/{{url:part.module}}/{{url:part.page}}", $this->layout);
+
+		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(), $this->layout);
+
+		$mode = (new Setting)->get("site.mode")[0]->value;
+		$apiUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . (Strings::equal($mode, "dev") ? "dev." : "") . "api.kaboe.be";
+		$this->layout = str_replace("{{api:url}}", $apiUrl, $this->layout);
 	}
 
 	private function loadOthers()
@@ -125,8 +210,34 @@ class DefaultController
 
 	private function loadSettings()
 	{
-		foreach ($this->getSettings() as $setting) {
-			$this->layout = str_replace('{{' . $setting->id . '}}', $setting->value, $this->layout);
+		foreach ((new Setting)->get(order: false) as $setting) {
+			$this->layout = str_replace('{{setting:' . $setting->id . '}}', $setting->value, $this->layout);
+		}
+	}
+
+	private function loadModuleSettings()
+	{
+		$settings = $this->getModuleSettings();
+
+		if (!$settings) return;
+		foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) {
+			$this->layout = str_replace('{{module:' . $key . '}}', $value, $this->layout);
+		}
+	}
+
+	private function loadUrlParts()
+	{
+		$this->layout = str_replace("{{url:part.module}}", Helpers::getModule() ?? "", $this->layout);
+		$this->layout = str_replace("{{url:part.page}}", Helpers::getPage() ?? "", $this->layout);
+		$this->layout = str_replace("{{url:part.id}}", Helpers::getId() ?? "", $this->layout);
+	}
+
+	private function loadUrlParams()
+	{
+		foreach (Helpers::url()->getParams() as $key => $value) {
+			if (is_array($key) || is_array($value)) continue;
+
+			$this->layout = str_replace("{{url:param.{$key}}}", $value, $this->layout);
 		}
 	}
 
@@ -135,14 +246,8 @@ class DefaultController
 		$user = User::getLoggedInUser();
 		if (!$user) return;
 
-		$profile = (new UserProfile)->getByUserId($user->id);
-
-		foreach ($user as $key => $value) {
-			$this->layout = str_replace("{{user:{$key}}}", $value, $this->layout);
-		}
-
-		foreach ($profile as $key => $value) {
-			$this->layout = str_replace("{{user:profile:{$key}}}", $value, $this->layout);
+		foreach ($user->toArray(true) as $key => $value) {
+			$this->layout = str_replace("{{user:{$key}}}", $value ?? "", $this->layout);
 		}
 	}
 
@@ -154,12 +259,12 @@ class DefaultController
 		$json = Arrays::getValue($json, $position, []);
 
 		$html = "";
+		$fileTags = ["src", "href"];
 
 		foreach ($json as $line) {
 			$isFolder = $line['isFolder'] ?? false;
 
 			if ($isFolder) {
-				die(var_dump(Path::normalize(LOCATION_PUBLIC . "/" . $line['folder'])));
 				$files = array_values(array_diff(scandir(Path::normalize(LOCATION_PUBLIC . "/" . $line['folder'])), ['.', '..']));
 
 				foreach ($files as $file) {
@@ -176,6 +281,10 @@ class DefaultController
 				$html .= "<{$line['tag']}";
 
 				foreach ($line['attributes'] as $key => $value) {
+					if (Arrays::contains($fileTags, $key) && !Strings::startsWith($value, "http")) {
+						$value .= "?" . filemtime(str_replace("{{site:url}}", LOCATION_ROOT, $value));
+					}
+
 					$html .= " {$key}=\"{$value}\"";
 				}
 
@@ -189,19 +298,31 @@ class DefaultController
 
 	private function getContentPage()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/index.php")) {
+		$content = "";
+
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/index.php")) {
 			ob_start();
-			require_once LOCATION_FRONTEND . Helpers::getPageFolder() . "/index.php";
-			return ob_get_clean();
+			require_once LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/index.php";
+			$content = ob_get_clean();
 		}
 
-		return "";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal")) {
+			$modals = array_diff(scandir(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal"), [".", ".."]);
+
+			foreach ($modals as $modal) {
+				ob_start();
+				require_once LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/modal/{$modal}";
+				$content .= ob_get_clean();
+			}
+		}
+
+		return $content;
 	}
 
 	private function getContentPageCss()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/style.css")) {
-			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend" . Helpers::getPageFolder() . "/style.css\" />";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/style.css")) {
+			return "<link rel=\"stylesheet\" href=\"{{site:url}}/frontend/pages" . Helpers::getDirectory() . "/style.css\" />";
 		}
 
 		return "";
@@ -209,8 +330,8 @@ class DefaultController
 
 	private function getContentPageJs()
 	{
-		if (file_exists(LOCATION_FRONTEND . Helpers::getPageFolder() . "/functions.js")) {
-			return "<script type=\"module\" src=\"{{site:url}}/frontend" . Helpers::getPageFolder() . "/functions.js\"></script>";
+		if (file_exists(LOCATION_FRONTEND_PAGES . Helpers::getDirectory() . "/functions.js")) {
+			return "<script type=\"module\" src=\"{{site:url}}/frontend/pages" . Helpers::getDirectory() . "/functions.js\"></script>";
 		}
 
 		return "";
@@ -221,8 +342,17 @@ class DefaultController
 		return Arrays::keyExists(self::SHORT_TAG, $tag);
 	}
 
-	private function getSettings()
+	private function getModuleSettings()
 	{
-		return (new Setting)->get(order: false);
+		$repo = new Navigation;
+		$domain = Helpers::url()->getHost();
+		$routeGroup = (new Group)->getByDomain($domain);
+		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
+		if (!$module) return [];
+
+		Session::set("moduleSettingsId", $module->id);
+		if ($module->settings !== null) $settings = $module->settings;
+
+		return $settings;
 	}
 }

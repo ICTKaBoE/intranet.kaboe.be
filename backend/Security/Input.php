@@ -2,6 +2,7 @@
 
 namespace Security;
 
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 
 abstract class Input
@@ -47,6 +48,7 @@ abstract class Input
 	static public function empty($input)
 	{
 		if (self::check($input, self::INPUT_TYPE_ARRAY)) return empty($input);
+		if (self::check($input, self::INPUT_TYPE_INT) !== false && (int)$input == 0) return false;
 
 		return Strings::isBlank($input) || is_null($input) || empty($input);
 	}
@@ -91,13 +93,10 @@ abstract class Input
 	static public function convertToBool($input)
 	{
 		if (Strings::equal($input, "on")) return true;
-		else if (Strings::equal($input, "off")) return false;
 		else if (Strings::equal($input, "true")) return true;
-		else if (Strings::equal($input, "false")) return false;
 		else if (Strings::equal($input, "1")) return true;
-		else if (Strings::equal($input, "0")) return false;
 
-		return $input;
+		return false;
 	}
 
 	static public function formatInsz($input)
@@ -106,5 +105,75 @@ abstract class Input
 		if (Strings::isBlank($input)) return "";
 
 		return substr($input, 0, 2) . "." . substr($input, 2, 2) . "." . substr($input, 4, 2) . "-" . substr($input, 6, 3) . "." . substr($input, 9, 2);
+	}
+
+	static public function convertArrayToCsv($array, $delimiter = ";")
+	{
+		$csv = "";
+		$array = array_values($array);
+		$keys = $array[0]->getKeys();
+
+		$csv = implode($delimiter, $keys) . PHP_EOL;
+
+		foreach ($array as $row) {
+			$row = (array)$row;
+			$row = Arrays::filterByAllowedKeys($row, $keys);
+
+			$csv .= implode($delimiter, $row) . PHP_EOL;
+		}
+
+		return $csv;
+	}
+
+	static public function clean($input)
+	{
+		$utf8 = array(
+			'/[áàâãªä]/u'   =>   'a',
+			'/[ÁÀÂÃÄ]/u'    =>   'A',
+			'/[ÍÌÎÏ]/u'     =>   'I',
+			'/[íìîï]/u'     =>   'i',
+			'/[éèêë]/u'     =>   'e',
+			'/[ÉÈÊË]/u'     =>   'E',
+			'/[óòôõºö]/u'   =>   'o',
+			'/[ÓÒÔÕÖ]/u'    =>   'O',
+			'/[úùûü]/u'     =>   'u',
+			'/[ÚÙÛÜ]/u'     =>   'U',
+			'/[ç]/'        =>   'c',
+			'/Ç/'           =>   'C',
+			'/ñ/'           =>   'n',
+			'/Ñ/'           =>   'N',
+			'/–/'           =>   '', // UTF-8 hyphen to "normal" hyphen
+			'/-/'           =>   '', // UTF-8 hyphen to "normal" hyphen
+			'/[’‘\'‹›‚]/u'  =>   '', // Literally a single quote
+			'/[“”«»„]/u'    =>   '', // Double quote
+			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)
+		);
+
+		$output = preg_replace(array_keys($utf8), array_values($utf8), $input);
+		$output = str_replace("c̕", "c", $output);
+
+		return $output;
+	}
+
+	static public function createEmail($format, $firstName, $name, $suffix)
+	{
+		$firstName = strtolower(self::clean($firstName));
+		$name = strtolower(self::clean($name));
+
+		$output = $format;
+		$output = str_replace("{{FN}}", $firstName, $output);
+		$output = str_replace("{{LN}}", $name, $output);
+		$output = str_replace("{{SUFFIX}}", $suffix, $output);
+
+		return $output;
+	}
+
+	static public function createDisplayName($format, $firstName, $name)
+	{
+		$output = $format;
+		$output = str_replace("{{FN}}", $firstName, $output);
+		$output = str_replace("{{LN}}", $name, $output);
+
+		return $output;
 	}
 }

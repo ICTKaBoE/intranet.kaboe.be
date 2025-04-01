@@ -4,14 +4,18 @@ namespace Router;
 
 use Pecee\Http\Url;
 use Pecee\Http\Request;
-use Pecee\Http\Response;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Path;
+use Pecee\Http\Response;
+use Security\FileSystem;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
+use Database\Repository\Setting\Setting;
 use Pecee\SimpleRouter\SimpleRouter;
 
 abstract class Helpers
 {
+	static $noAuthRoutes = [];
+
 	static function url(?string $name = null, $parameters = null, ?array $getParams = null): Url
 	{
 		return SimpleRouter::getUrl($name, $parameters, $getParams);
@@ -55,63 +59,46 @@ abstract class Helpers
 		return null;
 	}
 
-	static function getPrefix()
+	static function getReletiveUrl($params = false)
 	{
-		if (!is_null(self::request()->getLoadedRoute())) return self::request()->getLoadedRoute()->getGroup()->getPrefix();
+		return rtrim(self::url()->getRelativeUrl($params), "/");
+	}
 
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return "/" . explode("/", $url)[0];
+	static function getDomainFolder()
+	{
+		$host = self::url()->getHost();
+
+		$mode = (new Setting)->get("site.mode")[0]->value;
+		$mainUrl = (new Setting)->get("site.mainUrl")[0]->value;
+
+		$host = str_replace([$mode, $mainUrl, "."], "", $host);
+
+		return $host;
 	}
 
 	static function getModule()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "module")) return self::request()->getLoadedRoute()->getParameters()['module'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[1] ?? false;
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "module");
 	}
 
 	static function getPage()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "page")) return self::request()->getLoadedRoute()->getParameters()['page'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[2] ?? false;
-	}
-
-	static function getMethod()
-	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "method")) return self::request()->getLoadedRoute()->getParameters()['method'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[3] ?? false;
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "page");
 	}
 
 	static function getId()
 	{
-		if (!is_null(self::request()->getLoadedRoute()) && Arrays::keyExists(self::request()->getLoadedRoute()->getParameters(), "id")) return self::request()->getLoadedRoute()->getParameters()['id'];
-
-		$url = trim(self::url()->getRelativeUrl(false), "/");
-		return explode("/", $url)[4] ?? false;
+		return Arrays::getValue(self::request()->getLoadedRoute()->getParameters(), "id");
 	}
 
-	static function isPublicPage()
+	static function getDirectory()
 	{
-		return Strings::equal(self::getPrefix(), "/public");
+		if (!self::getModule()) return "/" . (self::getDomainFolder() ?: "public") . self::getReletiveUrl();
+		else return "/" . (self::getDomainFolder() ?: "public") . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getId() ? "/form" : "");
 	}
 
 	static function isErrorPage()
 	{
-		return Strings::equal(self::getModule(), 'error');
-	}
-
-	static function getPageFolder()
-	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/form") : ""));
-	}
-
-	static function getApiPath()
-	{
-		return Path::normalize(self::getPrefix() . "/" . self::getModule() . (self::getPage() ? "/" . self::getPage() : "") . (self::getMethod() ? (self::isPublicPage() ? "" : "/" . self::getMethod()) : "") . (self::getId() ? "/" . self::getId() : ""));
+		return Strings::contains(self::getReletiveUrl(), "/error/");
 	}
 }

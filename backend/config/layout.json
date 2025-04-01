@@ -1,0 +1,16 @@
+{
+	"_": "default",
+	"overwrite": {
+		"public": {
+			"nocomponents": ["/error/{code}", "/login"]
+		},
+		"intranet": {
+			"_": "intranet",
+			"minimal": ["/index"]
+		},
+		"extranet": {
+			"_": "extranet",
+			"nocomponents": ["/signage"]
+		}
+	}
+}

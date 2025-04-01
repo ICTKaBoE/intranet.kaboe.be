@@ -4,38 +4,42 @@ namespace Database\Object;
 
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
-use Database\Repository\School;
+use Ouzo\Utilities\Strings;
 use Database\Interface\CustomObject;
+use stdClass;
 
 class Holliday extends CustomObject
 {
-	protected $objectAttributes = [
-		"id",
-		"schoolId",
-		"name",
-		"start",
-		"end",
-		"fullDay",
-		"deleted"
-	];
+    protected $objectAttributes = [
+        "id" => "int",
+        "schoolId" => "int",
+        "name" => "string",
+        "start" => "datetime",
+        "end" => "datetime",
+        "fullDay" => "bool",
+        "deleted" => "bool"
+    ];
 
-	protected $encodeAttributes = [
-		"name"
-	];
+    protected $linkedAttributes = [
+        "school" => ['schoolId' => \Database\Repository\School\School::class]
+    ];
 
-	public function link()
-	{
-		$this->school = ($this->schoolId == 0 ? false : (new School)->get($this->schoolId)[0]);
-		return $this;
-	}
+    public function init()
+    {
+        $this->formatted->start = new stdClass;
+        $this->formatted->end = new stdClass;
 
-	public function init()
-	{
-		$this->fullDay = ($this->fullDay == 1);
+        $this->formatted->start->display = Clock::at($this->start)->format("d/m/Y" . ($this->fullDay ? "" : " H:i"));
+        $this->formatted->start->sort = Clock::at($this->start)->format("u");
 
-		if ($this->fullDay) {
-			$this->start = Arrays::first(explode(" ", $this->start));
-			$this->end = Arrays::first(explode(" ", $this->end));
-		}
-	}
+        $this->formatted->end->display = Clock::at($this->end)->format("d/m/Y" . ($this->fullDay ? "" : " H:i"));
+        $this->formatted->end->sort = Clock::at($this->end)->format("u");
+
+        if ($this->fullDay) {
+            $this->start = Arrays::first(explode(" ", $this->start));
+            $this->end = Arrays::first(explode(" ", $this->end));
+
+            if (!Strings::equal($this->start, $this->end)) $this->end = Clock::at($this->end)->plusDays(1)->format("Y-m-d");
+        }
+    }
 }

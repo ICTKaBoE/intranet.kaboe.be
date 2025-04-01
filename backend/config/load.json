@@ -23,7 +23,15 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.css",
+				"rel": "icon",
+				"type": "image/png",
+				"href": "{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -37,35 +45,42 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-flags.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-flags.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-payments.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-payments.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/tabler-vendors.min.css?1643465883",
+				"href": "{{site:url}}/frontend/shared/ui/css/tabler-vendors.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "{{site:url}}/frontend/shared/ui/css/custom/main.css",
+				"href": "{{site:url}}/frontend/shared/ui/icons/tabler-icons.min.css",
+				"rel": "stylesheet"
+			}
+		},
+		{
+			"tag": "link",
+			"attributes": {
+				"href": "{{site:url}}/frontend/shared/default/css/main.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -82,19 +97,25 @@
 		{
 			"tag": "script",
 			"attributes": {
+				"src": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
 				"src": "{{site:url}}/frontend/shared/ui/libs/tom-select/dist/js/tom-select.complete.min.js"
 			}
 		},
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/main.min.js"
+				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/dist/index.global.js"
 			}
 		},
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/libs/fullcalendar/locales-all.min.js"
+				"src": "{{site:url}}/frontend/shared/default/libs/fullcalendar/packages/core/locales-all.global.min.js"
 			}
 		},
 		{
@@ -124,14 +145,14 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js?1643465883"
+				"src": "{{site:url}}/frontend/shared/ui/js/tabler.min.js"
 			}
 		},
 		{
 			"tag": "script",
 			"attributes": {
 				"type": "module",
-				"src": "{{site:url}}/frontend/shared/ui/js/custom/main.js"
+				"src": "{{site:url}}/frontend/shared/default/js/main.js"
 			}
 		}
 	]

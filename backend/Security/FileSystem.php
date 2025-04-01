@@ -27,9 +27,26 @@ abstract class FileSystem
 	{
 		$path = Path::normalize($path);
 		$path = self::unifyPath($path);
+
 		$path = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . $path;
+		// $path = "https://kaboe.be" . $path;
 
 		return $path;
+	}
+
+	static public function WriteFile($path, $content)
+	{
+		$path = Path::normalize($path);
+		$stream = fopen($path, "wb");
+		$result = fwrite($stream, $content);
+		fclose($stream);
+
+		return ($result !== 0);
+	}
+
+	static public function RemoveFile($path)
+	{
+		return unlink($path);
 	}
 
 	static public function unifyPath($path)
@@ -40,7 +57,8 @@ abstract class FileSystem
 
 	static public function getFiles($path)
 	{
-		return array_values(array_diff(scandir($path), [".", ".."]));
+		if (!self::PathExists($path)) return false;
+		return array_values(array_diff(scandir(Path::normalize($path)), [".", ".."]));
 	}
 
 	static public function getLatestFile($path)

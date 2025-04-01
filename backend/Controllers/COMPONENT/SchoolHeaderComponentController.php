@@ -3,15 +3,15 @@
 namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
-use Database\Repository\School;
+use Database\Repository\School\School;
 use Router\Helpers;
 use Security\User;
 
 class SchoolHeaderComponentController extends ComponentController
 {
-	public function __construct()
+	public function __construct($arguments = [])
 	{
-		parent::__construct('schoolheader');
+		parent::__construct('schoolheader', $arguments);
 		$this->loadSchoolDetails();
 	}
 
@@ -19,8 +19,8 @@ class SchoolHeaderComponentController extends ComponentController
 
 	private function loadSchoolDetails()
 	{
-		$details = (new School)->get(Helpers::request()->getLoadedRoute()->getParameters()['id'])[0];
+		$details = (new School)->get(Helpers::url()->getParam('schoolId'))[0];
 
-		foreach ($details as $key => $value) $this->layout = str_replace("{{school:" . $key . "}}", $value, $this->layout);
+		foreach ($details->toArray() as $key => $value) $this->layout = str_replace("{{school:" . $key . "}}", $value, $this->layout);
 	}
 }

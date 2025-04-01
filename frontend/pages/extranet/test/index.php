@@ -1,0 +1,1 @@
+<iframe width="402" height="346" frameborder="0" scrolling="no" src="https://collegetendoorn.sharepoint.com/sites/KaBoE-ICT-Dienst5/_layouts/15/Doc.aspx?sourcedoc={488085ab-97ac-4ab0-80ba-35b8b78ac167}&action=embedview&wdAllowInteractivity=False&wdHideHeaders=True&wdInConfigurator=True&wdInConfigurator=True"></iframe>

@@ -3,7 +3,9 @@
 namespace Router\Middleware;
 
 use Controllers\API\UserController;
+use Database\Repository\Route\Route;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
 use Pecee\Http\Middleware\IMiddleware;
 use Pecee\Http\Request;
 use Router\Helpers;
@@ -11,27 +13,21 @@ use Security\User;
 
 class ApiMiddleware implements IMiddleware
 {
-	const SKIP_SIGN_IN_CHECK = [
-		"/api/v1.0/user/sync/",
-		"/api/v1.0/app/user/login/",
-		"/api/v1.0/user/o365/callback/",
-		"/api/v1.0/form/app/user/login/",
-		"/api/v1.0/check/student/relation/"
-	];
+    public function handle(Request $request): void
+    {
+        $loadedRoute = Helpers::request()->getLoadedRoute()->getUrl();
+        $route = Arrays::firstOrNull(Arrays::filter((new Route)->get(), fn($r) => Strings::equal($r->formatted->full, $loadedRoute)));
 
-	public function handle(Request $request): void
-	{
-		if (!Arrays::contains(self::SKIP_SIGN_IN_CHECK, Helpers::url()->getRelativeUrl(false))) {
-			if (!User::isSignedIn()) {
-				if (!(new UserController)->login(prefix: null, apiLogin: true)) {
-					Helpers::response()->httpCode(401);
-					Helpers::response()->json(["error" => "You are not authorized!"]);
-				}
-			} else {
-				$request->authenticated = true;
-			}
-		} else {
-			$request->authenticated = true;
-		}
-	}
+        if (!$route) Helpers::response()->httpCode(404)->json(["error" => "Route not found!"]);
+        else {
+            if (!$route->apiNoAuth) {
+                $user = null;
+                if (User::isSignedIn()) $user = User::getLoggedInUser();
+                else $user = UserController::ApiLogin();
+
+                if (!$user) Helpers::response()->httpCode(401)->json(["error" => "You are not authorized!"]);
+                else if (!$user->api) Helpers::response()->httpCode(401)->json(["error" => "You are not able to use the API!"]);
+            }
+        }
+    }
 }
