@@ -1,0 +1,7 @@
+--CREATE
+--RENAME
+--ALTER
+--INSERT
+--UPDATE
+UPDATE tbl_setting SET value=0x342E322E31 WHERE id='site.version';
+--DELETE
