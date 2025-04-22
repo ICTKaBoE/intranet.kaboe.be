@@ -11,12 +11,13 @@
 
                 </div>
 
-                <div class="col-12">
+                <div class="col" id="chbBlockPastEnabled" role="checkbox" data-type="checkbox" data-name="block.past.enabled" data-text="Blokkeer registraties in het verleden"></div>
+                <!-- <div class="col-12">
                     <label class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="block.past.enabled" name="block.past.enabled">
                         <span class="form-check-label">Blokkeer registraties in het verleden</span>
                     </label>
-                </div>
+                </div> -->
 
                 <div class="col-12 mb-3">
                     <select name="block.past.amount" id="block.past.amount">
@@ -61,12 +62,13 @@
 
                 </div>
 
-                <div class="col-12">
+                <div class="col" id="chbBlockFutureEnabled" role="checkbox" data-type="checkbox" data-name="block.future.enabled" data-text="Blokkeer registraties in de toekomst"></div>
+                <!-- <div class="col-12">
                     <label class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="block.future.enabled" name="block.future.enabled">
                         <span class="form-check-label">Blokkeer registraties in de toekomst</span>
                     </label>
-                </div>
+                </div> -->
 
                 <div class="col-12 mb-3">
                     <select name="block.future.amount" id="block.future.amount">

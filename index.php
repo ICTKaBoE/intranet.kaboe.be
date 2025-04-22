@@ -1,7 +1,9 @@
 <?php
 
-use Router\Router;
-
 require_once __DIR__ . "/backend/autoload.php";
+
+Security\Session::accross();
+Security\Session::start();
 Security\Code::errors(false);
-Router::start();
+
+Router\Router::start();

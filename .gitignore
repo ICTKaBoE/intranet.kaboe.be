@@ -1,7 +1,6 @@
 **/downloads
 **/uploads
 **/powershell
-**/backend/vendor
 **/*.old
 **/*.bak
 info.php

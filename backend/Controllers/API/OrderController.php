@@ -20,6 +20,7 @@ use Database\Repository\Order\Order;
 use Database\Repository\Mail\Receiver;
 use Database\Repository\Order\Supplier;
 use Database\Object\Mail\Mail as MailMail;
+use Database\Object\Order\Order as OrderOrder;
 use Database\Object\Order\Line as OrderLine;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Object\Order\Supplier as OrderSupplier;
@@ -433,7 +434,7 @@ class OrderController extends ApiController
         if ($this->validationIsAllGood()) {
             $repo = new Order;
 
-            $item = $id ? Arrays::first($repo->get($id)) : new Order;
+            $item = $id ? Arrays::first($repo->get($id)) : new OrderOrder;
             if (!$item->number) $item->number = $settings['lastNumber'] + 1;
             if (!$id) $item->creatorUserId = User::getLoggedInUser()->id;
             $item->status = $status;
@@ -530,10 +531,14 @@ class OrderController extends ApiController
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $item->status = "QR";
+            $repo->set($item);
+
             $this->mailQuote($item->id);
             $this->setToast("Offerte aangevraagd voor bon #{$item->formatted->number}");
         }
 
+        $this->setReloadTable();
         $this->setCloseModal();
     }
 
@@ -545,10 +550,14 @@ class OrderController extends ApiController
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $item->status = "QA";
+            $repo->set($item);
+
             $this->mailAccept($item->id);
             $this->setToast("Goedkeuring aangevraagd voor bon #{$item->formatted->number}");
         }
 
+        $this->setReloadTable();
         $this->setCloseModal();
     }
 
@@ -559,10 +568,14 @@ class OrderController extends ApiController
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
+            $item->status = "O";
+            $repo->set($item);
+
             $this->mailOrder($item->id);
             $this->setToast("Bestelling geplaatst voor bon #{$item->formatted->number}");
         }
 
+        $this->setReloadTable();
         $this->setCloseModal();
     }
 

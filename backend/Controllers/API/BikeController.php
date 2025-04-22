@@ -231,7 +231,7 @@ class BikeController extends ApiController
         $date = Helpers::input()->post('date')->getValue();
         $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
 
-        if ($settings['block']['past']['enabled']) {
+        if (General::convert($settings['block']['past']['enabled'], 'bool')) {
             $pastDate = Clock::now()->toDateTime();
             if ($settings['block']['past']['amount'] !== 0) $pastDate->modify("-" . $settings['block']['past']['amount']);
             $pastDate = Clock::at($pastDate->format('Y-m-d'));
@@ -241,7 +241,7 @@ class BikeController extends ApiController
             if (Clock::at($date)->isBefore($pastDate)) $this->setToast("U kan geen rit inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
         }
 
-        if ($settings['block']['future']['enabled']) {
+        if (General::convert($settings['block']['future']['enabled'], 'bool')) {
             $futureDate = Clock::now()->toDateTime();
             if ($settings['block']['future']['amount'] !== 0) $futureDate->modify("+" . $settings['block']['future']['amount']);
             $futureDate = Clock::at($futureDate->format('Y-m-d'));
