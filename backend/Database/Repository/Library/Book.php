@@ -13,16 +13,23 @@ class Book extends Repository
 
     public function getByAuthorId($authorId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("authorId", $authorId);
-
+        $statement = $this->prepareSelect(filters: ['authorId' => $authorId]);
         return $this->executeSelect($statement);
     }
 
     public function getByCategoryId($categoryId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("categoryId", $categoryId);
+        $statement = $this->prepareSelect(filters: ['categoryId' => $categoryId]);
+        return $this->executeSelect($statement);
+    }
+
+    public function getBySchoolIdAuthorIdAndCategoryId($schoolId, $authorId, $categoryId)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'schoolId' => $schoolId,
+            'authorId' => $authorId,
+            'categoryId' => $categoryId
+        ]);
 
         return $this->executeSelect($statement);
     }

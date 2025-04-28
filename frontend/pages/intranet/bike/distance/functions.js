@@ -5,14 +5,8 @@ import Select from "../../../../shared/default/js/object/Select.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
-window.changeLocationType = () => {
-	let type = Select.GetInstance("type").getValue();
-	Select.GetInstance("startId").setDetails(type);
-};
-
 window.emptyFilter = () => {
 	Select.GetInstance("type").clear();
-	Select.GetInstance("startId").clear();
 
 	filter();
 };
@@ -21,10 +15,6 @@ window.filter = () => {
 	Table.GetInstance(pageId).addExtraData(
 		"type",
 		Select.GetInstance("type").getValue()
-	);
-	Table.GetInstance(pageId).addExtraData(
-		"startId",
-		Select.GetInstance("startId").getValue()
 	);
 
 	Helpers.closeAllModals();

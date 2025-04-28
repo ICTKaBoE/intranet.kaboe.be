@@ -14,17 +14,13 @@ class IPad extends Repository
 
     public function getBySchoolId($schoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolId', $schoolId);
-
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
 
     public function getByJamfId($jamfId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('jamfId', $jamfId);
-
+        $statement = $this->prepareSelect(filters: ['jamfId' => $jamfId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

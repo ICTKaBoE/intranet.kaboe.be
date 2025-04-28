@@ -122,8 +122,7 @@ class TempregController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
             if (Helpers::url()->getParam("start")) $items = Arrays::filter($items, fn($i) => Clock::at($i->start)->isAfterOrEqualTo(Clock::at(Helpers::url()->getParam("start"))));
             if (Helpers::url()->getParam("end")) $items = Arrays::filter($items, fn($i) => Clock::at($i->end)->isBeforeOrEqualTo(Clock::at(Helpers::url()->getParam("end"))));
 

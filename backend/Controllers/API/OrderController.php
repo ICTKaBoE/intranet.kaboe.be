@@ -125,14 +125,10 @@ class OrderController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -187,14 +183,10 @@ class OrderController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -257,14 +249,10 @@ class OrderController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -312,14 +300,10 @@ class OrderController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -363,14 +347,10 @@ class OrderController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -398,7 +378,7 @@ class OrderController extends ApiController
             else {
                 $items = Arrays::map($quotes, function ($a) use ($order) {
                     $item = new stdClass;
-                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/order/{$order->guid}.pdf"), $a, HTML::LINK_TARGET_BLANK);
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, Strings::startsWith("http", $a) ? $a : FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/order/{$order->guid}.pdf"), $a, HTML::LINK_TARGET_BLANK);
 
                     return $item;
                 });
@@ -441,7 +421,7 @@ class OrderController extends ApiController
             $item->schoolId = $schoolId;
             $item->acceptorUserId = $acceptorUserId;
             $item->supplierId = $supplierId;
-            $item->quoteLink = $quoteLink;
+            $item->quoteLink = $quoteLink || $item->quoteLink;
 
             $newId = $repo->set($item);
             if (!$id) $item->id = $newId;
@@ -550,7 +530,7 @@ class OrderController extends ApiController
 
         foreach ($id as $_id) {
             $item = Arrays::first($repo->get($_id));
-            $item->status = "QA";
+            $item->status = "WA";
             $repo->set($item);
 
             $this->mailAccept($item->id);

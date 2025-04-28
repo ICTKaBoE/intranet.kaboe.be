@@ -18,7 +18,6 @@ $lines = explode(";", $file);
 $lines = Arrays::map($lines, fn($l) => trim($l));
 $lines = Arrays::filterNotBlank($lines);
 $lines = Arrays::map($lines, fn($l) => "{$l};");
-die(var_dump($lines));
 
 $db = Database::getInstance();
 $connection = $db->getConnection();

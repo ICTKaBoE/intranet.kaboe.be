@@ -14,9 +14,7 @@ class Sync extends Repository
 
     public function getByEmployeeId($employeeId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('employeeId', $employeeId);
-
+        $statement = $this->prepareSelect(filters: ['employeeId' => $employeeId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

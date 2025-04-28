@@ -14,17 +14,13 @@ class Room extends Repository
 
     public function getBySchoolId($schoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolId', $schoolId);
-
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
 
     public function getByBuildingId($buildingId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('buildingId', $buildingId);
-
+        $statement = $this->prepareSelect(filters: ['buildingId' => $buildingId]);
         return $this->executeSelect($statement);
     }
 }

@@ -17,13 +17,9 @@ class HollidayController extends ApiController
     protected function getGeneral($view, $id = null)
     {
         $repo = new Holliday;
-        $items = $repo->get($id);
+        $items = $repo->getAfterToday();
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            ];
-
             $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[1, "asc"]]);
             $this->appendToJson(
@@ -56,15 +52,13 @@ class HollidayController extends ApiController
                 ]
             );
 
-            General::filter($items, $filters);
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         }
     }
 
     protected function getSchool($view, $id = null)
     {
         $repo = new Holliday;
-        $items = $repo->get($id);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
@@ -117,8 +111,8 @@ class HollidayController extends ApiController
                 ]
             );
 
-            General::filter($items, $filters);
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
     }
 

@@ -13,9 +13,7 @@ class Line extends Repository
 
     public function getByOrderId($orderId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("orderId", $orderId);
-
+        $statement = $this->prepareSelect(filters: ['orderId' => $orderId]);
         return $this->executeSelect($statement);
     }
 }

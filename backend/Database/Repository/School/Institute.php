@@ -13,17 +13,13 @@ class Institute extends Repository
 
     public function getBySchoolId($schoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolId', $schoolId);
-
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
 
     public function getByInstituteNumber($number)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('number', $number);
-
+        $statement = $this->prepareSelect(filters: ['number' => $number]);
         return $this->executeSelect($statement);
     }
 }

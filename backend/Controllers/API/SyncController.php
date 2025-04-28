@@ -97,8 +97,7 @@ class SyncController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_PS)) {
             $items = $repo->get();

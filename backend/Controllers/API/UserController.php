@@ -126,10 +126,9 @@ class UserController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get();
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
             $items = Arrays::map($items, fn($i) => $i = $i->toArray(true));
-            $this->appendToJson('items', array_values($items));
+            $this->appendToJson('items', $items);
         } else if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);
@@ -158,14 +157,14 @@ class UserController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
+            $items = $repo->get(filters: $filters);
             Arrays::each($items, function ($i) use ($loginRepo) {
                 $lastLogin = $loginRepo->getByUserId($i->id);
                 $lastLogin = Arrays::firstOrNull($lastLogin);
 
                 $i->formatted->lastLogin = $lastLogin ? Clock::at($lastLogin->timestamp)->plusHours(1)->format("d/m/Y H:i:s") . " (" . (Strings::equal($lastLogin->source, "local") ? "Lokaal" : "Office 365") . ")" : null;
             });
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         }
     }
 

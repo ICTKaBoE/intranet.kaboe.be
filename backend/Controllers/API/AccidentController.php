@@ -84,10 +84,9 @@ class AccidentController extends ApiController
                 ]
             );
 
-            $items = $repo->get($id);
-            General::filter($items, $filters);
+            $items = $repo->get($id, filters: $filters);
 
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
     }
@@ -162,10 +161,8 @@ class AccidentController extends ApiController
                 ]
             );
 
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get($id, filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
     }
@@ -314,7 +311,7 @@ class AccidentController extends ApiController
             if (!Input::check($partyOtherFullName) || Input::empty($partyOtherFullName)) $this->setValidation("partyOtherFullName", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($partyOtherFullAddress) || Input::empty($partyOtherFullAddress)) $this->setValidation("partyOtherFullAddress", state: self::VALIDATION_STATE_INVALID);
             if (!Input::check($partyOtherBirthDay) || Input::empty($partyOtherBirthDay)) $this->setValidation("partyOtherBirthDay", state: self::VALIDATION_STATE_INVALID);
-        } else {
+        } else if ($party == "I") {
             if (!Input::check($partyInstallReason) || Input::empty($partyInstallReason)) $this->setValidation("partyInstallReason", state: self::VALIDATION_STATE_INVALID);
         }
 

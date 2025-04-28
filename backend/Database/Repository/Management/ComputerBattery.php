@@ -14,17 +14,16 @@ class ComputerBattery extends Repository
 
     public function getByComputerId($computerId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-
+        $statement = $this->prepareSelect(filters: ['computerId' => $computerId]);
         return $this->executeSelect($statement);
     }
 
     public function getByComputerIdAndBatteryId($computerId, $batteryId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-        $statement->where('batteryId', $batteryId);
+        $statement = $this->prepareSelect(filters: [
+            'computerId' => $computerId,
+            'batteryId' => $batteryId
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

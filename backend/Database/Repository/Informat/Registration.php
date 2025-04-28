@@ -16,32 +16,25 @@ class Registration extends Repository
 
     public function getByInformatId($informatId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
-
+        $statement = $this->prepareSelect(filters: ['informatId' => $informatId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatGuid($informatGuid)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatGuid', $informatGuid);
-
+        $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatStudentId($informatStudentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatStudentId', $informatStudentId);
-
+        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId]);
         return $this->executeSelect($statement);
     }
 
     public function getCurrentByInformatStudentId($informatStudentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatStudentId', $informatStudentId);
+        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId]);
         // $statement->where('status', 0);
         // $statement->where('start', '>=', Clock::nowAsString("Y-m-d"));
         // $statement->whereNotNull('end');
@@ -51,9 +44,7 @@ class Registration extends Repository
 
     public function getBySchoolInstituteId($schoolInstituteId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolInstituteId', $schoolInstituteId);
-
+        $statement = $this->prepareSelect(filters: ['schoolInstituteId' => $schoolInstituteId]);
         return $this->executeSelect($statement);
     }
 }

@@ -14,17 +14,13 @@ class PlaylistItem extends Repository
 
     public function getByPlaylistId($playlistId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("playlistId", $playlistId);
-
+        $statement = $this->prepareSelect(filters: ['playlistId' => $playlistId]);
         return $this->executeSelect($statement);
     }
 
     public function getByMediaId($mediaId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("mediaId", $mediaId);
-
+        $statement = $this->prepareSelect(filters: ['mediaId' => $mediaId]);
         return $this->executeSelect($statement);
     }
 }

@@ -34,6 +34,7 @@ class HelpdeskController extends ApiController
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
+                'creatorUserId' => $currentUserId,
                 'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];
@@ -104,8 +105,7 @@ class HelpdeskController extends ApiController
                 ]
             );
 
-            $items = $repo->getByCreatorUserId($currentUserId);
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
 
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
@@ -193,8 +193,7 @@ class HelpdeskController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
 
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
@@ -207,6 +206,7 @@ class HelpdeskController extends ApiController
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
+                'assignedToUserId' => $currentUserId,
                 'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];
@@ -277,8 +277,7 @@ class HelpdeskController extends ApiController
                 ]
             );
 
-            $items = $repo->getByAssignedToUserId($currentUserId);
-            General::filter($items, $filters);
+            $items = $repo->get(filters: $filters);
 
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));

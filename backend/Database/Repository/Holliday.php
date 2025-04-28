@@ -13,6 +13,14 @@ class Holliday extends Repository
         parent::__construct("tbl_holliday", \Database\Object\Holliday::class, orderField: 'start', guidField: false);
     }
 
+    public function getAfterToday()
+    {
+        $statement = $this->prepareSelect();
+        $statement->where("start", ">=", Clock::nowAsString("Y-m-d"));
+
+        return $this->executeSelect($statement);
+    }
+
     public function dateContainsHolliday($date)
     {
         $date = Clock::at($date);

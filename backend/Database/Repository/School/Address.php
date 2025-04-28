@@ -13,9 +13,7 @@ class Address extends Repository
 
     public function getBySchoolId($schoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolId', $schoolId);
-
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
 }

@@ -15,33 +15,30 @@ class ComputerUsageLogOn extends Repository
 
     public function getByComputerId($computerId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-
+        $statement = $this->prepareSelect(filters: ['computerId' => $computerId]);
         return $this->executeSelect($statement);
     }
 
     public function getByComputerIdAndLogon($computerId, $logon)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-        $statement->where('logon', $logon);
+        $statement = $this->prepareSelect(filters: [
+            'computerId' => $computerId,
+            'logon' => $logon
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByComputerIdAndLogonBetweenStartupAndShutdown($computerId, $startup, $shutdown)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-
+        $statement = $this->prepareSelect(filters: ['computerId' => $computerId]);
         $items = $this->executeSelect($statement);
 
         $items = Arrays::filter($items, fn($i) => Clock::at($i->logon)->isAfterOrEqualTo(Clock::at($startup)));
-        
+
         if ($items) {
             if (is_null($shutdown)) $items = Arrays::filter($items, fn($i) => Clock::at($i->logon)->isAfter(Clock::at($startup)));
-            else $items = Arrays::filter($items, fn ($i) =>  Clock::at($i->logon)->isBeforeOrEqualTo(Clock::at($shutdown)));
+            else $items = Arrays::filter($items, fn($i) =>  Clock::at($i->logon)->isBeforeOrEqualTo(Clock::at($shutdown)));
         }
 
         return $items;

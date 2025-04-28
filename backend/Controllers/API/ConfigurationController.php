@@ -90,7 +90,7 @@ class ConfigurationController extends ApiController
             );
 
             $items = $repo->get();
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $group = Arrays::firstOrNull($repo->get($id));
             $this->appendToJson('fields', $group);
@@ -171,7 +171,7 @@ class ConfigurationController extends ApiController
             );
 
             $items = $repo->get();
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));

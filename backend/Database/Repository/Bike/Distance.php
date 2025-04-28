@@ -13,17 +13,19 @@ class Distance extends Repository
 
     public function getByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getByUserIdAndType($userId, $type)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-        $statement->where('type', $type);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'type' => $type
+        ]);
 
         return $this->executeSelect($statement);
     }

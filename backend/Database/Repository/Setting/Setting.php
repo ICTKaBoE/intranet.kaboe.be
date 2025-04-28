@@ -13,9 +13,7 @@ class Setting extends Repository
 
     public function getBySettingTabId($settingTabId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('settingTabId', $settingTabId);
-
+        $statement = $this->prepareSelect(filters: ['settingTabId' => $settingTabId]);
         return $this->executeSelect($statement);
     }
 }

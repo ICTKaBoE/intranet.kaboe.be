@@ -13,9 +13,7 @@ class LoginHistory extends Repository
 
     public function getByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-
+        $statement = $this->prepareSelect(filters: ['userId' => $userId]);
         return $this->executeSelect($statement);
     }
 }

@@ -13,10 +13,7 @@ class GeneralMessage extends Repository
 
     public function getByNavigationId($navigationId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('navigationId', $navigationId);
-        $statement->orWhere('navigationId', 0);
-
+        $statement = $this->prepareSelect(filters: ['navigationId' => [$navigationId, 0]]);
         return $this->executeSelect($statement);
     }
 }

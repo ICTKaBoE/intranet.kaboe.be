@@ -14,17 +14,13 @@ class StudentNumber extends Repository
 
     public function getByInformatStudentId($informatStudentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatStudentId', $informatStudentId);
-
+        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId]);
         return $this->executeSelect($statement);
     }
 
     public function getByInformatId($informatId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
-
+        $statement = $this->prepareSelect(filters: ['informatId' => $informatId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

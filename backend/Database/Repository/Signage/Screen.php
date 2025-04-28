@@ -14,9 +14,7 @@ class Screen extends Repository
 
     public function getByCode($code)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("code", $code);
-
+        $statement = $this->prepareSelect(filters: ['code' => $code]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

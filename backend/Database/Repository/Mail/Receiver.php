@@ -13,9 +13,7 @@ class Receiver extends Repository
 
     public function getByMailId($mailId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('mailId', $mailId);
-
+        $statement = $this->prepareSelect(filters: ['mailId' => $mailId]);
         return $this->executeSelect($statement);
     }
 }

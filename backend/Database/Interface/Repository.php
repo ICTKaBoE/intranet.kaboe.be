@@ -24,7 +24,7 @@ class Repository extends stdClass
         $this->repoTable = $this->db->getBuilder()->table($this->table);
     }
 
-    protected function prepareSelect($id = null, $order = true, $deleted = false)
+    protected function prepareSelect($id = null, $order = true, $deleted = false, $filters = [])
     {
         $statement = $this->repoTable->select();
         if (!is_null($id)) {
@@ -33,8 +33,15 @@ class Repository extends stdClass
                 else $statement->where($this->idField, $id);
             } else $statement->where($this->idField, $id);
         }
+
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");
         if ($order && $this->orderField) $statement->orderBy($this->orderField, $this->orderDirection);
+
+        foreach ($filters as $key => $value) {
+            if (is_null($value)) continue;
+            if (!is_array($value)) $value = [$value];
+            $statement->whereIn($key, $value);
+        }
 
         return $statement;
     }
@@ -49,9 +56,9 @@ class Repository extends stdClass
         return $objects;
     }
 
-    public function get($id = null, $order = true, $deleted = false)
+    public function get($id = null, $order = true, $deleted = false, $filters = [])
     {
-        $statement = $this->prepareSelect($id, $order, $deleted);
+        $statement = $this->prepareSelect($id, $order, $deleted, $filters);
         return $this->executeSelect($statement);
     }
 

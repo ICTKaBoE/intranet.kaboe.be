@@ -7,6 +7,8 @@ import Component from "../../../../shared/default/js/object/Component.js";
 
 window.emptyFilter = () => {
 	Select.GetInstance("schoolId").clear();
+	Select.GetInstance("authorId").clear();
+	Select.GetInstance("categoryId").clear();
 
 	filter();
 };
@@ -15,6 +17,14 @@ window.filter = () => {
 	Table.GetInstance(pageId).addExtraData(
 		"schoolId",
 		Select.GetInstance("schoolId").getValue()
+	);
+	Table.GetInstance(pageId).addExtraData(
+		"authorId",
+		Select.GetInstance("authorId").getValue()
+	);
+	Table.GetInstance(pageId).addExtraData(
+		"categoryId",
+		Select.GetInstance("categoryId").getValue()
 	);
 
 	Helpers.closeAllModals();

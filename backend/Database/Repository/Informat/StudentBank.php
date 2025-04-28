@@ -14,17 +14,16 @@ class StudentBank extends Repository
 
     public function getByInformatStudentId($informatStudentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatStudentId', $informatStudentId);
-
+        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId]);
         return $this->executeSelect($statement);
     }
 
     public function getByInformatStudentIdAndIban($informatStudentId, $iban)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatStudentId', $informatStudentId);
-        $statement->where('iban', $iban);
+        $statement = $this->prepareSelect(filters: [
+            'informatStudentId' => $informatStudentId,
+            'iban' => $iban
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

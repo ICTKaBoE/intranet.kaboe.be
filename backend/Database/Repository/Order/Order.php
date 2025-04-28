@@ -13,9 +13,7 @@ class Order extends Repository
 
     public function getBySupplierId($supplierId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("supplierId", $supplierId);
-
+        $statement = $this->prepareSelect(filters: ['supplierId' => $supplierId]);
         return $this->executeSelect($statement);
     }
 }

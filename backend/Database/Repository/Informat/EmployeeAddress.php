@@ -14,17 +14,13 @@ class EmployeeAddress extends Repository
 
     public function getByInformatEmployeeId($informatEmployeeId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatEmployeeId', $informatEmployeeId);
-
+        $statement = $this->prepareSelect(filters: ['informatEmployeeId' => $informatEmployeeId]);
         return $this->executeSelect($statement);
     }
 
     public function getByInformatGuid($informatGuid)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatGuid', $informatGuid);
-
+        $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

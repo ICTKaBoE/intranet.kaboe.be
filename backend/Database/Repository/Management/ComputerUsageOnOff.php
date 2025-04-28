@@ -14,17 +14,16 @@ class ComputerUsageOnOff extends Repository
 
     public function getByComputerId($computerId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-
+        $statement = $this->prepareSelect(filters: ['computerId' => $computerId]);
         return $this->executeSelect($statement);
     }
 
     public function getByComputerIdAndStartup($computerId, $startup)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('computerId', $computerId);
-        $statement->where('startup', $startup);
+        $statement = $this->prepareSelect(filters: [
+            'computerId' => $computerId,
+            'startup' => $startup
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

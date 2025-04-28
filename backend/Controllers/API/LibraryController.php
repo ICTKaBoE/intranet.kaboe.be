@@ -27,7 +27,6 @@ class LibraryController extends ApiController
     protected function getAuthor($view, $id = null)
     {
         $repo = new Author;
-        $filters = [];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
@@ -50,13 +49,9 @@ class LibraryController extends ApiController
             );
 
             $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
-            General::filter($items, $filters);
-
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -64,7 +59,6 @@ class LibraryController extends ApiController
     protected function getCategory($view, $id = null)
     {
         $repo = new Category;
-        $filters = [];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", true);
@@ -87,13 +81,9 @@ class LibraryController extends ApiController
             );
 
             $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
-            General::filter($items, $filters);
-
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -154,14 +144,10 @@ class LibraryController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get();
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -170,7 +156,6 @@ class LibraryController extends ApiController
     {
         $book = Arrays::firstOrNull((new Book)->get($id));
         $repo = new BookHistory;
-        $filters = [];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $this->appendToJson("checkbox", false);
@@ -219,13 +204,9 @@ class LibraryController extends ApiController
             );
 
             $items = $repo->getByBookId($book->id);
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
-            General::filter($items, $filters);
-
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }

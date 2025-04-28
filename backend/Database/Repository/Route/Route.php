@@ -13,9 +13,7 @@ class Route extends Repository
 
     public function getByRouteGroupId($routeGroupId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('routeGroupId', $routeGroupId);
-
+        $statement = $this->prepareSelect(filters: ['routeGroupId' => $routeGroupId]);
         return $this->executeSelect($statement);
     }
 }

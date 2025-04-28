@@ -12,19 +12,21 @@ class Employee extends Repository
         parent::__construct("tbl_informat_employee", \Database\Object\Informat\Employee::class, orderField: 'name', deletedField: false, guidField: 'informatGuid');
     }
 
+    public function getActive()
+    {
+        $statement = $this->prepareSelect(filters: ['active' => true]);
+        return $this->executeSelect($statement);
+    }
+
     public function getByInformatId($informatId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
-
+        $statement = $this->prepareSelect(filters: ['informatId' => $informatId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatGuid($informatGuid)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatGuid', $informatGuid);
-
+        $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

@@ -14,25 +14,19 @@ class Computer extends Repository
 
     public function getByEntraId($entraId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('entraId', $entraId);
-
+        $statement = $this->prepareSelect(filters: ['entraId' => $entraId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByName($name)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('name', $name);
-
+        $statement = $this->prepareSelect(filters: ['name' => $name]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getBySchoolId($schoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolId', $schoolId);
-
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
 }

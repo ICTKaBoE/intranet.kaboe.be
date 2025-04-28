@@ -38,8 +38,8 @@ class Computer extends CustomObject
         $this->formatted->os = "{$this->osType} {$this->osVersion}";
         $this->formatted->manModel = "{$this->manufacturer} {$this->model}";
 
-        $this->getBatteries();
-        $this->getLastUsage();
+        // $this->getBatteries();
+        // $this->getLastUsage();
     }
 
     private function getBatteries()

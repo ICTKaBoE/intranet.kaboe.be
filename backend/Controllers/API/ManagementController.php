@@ -106,29 +106,23 @@ class ManagementController extends ApiController
                         "data" => "formatted.os",
                         "width" => "200px"
                     ],
-                    [
-                        "title" => "Laatst gebruikt",
-                        "data" => "formatted.lastUsage",
-                        "width" => "300px"
-                    ],
-                    [
-                        "title" => HTML::Icon("battery", "Batterij Capaciteit"),
-                        "data" => "formatted.badge.capacity",
-                        "width" => "10px"
-                    ]
+                    // [
+                    //     "title" => "Laatst gebruikt",
+                    //     "data" => "formatted.lastUsage",
+                    //     "width" => "300px"
+                    // ],
+                    // [
+                    //     "title" => HTML::Icon("battery", "Batterij Capaciteit"),
+                    //     "data" => "formatted.badge.capacity",
+                    //     "width" => "10px"
+                    // ]
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
@@ -268,16 +262,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -332,16 +320,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -397,16 +379,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -414,15 +390,14 @@ class ManagementController extends ApiController
     protected function getPatchpanel($view, $id = null)
     {
         $repo = new Patchpanel;
+        $filters = [
+            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
+            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
+            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
+            'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
+        ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-                'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-                'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-                'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
-            ];
-
             $this->appendToJson("checkbox", true);
             $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
             $this->appendToJson(
@@ -474,18 +449,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $cabinetId = Helpers::url()->getParam('cabinetId');
-            $items = $repo->get($id);
-
-            if ($cabinetId) $items = Arrays::filter($items, fn($i) => Strings::equal($i->cabinetId, $cabinetId));
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -567,16 +534,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -663,16 +624,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -748,16 +703,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -822,16 +771,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
@@ -896,16 +839,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
@@ -982,16 +919,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
@@ -1077,16 +1008,10 @@ class ManagementController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-            $items = array_values($items);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }

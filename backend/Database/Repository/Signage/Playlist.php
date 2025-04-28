@@ -14,9 +14,10 @@ class Playlist extends Repository
 
     public function getByAssignedToAndAssignedToId($assignedTo, $assignedToId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("assignedTo", $assignedTo);
-        $statement->where("assignedToId", $assignedToId);
+        $statement = $this->prepareSelect(filters: [
+            'assignedTo' => $assignedTo,
+            'assignedToId' => $assignedToId
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

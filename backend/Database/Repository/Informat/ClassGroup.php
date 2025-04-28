@@ -14,32 +14,43 @@ class ClassGroup extends Repository
 
     public function getByInformatId($informatId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatId', $informatId);
+        $statement = $this->prepareSelect(filters: [
+            'informatId' => $informatId
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatGuid($informatGuid)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatGuid', $informatGuid);
+        $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getBySchoolInstituteId($schoolInstituteId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolInstituteId', $schoolInstituteId);
+        $statement = $this->prepareSelect(filters: ['schoolInstituteId' => $schoolInstituteId]);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getBySchoolInstituteIdSchoolyearAndType($schoolInstituteId, $schoolyear, $type)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'schoolInstituteId' => $schoolInstituteId,
+            'schoolyear' => $schoolyear,
+            'type' => $type
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getBySchoolyear($schoolyear)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('schoolyear', $schoolyear);
+        $statement = $this->prepareSelect(filters: [
+            'schoolyear' => $schoolyear
+        ]);
 
         return $this->executeSelect($statement);
     }

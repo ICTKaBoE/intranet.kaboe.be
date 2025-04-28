@@ -57,3 +57,7 @@ div.dt-paging .pagination {
 td:first-child {
   white-space: nowrap;
 }
+
+.dropdown-menu.ts-dropdown .ts-dropdown-content .optgroup .dropdown-item {
+  padding-left: 2rem;
+}

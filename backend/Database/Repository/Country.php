@@ -14,25 +14,19 @@ class Country extends Repository
 
     public function getByAlpha2Code($alpha2Code)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('alpha2Code', $alpha2Code);
-
+        $statement = $this->prepareSelect(filters: ['alpha2Code' => $alpha2Code]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByAlpha3Code($alpha3Code)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('alpha3Code', $alpha3Code);
-
+        $statement = $this->prepareSelect(filters: ['alpha3Code' => $alpha3Code]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByNisCode($nisCode)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('nisCode', $nisCode);
-
+        $statement = $this->prepareSelect(filters: ['nisCode' => $nisCode]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

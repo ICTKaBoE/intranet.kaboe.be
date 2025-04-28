@@ -16,36 +16,29 @@ class RegistrationClass extends Repository
 
     public function getByInformatGuid($informatGuid)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatGuid', $informatGuid);
-
+        $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatRegistrationId($informatRegistrationId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatRegistrationId', $informatRegistrationId);
-
+        $statement = $this->prepareSelect(filters: ['informatRegistrationId' => $informatRegistrationId]);
         return $this->executeSelect($statement);
     }
 
     public function getCurrentByInformatRegistrationId($informatRegistrationId)
     {
 
-        $statement = $this->prepareSelect();
-        $statement->where('informatRegistrationId', $informatRegistrationId);
-        $statement->where('start', '<=', Clock::nowAsString("Y-m-d"));
-        $statement->whereNotNull('end');
+        $statement = $this->prepareSelect(filters: ['informatRegistrationId', $informatRegistrationId])
+            ->where('start', '<=', Clock::nowAsString("Y-m-d"))
+            ->whereNotNull('end');
 
         return $this->executeSelect($statement);
     }
 
     public function getByInformatClassgroupId($informatClassgroupId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatClassgroupId', $informatClassgroupId);
-
+        $statement = $this->prepareSelect(filters: ['informatClassgroupId' => $informatClassgroupId]);
         return $this->executeSelect($statement);
     }
 }

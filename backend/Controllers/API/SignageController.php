@@ -81,14 +81,10 @@ class SignageController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -175,14 +171,10 @@ class SignageController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -221,14 +213,10 @@ class SignageController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }
@@ -277,14 +265,10 @@ class SignageController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
     }

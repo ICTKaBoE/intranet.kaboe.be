@@ -50,14 +50,10 @@ class InformatController extends ApiController
                 ]
             );
 
-            $items = $repo->get();
-            General::filter($items, $filters);
-
-            $this->appendToJson("rows", array_values($items));
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get($id);
-            General::filter($items, $filters);
-
+            $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
@@ -70,14 +66,18 @@ class InformatController extends ApiController
 
         $subgroups = [];
         foreach ($institutes as $institute) {
-            $sgs = $repo->getBySchoolInstituteId($institute->id);
+            $filters = [
+                'schoolInstituteId' => $institute->id,
+                'schoolyear' => INFORMAT_CURRENT_SCHOOLYEAR,
+                'type' => "C"
+            ];
+            $sgs = $repo->get(filters: $filters);
 
             foreach ($sgs as $sg) $subgroups[] = $sg;
         }
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = Arrays::orderBy($subgroups, "code");
-            General::filter($items, ['schoolyear' => INFORMAT_CURRENT_SCHOOLYEAR, 'type' => "C"]);
             $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }

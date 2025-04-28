@@ -14,26 +14,23 @@ class Address extends Repository
 
     public function getCurrentByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-        $statement->where('current', 1);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'current' => true
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-
+        $statement = $this->prepareSelect(filters: ['userId' => $userId]);
         return $this->executeSelect($statement);
     }
 
     public function getByInformatEmployeeAddressId($informatEmployeeAddressId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatEmployeeAddressId', $informatEmployeeAddressId);
-
+        $statement = $this->prepareSelect(filters: ['informatEmployeeAddressId' => $informatEmployeeAddressId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

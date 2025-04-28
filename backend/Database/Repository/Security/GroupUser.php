@@ -14,25 +14,22 @@ class GroupUser extends Repository
 
     public function getByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-
+        $statement = $this->prepareSelect(filters: ['userId' => $userId]);
         return $this->executeSelect($statement);
     }
 
     public function getBySecurityGroupId($securityGroupId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('securityGroupId', $securityGroupId);
-
+        $statement = $this->prepareSelect(filters: ['securityGroupId' => $securityGroupId]);
         return $this->executeSelect($statement);
     }
 
     public function getBySecurityGroupIdAndUserId($securityGroupId, $userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('securityGroupId', $securityGroupId);
-        $statement->where('userId', $userId);
+        $statement = $this->prepareSelect(filters: [
+            'securityGroupId' => $securityGroupId,
+            'userId' => $userId
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

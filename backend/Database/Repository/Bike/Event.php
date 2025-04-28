@@ -14,52 +14,82 @@ class Event extends Repository
 
     public function getByUserMainSchoolId($userMainSchoolId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userMainSchoolId', $userMainSchoolId);
+        $statement = $this->prepareSelect(filters: [
+            'userMainSchoolId' => $userMainSchoolId
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getByBikeDistanceId($bikeDistanceId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('bikeDistanceId', $bikeDistanceId);
+        $statement = $this->prepareSelect(filters: [
+            'bikeDistanceId' => $bikeDistanceId
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getByUserMainSchoolIdAndType($userMainSchoolId, $type)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userMainSchoolId', $userMainSchoolId);
-        $statement->where('type', $type);
+        $statement = $this->prepareSelect(filters: [
+            'userMainSchoolId' => $userMainSchoolId,
+            'type' => $type
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getByUserId($userId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId
+        ]);
 
         return $this->executeSelect($statement);
     }
 
     public function getByUserIdAndType($userId, $type)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-        $statement->where('type', $type);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'type' => $type
+        ]);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getByUserIdAndTypeDistanceMoreThenZero($userId, $type)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'type' => $type
+        ])
+            ->where('distance', '>', 0);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getByUserIdAndTypeDistanceMoreThenZeroBetweenDates($userId, $type, $start, $end)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'type' => $type
+        ])
+            ->where('distance', '>', 0)
+            ->where('date', '>=', $start)
+            ->where('date', '<=', $end);
 
         return $this->executeSelect($statement);
     }
 
     public function getByUserIdTypeAndDate($userId, $type, $date)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('userId', $userId);
-        $statement->where('type', $type);
-        $statement->where('date', $date);
+        $statement = $this->prepareSelect(filters: [
+            'userId' => $userId,
+            'type' => $type,
+            'date' => $date
+        ]);
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }

@@ -14,9 +14,10 @@ class Navigation extends Repository
 
     public function getByRouteGroupIdParentIdAndLink($routeGroupId, $parentId, $link)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('parentId', $parentId);
-        $statement->where('link', $link);
+        $statement = $this->prepareSelect(filters: [
+            'parentId' => $parentId,
+            'link' => $link
+        ]);
 
         $items = $this->executeSelect($statement);
         return Arrays::filter($items, fn($i) => Arrays::contains(explode(",", $i->routeGroupId), $routeGroupId));
@@ -24,34 +25,29 @@ class Navigation extends Repository
 
     public function getByRouteGroupIdAndParentId($routeGroupId, $parentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('parentId', $parentId);
-
+        $statement = $this->prepareSelect(filters: ['parentId' => $parentId]);
         $items = $this->executeSelect($statement);
         return Arrays::filter($items, fn($i) => Arrays::contains(explode(",", $i->routeGroupId), $routeGroupId));
     }
 
     public function getByParentId($parentId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('parentId', $parentId);
-
+        $statement = $this->prepareSelect(filters: ['parentId' => $parentId]);
         return $this->executeSelect($statement);
     }
 
     public function getByLink($link)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('link', $link);
-
+        $statement = $this->prepareSelect(filters: ['link' => $link]);
         return $this->executeSelect($statement);
     }
 
     public function getByParentIdAndLink($parentId, $link)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('parentId', $parentId);
-        $statement->where('link', $link);
+        $statement = $this->prepareSelect(filters: [
+            'parentId' => $parentId,
+            'link' => $link
+        ]);
 
         return $this->executeSelect($statement);
     }

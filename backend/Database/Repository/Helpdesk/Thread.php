@@ -13,8 +13,9 @@ class Thread extends Repository
 
     public function getByTicketId($ticketId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('ticketId', $ticketId);
+        $statement = $this->prepareSelect(filters: [
+            'ticketId' => $ticketId
+        ]);
 
         return $this->executeSelect($statement);
     }

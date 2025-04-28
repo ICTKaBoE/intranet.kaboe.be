@@ -47,8 +47,8 @@ class BikeController extends ApiController
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [
-                'type' => Helpers::url()->getParam("type"),
-                'startId' => Helpers::url()->getParam('startId')
+                'userId' => $currentUserId,
+                'type' => Helpers::url()->getParam("type")
             ];
 
             $this->appendToJson("checkbox", true);
@@ -101,10 +101,8 @@ class BikeController extends ApiController
                 ]
             );
 
-            $distances = $repo->getByUserId($currentUserId);
-            General::filter($distances, $filters);
-
-            $this->appendToJson("rows", array_values($distances));
+            $distances = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $distances);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
         else if (Strings::equal($view, self::VIEW_LIST)) {
@@ -135,21 +133,19 @@ class BikeController extends ApiController
         $currentUserId = User::getLoggedInUser()->id;
 
         if (Strings::equal($view, self::VIEW_CALENDAR)) {
-            $items = $repo->getByUserIdAndType($currentUserId, $type);
-            $items = Arrays::filter($items, fn($i) => $i->distance > 0);
+            $items = $repo->getByUserIdAndTypeDistanceMoreThenZero($currentUserId, $type);
+            // $items = Arrays::filter($items, fn($i) => $i->distance > 0);
 
-            foreach ($items as $event) {
-                $this->appendToJson(data: [
-                    "start" => $event->date,
-                    "title" => "{$event->alias} ({$event->formatted->distance})",
-                    "display" => "background",
-                    "classNames" => [
-                        "bg-{$event->color}",
-                        "text-{$event->textColor}"
-                    ],
-                    "allDay" => true,
-                ]);
-            }
+            Arrays::each($items, fn($i) => $this->appendToJson(data: [
+                "start" => $i->date,
+                "title" => "{$i->alias} ({$i->formatted->distance})",
+                "display" => "background",
+                "classNames" => [
+                    "bg-{$i->color}",
+                    "text-{$i->textColor}"
+                ],
+                "allDay" => true,
+            ]));
         }
     }
 
@@ -285,7 +281,6 @@ class BikeController extends ApiController
             $item->color = $distance->color;
             $item->userMainSchoolId = User::getLoggedInUser()->mainSchoolId;
             $item->pricePerKm = (new Price)->getBetween($date)->amount;
-
             $repo->set($item);
             if ($distance == null) $this->setToast("Rit op datum {$rDate} verwijderd!");
             else $this->setToast("Rit '{$distance->alias} ({$distance->formatted->distance})' op datum {$rDate} opgeslagen!");
@@ -878,7 +873,7 @@ class BikeController extends ApiController
             $address = $userAddressRepo->getCurrentByUserId($user->id);
             $eventsGrouped[$user->username]['address'] = $address;
 
-            $events = $eventRepo->getByUserIdAndType($user->id, $type);
+            $events = $eventRepo->getByUserIdAndTypeDistanceMoreThenZeroBetweenDates($user->id, $type, $start, $end);
 
             $events = Arrays::filter($events, fn($e) => Clock::at($e->date)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->date)->isBeforeOrEqualTo(Clock::at($end)));
             $events = Arrays::filter($events, fn($e) => !is_null($e->distance) && !Strings::equal($e->distance, 0));

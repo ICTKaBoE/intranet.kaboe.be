@@ -14,25 +14,19 @@ class User extends Repository
 
     public function getByUsername($username)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('username', $username);
-
+        $statement = $this->prepareSelect(filters: ['username' => $username]);
         return $this->executeSelect($statement);
     }
 
     public function getByEntraId($entraId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('entraId', $entraId);
-
+        $statement = $this->prepareSelect(filters: ['entraId' => $entraId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getByInformatEmployeeId($informatEmployeeId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('informatEmployeeId', $informatEmployeeId);
-
+        $statement = $this->prepareSelect(filters: ['informatEmployeeId' => $informatEmployeeId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

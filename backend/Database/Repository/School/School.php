@@ -14,9 +14,7 @@ class School extends Repository
 
     public function getByName($name)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('name', $name);
-
+        $statement = $this->prepareSelect(filters: ['name' => $name]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

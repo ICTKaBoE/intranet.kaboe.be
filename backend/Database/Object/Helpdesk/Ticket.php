@@ -107,15 +107,15 @@ class Ticket extends CustomObject
 
     private function createLastActivity()
     {
-        $laage = Clock::at($this->lastActionDateTime)->toDateTime()->diff(Clock::now()->toDateTime());
-        if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0 && $laage->h == 0 && $laage->i == 0) $this->laage = $laage->s . " seconden";
-        else if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0 && $laage->h == 0) $this->laage = $laage->i . " minuten";
-        else if ($laage->y == 0 && $laage->m == 0 && $laage->d == 0) $this->laage = $laage->h . " uren";
-        else if ($laage->y == 0 && $laage->m == 0) $this->laage = $laage->d . " dagen";
-        else if ($laage->y == 0) $this->laage = $laage->m . " maanden";
+        $la = Clock::at($this->lastActionDateTime)->toDateTime()->diff(Clock::now()->toDateTime());
+        if ($la->y == 0 && $la->m == 0 && $la->d == 0 && $la->h == 0 && $la->i == 0) $this->la = $la->s . " seconden";
+        else if ($la->y == 0 && $la->m == 0 && $la->d == 0 && $la->h == 0) $this->la = $la->i . " minuten";
+        else if ($la->y == 0 && $la->m == 0 && $la->d == 0) $this->la = $la->h . " uren";
+        else if ($la->y == 0 && $la->m == 0) $this->la = $la->d . " dagen";
+        else if ($la->y == 0) $this->la = $la->m . " maanden";
 
         $this->formatted->lastActivity = new stdClass;
-        $this->formatted->lastActivity->display = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s") . " ({$this->laage} geleden)";
+        $this->formatted->lastActivity->display = Clock::at($this->lastActionDateTime)->format("d/m/Y H:i:s") . " ({$this->la} geleden)";
         $this->formatted->lastActivity->sort = Clock::at($this->lastActionDateTime)->format("U");
     }
 }

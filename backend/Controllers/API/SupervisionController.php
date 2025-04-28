@@ -36,18 +36,21 @@ class SupervisionController extends ApiController
         if (Strings::equal($view, self::VIEW_CALENDAR)) {
             $items = $repo->getByUserId($currentUserId);
 
-            foreach ($items as $event) {
+            // foreach ($items as $event) {
+            Arrays::each(
+                $items,
+                fn($i) =>
                 $this->appendToJson(data: [
-                    "id" => $event->id,
-                    "start" => $event->start,
-                    "end" => $event->end,
-                    "backgroundColor" => $event->linked->school->color,
-                    "borderColor" => $event->linked->school->color,
+                    "id" => $i->id,
+                    "start" => $i->start,
+                    "end" => $i->end,
+                    "backgroundColor" => $i->linked->school->color,
+                    "borderColor" => $i->linked->school->color,
                     "classNames" => [
                         "text-auto"
                     ],
-                ]);
-            }
+                ])
+            );
         }
     }
 

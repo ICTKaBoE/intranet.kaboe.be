@@ -15,17 +15,13 @@ class BookHistory extends Repository
 
     public function getByBookId($bookId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where("bookId", $bookId);
-
+        $statement = $this->prepareSelect(filters: ['bookId' => $bookId]);
         return $this->executeSelect($statement);
     }
 
     public function getNotReturnedByBookId($bookId)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('bookId', $bookId);
-
+        $statement = $this->prepareSelect(filters: ['bookId' => $bookId]);
         $items = $this->executeSelect($statement);
         return Arrays::filter($items, fn($i) => Strings::isBlank($i->receiverUserId));
     }

@@ -14,9 +14,7 @@ class Group extends Repository
 
     public function getByDomain($domain)
     {
-        $statement = $this->prepareSelect();
-        $statement->where('domain', $domain);
-
+        $statement = $this->prepareSelect(filters: ['domain' => $domain]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }
