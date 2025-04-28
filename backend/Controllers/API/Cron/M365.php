@@ -278,7 +278,7 @@ abstract class M365
         $mailReceiverRepo = new Receiver;
 
         $groupId = Arrays::firstOrNull((new Setting)->get("m365.employee.groupId"))->value;
-        $members = (new User)->getGroupMembersByGroupId($groupId, ['id', 'accountEnabled', 'employeeId', 'lastPasswordChangeDateTime', 'onPremisesExtensionAttributes']);
+        $members = (new User)->getGroupMembersByGroupId($groupId, ['id', 'accountEnabled', 'mail', 'employeeId', 'lastPasswordChangeDateTime', 'onPremisesExtensionAttributes']);
 
         foreach ($members as $member) {
             if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
@@ -315,7 +315,7 @@ abstract class M365
 
             $receiver = new MailReceiver;
             $receiver->mailId = $mId;
-            $receiver->email = "ict.kaboe@coltd.be";
+            $receiver->email = $member->getMail();
             $receiver->name = $employee->formatted->fullNameReversed;
             $mailReceiverRepo->set($receiver);
         }
