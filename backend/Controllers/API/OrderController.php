@@ -421,7 +421,7 @@ class OrderController extends ApiController
             $item->schoolId = $schoolId;
             $item->acceptorUserId = $acceptorUserId;
             $item->supplierId = $supplierId;
-            $item->quoteLink = $quoteLink || $item->quoteLink;
+            $item->quoteLink = $quoteLink ?? $item->quoteLink;
 
             $newId = $repo->set($item);
             if (!$id) $item->id = $newId;
