@@ -51,4 +51,11 @@ class Navigation extends Repository
 
         return $this->executeSelect($statement);
     }
+
+    public function getByRouteGroupIdParentIdAndFolderId($routeGroupId, $parentId, $folderId)
+    {
+        $statement = $this->prepareSelect(filters: ['folderId' => $folderId, 'parentId' => $parentId]);
+        $items = $this->executeSelect($statement);
+        return Arrays::filter($items, fn($i) => Arrays::contains(explode(",", $i->routeGroupId), $routeGroupId));
+    }
 }

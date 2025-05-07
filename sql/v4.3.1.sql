@@ -1,5 +1,8 @@
 ALTER TABLE db_intranet_v4.tbl_navigation ADD `type` set('M','F','P','L') DEFAULT 'M' NOT NULL;
 ALTER TABLE db_intranet_v4.tbl_navigation CHANGE `type` `type` set('M','F','P','L') DEFAULT 'M' NOT NULL AFTER parentId;
+ALTER TABLE db_intranet_v4.tbl_navigation ADD folderId INT DEFAULT 0 NULL;
+ALTER TABLE db_intranet_v4.tbl_navigation CHANGE folderId folderId INT DEFAULT 0 NULL AFTER parentId;
+
 
 UPDATE tbl_navigation SET type = "P" WHERE parentId > 0;
 UPDATE tbl_navigation SET type = "L" WHERE redirect = 1;

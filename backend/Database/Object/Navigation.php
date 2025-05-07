@@ -14,6 +14,7 @@ class Navigation extends CustomObject
         "id" => "int",
         "routeGroupId" => "string",
         "parentId" => "int",
+        "folderId" => "int",
         "type" => "string",
         "order" => "int",
         "link" => "string",
@@ -35,7 +36,7 @@ class Navigation extends CustomObject
     {
         $default = $this->settings["_"] ?: null;
 
-        $this->formatted->link = $this->type == "L" ? $this->link : ($this->type == "F" ? "?folder={$this->link}" : Path::normalize("/" . ($this->linked->parent ? $this->linked->parent->formatted->link . "/" : "") . $this->link));
+        $this->formatted->link = $this->type == "L" ? $this->link : ($this->type == "F" ? "#{$this->link}" : Path::normalize("/" . ($this->linked->parent && $this->linked->parent->type !== "F" ? $this->linked->parent->formatted->link . "/" : "") . $this->link));
         $this->formatted->linkWithDefault = $this->formatted->link . ($default ? "/{$default}" : "");
 
         $this->formatted->active = Strings::contains(Helpers::getReletiveUrl(), $this->formatted->link);

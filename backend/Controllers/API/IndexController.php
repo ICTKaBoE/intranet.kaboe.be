@@ -23,7 +23,7 @@ class IndexController extends ApiController
 
         $folder = Helpers::url()->getParams();
         $folderId = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink(0, $folder))?->id ?? 0;
-        $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $folderId);
+        $topLevelItems = $navigationRepo->getByRouteGroupIdParentIdAndFolderId($routeGroup->id, 0, $folderId);
 
         $items = [];
 

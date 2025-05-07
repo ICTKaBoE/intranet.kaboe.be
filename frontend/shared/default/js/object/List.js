@@ -60,6 +60,15 @@ export default class List {
 		if (!this.stopCheckNext) this.checkNext();
 	};
 
+	reload = async () => {
+		this.stopCheckNext = true;
+		this.extraData.page = 0;
+
+		await this.getData();
+		this.fill();
+		if (!this.stopCheckNext) await this.checkNext();
+	};
+
 	getData = () => {
 		if (!this.source) return;
 
@@ -84,6 +93,10 @@ export default class List {
 		await this.getData();
 		this.fill();
 		this.checkNext();
+	};
+
+	setExtraLoadParam = (key, value) => {
+		this.extraData[key] = value;
 	};
 
 	checkNext = () => {
