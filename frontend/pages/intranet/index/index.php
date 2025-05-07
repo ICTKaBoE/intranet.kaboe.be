@@ -13,4 +13,4 @@ const TEMPLATE = "  <div class='col-12 col-md-6 col-lg-3 col-xl-2'>
 
 ?>
 
-<div role="list" data-template="<?= TEMPLATE; ?>" data-source="{{list:url:full}}" class="row row-cards row-deck"></div>
+<div role="list" data-template="<?= TEMPLATE; ?>" data-source="{{list:url:full}}?folder={{url:param.folder}}" class="row row-cards row-deck"></div>

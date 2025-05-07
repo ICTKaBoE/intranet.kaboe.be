@@ -5,6 +5,7 @@ namespace Controllers\API;
 use Security\User;
 use Router\Helpers;
 use Controllers\ApiController;
+use Database\Object\Navigation as ObjectNavigation;
 use Database\Repository\Navigation;
 use Database\Repository\Route\Group;
 use Database\Repository\Setting\Setting;
@@ -19,7 +20,10 @@ class IndexController extends ApiController
         $mode = (new Setting)->get("site.mode")[0]->value;
         $navigationRepo = new Navigation;
         $routeGroup = (new Group)->getByDomain(($mode == "dev" ? "dev.intranet.kaboe.be" : "intranet.kaboe.be"));
-        $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0);
+
+        $folder = Helpers::url()->getParams();
+        $folderId = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink(0, $folder))?->id ?? 0;
+        $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $folderId);
 
         $items = [];
 
