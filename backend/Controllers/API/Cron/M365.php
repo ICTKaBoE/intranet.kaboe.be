@@ -53,11 +53,11 @@ abstract class M365
             foreach ($members as $member) {
                 if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
                 $user = $userRepo->getByEntraId($member->getId()) ?? $userRepo->getByInformatEmployeeId($member->getEmployeeId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
-
                 if ($user) {
                     $user->entraId = $member->getId();
                     $userRepo->set($user);
 
+                    if ($sguRepo->getBySecurityGroupIdAndUserId($sg->id, $user->id)) continue;
                     $sgu = new ObjectSecurityGroupUser;
                     $sgu->securityGroupId = $sg->id;
                     $sgu->userId = $user->id;

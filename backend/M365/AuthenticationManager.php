@@ -125,12 +125,12 @@ class AuthenticationManager
         }
 
         // The id token is a JWT token that contains information about the user
-        // It's a base64 coded string that has a header and payload 
+        // It's a base64 coded string that has a header and payload
         $decodedAccessTokenPayload = base64_decode(
             explode('.', Session::get('id_token'))[1]
         );
-        $jsonAccessTokenPayload = json_decode($decodedAccessTokenPayload, true);
 
+        $jsonAccessTokenPayload = json_decode($decodedAccessTokenPayload, true);
         // The id token payload has the following parameters:
         // aud - Audience of the token.
         // exp - Expiration time.

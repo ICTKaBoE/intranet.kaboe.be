@@ -5,22 +5,22 @@ namespace Controllers\API;
 use Router\Helpers;
 use Security\Session;
 use Controllers\ApiController;
-use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 use M365\AuthenticationManager;
+use Database\Repository\User\User;
 use Database\Repository\Setting\Setting;
 use Database\Repository\User\LoginHistory;
-use Database\Repository\User\User;
+use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 
 class M365Controller extends ApiController
 {
     public function callback()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['code'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && Helpers::input()->exists('code')) {
             Session::start();
-            if (Helpers::input()->exists('admin_consent')) Session::set('admin_consent', Helpers::input()->get('admin_consent'));
-            if (Helpers::input()->exists('code')) Session::set('code', Helpers::input()->get('code'));
-            if (Helpers::input()->exists('session_state')) Session::set('session_state', Helpers::input()->get('session_state'));
-            if (Helpers::input()->exists('state')) Session::set('state', Helpers::input()->get('state'));
+            if (Helpers::input()->exists('admin_consent')) Session::set('admin_consent', Helpers::input()->get('admin_consent')->getValue());
+            if (Helpers::input()->exists('code')) Session::set('code', Helpers::input()->get('code')->getValue());
+            if (Helpers::input()->exists('session_state')) Session::set('session_state', Helpers::input()->get('session_state')->getValue());
+            if (Helpers::input()->exists('state')) Session::set('state', Helpers::input()->get('state')->getValue());
 
             // With the authorization code, we can retrieve access tokens and other data.
             try {

@@ -323,13 +323,13 @@ class AccidentController extends ApiController
             if (!Input::check($informatSupervisorId, Input::INPUT_TYPE_INT) || Input::empty($informatSupervisorId)) $this->setValidation("informatSupervisorId", state: self::VALIDATION_STATE_INVALID);
         }
 
-        if ($id) {
-            if (!Input::check($informatStudentRelationId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentRelationId)) $this->setValidation("informatStudentRelationId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatStudentEmailId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentEmailId)) $this->setValidation("informatStudentEmailId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatStudentNumberId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentNumberId)) $this->setValidation("informatStudentNumberId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatStudentBankId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentBankId)) $this->setValidation("informatStudentBankId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatStudentAddressId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentAddressId)) $this->setValidation("informatStudentAddressId", state: self::VALIDATION_STATE_INVALID);
-        }
+        // if ($id) {
+        //     if (!Input::check($informatStudentRelationId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentRelationId)) $this->setValidation("informatStudentRelationId", state: self::VALIDATION_STATE_INVALID);
+        //     if (!Input::check($informatStudentEmailId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentEmailId)) $this->setValidation("informatStudentEmailId", state: self::VALIDATION_STATE_INVALID);
+        //     if (!Input::check($informatStudentNumberId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentNumberId)) $this->setValidation("informatStudentNumberId", state: self::VALIDATION_STATE_INVALID);
+        //     if (!Input::check($informatStudentBankId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentBankId)) $this->setValidation("informatStudentBankId", state: self::VALIDATION_STATE_INVALID);
+        //     if (!Input::check($informatStudentAddressId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentAddressId)) $this->setValidation("informatStudentAddressId", state: self::VALIDATION_STATE_INVALID);
+        // }
 
         if ($this->validationIsAllGood()) {
             $accident = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectAccident);
