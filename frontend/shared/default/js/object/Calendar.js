@@ -99,22 +99,40 @@ export default class Calendar {
 		}
 
 		if (this.source) {
-			if (Array.isArray(this.source)) {
-				let sources = [];
+			options.events = (info, successCallback, failureCallback) => {
+				let fetches = [];
 
-				for (const source of this.source) {
-					sources.push({
-						url: source,
-						extraParams: this.extraData,
+				if (Array.isArray(this.source)) {
+					for (const source of this.source) {
+						fetches.push(
+							fetch(
+								source +
+									"?" +
+									new URLSearchParams(this.extraData),
+								{ credentials: "include" }
+							).then((resp) => resp.json())
+						);
+					}
+				} else
+					fetches.push(
+						fetch(
+							this.source +
+								"?" +
+								new URLSearchParams(this.extraData),
+							{ credentials: "include" }
+						).then((resp) => resp.json())
+					);
+
+				Promise.all(fetches)
+					.then((...datas) => {
+						let d = [];
+						for (const data of datas[0]) d = d.concat(data);
+						successCallback(d);
+					})
+					.catch((error) => {
+						failureCallback(error);
 					});
-				}
-
-				options.eventSources = this.source;
-			} else
-				options.events = {
-					url: this.source,
-					extraParams: this.extraData,
-				};
+			};
 		}
 
 		this.elementObject = new FullCalendar.Calendar(this.element, options);

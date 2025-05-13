@@ -127,9 +127,10 @@ export default class Select {
 
 	init = async () => {
 		this.element.setAttribute("role", "select");
+		this.element.setAttribute("type", "text");
 		this.element.removeAttribute("disabled");
-		if (!this.element.classList.contains("form-select"))
-			this.element.classList.add("form-select");
+		// if (!this.element.classList.contains("form-select"))
+		// 	this.element.classList.add("form-select");
 
 		if (!this.defaultNoLoad && this.loadSource) {
 			this.loadParams.page = 0;
@@ -184,8 +185,10 @@ export default class Select {
 			persist: false,
 			create: false,
 			render: {},
-			controlInput: null,
 			searchField: ["text"],
+			copyClassesToDropdown: false,
+			dropdownParent: "body",
+			controlInput: "<input>",
 		};
 
 		if (this.render.item)
