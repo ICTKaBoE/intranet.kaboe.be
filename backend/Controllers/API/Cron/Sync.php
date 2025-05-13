@@ -112,7 +112,8 @@ abstract class Sync
             $departments = Arrays::map($schools, fn($d) => $schoolRepo->getByName($d)->name);
             $departments = implode(", ", $departments);
 
-            $jobtitles = Arrays::map($functions, fn($f) => Arrays::first(explode(' (', $f->value)));
+            $jobtitles = Arrays::filter($functions, fn($f) => !Strings::startsWith(Arrays::last(explode(' (', $f->value)), "!"));
+            $jobtitles = Arrays::map($jobtitles, fn($f) => Arrays::first(explode(' (', $f->value)));
             $jobtitles = array_unique(array_values($jobtitles));
             $jobtitles = implode(", ", $jobtitles);
 
@@ -130,6 +131,7 @@ abstract class Sync
 
                 foreach ($_functions as $_school => $_codes) {
                     foreach ($_codes as $_code) {
+                        $_code = str_replace("!", "", $_code);
                         $ea1[] = "{$_school}:{$_code}";
                     }
                 }
