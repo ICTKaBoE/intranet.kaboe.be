@@ -129,8 +129,8 @@ export default class Select {
 		this.element.setAttribute("role", "select");
 		this.element.setAttribute("type", "text");
 		this.element.removeAttribute("disabled");
-		// if (!this.element.classList.contains("form-select"))
-		// 	this.element.classList.add("form-select");
+		if (!this.element.classList.contains("form-select"))
+			this.element.classList.add("form-select");
 
 		if (!this.defaultNoLoad && this.loadSource) {
 			this.loadParams.page = 0;
@@ -187,7 +187,6 @@ export default class Select {
 			render: {},
 			searchField: ["text"],
 			copyClassesToDropdown: false,
-			dropdownParent: "body",
 			controlInput: "<input>",
 		};
 

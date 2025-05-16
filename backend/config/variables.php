@@ -48,8 +48,10 @@ define("SELECT_OTHER_VALUE", "Andere");
 define("SELECT_ALL_ID", 0);
 define("SELECT_ALL_VALUE", "Alle");
 
-define("INFORMAT_CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
-// define("INFORMAT_CURRENT_SCHOOLYEAR", "2023-24");
+define("CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
+// define("CURRENT_SCHOOLYEAR", "2023-24");
+define("CURRENT_SCHOOLYEAR_START", (date('n') <= 8 ? (date("Y") - 1) : date("Y")) . "-09-01");
+define("CURRENT_SCHOOLYEAR_END", (date("n") <= 8 ? date("Y") : (date("Y") + 1)) . "-08-31");
 define("INFORMAT_REFERENCE_DATE", "2024-01-01");
 
 define("EMAIL_SUFFIX", "coltd.be");

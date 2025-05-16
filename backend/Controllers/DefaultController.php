@@ -14,6 +14,7 @@ use Database\Repository\Setting\Setting;
 use Database\Repository\Navigation;
 use Database\Repository\Route\Group;
 use Helpers\CString;
+use Helpers\General;
 
 use function Ramsey\Uuid\v1;
 
@@ -206,6 +207,9 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{page:id}}", $this->pageId, $this->layout);
 		$this->layout = str_replace("{{page:action}}", $this->pageAction, $this->layout);
 		$this->layout = str_replace("{{site:url}}", $this->siteUrl, $this->layout);
+		$this->layout = str_replace("{{schoolyear}}", General::getSchoolyear(), $this->layout);
+		$this->layout = str_replace("{{schoolyear:start}}", General::getSchoolyearStart(), $this->layout);
+		$this->layout = str_replace("{{schoolyear:end}}", General::getSchoolyearEnd(), $this->layout);
 	}
 
 	private function loadSettings()

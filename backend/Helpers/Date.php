@@ -20,4 +20,18 @@ abstract class Date
 
 		return $months;
 	}
+
+	static public function workingDays($year, $month)
+	{
+		$first = strtotime("{$year}-{$month}-01");
+		$last = strtotime("last day of {$year}-{$month}");
+
+		$workingDays = 0;
+
+		for ($day = $first; $day <= $last; $day = strtotime("+1 day", $day)) {
+			if (date("N", $day) <= 5) $workingDays++;
+		}
+
+		return $workingDays;
+	}
 }

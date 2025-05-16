@@ -17,7 +17,9 @@ export default class Helpers {
 	};
 
 	static closeAllModals = () => {
-		$(".modal").modal("hide");
+		$(".modal.show").each((id, mod) => {
+			this.toggleModal(mod.id.replace("modal-", ""));
+		});
 	};
 
 	static redirect = (link) => {
@@ -92,9 +94,7 @@ export default class Helpers {
 		return result;
 	};
 
-	static formatValue = (value, type, format, originalData = null) => {
-		if (undefined === format) return value;
-
+	static formatValue = (value, type, format = {}, originalData = null) => {
 		switch (type) {
 			case "double":
 				{
@@ -102,6 +102,21 @@ export default class Helpers {
 					if (format.precision) value.toFixed(format.precision);
 					if (format.prefix) value = `${format.prefix}${value}`;
 					if (format.suffix) value = `${value}${format.suffix}`;
+				}
+				break;
+			case "secondsToDhms":
+				{
+					value = Number(value);
+					let d = Math.floor(value / (3600 * 24));
+					let h = Math.floor((value % (3600 * 24)) / 3600);
+					let m = Math.floor((value % 3600) / 60);
+					let s = Math.floor(value % 60);
+
+					value =
+						(d > 0 ? `${d}${format.d || "d"} ` : "") +
+						(h > 0 ? `${h}${format.u || "u"} ` : "") +
+						(m > 0 ? `${m}${format.m || "m"} ` : "") +
+						(s > 0 ? `${s}${format.s || "s"} ` : "");
 				}
 				break;
 			case "password": {

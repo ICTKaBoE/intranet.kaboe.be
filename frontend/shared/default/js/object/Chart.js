@@ -6,8 +6,13 @@ export default class Chart {
 	constructor(element) {
 		this.element = element;
 		this.id = this.element.id || false;
-		this.type = this.element.dataset.type || 'line';
+		this.type = this.element.dataset.type || "line";
 		this.source = this.element.dataset.source || false;
+		this.title = this.element.dataset.title || false;
+		this.group = this.element.dataset.group || false;
+		this.legendPosition = this.element.dataset.legendPosition || "bottom";
+		this.noDataText = this.element.dataset.noDataText || "Loading...";
+		this.formatter = this.element.dataset.formatter || false;
 
 		this.data = {};
 		this.extraData = {};
@@ -19,68 +24,138 @@ export default class Chart {
 
 	static ScanAndCreate() {
 		$("div[role='chart']").each((ids, el) => {
-			if (!Chart.INSTANCES.hasOwnProperty(el.getAttribute("id"))) Chart.INSTANCES[el.getAttribute("id")] = new Chart(el);
+			if (!Chart.INSTANCES.hasOwnProperty(el.getAttribute("id")))
+				Chart.INSTANCES[el.getAttribute("id")] = new Chart(el);
 		});
 	}
 
-	init = async () => {
-		await this.getData();
-		this.createOptions();
-		this.createChart();
+	static GetInstance = (id) => {
+		if (!id.startsWith("crt")) id = `crt${id}`;
+		return Chart.INSTANCES[id] || false;
 	};
 
-	createOptions = () => {
-		if (!this.data.series) return;
-
-		this.options.chart = {};
-		this.options.chart.type = this.type;
-
-		this.options.chart.animations = {};
-		this.options.chart.animations.enabled = false;
-
-		this.options.chart.toolbar = {};
-		this.options.chart.toolbar.show = false;
-
-		this.options.tooltip = {};
-		this.options.tooltip.theme = "dark";
-
-		if (this.data.labels) this.options.labels = this.data.labels;
-		if (this.data.series) this.options.series = this.data.series;
-		if (this.data.colors) this.options.colors = this.data.colors;
-
-		this.options.plotOptions = {};
-
-		if (this.type === "bar") {
-			this.options.plotOptions.bar = {};
-			this.options.plotOptions.bar.horizontal = true;
-
-			this.options.dataLabels = {};
-			this.options.dataLabels.enabled = false;
-
-			this.options.tooltip.shared = true;
-			this.options.tooltip.intersect = false;
-
-			this.options.xaxis = {};
-			this.options.xaxis.type = "category";
-
-			this.options.xaxis.tooltip = {};
-			this.options.xaxis.tooltip.enabled = false;
-
-			this.options.xaxis.axisBorder = {};
-			this.options.xaxis.axisBorder.show = false;
-
-			this.options.tooltip.y = {};
-			this.options.tooltip.y.formatter = (val) => {
-				return 	Number.isInteger(val) ? parseInt(val).toFixed(0) : val;
-			};
-
-			if (this.data.xaxis.categories) this.options.xaxis.categories = this.data.xaxis.categories;
+	static ReloadAll = () => {
+		for (const crt in Chart.INSTANCES) {
+			Chart.INSTANCES[crt].reload();
 		}
 	};
 
-	createChart = () => {
-		if (!this.data.series) return;
+	init = async () => {
+		this.createOptions();
+		this.createChart();
+		await this.getData();
+		this.updateChart();
+	};
 
+	reload = async () => {
+		await this.getData();
+		this.updateChart();
+	};
+
+	createOptions = () => {
+		this.options = {
+			chart: {
+				id: this.id,
+				type: this.type,
+				fontFamily: "inherit",
+				height: "350vh",
+				parentHeightOffset: 0,
+				toolbar: {
+					show: false,
+				},
+				animations: {
+					enabled: false,
+				},
+			},
+			stroke: {
+				width: 2,
+				lineCap: "round",
+				curve: "straight",
+			},
+			tooltip: {
+				theme: "dark",
+				shared: true,
+				intersect: false,
+				y: {},
+			},
+			grid: {
+				padding: {
+					top: -20,
+					right: 0,
+					left: -4,
+					bottom: -4,
+				},
+				strokeDashArray: 4,
+			},
+			xaxis: {
+				labels: {
+					padding: 0,
+				},
+				tooltip: {
+					enabled: false,
+				},
+				axisBorder: {
+					show: false,
+				},
+				type: "category",
+			},
+			yaxis: {
+				labels: {
+					padding: 4,
+				},
+			},
+			legend: {
+				show: true,
+				position: this.legendPosition,
+				horizontalAlign: "left",
+				offsetX: 40,
+				markers: {
+					width: 10,
+					height: 10,
+					radius: 100,
+				},
+				itemMargin: {
+					horizontal: 8,
+					vertical: 8,
+				},
+			},
+			fill: {},
+			series: [],
+			noData: {
+				text: this.noDataText,
+			},
+		};
+
+		if (this.title)
+			this.options.title = {
+				text: this.title,
+				align: "left",
+			};
+
+		if (this.group) this.options.chart.group = this.group;
+		if (this.formatter) {
+			this.options.yaxis.labels.formatter = (v) => {
+				if (this.formatter instanceof Function)
+					return this.formatter(v);
+				else return window[this.formatter](v);
+			};
+
+			this.options.tooltip.y.formatter = (v) => {
+				if (this.formatter instanceof Function)
+					return this.formatter(v);
+				else return window[this.formatter](v);
+			};
+		}
+
+		// if (this.data.labels) this.options.labels = this.data.labels;
+		// if (this.data.series) this.options.series = this.data.series;
+		// if (this.data.colors) this.options.colors = this.data.colors;
+		// if (this.data.yaxis) this.options.yaxis = this.data.yaxis;
+		// if (this.data.xaxis?.categories)
+		// 	this.options.xaxis.categories = this.data.xaxis.categories;
+	};
+
+	createChart = () => {
 		this.apexChart = new ApexCharts(this.element, this.options);
 		this.apexChart.render();
 	};
@@ -88,8 +163,28 @@ export default class Chart {
 	getData = () => {
 		if (!this.source) return;
 
-		return $.get(this.source, this.extraData).done(data => {
+		return $.get(this.source, this.extraData).done((data) => {
 			this.data = data;
 		});
+	};
+
+	updateChart = () => {
+		if (this.data.series) this.apexChart.updateSeries(this.data.series);
+	};
+
+	addExtraData = (key, value) => {
+		this.extraData[key] = value;
+	};
+
+	removeExtraData = (key) => {
+		delete this.extraData[key];
+	};
+
+	clearExtraData = () => {
+		this.extraData = {};
+	};
+
+	destroy = () => {
+		if (this.apexChart) this.apexChart.destroy();
 	};
 }

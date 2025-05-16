@@ -68,7 +68,7 @@ class InformatController extends ApiController
         foreach ($institutes as $institute) {
             $filters = [
                 'schoolInstituteId' => $institute->id,
-                'schoolyear' => INFORMAT_CURRENT_SCHOOLYEAR,
+                'schoolyear' => General::getSchoolyear(),
                 'type' => "C"
             ];
             $sgs = $repo->get(filters: $filters);

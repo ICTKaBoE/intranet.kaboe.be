@@ -392,7 +392,7 @@ abstract class Informat
         $classgroup->informatId = $inschr->pKlas;
         $classgroup->informatGuid = $inschr->klasId;
         $classgroup->schoolInstituteId = $instituteId;
-        $classgroup->schoolyear = INFORMAT_CURRENT_SCHOOLYEAR;
+        $classgroup->schoolyear = General::getSchoolyear();
         $classgroup->departmentCode = $departmentCode;
         $classgroup->grade = $grade;
         $classgroup->year = $year;

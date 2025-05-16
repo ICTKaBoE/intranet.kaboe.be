@@ -20,6 +20,7 @@ class ComputerUsageOnOff extends CustomObject
     public function init()
     {
         if (Strings::startsWith($this->shutdown, '-')) $this->shutdown = false;
+        $this->seconds = ($this->shutdown ? strtotime($this->shutdown) - strtotime($this->startup) : 0);
         $this->formatted->duration = ($this->shutdown ? Clock::at($this->shutdown)->toDateTime()->diff(Clock::at($this->startup)->toDateTime())->format("%a %H:%I:%S") : "N/A");
 
         $this->formatted->startup = new stdClass;

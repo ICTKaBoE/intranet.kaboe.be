@@ -53,7 +53,6 @@ export default class Button {
 
 		if (this.options.modal || false)
 			this.element.addEventListener("click", () => {
-				Helpers.closeAllModals();
 				Helpers.toggleModal(this.options.modal);
 			});
 

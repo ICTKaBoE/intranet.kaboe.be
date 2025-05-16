@@ -4,6 +4,7 @@ namespace Informat\Interface;
 
 use Database\Repository\Setting\Setting;
 use GuzzleHttp\Client;
+use Helpers\General;
 use stdClass;
 use Informat\Connection;
 use Ouzo\Utilities\Arrays;
@@ -40,7 +41,7 @@ class Repository extends stdClass
         ];
 
         $requestQuery = [
-            "schoolyear" => INFORMAT_CURRENT_SCHOOLYEAR,
+            "schoolyear" => General::getSchoolyear(),
             "structure" => Arrays::first((new Setting)->get("informat.structure"))->value
         ];
 

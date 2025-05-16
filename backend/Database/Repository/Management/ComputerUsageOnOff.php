@@ -27,4 +27,21 @@ class ComputerUsageOnOff extends Repository
 
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getBetween($start, $end)
+    {
+        $statement = $this->prepareSelect();
+        $statement->where('startup', '>=', $start);
+        $statement->where('shutdown', '<=', $end);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getByComputerIdBetween($computerId, $start, $end)
+    {
+        $statement = $this->prepareSelect(filters: ['computerId' => $computerId]);
+        $statement->where('startup', '>=', $start);
+        $statement->where('shutdown', '<=', $end);
+        return $this->executeSelect($statement);
+    }
 }

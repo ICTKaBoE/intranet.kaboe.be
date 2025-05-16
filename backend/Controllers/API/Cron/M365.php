@@ -150,7 +150,7 @@ abstract class M365
         $employeeRepo = new Employee;
         $m365UserRepo = new User;
         $employeeOwnfieldRepo = new EmployeeOwnfield;
-        $classes = (new ClassGroup)->getBySchoolyear(INFORMAT_CURRENT_SCHOOLYEAR);
+        $classes = (new ClassGroup)->getBySchoolyear(General::getSchoolyear());
 
         $defaultOwner = Input::check($_classOwner, Input::INPUT_TYPE_EMAIL) ? $m365UserRepo->getByEmail($_classOwner)->getId() : $_classOwner;
 

@@ -30,29 +30,29 @@ window.batteryStatus = () => {
 	Table.GetInstance(pageId + "Battery").reload();
 };
 
-window.usage = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
+// window.usage = () => {
+// 	let selected = Table.GetInstance(pageId).getSelectedRowData();
 
-	Table.GetInstance(pageId + "Usage").appendSource(
-		selected[0].guid || selected[0].id
-	);
+// 	Table.GetInstance(pageId + "Usage").appendSource(
+// 		selected[0].guid || selected[0].id
+// 	);
 
-	Table.GetInstance(pageId + "Usage").reload();
-};
+// 	Table.GetInstance(pageId + "Usage").reload();
+// };
 
-window.usageChildRowFormat = (d) => {
-	let ret = "<ul>";
+// window.usageChildRowFormat = (d) => {
+// 	let ret = "<ul>";
 
-	d.logon.forEach((l) => {
-		ret += `<li>${l.username} - ${l.formatted.logon}${
-			l.logoff ? " - " + l.formatted.logoff : ""
-		}</li>`;
-	});
+// 	d.logon.forEach((l) => {
+// 		ret += `<li>${l.username} - ${l.formatted.logon}${
+// 			l.logoff ? " - " + l.formatted.logoff : ""
+// 		}</li>`;
+// 	});
 
-	ret += "</ul>";
+// 	ret += "</ul>";
 
-	return ret;
-};
+// 	return ret;
+// };
 
 let btnFilter = new Button({
 	options: {
@@ -75,21 +75,21 @@ let btnBattery = new Button({
 	},
 });
 
-let btnUsage = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "clock",
-		title: "Gebruik",
-		bgColor: "blue",
-		onclick: "usage",
-		modal: "usage",
-	},
-});
+// let btnUsage = new Button({
+// 	options: {
+// 		type: Button.TYPE_ICON,
+// 		icon: "clock",
+// 		title: "Gebruik",
+// 		bgColor: "blue",
+// 		onclick: "usage",
+// 		modal: "usage",
+// 	},
+// });
 
-Component.addActionButton(btnFilter, btnBattery, btnUsage);
+Component.addActionButton(btnFilter, btnBattery);
 Component.addExtraPageInfo(`Laatste sync: ${lastSyncTime}`);
 
 $(document).ready(() => {
 	Table.GetInstance(pageId).attachButton(btnBattery, "==1");
-	Table.GetInstance(pageId).attachButton(btnUsage, "==1");
+	// Table.GetInstance(pageId).attachButton(btnUsage, "==1");
 });

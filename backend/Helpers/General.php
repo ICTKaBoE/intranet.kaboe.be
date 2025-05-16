@@ -162,4 +162,46 @@ abstract class General
 
         return $randomString;
     }
+
+    static public function getSchoolyear($date = null)
+    {
+        if (is_null($date)) $date = Clock::now();
+        else $date = Clock::at($date);
+
+        return $date->format("n") <= 8 ? ($date->format("Y") - 1) . "-" . $date->format("y") : $date->format("Y") . "-" . ($date->format("y") + 1);
+    }
+
+    static public function getSchoolyearStart($date = null)
+    {
+        if (is_null($date)) $date = Clock::now();
+        else $date = Clock::at($date);
+
+        return ($date->format("n") <= 8 ? ($date->format("Y") - 1) : $date->format("Y")) . "-09-01";
+    }
+
+    static public function getSchoolyearEnd($date = null)
+    {
+        if (is_null($date)) $date = Clock::now();
+        else $date = Clock::at($date);
+
+        return ($date->format("n") <= 8 ? $date->format("Y") : ($date->format("Y") + 1)) . "-08-31";
+    }
+
+    static public function getSchoolyearStartBySchoolyear($schoolyear = null)
+    {
+        if (is_null($schoolyear)) $schoolyear = self::getSchoolyear();
+        $part = Arrays::first(explode("-", $schoolyear));
+        if (strlen($part) == 2) $part = "20{$part}";
+
+        return self::getSchoolyearStart("{$part}-09-01");
+    }
+
+    static public function getSchoolyearEndBySchoolyear($schoolyear = null)
+    {
+        if (is_null($schoolyear)) $schoolyear = self::getSchoolyear();
+        $part = Arrays::last(explode("-", $schoolyear));
+        if (strlen($part) == 2) $part = "20{$part}";
+
+        return self::getSchoolyearEnd("{$part}-08-31");
+    }
 }

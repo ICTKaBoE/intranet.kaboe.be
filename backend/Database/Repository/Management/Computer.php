@@ -29,4 +29,13 @@ class Computer extends Repository
         $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
         return $this->executeSelect($statement);
     }
+
+    public function getBySchoolIdAndLikeName($schoolId, $likeName)
+    {
+        if (!$schoolId || !$likeName) return [];
+
+        $statement = $this->prepareSelect(filters: ['schoolId' => $schoolId]);
+        $statement->where("name", "LIKE", $likeName);
+        return $this->executeSelect($statement);
+    }
 }
