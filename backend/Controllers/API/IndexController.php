@@ -26,7 +26,6 @@ class IndexController extends ApiController
         $topLevelItems = $navigationRepo->getByRouteGroupIdParentIdAndFolderId($routeGroup->id, 0, $folderId);
 
         $items = [];
-
         foreach ($topLevelItems as $tli) {
             if ($tli->order < 0) continue;
             if (!User::canAccess($tli->minimumRights)) continue;
@@ -35,7 +34,6 @@ class IndexController extends ApiController
         }
 
         $items = Arrays::map($items, fn($i) => $i->toArray(true));
-
         $this->appendToJson('raw', General::processTemplate($items));
     }
 }

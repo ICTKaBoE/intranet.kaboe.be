@@ -23,7 +23,7 @@ class PageTitleComponentController extends ComponentController
 
 		$navigationRepo = new Navigation;
 		$moduleNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink(0, $module));
-		$pageNavigation = Arrays::firstOrNull($navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page));
+		$pageNavigation = is_null($page) ? null : Arrays::firstOrNull($navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page));
 
 		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);
 		$this->layout = str_replace("{{page:title}}", $pagetitle, $this->layout);
