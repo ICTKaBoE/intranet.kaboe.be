@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-battery" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-battery" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">

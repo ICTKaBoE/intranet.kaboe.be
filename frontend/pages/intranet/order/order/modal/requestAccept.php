@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-requestAccept" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-requestAccept" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form action="{{form:url:full}}RequestAccept" method="post" autocomplete="off" id="frm{{page:id}}RequestAccept" class="modal-content">
             <div class="modal-header">

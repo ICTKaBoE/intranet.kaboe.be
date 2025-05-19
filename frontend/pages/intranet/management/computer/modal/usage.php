@@ -1,4 +1,4 @@
-<!-- <div class="modal modal-blur fade show" id="modal-usage" tabindex="-1" role="dialog" aria-modal="true">
+<!-- <div class="modal modal-blur fade" id="modal-usage" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">

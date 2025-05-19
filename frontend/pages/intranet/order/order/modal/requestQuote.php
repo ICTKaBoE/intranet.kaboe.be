@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-requestQuote" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-requestQuote" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form action="{{form:url:full}}RequestQuote" method="post" autocomplete="off" id="frm{{page:id}}RequestQuote" class="modal-content">
             <div class="modal-header">

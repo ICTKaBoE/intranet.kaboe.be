@@ -14,7 +14,6 @@ export default class Button {
 			this.create();
 		}
 
-		this.element.id = Helpers.generateId("btn");
 		this.id = this.element.id;
 	}
 

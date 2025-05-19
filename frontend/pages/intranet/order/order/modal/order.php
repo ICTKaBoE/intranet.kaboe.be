@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-order" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-order" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form action="{{form:url:full}}Order" method="post" autocomplete="off" id="frm{{page:id}}Order" class="modal-content">
             <div class="modal-header">

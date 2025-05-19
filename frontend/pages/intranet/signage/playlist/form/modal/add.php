@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-add" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-add" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form action="{{form:url:full}}Item" method="post" autocomplete="off" id="frm{{page:id}}Item" class="modal-content">
             <input type="hidden" name="playlistId" id="playlistId" value="{{url:part.id}}" />

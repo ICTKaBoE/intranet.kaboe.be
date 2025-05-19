@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade show" id="modal-delete" tabindex="-1" role="dialog" aria-modal="true">
+<div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form action="{{form:url:full}}Line" method="delete" autocomplete="off" id="frm{{page:id}}LineDelete" class="modal-content">
             <div class="modal-header">
