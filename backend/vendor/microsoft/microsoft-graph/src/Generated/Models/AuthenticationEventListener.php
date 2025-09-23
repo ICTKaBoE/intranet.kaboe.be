@@ -26,7 +26,10 @@ class AuthenticationEventListener extends Entity implements Parsable
             $mappingValue = $mappingValueNode->getStringValue();
             switch ($mappingValue) {
                 case '#microsoft.graph.onAttributeCollectionListener': return new OnAttributeCollectionListener();
+                case '#microsoft.graph.onAttributeCollectionStartListener': return new OnAttributeCollectionStartListener();
+                case '#microsoft.graph.onAttributeCollectionSubmitListener': return new OnAttributeCollectionSubmitListener();
                 case '#microsoft.graph.onAuthenticationMethodLoadStartListener': return new OnAuthenticationMethodLoadStartListener();
+                case '#microsoft.graph.onEmailOtpSendListener': return new OnEmailOtpSendListener();
                 case '#microsoft.graph.onInteractiveAuthFlowStartListener': return new OnInteractiveAuthFlowStartListener();
                 case '#microsoft.graph.onTokenIssuanceStartListener': return new OnTokenIssuanceStartListener();
                 case '#microsoft.graph.onUserCreateStartListener': return new OnUserCreateStartListener();
@@ -36,7 +39,7 @@ class AuthenticationEventListener extends Entity implements Parsable
     }
 
     /**
-     * Gets the authenticationEventsFlowId property value. Indicates the authenticationEventListener is associated with an authenticationEventsFlow. Read-only.
+     * Gets the authenticationEventsFlowId property value. The identifier of the authenticationEventsFlow object.
      * @return string|null
     */
     public function getAuthenticationEventsFlowId(): ?string {
@@ -82,7 +85,7 @@ class AuthenticationEventListener extends Entity implements Parsable
     }
 
     /**
-     * Sets the authenticationEventsFlowId property value. Indicates the authenticationEventListener is associated with an authenticationEventsFlow. Read-only.
+     * Sets the authenticationEventsFlowId property value. The identifier of the authenticationEventsFlow object.
      * @param string|null $value Value to set for the authenticationEventsFlowId property.
     */
     public function setAuthenticationEventsFlowId(?string $value): void {

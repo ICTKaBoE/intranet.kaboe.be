@@ -5,6 +5,7 @@ namespace Microsoft\Graph\Generated\Models\Security;
 use Microsoft\Kiota\Abstractions\Serialization\Parsable;
 use Microsoft\Kiota\Abstractions\Serialization\ParseNode;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
+use Microsoft\Kiota\Abstractions\Types\TypeUtils;
 
 class EdiscoveryEstimateOperation extends CaseOperation implements Parsable 
 {
@@ -34,6 +35,7 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
             'indexedItemCount' => fn(ParseNode $n) => $o->setIndexedItemCount($n->getIntegerValue()),
             'indexedItemsSize' => fn(ParseNode $n) => $o->setIndexedItemsSize($n->getIntegerValue()),
             'mailboxCount' => fn(ParseNode $n) => $o->setMailboxCount($n->getIntegerValue()),
+            'reportFileMetadata' => fn(ParseNode $n) => $o->setReportFileMetadata($n->getCollectionOfObjectValues([ReportFileMetadata::class, 'createFromDiscriminatorValue'])),
             'search' => fn(ParseNode $n) => $o->setSearch($n->getObjectValue([EdiscoverySearch::class, 'createFromDiscriminatorValue'])),
             'siteCount' => fn(ParseNode $n) => $o->setSiteCount($n->getIntegerValue()),
             'statisticsOptions' => fn(ParseNode $n) => $o->setStatisticsOptions($n->getEnumValue(StatisticsOptions::class)),
@@ -79,6 +81,20 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
     }
 
     /**
+     * Gets the reportFileMetadata property value. Contains the properties for report file metadata, including downloadUrl, fileName, and size.
+     * @return array<ReportFileMetadata>|null
+    */
+    public function getReportFileMetadata(): ?array {
+        $val = $this->getBackingStore()->get('reportFileMetadata');
+        if (is_array($val) || is_null($val)) {
+            TypeUtils::validateCollectionValues($val, ReportFileMetadata::class);
+            /** @var array<ReportFileMetadata>|null $val */
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'reportFileMetadata'");
+    }
+
+    /**
      * Gets the search property value. eDiscovery search.
      * @return EdiscoverySearch|null
     */
@@ -103,7 +119,7 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
     }
 
     /**
-     * Gets the statisticsOptions property value. The statisticsOptions property
+     * Gets the statisticsOptions property value. The options to generate statistics. Possible values are: includeRefiners, includeQueryStats, includeUnindexedStats, advancedIndexing, locationsWithoutHits, unknownFutureValue.
      * @return StatisticsOptions|null
     */
     public function getStatisticsOptions(): ?StatisticsOptions {
@@ -147,6 +163,7 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
         $writer->writeIntegerValue('indexedItemCount', $this->getIndexedItemCount());
         $writer->writeIntegerValue('indexedItemsSize', $this->getIndexedItemsSize());
         $writer->writeIntegerValue('mailboxCount', $this->getMailboxCount());
+        $writer->writeCollectionOfObjectValues('reportFileMetadata', $this->getReportFileMetadata());
         $writer->writeObjectValue('search', $this->getSearch());
         $writer->writeIntegerValue('siteCount', $this->getSiteCount());
         $writer->writeEnumValue('statisticsOptions', $this->getStatisticsOptions());
@@ -179,6 +196,14 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
     }
 
     /**
+     * Sets the reportFileMetadata property value. Contains the properties for report file metadata, including downloadUrl, fileName, and size.
+     * @param array<ReportFileMetadata>|null $value Value to set for the reportFileMetadata property.
+    */
+    public function setReportFileMetadata(?array $value): void {
+        $this->getBackingStore()->set('reportFileMetadata', $value);
+    }
+
+    /**
      * Sets the search property value. eDiscovery search.
      * @param EdiscoverySearch|null $value Value to set for the search property.
     */
@@ -195,7 +220,7 @@ class EdiscoveryEstimateOperation extends CaseOperation implements Parsable
     }
 
     /**
-     * Sets the statisticsOptions property value. The statisticsOptions property
+     * Sets the statisticsOptions property value. The options to generate statistics. Possible values are: includeRefiners, includeQueryStats, includeUnindexedStats, advancedIndexing, locationsWithoutHits, unknownFutureValue.
      * @param StatisticsOptions|null $value Value to set for the statisticsOptions property.
     */
     public function setStatisticsOptions(?StatisticsOptions $value): void {

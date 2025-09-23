@@ -70,6 +70,18 @@ class OnlineMeetingBase extends Entity implements Parsable
     }
 
     /**
+     * Gets the allowCopyingAndSharingMeetingContent property value. Indicates whether the ability to copy and share meeting content is enabled for the meeting.
+     * @return bool|null
+    */
+    public function getAllowCopyingAndSharingMeetingContent(): ?bool {
+        $val = $this->getBackingStore()->get('allowCopyingAndSharingMeetingContent');
+        if (is_null($val) || is_bool($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'allowCopyingAndSharingMeetingContent'");
+    }
+
+    /**
      * Gets the allowedLobbyAdmitters property value. Specifies the users who can admit from the lobby. Possible values are: organizerAndCoOrganizersAndPresenters, organizerAndCoOrganizers, unknownFutureValue.
      * @return AllowedLobbyAdmitterRoles|null
     */
@@ -82,7 +94,7 @@ class OnlineMeetingBase extends Entity implements Parsable
     }
 
     /**
-     * Gets the allowedPresenters property value. Specifies who can be a presenter in a meeting.
+     * Gets the allowedPresenters property value. Specifies who can be a presenter in a meeting. Possible values are: everyone, organization, roleIsPresenter, organizer, unknownFutureValue. Inherited from onlineMeetingBase.
      * @return OnlineMeetingPresenters|null
     */
     public function getAllowedPresenters(): ?OnlineMeetingPresenters {
@@ -249,6 +261,7 @@ class OnlineMeetingBase extends Entity implements Parsable
             'allowAttendeeToEnableCamera' => fn(ParseNode $n) => $o->setAllowAttendeeToEnableCamera($n->getBooleanValue()),
             'allowAttendeeToEnableMic' => fn(ParseNode $n) => $o->setAllowAttendeeToEnableMic($n->getBooleanValue()),
             'allowBreakoutRooms' => fn(ParseNode $n) => $o->setAllowBreakoutRooms($n->getBooleanValue()),
+            'allowCopyingAndSharingMeetingContent' => fn(ParseNode $n) => $o->setAllowCopyingAndSharingMeetingContent($n->getBooleanValue()),
             'allowedLobbyAdmitters' => fn(ParseNode $n) => $o->setAllowedLobbyAdmitters($n->getEnumValue(AllowedLobbyAdmitterRoles::class)),
             'allowedPresenters' => fn(ParseNode $n) => $o->setAllowedPresenters($n->getEnumValue(OnlineMeetingPresenters::class)),
             'allowLiveShare' => fn(ParseNode $n) => $o->setAllowLiveShare($n->getEnumValue(MeetingLiveShareOptions::class)),
@@ -263,6 +276,7 @@ class OnlineMeetingBase extends Entity implements Parsable
             'audioConferencing' => fn(ParseNode $n) => $o->setAudioConferencing($n->getObjectValue([AudioConferencing::class, 'createFromDiscriminatorValue'])),
             'chatInfo' => fn(ParseNode $n) => $o->setChatInfo($n->getObjectValue([ChatInfo::class, 'createFromDiscriminatorValue'])),
             'chatRestrictions' => fn(ParseNode $n) => $o->setChatRestrictions($n->getObjectValue([ChatRestrictions::class, 'createFromDiscriminatorValue'])),
+            'isEndToEndEncryptionEnabled' => fn(ParseNode $n) => $o->setIsEndToEndEncryptionEnabled($n->getBooleanValue()),
             'isEntryExitAnnounced' => fn(ParseNode $n) => $o->setIsEntryExitAnnounced($n->getBooleanValue()),
             'joinInformation' => fn(ParseNode $n) => $o->setJoinInformation($n->getObjectValue([ItemBody::class, 'createFromDiscriminatorValue'])),
             'joinMeetingIdSettings' => fn(ParseNode $n) => $o->setJoinMeetingIdSettings($n->getObjectValue([JoinMeetingIdSettings::class, 'createFromDiscriminatorValue'])),
@@ -274,6 +288,18 @@ class OnlineMeetingBase extends Entity implements Parsable
             'videoTeleconferenceId' => fn(ParseNode $n) => $o->setVideoTeleconferenceId($n->getStringValue()),
             'watermarkProtection' => fn(ParseNode $n) => $o->setWatermarkProtection($n->getObjectValue([WatermarkProtectionValues::class, 'createFromDiscriminatorValue'])),
         ]);
+    }
+
+    /**
+     * Gets the isEndToEndEncryptionEnabled property value. Indicates whether end-to-end encryption (E2EE) is enabled for the online meeting.
+     * @return bool|null
+    */
+    public function getIsEndToEndEncryptionEnabled(): ?bool {
+        $val = $this->getBackingStore()->get('isEndToEndEncryptionEnabled');
+        if (is_null($val) || is_bool($val)) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'isEndToEndEncryptionEnabled'");
     }
 
     /**
@@ -405,6 +431,7 @@ class OnlineMeetingBase extends Entity implements Parsable
         $writer->writeBooleanValue('allowAttendeeToEnableCamera', $this->getAllowAttendeeToEnableCamera());
         $writer->writeBooleanValue('allowAttendeeToEnableMic', $this->getAllowAttendeeToEnableMic());
         $writer->writeBooleanValue('allowBreakoutRooms', $this->getAllowBreakoutRooms());
+        $writer->writeBooleanValue('allowCopyingAndSharingMeetingContent', $this->getAllowCopyingAndSharingMeetingContent());
         $writer->writeEnumValue('allowedLobbyAdmitters', $this->getAllowedLobbyAdmitters());
         $writer->writeEnumValue('allowedPresenters', $this->getAllowedPresenters());
         $writer->writeEnumValue('allowLiveShare', $this->getAllowLiveShare());
@@ -419,6 +446,7 @@ class OnlineMeetingBase extends Entity implements Parsable
         $writer->writeObjectValue('audioConferencing', $this->getAudioConferencing());
         $writer->writeObjectValue('chatInfo', $this->getChatInfo());
         $writer->writeObjectValue('chatRestrictions', $this->getChatRestrictions());
+        $writer->writeBooleanValue('isEndToEndEncryptionEnabled', $this->getIsEndToEndEncryptionEnabled());
         $writer->writeBooleanValue('isEntryExitAnnounced', $this->getIsEntryExitAnnounced());
         $writer->writeObjectValue('joinInformation', $this->getJoinInformation());
         $writer->writeObjectValue('joinMeetingIdSettings', $this->getJoinMeetingIdSettings());
@@ -456,6 +484,14 @@ class OnlineMeetingBase extends Entity implements Parsable
     }
 
     /**
+     * Sets the allowCopyingAndSharingMeetingContent property value. Indicates whether the ability to copy and share meeting content is enabled for the meeting.
+     * @param bool|null $value Value to set for the allowCopyingAndSharingMeetingContent property.
+    */
+    public function setAllowCopyingAndSharingMeetingContent(?bool $value): void {
+        $this->getBackingStore()->set('allowCopyingAndSharingMeetingContent', $value);
+    }
+
+    /**
      * Sets the allowedLobbyAdmitters property value. Specifies the users who can admit from the lobby. Possible values are: organizerAndCoOrganizersAndPresenters, organizerAndCoOrganizers, unknownFutureValue.
      * @param AllowedLobbyAdmitterRoles|null $value Value to set for the allowedLobbyAdmitters property.
     */
@@ -464,7 +500,7 @@ class OnlineMeetingBase extends Entity implements Parsable
     }
 
     /**
-     * Sets the allowedPresenters property value. Specifies who can be a presenter in a meeting.
+     * Sets the allowedPresenters property value. Specifies who can be a presenter in a meeting. Possible values are: everyone, organization, roleIsPresenter, organizer, unknownFutureValue. Inherited from onlineMeetingBase.
      * @param OnlineMeetingPresenters|null $value Value to set for the allowedPresenters property.
     */
     public function setAllowedPresenters(?OnlineMeetingPresenters $value): void {
@@ -565,6 +601,14 @@ class OnlineMeetingBase extends Entity implements Parsable
     */
     public function setChatRestrictions(?ChatRestrictions $value): void {
         $this->getBackingStore()->set('chatRestrictions', $value);
+    }
+
+    /**
+     * Sets the isEndToEndEncryptionEnabled property value. Indicates whether end-to-end encryption (E2EE) is enabled for the online meeting.
+     * @param bool|null $value Value to set for the isEndToEndEncryptionEnabled property.
+    */
+    public function setIsEndToEndEncryptionEnabled(?bool $value): void {
+        $this->getBackingStore()->set('isEndToEndEncryptionEnabled', $value);
     }
 
     /**

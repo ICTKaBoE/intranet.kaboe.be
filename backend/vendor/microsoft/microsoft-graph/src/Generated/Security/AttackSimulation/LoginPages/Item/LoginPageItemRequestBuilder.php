@@ -45,10 +45,11 @@ class LoginPageItemRequestBuilder extends BaseRequestBuilder
     }
 
     /**
-     * Represents an attack simulation training login page.
+     * Get a loginPage associated with an attack simulation campaign for a tenant. Login pages are shown to users in attack simulations that use credential harvest and link in attachment social engineering techniques.
      * @param LoginPageItemRequestBuilderGetRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<LoginPage|null>
      * @throws Exception
+     * @link https://learn.microsoft.com/graph/api/loginpage-get?view=graph-rest-1.0 Find more info here
     */
     public function get(?LoginPageItemRequestBuilderGetRequestConfiguration $requestConfiguration = null): Promise {
         $requestInfo = $this->toGetRequestInformation($requestConfiguration);
@@ -87,11 +88,12 @@ class LoginPageItemRequestBuilder extends BaseRequestBuilder
             $requestInfo->addHeaders($requestConfiguration->headers);
             $requestInfo->addRequestOptions(...$requestConfiguration->options);
         }
+        $requestInfo->tryAddHeader('Accept', "application/json");
         return $requestInfo;
     }
 
     /**
-     * Represents an attack simulation training login page.
+     * Get a loginPage associated with an attack simulation campaign for a tenant. Login pages are shown to users in attack simulations that use credential harvest and link in attachment social engineering techniques.
      * @param LoginPageItemRequestBuilderGetRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return RequestInformation
     */

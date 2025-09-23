@@ -8,11 +8,13 @@ use Microsoft\Graph\Generated\Models\BackupRestoreRoot;
 use Microsoft\Graph\Generated\Models\ODataErrors\ODataError;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\DriveInclusionRules\DriveInclusionRulesRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\DriveProtectionUnits\DriveProtectionUnitsRequestBuilder;
+use Microsoft\Graph\Generated\Solutions\BackupRestore\DriveProtectionUnitsBulkAdditionJobs\DriveProtectionUnitsBulkAdditionJobsRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\Enable\EnableRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\ExchangeProtectionPolicies\ExchangeProtectionPoliciesRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\ExchangeRestoreSessions\ExchangeRestoreSessionsRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\MailboxInclusionRules\MailboxInclusionRulesRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\MailboxProtectionUnits\MailboxProtectionUnitsRequestBuilder;
+use Microsoft\Graph\Generated\Solutions\BackupRestore\MailboxProtectionUnitsBulkAdditionJobs\MailboxProtectionUnitsBulkAdditionJobsRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\OneDriveForBusinessProtectionPolicies\OneDriveForBusinessProtectionPoliciesRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\OneDriveForBusinessRestoreSessions\OneDriveForBusinessRestoreSessionsRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\ProtectionPolicies\ProtectionPoliciesRequestBuilder;
@@ -24,6 +26,7 @@ use Microsoft\Graph\Generated\Solutions\BackupRestore\SharePointProtectionPolici
 use Microsoft\Graph\Generated\Solutions\BackupRestore\SharePointRestoreSessions\SharePointRestoreSessionsRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\SiteInclusionRules\SiteInclusionRulesRequestBuilder;
 use Microsoft\Graph\Generated\Solutions\BackupRestore\SiteProtectionUnits\SiteProtectionUnitsRequestBuilder;
+use Microsoft\Graph\Generated\Solutions\BackupRestore\SiteProtectionUnitsBulkAdditionJobs\SiteProtectionUnitsBulkAdditionJobsRequestBuilder;
 use Microsoft\Kiota\Abstractions\BaseRequestBuilder;
 use Microsoft\Kiota\Abstractions\HttpMethod;
 use Microsoft\Kiota\Abstractions\RequestAdapter;
@@ -46,6 +49,13 @@ class BackupRestoreRequestBuilder extends BaseRequestBuilder
     */
     public function driveProtectionUnits(): DriveProtectionUnitsRequestBuilder {
         return new DriveProtectionUnitsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
+    /**
+     * Provides operations to manage the driveProtectionUnitsBulkAdditionJobs property of the microsoft.graph.backupRestoreRoot entity.
+    */
+    public function driveProtectionUnitsBulkAdditionJobs(): DriveProtectionUnitsBulkAdditionJobsRequestBuilder {
+        return new DriveProtectionUnitsBulkAdditionJobsRequestBuilder($this->pathParameters, $this->requestAdapter);
     }
     
     /**
@@ -81,6 +91,13 @@ class BackupRestoreRequestBuilder extends BaseRequestBuilder
     */
     public function mailboxProtectionUnits(): MailboxProtectionUnitsRequestBuilder {
         return new MailboxProtectionUnitsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
+    /**
+     * Provides operations to manage the mailboxProtectionUnitsBulkAdditionJobs property of the microsoft.graph.backupRestoreRoot entity.
+    */
+    public function mailboxProtectionUnitsBulkAdditionJobs(): MailboxProtectionUnitsBulkAdditionJobsRequestBuilder {
+        return new MailboxProtectionUnitsBulkAdditionJobsRequestBuilder($this->pathParameters, $this->requestAdapter);
     }
     
     /**
@@ -161,6 +178,13 @@ class BackupRestoreRequestBuilder extends BaseRequestBuilder
     }
     
     /**
+     * Provides operations to manage the siteProtectionUnitsBulkAdditionJobs property of the microsoft.graph.backupRestoreRoot entity.
+    */
+    public function siteProtectionUnitsBulkAdditionJobs(): SiteProtectionUnitsBulkAdditionJobsRequestBuilder {
+        return new SiteProtectionUnitsBulkAdditionJobsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
+    /**
      * Instantiates a new BackupRestoreRequestBuilder and sets the default values.
      * @param array<string, mixed>|string $pathParametersOrRawUrl Path parameters for the request or a String representing the raw URL.
      * @param RequestAdapter $requestAdapter The request adapter to use to execute the requests.
@@ -232,6 +256,7 @@ class BackupRestoreRequestBuilder extends BaseRequestBuilder
             $requestInfo->addHeaders($requestConfiguration->headers);
             $requestInfo->addRequestOptions(...$requestConfiguration->options);
         }
+        $requestInfo->tryAddHeader('Accept', "application/json");
         return $requestInfo;
     }
 

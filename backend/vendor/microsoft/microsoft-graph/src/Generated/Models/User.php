@@ -393,6 +393,18 @@ class User extends DirectoryObject implements Parsable
     }
 
     /**
+     * Gets the dataSecurityAndGovernance property value. The data security and governance settings for the user. Read-only. Nullable.
+     * @return UserDataSecurityAndGovernance|null
+    */
+    public function getDataSecurityAndGovernance(): ?UserDataSecurityAndGovernance {
+        $val = $this->getBackingStore()->get('dataSecurityAndGovernance');
+        if (is_null($val) || $val instanceof UserDataSecurityAndGovernance) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'dataSecurityAndGovernance'");
+    }
+
+    /**
      * Gets the department property value. The name of the department in which the user works. Maximum length is 64 characters. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in, and eq on null values).
      * @return string|null
     */
@@ -672,6 +684,7 @@ class User extends DirectoryObject implements Parsable
             'createdObjects' => fn(ParseNode $n) => $o->setCreatedObjects($n->getCollectionOfObjectValues([DirectoryObject::class, 'createFromDiscriminatorValue'])),
             'creationType' => fn(ParseNode $n) => $o->setCreationType($n->getStringValue()),
             'customSecurityAttributes' => fn(ParseNode $n) => $o->setCustomSecurityAttributes($n->getObjectValue([CustomSecurityAttributeValue::class, 'createFromDiscriminatorValue'])),
+            'dataSecurityAndGovernance' => fn(ParseNode $n) => $o->setDataSecurityAndGovernance($n->getObjectValue([UserDataSecurityAndGovernance::class, 'createFromDiscriminatorValue'])),
             'department' => fn(ParseNode $n) => $o->setDepartment($n->getStringValue()),
             'deviceEnrollmentLimit' => fn(ParseNode $n) => $o->setDeviceEnrollmentLimit($n->getIntegerValue()),
             'deviceManagementTroubleshootingEvents' => fn(ParseNode $n) => $o->setDeviceManagementTroubleshootingEvents($n->getCollectionOfObjectValues([DeviceManagementTroubleshootingEvent::class, 'createFromDiscriminatorValue'])),
@@ -937,7 +950,7 @@ class User extends DirectoryObject implements Parsable
     }
 
     /**
-     * Gets the isManagementRestricted property value. The isManagementRestricted property
+     * Gets the isManagementRestricted property value. true if the user is a member of a restricted management administrative unit. If not set, the default value is null and the default behavior is false. Read-only.  To manage a user who is a member of a restricted management administrative unit, the administrator or calling app must be assigned a Microsoft Entra role at the scope of the restricted management administrative unit. Returned only on $select.
      * @return bool|null
     */
     public function getIsManagementRestricted(): ?bool {
@@ -1914,6 +1927,7 @@ class User extends DirectoryObject implements Parsable
         $writer->writeCollectionOfObjectValues('createdObjects', $this->getCreatedObjects());
         $writer->writeStringValue('creationType', $this->getCreationType());
         $writer->writeObjectValue('customSecurityAttributes', $this->getCustomSecurityAttributes());
+        $writer->writeObjectValue('dataSecurityAndGovernance', $this->getDataSecurityAndGovernance());
         $writer->writeStringValue('department', $this->getDepartment());
         $writer->writeIntegerValue('deviceEnrollmentLimit', $this->getDeviceEnrollmentLimit());
         $writer->writeCollectionOfObjectValues('deviceManagementTroubleshootingEvents', $this->getDeviceManagementTroubleshootingEvents());
@@ -2242,6 +2256,14 @@ class User extends DirectoryObject implements Parsable
     }
 
     /**
+     * Sets the dataSecurityAndGovernance property value. The data security and governance settings for the user. Read-only. Nullable.
+     * @param UserDataSecurityAndGovernance|null $value Value to set for the dataSecurityAndGovernance property.
+    */
+    public function setDataSecurityAndGovernance(?UserDataSecurityAndGovernance $value): void {
+        $this->getBackingStore()->set('dataSecurityAndGovernance', $value);
+    }
+
+    /**
      * Sets the department property value. The name of the department in which the user works. Maximum length is 64 characters. Returned only on $select. Supports $filter (eq, ne, not , ge, le, in, and eq on null values).
      * @param string|null $value Value to set for the department property.
     */
@@ -2458,7 +2480,7 @@ class User extends DirectoryObject implements Parsable
     }
 
     /**
-     * Sets the isManagementRestricted property value. The isManagementRestricted property
+     * Sets the isManagementRestricted property value. true if the user is a member of a restricted management administrative unit. If not set, the default value is null and the default behavior is false. Read-only.  To manage a user who is a member of a restricted management administrative unit, the administrator or calling app must be assigned a Microsoft Entra role at the scope of the restricted management administrative unit. Returned only on $select.
      * @param bool|null $value Value to set for the isManagementRestricted property.
     */
     public function setIsManagementRestricted(?bool $value): void {

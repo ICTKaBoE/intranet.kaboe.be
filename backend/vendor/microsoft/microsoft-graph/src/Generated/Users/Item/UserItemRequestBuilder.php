@@ -23,6 +23,7 @@ use Microsoft\Graph\Generated\Users\Item\CloudClipboard\CloudClipboardRequestBui
 use Microsoft\Graph\Generated\Users\Item\ContactFolders\ContactFoldersRequestBuilder;
 use Microsoft\Graph\Generated\Users\Item\Contacts\ContactsRequestBuilder;
 use Microsoft\Graph\Generated\Users\Item\CreatedObjects\CreatedObjectsRequestBuilder;
+use Microsoft\Graph\Generated\Users\Item\DataSecurityAndGovernance\DataSecurityAndGovernanceRequestBuilder;
 use Microsoft\Graph\Generated\Users\Item\DeviceManagementTroubleshootingEvents\DeviceManagementTroubleshootingEventsRequestBuilder;
 use Microsoft\Graph\Generated\Users\Item\DirectReports\DirectReportsRequestBuilder;
 use Microsoft\Graph\Generated\Users\Item\Drive\DriveRequestBuilder;
@@ -209,6 +210,13 @@ class UserItemRequestBuilder extends BaseRequestBuilder
     */
     public function createdObjects(): CreatedObjectsRequestBuilder {
         return new CreatedObjectsRequestBuilder($this->pathParameters, $this->requestAdapter);
+    }
+    
+    /**
+     * Provides operations to manage the dataSecurityAndGovernance property of the microsoft.graph.user entity.
+    */
+    public function dataSecurityAndGovernance(): DataSecurityAndGovernanceRequestBuilder {
+        return new DataSecurityAndGovernanceRequestBuilder($this->pathParameters, $this->requestAdapter);
     }
     
     /**
@@ -629,7 +637,7 @@ class UserItemRequestBuilder extends BaseRequestBuilder
      * @param UserItemRequestBuilderDeleteRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<void|null>
      * @throws Exception
-     * @link https://learn.microsoft.com/graph/api/intune-onboarding-user-delete?view=graph-rest-1.0 Find more info here
+     * @link https://learn.microsoft.com/graph/api/intune-mam-user-delete?view=graph-rest-1.0 Find more info here
     */
     public function delete(?UserItemRequestBuilderDeleteRequestConfiguration $requestConfiguration = null): Promise {
         $requestInfo = $this->toDeleteRequestInformation($requestConfiguration);
@@ -670,7 +678,7 @@ class UserItemRequestBuilder extends BaseRequestBuilder
      * @param UserItemRequestBuilderPatchRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<User|null>
      * @throws Exception
-     * @link https://learn.microsoft.com/graph/api/intune-mam-user-update?view=graph-rest-1.0 Find more info here
+     * @link https://learn.microsoft.com/graph/api/user-update?view=graph-rest-1.0 Find more info here
     */
     public function patch(User $body, ?UserItemRequestBuilderPatchRequestConfiguration $requestConfiguration = null): Promise {
         $requestInfo = $this->toPatchRequestInformation($body, $requestConfiguration);
@@ -704,6 +712,7 @@ class UserItemRequestBuilder extends BaseRequestBuilder
             $requestInfo->addHeaders($requestConfiguration->headers);
             $requestInfo->addRequestOptions(...$requestConfiguration->options);
         }
+        $requestInfo->tryAddHeader('Accept', "application/json");
         return $requestInfo;
     }
 

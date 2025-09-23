@@ -5,6 +5,7 @@ namespace Microsoft\Graph\Generated\Models\Security;
 use Microsoft\Kiota\Abstractions\Serialization\Parsable;
 use Microsoft\Kiota\Abstractions\Serialization\ParseNode;
 use Microsoft\Kiota\Abstractions\Serialization\SerializationWriter;
+use Microsoft\Kiota\Abstractions\Types\TypeUtils;
 
 class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsable 
 {
@@ -25,7 +26,7 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Gets the additionalDataOptions property value. The additionalDataOptions property
+     * Gets the additionalDataOptions property value. The options to add items to the review set. Possible values are: allVersions, linkedFiles, unknownFutureValue, advancedIndexing, listAttachments, htmlTranscripts, messageConversationExpansion, locationsWithoutHits, allItemsInFolder. Use the Prefer: include-unknown-enum-members request header to get the following values from this evolvable enum: advancedIndexing, listAttachments, htmlTranscripts, messageConversationExpansion, locationsWithoutHits, allItemsInFolder.
      * @return AdditionalDataOptions|null
     */
     public function getAdditionalDataOptions(): ?AdditionalDataOptions {
@@ -37,7 +38,7 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Gets the cloudAttachmentVersion property value. The cloudAttachmentVersion property
+     * Gets the cloudAttachmentVersion property value. Specifies the number of most recent versions of cloud attachments to collect. Possible values are: latest, recent10, recent100, all, unknownFutureValue.
      * @return CloudAttachmentVersion|null
     */
     public function getCloudAttachmentVersion(): ?CloudAttachmentVersion {
@@ -49,7 +50,7 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Gets the documentVersion property value. The documentVersion property
+     * Gets the documentVersion property value. Specifies the number of most recent versions of SharePoint documents to collect. Possible values are: latest, recent10, recent100, all, unknownFutureValue.
      * @return DocumentVersion|null
     */
     public function getDocumentVersion(): ?DocumentVersion {
@@ -71,13 +72,14 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
             'cloudAttachmentVersion' => fn(ParseNode $n) => $o->setCloudAttachmentVersion($n->getEnumValue(CloudAttachmentVersion::class)),
             'documentVersion' => fn(ParseNode $n) => $o->setDocumentVersion($n->getEnumValue(DocumentVersion::class)),
             'itemsToInclude' => fn(ParseNode $n) => $o->setItemsToInclude($n->getEnumValue(ItemsToInclude::class)),
+            'reportFileMetadata' => fn(ParseNode $n) => $o->setReportFileMetadata($n->getCollectionOfObjectValues([ReportFileMetadata::class, 'createFromDiscriminatorValue'])),
             'reviewSet' => fn(ParseNode $n) => $o->setReviewSet($n->getObjectValue([EdiscoveryReviewSet::class, 'createFromDiscriminatorValue'])),
             'search' => fn(ParseNode $n) => $o->setSearch($n->getObjectValue([EdiscoverySearch::class, 'createFromDiscriminatorValue'])),
         ]);
     }
 
     /**
-     * Gets the itemsToInclude property value. The itemsToInclude property
+     * Gets the itemsToInclude property value. The items to include in the review set. Possible values are: searchHits, partiallyIndexed, unknownFutureValue.
      * @return ItemsToInclude|null
     */
     public function getItemsToInclude(): ?ItemsToInclude {
@@ -86,6 +88,20 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
             return $val;
         }
         throw new \UnexpectedValueException("Invalid type found in backing store for 'itemsToInclude'");
+    }
+
+    /**
+     * Gets the reportFileMetadata property value. Contains the properties for report file metadata, including downloadUrl, fileName, and size.
+     * @return array<ReportFileMetadata>|null
+    */
+    public function getReportFileMetadata(): ?array {
+        $val = $this->getBackingStore()->get('reportFileMetadata');
+        if (is_array($val) || is_null($val)) {
+            TypeUtils::validateCollectionValues($val, ReportFileMetadata::class);
+            /** @var array<ReportFileMetadata>|null $val */
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'reportFileMetadata'");
     }
 
     /**
@@ -122,12 +138,13 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
         $writer->writeEnumValue('cloudAttachmentVersion', $this->getCloudAttachmentVersion());
         $writer->writeEnumValue('documentVersion', $this->getDocumentVersion());
         $writer->writeEnumValue('itemsToInclude', $this->getItemsToInclude());
+        $writer->writeCollectionOfObjectValues('reportFileMetadata', $this->getReportFileMetadata());
         $writer->writeObjectValue('reviewSet', $this->getReviewSet());
         $writer->writeObjectValue('search', $this->getSearch());
     }
 
     /**
-     * Sets the additionalDataOptions property value. The additionalDataOptions property
+     * Sets the additionalDataOptions property value. The options to add items to the review set. Possible values are: allVersions, linkedFiles, unknownFutureValue, advancedIndexing, listAttachments, htmlTranscripts, messageConversationExpansion, locationsWithoutHits, allItemsInFolder. Use the Prefer: include-unknown-enum-members request header to get the following values from this evolvable enum: advancedIndexing, listAttachments, htmlTranscripts, messageConversationExpansion, locationsWithoutHits, allItemsInFolder.
      * @param AdditionalDataOptions|null $value Value to set for the additionalDataOptions property.
     */
     public function setAdditionalDataOptions(?AdditionalDataOptions $value): void {
@@ -135,7 +152,7 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Sets the cloudAttachmentVersion property value. The cloudAttachmentVersion property
+     * Sets the cloudAttachmentVersion property value. Specifies the number of most recent versions of cloud attachments to collect. Possible values are: latest, recent10, recent100, all, unknownFutureValue.
      * @param CloudAttachmentVersion|null $value Value to set for the cloudAttachmentVersion property.
     */
     public function setCloudAttachmentVersion(?CloudAttachmentVersion $value): void {
@@ -143,7 +160,7 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Sets the documentVersion property value. The documentVersion property
+     * Sets the documentVersion property value. Specifies the number of most recent versions of SharePoint documents to collect. Possible values are: latest, recent10, recent100, all, unknownFutureValue.
      * @param DocumentVersion|null $value Value to set for the documentVersion property.
     */
     public function setDocumentVersion(?DocumentVersion $value): void {
@@ -151,11 +168,19 @@ class EdiscoveryAddToReviewSetOperation extends CaseOperation implements Parsabl
     }
 
     /**
-     * Sets the itemsToInclude property value. The itemsToInclude property
+     * Sets the itemsToInclude property value. The items to include in the review set. Possible values are: searchHits, partiallyIndexed, unknownFutureValue.
      * @param ItemsToInclude|null $value Value to set for the itemsToInclude property.
     */
     public function setItemsToInclude(?ItemsToInclude $value): void {
         $this->getBackingStore()->set('itemsToInclude', $value);
+    }
+
+    /**
+     * Sets the reportFileMetadata property value. Contains the properties for report file metadata, including downloadUrl, fileName, and size.
+     * @param array<ReportFileMetadata>|null $value Value to set for the reportFileMetadata property.
+    */
+    public function setReportFileMetadata(?array $value): void {
+        $this->getBackingStore()->set('reportFileMetadata', $value);
     }
 
     /**

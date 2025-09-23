@@ -27,7 +27,7 @@ class OneDriveForBusinessRestoreSession extends RestoreSessionBase implements Pa
     }
 
     /**
-     * Gets the driveRestoreArtifacts property value. A collection of restore points and destination details that can be used to restore a OneDrive for Business drive.
+     * Gets the driveRestoreArtifacts property value. A collection of restore points and destination details that can be used to restore a OneDrive for work or school drive.
      * @return array<DriveRestoreArtifact>|null
     */
     public function getDriveRestoreArtifacts(): ?array {
@@ -41,6 +41,20 @@ class OneDriveForBusinessRestoreSession extends RestoreSessionBase implements Pa
     }
 
     /**
+     * Gets the driveRestoreArtifactsBulkAdditionRequests property value. A collection of user mailboxes and destination details that can be used to restore a OneDrive for work or school drive.
+     * @return array<DriveRestoreArtifactsBulkAdditionRequest>|null
+    */
+    public function getDriveRestoreArtifactsBulkAdditionRequests(): ?array {
+        $val = $this->getBackingStore()->get('driveRestoreArtifactsBulkAdditionRequests');
+        if (is_array($val) || is_null($val)) {
+            TypeUtils::validateCollectionValues($val, DriveRestoreArtifactsBulkAdditionRequest::class);
+            /** @var array<DriveRestoreArtifactsBulkAdditionRequest>|null $val */
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'driveRestoreArtifactsBulkAdditionRequests'");
+    }
+
+    /**
      * The deserialization information for the current model
      * @return array<string, callable(ParseNode): void>
     */
@@ -48,6 +62,7 @@ class OneDriveForBusinessRestoreSession extends RestoreSessionBase implements Pa
         $o = $this;
         return array_merge(parent::getFieldDeserializers(), [
             'driveRestoreArtifacts' => fn(ParseNode $n) => $o->setDriveRestoreArtifacts($n->getCollectionOfObjectValues([DriveRestoreArtifact::class, 'createFromDiscriminatorValue'])),
+            'driveRestoreArtifactsBulkAdditionRequests' => fn(ParseNode $n) => $o->setDriveRestoreArtifactsBulkAdditionRequests($n->getCollectionOfObjectValues([DriveRestoreArtifactsBulkAdditionRequest::class, 'createFromDiscriminatorValue'])),
         ]);
     }
 
@@ -58,14 +73,23 @@ class OneDriveForBusinessRestoreSession extends RestoreSessionBase implements Pa
     public function serialize(SerializationWriter $writer): void {
         parent::serialize($writer);
         $writer->writeCollectionOfObjectValues('driveRestoreArtifacts', $this->getDriveRestoreArtifacts());
+        $writer->writeCollectionOfObjectValues('driveRestoreArtifactsBulkAdditionRequests', $this->getDriveRestoreArtifactsBulkAdditionRequests());
     }
 
     /**
-     * Sets the driveRestoreArtifacts property value. A collection of restore points and destination details that can be used to restore a OneDrive for Business drive.
+     * Sets the driveRestoreArtifacts property value. A collection of restore points and destination details that can be used to restore a OneDrive for work or school drive.
      * @param array<DriveRestoreArtifact>|null $value Value to set for the driveRestoreArtifacts property.
     */
     public function setDriveRestoreArtifacts(?array $value): void {
         $this->getBackingStore()->set('driveRestoreArtifacts', $value);
+    }
+
+    /**
+     * Sets the driveRestoreArtifactsBulkAdditionRequests property value. A collection of user mailboxes and destination details that can be used to restore a OneDrive for work or school drive.
+     * @param array<DriveRestoreArtifactsBulkAdditionRequest>|null $value Value to set for the driveRestoreArtifactsBulkAdditionRequests property.
+    */
+    public function setDriveRestoreArtifactsBulkAdditionRequests(?array $value): void {
+        $this->getBackingStore()->set('driveRestoreArtifactsBulkAdditionRequests', $value);
     }
 
 }

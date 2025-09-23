@@ -53,10 +53,11 @@ class LandingPageItemRequestBuilder extends BaseRequestBuilder
     }
 
     /**
-     * Represents an attack simulation training landing page.
+     * Get a landingPage associated with an attack simulation campaign for a tenant.
      * @param LandingPageItemRequestBuilderGetRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return Promise<LandingPage|null>
      * @throws Exception
+     * @link https://learn.microsoft.com/graph/api/landingpage-get?view=graph-rest-1.0 Find more info here
     */
     public function get(?LandingPageItemRequestBuilderGetRequestConfiguration $requestConfiguration = null): Promise {
         $requestInfo = $this->toGetRequestInformation($requestConfiguration);
@@ -95,11 +96,12 @@ class LandingPageItemRequestBuilder extends BaseRequestBuilder
             $requestInfo->addHeaders($requestConfiguration->headers);
             $requestInfo->addRequestOptions(...$requestConfiguration->options);
         }
+        $requestInfo->tryAddHeader('Accept', "application/json");
         return $requestInfo;
     }
 
     /**
-     * Represents an attack simulation training landing page.
+     * Get a landingPage associated with an attack simulation campaign for a tenant.
      * @param LandingPageItemRequestBuilderGetRequestConfiguration|null $requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @return RequestInformation
     */
