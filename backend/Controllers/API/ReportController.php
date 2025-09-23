@@ -10,9 +10,12 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Navigation;
+use Database\Repository\Helpdesk\Helpdesk;
+use Database\Repository\Helpdesk\Ticket;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\ComputerUsageOnOff;
+use Database\Repository\TempReg\TempReg;
 use Helpers\CString;
 
 class ReportController extends ApiController
@@ -52,13 +55,15 @@ class ReportController extends ApiController
             }
 
             // die(var_dump($usagePerMonth));
-            $this->appendToJson(['series', 0], [
-                'data' => $usagePerDay,
-                'name' => 'Per dag'
-            ]);
-            $this->appendToJson(['series', 1], [
-                'data' => $usagePerWeek,
-                'name' => 'Per week'
+            $this->appendToJson('series', [
+                [
+                    'data' => $usagePerDay,
+                    'name' => 'Per dag'
+                ],
+                [
+                    'data' => $usagePerWeek,
+                    'name' => 'Per week'
+                ]
             ]);
         }
     }
@@ -72,7 +77,6 @@ class ReportController extends ApiController
         ];
 
         if ($filters['schoolId']) {
-            $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
             $repo = new ComputerUsageOnOff;
             $computerRepo = new Computer;
 
@@ -99,14 +103,97 @@ class ReportController extends ApiController
             }
 
             // die(var_dump($usagePerMonth));
-            $this->appendToJson(['series', 0], [
-                'data' => $usagePerDay,
-                'name' => 'Per dag'
-            ]);
-            $this->appendToJson(['series', 1], [
-                'data' => $usagePerWeek,
-                'name' => 'Per week'
+            $this->appendToJson('series', [
+                [
+                    'data' => $usagePerDay,
+                    'name' => 'Per dag'
+                ],
+                [
+                    'data' => $usagePerWeek,
+                    'name' => 'Per week'
+                ]
             ]);
         }
+    }
+
+    public function getTempreg($view, $id = null)
+    {
+        $filters = [
+            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
+            'schoolyear' => Helpers::url()->getParam('schoolyear'),
+        ];
+
+        if ($filters['schoolId']) {
+            $repo = new TempReg;
+
+            $start = General::getSchoolyearStartBySchoolyear($filters['schoolyear']);
+            $end = General::getSchoolyearEndBySchoolyear($filters['schoolyear']);
+            $items = $repo->getBySchoolIdBetween($filters['schoolId'], $start, $end);
+            $items = Arrays::orderBy($items, 'datetime');
+
+            $soup = $pasta = $vegetables = $meat = [];
+            foreach ($items as $item) {
+                $soup[] = [
+                    'x' => Clock::at($item->datetime)->format("Y-m-d"),
+                    'y' => $item->soup == 0 ? null : $item->soup
+                ];
+                $pasta[] = [
+                    'x' => Clock::at($item->datetime)->format("Y-m-d"),
+                    'y' => $item->pasta == 0 ? null : $item->pasta
+                ];
+                $vegetables[] = [
+                    'x' => Clock::at($item->datetime)->format("Y-m-d"),
+                    'y' => $item->vegetables == 0 ? null : $item->vegetables
+                ];
+                $meat[] = [
+                    'x' => Clock::at($item->datetime)->format("Y-m-d"),
+                    'y' => $item->meat == 0 ? null : $item->meat
+                ];
+            }
+
+            $this->appendToJson('series', [
+                [
+                    'data' => $soup,
+                    'name' => 'Soep'
+                ],
+                [
+                    'data' => $pasta,
+                    'name' => 'Aardappel, pasta, rijst, ...'
+                ],
+                [
+                    'data' => $vegetables,
+                    'name' => 'Groente'
+                ],
+                [
+                    'data' => $meat,
+                    'name' => 'Vlees/Vis'
+                ]
+            ]);
+
+            $settings = (new Navigation)->getByParentIdAndLink(0, "report")->settings;
+            $treshholds = Arrays::map($settings['foodtemp']['treshhold'], fn($t) => [
+                'label' => ['text' => ''],
+                'y' => $t['min'],
+                'y2' => $t['max'],
+                'fillColor' => $t['color']
+            ]);
+            $this->appendToJson(['options', 'annotations', 'yaxis'], $treshholds);
+        }
+    }
+
+    public function getHelpdesk($view, $id = null)
+    {
+        $status = (new Navigation)->getByParentIdAndLink(0, "helpdesk")->settings['status'];
+        $labels = array_values(Arrays::map($status, fn($s) => $s['name']));
+        $series = [];
+
+        $ticketRepo = new Helpdesk;
+
+        foreach ($status as $code => $details) {
+            $series[] = count($ticketRepo->getByStatus($code));
+        }
+
+        $this->appendToJson(['options', 'labels'], $labels);
+        $this->appendToJson('series', $series);
     }
 }

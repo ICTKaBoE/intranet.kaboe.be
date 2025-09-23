@@ -1,11 +1,11 @@
-$getSyncUrl = "https://dev.api.kaboe.be/ps/sync";
+$getSyncUrl = "https://api.kaboe.be/ps/sync";
 $postSyncUrl = "$($getSyncUrl)/update/<ID>";
 $baseOU = "OU=COLTD,DC=coltd,DC=be";
 $server = "SRV-DC01.coltd.be";
 
 $today = Get-Date -Format "yyyy-MM-dd";
 $now = Get-Date -Format "yyyy-MM-dd HH:mm:ss";
-$logPath = "$($PSScriptRoot)\Logs\Sync\$($today)";
+$logPath = "$($PSScriptRoot)\Logs\Synchronisation\$($today)";
 $logFile = "$($now.Replace(":", "-")).log";
 
 add-type @"
@@ -39,7 +39,7 @@ function GetExistingItem {
 
     WriteLogFile -type "info" -message "Trying to search for user with EmployeeID '$($item.employeeId)'...";
 
-    $i = Get-ADUser -Server $script:server -SearchBase $script:baseOU -Filter "EmployeeID -eq '$($item.employeeId)' -or EmployeeID -eq 'P$($item.employeeId)'";
+    $i = Get-ADUser -Server $script:server -SearchBase $script:baseOU -Filter "EmployeeID -eq '$($item.employeeId)' -or EmployeeID -eq 'P$($item.employeeId)'" -Properties *;
     return $i;
 }
 
@@ -49,6 +49,7 @@ function LoopItems {
     );
 
     foreach ($item in $items) {
+        EmptyLineLogFile;
         WriteLogFile -type "info" -message "$($item.linked.employee.formatted.fullNameReversed) - $($item.employeeId)";
 
         $lastError = $null;
@@ -76,8 +77,8 @@ function LoopItems {
             }
         }
         catch {
-            $lastError = $_;
-            WriteLogFile -type "error" -message $lastError;
+            $lastError = "$($_.Exception.Message)";
+            WriteLogFile -type "error" -message $_;
         }
 
         if ($updateDatabase -eq $true) {
@@ -133,13 +134,15 @@ function CreateItem {
 }
 
 function SetItemMembership {
-    param($item);
+    param($item, $i);
 
-    $i = GetExistingItem -item $item;
+    # $i = GetExistingItem -item $item;
 
     if ($item.memberOf) {
         foreach ($memberOf in $item.memberOf) {
-            Add-ADGroupMember -Identity $memberOf -Members $i.SamAccountName -Server $script:server -ErrorAction SilentlyContinue | Out-Null;
+            WriteLogFile -type "warn" -message "Adding user to '$($memberOf)'...";
+            # Add-ADGroupMember -Identity $memberOf -Members $i.SamAccountName -Server $script:server -ErrorAction SilentlyContinue | Out-Null;
+            $i | Add-ADPrincipalGroupMembership -MemberOf $memberOf -Server $script:server;
         }
     }
 }
@@ -157,34 +160,34 @@ function UpdateItem {
     }
     else {
         if ($null -ne $item.givenName) {
-            WriteLogFile -type "warn" -message "Updating user GivenName...";
+            WriteLogFile -type "warn" -message "Updating user GivenName ($($i.GivenName) --> $($item.givenName))...";
             $i | Set-ADUser -GivenName $item.givenName -Server $script:server -Confirm:$false;
         }
 
         if ($null -ne $item.surname) {
-            WriteLogFile -type "warn" -message "Updating user Surname...";
+            WriteLogFile -type "warn" -message "Updating user Surname ($($i.Surname) --> $($item.surname))...";
             $i | Set-ADUser -Surname $item.surname -Server $script:server -Confirm:$false;
         }
 
         if ($null -ne $item.displayName) {
-            WriteLogFile -type "warn" -message "Updating user DisplayName...";
+            WriteLogFile -type "warn" -message "Updating user DisplayName ($($i.DisplayName) --> $($item.displayName))...";
             $i | Set-ADUser -DisplayName $item.displayName -Server $script:server -Confirm:$false;
             $i | Rename-ADObject -NewName $item.displayName -Server $script:server -Confirm:$false;
             $i = GetExistingItem -item $item;
         }
 
         if ($null -ne $item.companyName) {
-            WriteLogFile -type "warn" -message "Updating user Company...";
+            WriteLogFile -type "warn" -message "Updating user Company ($($i.Company) --> $($item.companyName))...";
             $i | Set-ADUser -Company $item.companyName -Server $script:server -Confirm:$false;
         }
 
         if ($null -ne $item.department) {
-            WriteLogFile -type "warn" -message "Updating user Department...";
+            WriteLogFile -type "warn" -message "Updating user Department ($($i.Department) --> $($item.department))...";
             $i | Set-ADUser -Department $item.department -Server $script:server -Confirm:$false;
         }
 
         if ($null -ne $item.jobTitle) {
-            WriteLogFile -type "warn" -message "Updating user Title...";
+            WriteLogFile -type "warn" -message "Updating user Title ($($i.Title) --> $($item.jobTitle))...";
             $i | Set-ADUser -Title $item.jobTitle -Server $script:server -Confirm:$false;
         }
 
@@ -200,11 +203,11 @@ function UpdateItem {
 
         if ($null -ne $item.memberOf) {
             WriteLogFile -type "warn" -message "Set user membership...";
-            SetItemMembership -item $item;
+            SetItemMembership -item $item -i $i;
         }
 
         if ($null -ne $item.password) {
-            WriteLogFile -type "warn" -message "Updating user Password...";
+            WriteLogFile -type "warn" -message "Updating user Password $($item.password)...";
             $i | Set-ADAccountPassword -NewPassword (ConvertTo-SecureString -AsPlainText $item.password -Force) -Server $script:server;
             $i | Set-ADUser -ChangePasswordAtLogon $false -PasswordNeverExpires ($item.type -eq "S") -Server $script:server;
         }
@@ -239,12 +242,10 @@ function EnableItem {
     else {
         $i | Enable-ADAccount -Server $script:server -Confirm:$false;
         $i = GetExistingItem -item $item; 
+        UpdateItem -item $item;
 
         if ($i.Enabled -ne $true) {
             throw "Could not enable user!";
-        }
-        else {
-            UpdateItem -item $item;
         }
     }
 }
@@ -327,14 +328,12 @@ function WriteLogFile {
 
 function CloseLogFile {
     $path = "$($script:logPath)\$($script:logFile)";
-    $type = $type.ToUpper();
 
     Add-Content -Path $path -Value "[END OF LOG - $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")]";
 }
 
 function EmptyLineLogFile {
     $path = "$($script:logPath)\$($script:logFile)";
-    $type = $type.ToUpper();
 
     Add-Content -Path $path -Value "";
 }

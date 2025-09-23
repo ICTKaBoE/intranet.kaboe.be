@@ -80,7 +80,7 @@ class ContactController extends ApiController
                 $this->appendToJson('_raw', "base64");
                 $this->appendToJson('raw', base64_encode(General::processTemplate($items)));
             } else {
-                $item = Arrays::firstOrNull($repo->get($id));
+                $item = $repo->getById($id);
                 if (!$item) return;
 
                 $ownfields = $ownfieldRepo->getByInformatEmployeeIdAndSection($item->id, 2);
@@ -153,7 +153,7 @@ class ContactController extends ApiController
 
                 $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "&"));
             }
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getStudent($view, $id = null)
@@ -188,8 +188,6 @@ class ContactController extends ApiController
                 foreach ($items as $index => $i) {
                     $currentRegistration = $registrationRepo->getByInformatStudentId($i->id);
                     $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->current);
-                    // $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => Clock::now()->isAfterOrEqualTo(Clock::at($cr->start)) && (is_null($cr->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($cr->end))));
-                    // $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->status == 0);
                     $currentRegistration = Arrays::firstOrNull($currentRegistration);
 
                     if (!$currentRegistration) {
@@ -197,19 +195,17 @@ class ContactController extends ApiController
                         continue;
                     }
 
-                    $institute = Arrays::firstOrNull($instituteRepo->get($currentRegistration->schoolInstituteId));
-                    $school = Arrays::firstOrNull($schoolRepo->get($institute->schoolId));
+                    $institute = $instituteRepo->getById($currentRegistration->schoolInstituteId);
+                    $school = $schoolRepo->getById($institute->schoolId);
                     $i->linked->school = $school;
 
                     $currentRegistrationClass = $registrationClassRepo->getByInformatRegistrationId($currentRegistration->id);
                     $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => $crc->current);
-                    // $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)) && (is_null($crc->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($crc->end))));
-                    // $currentRegistrationClass = array_reverse(Arrays::orderBy($currentRegistrationClass, 'start'));
                     $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
 
                     if (!$currentRegistrationClass) continue;
                     $i->linked->registration = $currentRegistrationClass;
-                    $i->linked->class = Arrays::firstOrNull($classgroupRepo->get($currentRegistrationClass->informatClassGroupId));
+                    $i->linked->class = $classgroupRepo->getById($currentRegistrationClass->informatClassGroupId);
                 }
 
                 $items = Arrays::map(array_values($items), fn($i) => $i->toArray(true));
@@ -245,7 +241,7 @@ class ContactController extends ApiController
 
                 $history = "";
                 foreach ($registrations as $registration) {
-                    $school = $schoolRepo->get($instituteRepo->get($registration->schoolInstituteId)[0]->schoolId)[0];
+                    $school = $schoolRepo->getById($instituteRepo->getById($registration->schoolInstituteId)->schoolId);
                     $classRegistrations = $registrationClassRepo->getByInformatRegistrationId($registration->id);
                     $classRegistrations = array_reverse(Arrays::orderBy($classRegistrations, "start"));
 
@@ -253,7 +249,7 @@ class ContactController extends ApiController
                     $history .= "<ul>";
 
                     foreach ($classRegistrations as $cr) {
-                        $classgroup = Arrays::firstOrNull($classgroupRepo->get($cr->informatClassGroupId));
+                        $classgroup = $classgroupRepo->getById($cr->informatClassGroupId);
                         $history .= "<li>{$classgroup->code} - {$classgroup->name} ({$cr->formatted->dates})</li>";
                     }
 
@@ -287,7 +283,7 @@ class ContactController extends ApiController
 
                 $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "#"));
             }
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::first($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     // Post functions

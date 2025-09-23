@@ -11,7 +11,21 @@
 
         <div class="card card-md">
             <div class="card-body">
-                <form action="{{api:url}}/user/login" method="post" autocomplete="off" novalidate="" data-dwl-watching="1">
+                <div class="row">
+                    <div class="col-12">
+                        <a href="{{o365:connect}}" class="btn btn-primary w-100">Aanmelden via Office 365</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-secondary w-100" onclick="window.localLogin()">Lokale login</button>
+                    </div>
+                </div>
+
+                <form class="d-none mt-3" id="frm{{page:id}}" action="{{api:url}}/user/login" method="post" autocomplete="off" novalidate="" data-dwl-watching="1">
                     <div class="mb-3">
                         <label class="form-label" for="username">Gebruikersnaam</label>
                         <input type="email" name="username" id="username" class="form-control" placeholder="john.doe@coltd.be" required autofocus>
@@ -26,16 +40,6 @@
                         <button type="submit" id="btn-submit" class="btn btn-primary w-100">Aanmelden</button>
                     </div>
                 </form>
-            </div>
-
-            <div class="hr-text">of</div>
-
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
-                        <a href="{{o365:connect}}" class="btn btn-secondary w-100">Aanmelden via Office 365</a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

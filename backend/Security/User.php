@@ -7,9 +7,11 @@ use Ouzo\Utilities\Strings;
 use Database\Repository\Module;
 use Database\Repository\ModuleSetting;
 use Database\Repository\Security\Group;
+use Database\Repository\Security\GroupNavigation;
 use Database\Repository\Security\GroupUser;
 use Database\Repository\Setting\Setting;
 use Database\Repository\User\User as RepositoryUser;
+use Ouzo\Utilities\Comparator;
 
 abstract class User
 {
@@ -41,27 +43,23 @@ abstract class User
         return false;
     }
 
-    static public function canAccess($minimumRights)
+    static public function canAccess($navigationId)
     {
         $user = self::getLoggedInUser();
-        $userSecurityGroup = (new GroupUser)->getByUserId($user->id);
-        if (!$userSecurityGroup) return false;
+        if ($user->system) return true;
 
-        $permissions = [];
-        foreach ($userSecurityGroup as $usg) {
-            $securityGroup = Arrays::firstOrNull((new Group)->get($usg->securityGroupId));
-            if (!$securityGroup) continue;
+        $userSecurityGroups = (new GroupUser)->getByUserId($user->id);
+        if (!$userSecurityGroups) return false;
 
-            if (empty($permissions)) $permissions = $securityGroup->permission;
-            else {
-                foreach ($securityGroup->permission as $index => $value) {
-                    if ($permissions[$index] == 0 && $value == 1) $permissions[$index] = 1;
-                }
-            }
+        $sgnRepo = new GroupNavigation;
+        $navigationIds = [];
+        foreach ($userSecurityGroups as $usg) {
+            $_navigationIds = Arrays::map($sgnRepo->getBySecurityGroupId($usg->securityGroupId), fn($s) => $s->navigationId);
+            $navigationIds = array_merge($navigationIds, $_navigationIds);
         }
 
-        $firstIsTrue = Arrays::findKeyByValue($minimumRights, 1);
-        return Strings::equal($permissions[$firstIsTrue], 1);
+        $navigationIds = array_unique($navigationIds);
+        return Arrays::contains($navigationIds, $navigationId);
     }
 
     static public function generatePassword()

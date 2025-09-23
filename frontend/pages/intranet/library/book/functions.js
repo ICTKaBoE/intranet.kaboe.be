@@ -89,7 +89,7 @@ let btnDelete = new Button({
 			Form.GetInstance(`${pageId}Delete`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},
@@ -108,7 +108,7 @@ let btnLend = new Button({
 			Form.GetInstance(`${pageId}Lend`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},
@@ -127,7 +127,7 @@ let btnReturn = new Button({
 			Form.GetInstance(`${pageId}Return`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},
@@ -145,7 +145,7 @@ let btnHistory = new Button({
 			Table.GetInstance(`${pageId}History`).appendSource(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 

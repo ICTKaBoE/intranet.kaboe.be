@@ -19,7 +19,7 @@ class SchoolHeaderComponentController extends ComponentController
 
 	private function loadSchoolDetails()
 	{
-		$details = (new School)->get(Helpers::url()->getParam('schoolId'))[0];
+		$details = (new School)->getById(Helpers::url()->getParam('schoolId'));
 
 		foreach ($details->toArray() as $key => $value) $this->layout = str_replace("{{school:" . $key . "}}", $value, $this->layout);
 	}

@@ -5,34 +5,36 @@ namespace Controllers\API;
 use Helpers\PDF;
 use Helpers\ZIP;
 use Helpers\Date;
+use Helpers\Form;
 use Helpers\Excel;
+use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
+use Database\Repository\TempReg\TempReg;
 use Database\Repository\School\School;
-use Database\Repository\TempReg;
-use Database\Repository\Navigation;
-use Database\Repository\Informat\Teacher;
-use Database\Object\TempReg as ObjectTempReg;
+use Database\Repository\Navigation\Setting;
+use Database\Repository\Navigation\TableDef;
+use Database\Object\TempReg\TempReg as ObjectTempReg;
+use Database\Repository\Navigation\Navigation;
 
 class TempregController extends ApiController
 {
     // Get Functions
     protected function getPerson($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "tempreg");
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             if (Helpers::url()->getParam("schoolId")) {
                 $school = str_replace([" ", "-"], "", (new School)->get(Helpers::url()->getParam('schoolId'))[0]->name);
-                $who = $_settings['who'][$school];
+                $who = $settingsRepo->getByNavigationIdAndKey($navigation->id, "who.{$school}")->value;
 
                 $names = explode(PHP_EOL, $who);
                 if (!is_array($names)) $names = [$names];
@@ -53,74 +55,13 @@ class TempregController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
-            $this->appendToJson("defaultOrder", [[1, "desc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Datum/Tijd",
-                        "data" => "formatted.datetimeWithDay",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "300px",
-                    ],
-                    [
-                        "title" => "Gemeten door",
-                        "data" => "name",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Soep",
-                        "data" => "formatted.badge.soup",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "100px",
-                    ],
-                    [
-                        "title" => "Aardappel/Pasta/Rijst",
-                        "data" => "formatted.badge.pasta",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "100px",
-                    ],
-                    [
-                        "title" => "Groenten",
-                        "data" => "formatted.badge.vegetables",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "100px",
-                    ],
-                    [
-                        "title" => "Vlees/Vis",
-                        "data" => "formatted.badge.meat",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "100px",
-                    ],
-                    [
-                        "title" => "Opmerkingen",
-                        "data" => "notes"
-                    ],
-                ]
-            );
+
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "tempreg")->id, "overview");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             if (Helpers::url()->getParam("start")) $items = Arrays::filter($items, fn($i) => Clock::at($i->start)->isAfterOrEqualTo(Clock::at(Helpers::url()->getParam("start"))));
@@ -132,15 +73,12 @@ class TempregController extends ApiController
             General::filter($items, $filters);
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getSettings($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        $this->getNavigationSettings("tempreg");
     }
 
     // Post functions
@@ -148,83 +86,69 @@ class TempregController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $soup = Helpers::input()->post('soup')->getValue();
-        $pasta = Helpers::input()->post('pasta')->getValue();
-        $vegetables = Helpers::input()->post('vegetables')->getValue();
-        $meat = Helpers::input()->post('meat')->getValue();
-        $notes = Helpers::input()->post('notes')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "soup" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
+            "pasta" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
+            "vegetables" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
+            "meat" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
+            "notes",
+            ["default" => null]
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new TempReg;
             $item = new ObjectTempReg;
-            $item->schoolId = $schoolId;
-            $item->name = $name;
-            $item->soup = $soup ?: 0;
-            $item->pasta = $pasta ?: 0;
-            $item->vegetables = $vegetables ?: 0;
-            $item->meat = $meat ?: 0;
-            $item->notes = $notes ?: null;
+            $item->fillWithPostData();
 
             $repo->set($item);
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De registratie is opgeslagen!");
-            $this->setResetForm();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postSettings($view, $id = null)
     {
-        $_settings = Helpers::input()->all();
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("tempreg");
     }
 
     protected function postExport($view, $id = null)
     {
-        $school = Helpers::input()->post('school');
-        if (!is_null($school)) $school = $school->getValue();
-        if (is_array($school) && !Strings::contains($school, ";")) {
-            $s = [];
-            foreach ($school as $sch) {
-                $s[] = $sch->getValue();
-            }
-            $school = $s;
-        } else if (Strings::contains($school, ";")) {
-            $school = explode(";", $school);
-        } else $school = [$school];
-        $start = Helpers::input()->post('start')->getValue();
-        $end = Helpers::input()->post('end')->getValue();
-        $showNamesAs = Helpers::input()->post('showNamesAs')->getValue();
-        $exportAs = Helpers::input()->post('exportAs')->getValue();
+        $_fields = [
+            "school" => ["mandatory" => true],
+            "start" => ["mandatory" => true],
+            "end" => ["mandatory" => true],
+            "showNamesAs",
+            "exportAs"
+        ];
 
-        if (Input::empty($school[0])) $this->setValidation("school", "Scholen moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($start) || Input::empty($start)) $this->setValidation("start", "Start datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($end) || Input::empty($end)) $this->setValidation("end", "Eind datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if (is_array($fields['school']) && !Strings::contains($fields['school'], ";")) {
+            $s = [];
+            foreach ($fields['school'] as $sch)
+                $s[] = $sch->getValue();
+
+            $fields['school'] = $s;
+        } else if (Strings::contains($fields['school'], ";")) {
+            $fields['school'] = explode(";", $fields['school']);
+        } else $fields['school'] = [$fields['school']];
 
         if ($this->validationIsAllGood()) {
-            if (Clock::at($start)->isAfter(Clock::at($end))) {
+            if (Clock::at($fields["start"])->isAfter(Clock::at($fields["end"]))) {
                 $this->setValidation("start", "Start datum moet voor de eind datum liggen!", self::VALIDATION_STATE_INVALID);
                 $this->setValidation("end", "Start datum moet voor de eind datum liggen!", self::VALIDATION_STATE_INVALID);
             }
 
             if ($this->validationIsAllGood()) {
-                if (Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end, $showNamesAs);
-                else if (Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end, $showNamesAs);
+                if (Strings::equal($fields["exportAs"], 'pdf')) $this->exportPerSchoolAsPdf($fields["school"], $fields["start"], $fields["end"], $fields["showNamesAs"]);
+                else if (Strings::equal($fields["exportAs"], 'xlsx')) $this->exportPerSchoolAsXlsx($fields["school"], $fields["start"], $fields["end"], $fields["showNamesAs"]);
                 $this->setValidation("start", "", self::VALIDATION_STATE_VALID);
                 $this->setValidation("end", "", self::VALIDATION_STATE_VALID);
             }

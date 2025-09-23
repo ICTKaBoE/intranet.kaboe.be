@@ -2,6 +2,7 @@
 
 namespace Controllers\API;
 
+use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -9,13 +10,15 @@ use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\User\User;
 use Controllers\ApiController;
-use Database\Repository\Setting\Setting;
+use Database\Repository\User\User;
 use Security\User as SecurityUser;
 use Database\Repository\User\Address;
-use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
+use Database\Repository\Setting\Setting;
 use Database\Repository\User\LoginHistory;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 
 class UserController extends ApiController
 {
@@ -130,32 +133,12 @@ class UserController extends ApiController
             $items = Arrays::map($items, fn($i) => $i = $i->toArray(true));
             $this->appendToJson('items', $items);
         } else if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
-            $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "title" => "Naam",
-                        "data" => "name",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Voornaam",
-                        "data" => "firstName",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Gebruikersnaam",
-                        "data" => "username"
-                    ],
-                    [
-                        "title" => "Laatste aanmelding",
-                        "data" => "formatted.lastLogin",
-                        "width" => "250px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "users");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             Arrays::each($items, function ($i) use ($loginRepo) {

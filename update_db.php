@@ -33,6 +33,7 @@ try {
     }
 
     $db->commit();
+    echo "DONE!";
 } catch (\Exception $e) {
     $db->rollback();
     echo "Failed at line:<br />{$line}<br /><br />Error Message:<br />{$e->getMessage()}";

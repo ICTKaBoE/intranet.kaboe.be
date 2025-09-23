@@ -5,7 +5,7 @@ namespace Database\Object\Management;
 use Helpers\CString;
 use Security\Session;
 use Ouzo\Utilities\Arrays;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Interface\CustomObject;
 
 class Printer extends CustomObject
@@ -32,7 +32,7 @@ class Printer extends CustomObject
 
     public function init()
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $settings = (new Navigation)->getByParentIdAndLink(0, "management")->settings;
         $this->formatted->mode = $settings['printer']['mode'][$this->mode]['name'];
         $this->formatted->manModel = "{$this->manufacturer} {$this->model}";
     }

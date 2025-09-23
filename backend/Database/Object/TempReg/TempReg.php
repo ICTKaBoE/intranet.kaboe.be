@@ -1,0 +1,95 @@
+<?php
+
+namespace Database\Object\TempReg;
+
+use stdClass;
+use Helpers\HTML;
+use Helpers\CString;
+use Ouzo\Utilities\Clock;
+use Ouzo\Utilities\Arrays;
+use Database\Interface\CustomObject;
+use Database\Repository\TempReg\Treshhold;
+use Database\Repository\Navigation\Navigation;
+
+class TempReg extends CustomObject
+{
+    protected $objectAttributes = [
+        "id" => "int",
+        "schoolId" => "int",
+        "datetime" => "datetime",
+        "name" => "string",
+        "soup" => "double",
+        "pasta" => "double",
+        "vegetables" => "double",
+        "meat" => "double",
+        "notes" => "string",
+        "deleted" => "boolean"
+    ];
+
+    protected $linkedAttributes = [
+        "school" => [
+            "schoolId" => \Database\Repository\School\School::class
+        ]
+    ];
+
+    public function init()
+    {
+        $this->formatted->datetime = Clock::at($this->datetime)->format("d/m/Y H:i:s");
+        $this->formatted->datetimeWithDay = new stdClass;
+        $this->formatted->datetimeWithDay->display = Clock::at($this->datetime)->format("l d/m/Y H:i:s");
+        $this->formatted->datetimeWithDay->sort = Clock::at($this->datetime)->format("U");
+
+        $this->formatted->soup = CString::formatNumber($this->soup, 2) . "°C";
+        $this->formatted->pasta = CString::formatNumber($this->pasta, 2) . "°C";
+        $this->formatted->vegetables = CString::formatNumber($this->vegetables, 2) . "°C";
+        $this->formatted->meat = CString::formatNumber($this->meat, 2) . "°C";
+
+        $this->formatted->nameInitials = CString::firstLetterOfEachWord($this->name);
+
+        $this->createBadgeSoup();
+        $this->createBadgePasta();
+        $this->createBadgeVegetables();
+        $this->createBadgeMeat();
+    }
+
+    private function createBadgeSoup()
+    {
+        $level = (new Treshhold)->getByPercentageBetween($this->soup);
+        $this->formatted->badge->capacity = HTML::Badge($this->formatted->capacity, backgroundColor: $level->color);
+
+        if (!$level) return;
+        $this->formatted->badge->soup = new stdClass;
+        $this->formatted->badge->soup->display = $this->soup > 0 ? HTML::Badge($this->formatted->soup, backgroundColor: $level->color) : "";
+        $this->formatted->badge->soup->sort = $this->soup;
+    }
+
+    private function createBadgePasta()
+    {
+        $level = (new Treshhold)->getByPercentageBetween($this->pasta);
+
+        if (!$level) return;
+        $this->formatted->badge->pasta = new stdClass;
+        $this->formatted->badge->pasta->display = $this->pasta > 0 ? HTML::Badge($this->formatted->pasta, backgroundColor: $level->color) : "";
+        $this->formatted->badge->pasta->sort = $this->pasta;
+    }
+
+    private function createBadgeVegetables()
+    {
+        $level = (new Treshhold)->getByPercentageBetween($this->vegetables);
+
+        if (!$level) return;
+        $this->formatted->badge->vegetables = new stdClass;
+        $this->formatted->badge->vegetables->display = $this->vegetables > 0 ? HTML::Badge($this->formatted->vegetables, backgroundColor: $level->color) : "";
+        $this->formatted->badge->vegetables->sort = $this->vegetables;
+    }
+
+    private function createBadgeMeat()
+    {
+        $level = (new Treshhold)->getByPercentageBetween($this->meat);
+
+        if (!$level) return;
+        $this->formatted->badge->meat = new stdClass;
+        $this->formatted->badge->meat->display = $this->meat > 0 ? HTML::Badge($this->formatted->meat, backgroundColor: $level->color) : "";
+        $this->formatted->badge->meat->sort = $this->meat;
+    }
+}

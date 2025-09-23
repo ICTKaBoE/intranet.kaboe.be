@@ -3,6 +3,7 @@
 namespace Informat;
 
 use Database\Repository\Setting\Setting;
+use Database\Repository\Source;
 use GuzzleHttp\Client;
 use Helpers\CString;
 use Ouzo\Utilities\Arrays;
@@ -13,22 +14,22 @@ abstract class Connection
 {
     const RESPONSE_CODE_OK = 200;
 
-    static public function init()
+    static public function init($sourceId = null)
     {
-        $settingRepo = new Setting;
+        $sourceRepo = new Source;
 
-        $tokenValue = Arrays::firstOrNull($settingRepo->get('informat.token.value'));
-        $tokenType = Arrays::firstOrNull($settingRepo->get('informat.token.type'));
-        $tokenUntil = Arrays::firstOrNull($settingRepo->get('informat.token.until'));
+        $tokenValue = self::GetTokenValue($sourceId);
+        $tokenType = self::GetTokenType($sourceId);
+        $tokenUntil = self::GetTokenUntil($sourceId);
 
-        $identityEndpoint = Strings::trimToNull(self::GetIdentityEndpoint());
-        $identityGrantType = Strings::trimToNull(self::GetIdentityGrantType());
-        $identityClientId = Strings::trimToNull(self::GetIdentityClientId());
-        $identityClientSecret = Strings::trimToNull(self::GetIdentityClientSecret());
-        $identityScopes = Strings::trimToNull(self::GetIdentityScope());
+        $identityEndpoint = Strings::trimToNull(self::GetIdentityEndpoint($sourceId));
+        $identityGrantType = Strings::trimToNull(self::GetIdentityGrantType($sourceId));
+        $identityClientId = Strings::trimToNull(self::GetIdentityClientId($sourceId));
+        $identityClientSecret = Strings::trimToNull(self::GetIdentityClientSecret($sourceId));
+        $identityScopes = Strings::trimToNull(self::GetIdentityScope($sourceId));
         $identityScopes = CString::noLines($identityScopes, " ");
 
-        if (Strings::isBlank($tokenValue->value) || Strings::isBlank($tokenUntil->value) || Clock::now()->isAfter(Clock::at($tokenUntil?->value))) {
+        if (Strings::isBlank($tokenValue) || Strings::isBlank($tokenUntil) || Clock::now()->isAfter(Clock::at($tokenUntil))) {
             $client = new Client;
 
             $response = $client->request('POST', $identityEndpoint, [
@@ -44,13 +45,11 @@ abstract class Connection
                 $body = $response->getBody()->getContents();
                 $body = json_decode($body, true);
 
-                $tokenValue->value = $body['access_token'];
-                $tokenType->value = $body['token_type'];
-                $tokenUntil->value = Clock::now()->plusSeconds($body['expires_in'])->format("Y-m-d H:i:s");
-
-                $settingRepo->set($tokenValue);
-                $settingRepo->set($tokenType);
-                $settingRepo->set($tokenUntil);
+                $source = $sourceRepo->getById($sourceId);
+                $source->tokenValue = $body['access_token'];
+                $source->tokenType = $body['token_type'];
+                $source->tokenUntil = Clock::now()->plusSeconds($body['expires_in'])->format("Y-m-d H:i:s");
+                $sourceRepo->set($source);
             } else {
                 return false;
             }
@@ -59,43 +58,43 @@ abstract class Connection
         return true;
     }
 
-    static public function GetIdentityEndpoint()
+    static public function GetIdentityEndpoint($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.identity.endpoint"))->value;
+        return (new Source)->getById($sourceId)->identityEndpoint;
     }
 
-    static public function GetIdentityGrantType()
+    static public function GetIdentityGrantType($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.identity.grantType"))->value;
+        return (new Source)->getById($sourceId)->identityGrantType;
     }
 
-    static public function GetIdentityClientId()
+    static public function GetIdentityClientId($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.identity.clientId"))->value;
+        return (new Source)->getById($sourceId)->identityClientId;
     }
 
-    static public function GetIdentityClientSecret()
+    static public function GetIdentityClientSecret($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.identity.clientSecret"))->value;
+        return (new Source)->getById($sourceId)->identityClientSecret;
     }
 
-    static public function GetIdentityScope()
+    static public function GetIdentityScope($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.identity.scope"))->value;
+        return (new Source)->getById($sourceId)->identityScope;
     }
 
-    static public function GetTokenValue()
+    static public function GetTokenValue($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.token.value"))->value;
+        return (new Source)->getById($sourceId)->tokenValue;
     }
 
-    static public function GetTokenType()
+    static public function GetTokenType($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.token.type"))->value;
+        return (new Source)->getById($sourceId)->tokenType;
     }
 
-    static public function GetTokenUntil()
+    static public function GetTokenUntil($sourceId)
     {
-        return Arrays::first((new Setting)->get("informat.token.until"))->value;
+        return (new Source)->getById($sourceId)->tokenUntil;
     }
 }

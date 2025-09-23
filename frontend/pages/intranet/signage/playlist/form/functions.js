@@ -24,7 +24,7 @@ window.edit = () => {
 	Form.GetInstance(`${pageId}Item`).prefillForm(
 		Table.GetInstance(`${pageId}Item`)
 			.getSelectedRowData()
-			.map((r) => r.guid ?? r.id)
+			.map((r) => r.guid || r.id)
 			.join("_")
 	);
 };
@@ -68,7 +68,7 @@ let btnUp = new Button({
 			Form.GetInstance(`${pageId}ItemUp`).setLastLoadedId(
 				Table.GetInstance(`${pageId}Item`)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 			Form.GetInstance(`${pageId}ItemUp`).submit();
@@ -86,7 +86,7 @@ let btnDown = new Button({
 			Form.GetInstance(`${pageId}ItemDown`).setLastLoadedId(
 				Table.GetInstance(`${pageId}Item`)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 			Form.GetInstance(`${pageId}ItemDown`).submit();
@@ -105,7 +105,7 @@ let btnDelete = new Button({
 			Form.GetInstance(`${pageId}Delete`).setLastLoadedId(
 				Table.GetInstance(`${pageId}Item`)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},

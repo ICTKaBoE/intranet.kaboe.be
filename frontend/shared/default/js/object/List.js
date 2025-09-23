@@ -44,7 +44,10 @@ export default class List {
 	};
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("lst")) id = `lst${id}`;
+		if (!id.startsWith("lst"))
+			id = `lst${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return List.INSTANCES[id] || false;
 	};
 

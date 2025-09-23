@@ -27,6 +27,15 @@ export default class Select {
 		this.optgroupLabel = this.element.dataset.optgroupLabel || false;
 		this.limit = this.element.dataset.limit || 200;
 		this.defaultNoLoad = this.element.hasAttribute("data-default-no-load");
+		this.defaultNoValue = this.element.hasAttribute(
+			"data-default-no-value"
+		);
+		this.hideIfNoOptions = this.element.hasAttribute(
+			"data-hide-if-no-options"
+		);
+		this.disableIfNoOptions = this.element.hasAttribute(
+			"data-disable-if-no-options"
+		);
 
 		this.eventListeners = [];
 		this.selectedDetails = false;
@@ -142,7 +151,10 @@ export default class Select {
 		this.disable();
 		if (this.parent) this.detectParentAndSetFunctions();
 		this.setDefaultValue();
+		if (this.defaultNoValue) this.clear();
 		if (!this.defaultDisabled) this.enable();
+		if (this.hideIfNoOptions) this.checkHide();
+		if (this.disableIfNoOptions) this.checkDisable();
 		this.loaded = true;
 	};
 
@@ -161,7 +173,10 @@ export default class Select {
 		this.createSelect();
 		this.setEventListeners();
 		this.setDefaultValue();
+		if (this.defaultNoValue) this.clear();
 		if (!this.defaultDisabled) this.enable();
+		if (this.hideIfNoOptions) this.checkHide();
+		if (this.disableIfNoOptions) this.checkDisable();
 		this.loaded = true;
 	};
 
@@ -187,7 +202,7 @@ export default class Select {
 			render: {},
 			searchField: ["text"],
 			copyClassesToDropdown: false,
-			controlInput: "<input>",
+			controlInput: this.search ? "<input>" : null,
 		};
 
 		if (this.render.item)
@@ -202,10 +217,10 @@ export default class Select {
 
 		if (this.onChange)
 			settings.onChange = (value) => {
-				window[this.onChange](value);
+				$(document).ready(() => {
+					window[this.onChange](value);
+				});
 			};
-
-		if (this.search) settings.controlInput = "<input>";
 
 		if (this.optgroupAttribute) {
 			settings.optgroupField = this.optgroupAttribute;
@@ -266,6 +281,16 @@ export default class Select {
 		if (this.defaultValue) this.setValue(this.defaultValue, false);
 	};
 
+	checkHide = () => {
+		if (this.data.items.length > 0) this.show();
+		else this.hide();
+	};
+
+	checkDisable = () => {
+		if (this.data.items.length > 0) this.enable();
+		else this.disable();
+	};
+
 	setValue = (value, silent = false) => {
 		this.defaultValue = value;
 		Helpers.CheckAllLoaded(() => {
@@ -282,23 +307,19 @@ export default class Select {
 		return items;
 	};
 
-	getItemDetails = () => {
-		let value = this.getValue();
-		let details = null;
+	getText = () => {
+		let details = this.getItemDetails();
+		if (!details) return "";
+		return details[
+			this.loadLabel[this.selectedDetails || this.defaultDetails] ||
+				this.loadLabel
+		];
+	};
 
-		$.each(this.tomSelect.options, (idx, opt) => {
-			if (
-				opt[
-					this.loadValue[
-						this.selectedDetails || this.defaultDetails
-					] || this.loadValue
-				] == value
-			) {
-				details = opt;
-			}
-		});
+	getItemDetails = () => this.tomSelect.options[this.getValue()];
 
-		return details;
+	addOption = (v, t) => {
+		this.tomSelect.addOption({ value: v, text: t });
 	};
 
 	setEventListeners = () => {
@@ -313,6 +334,7 @@ export default class Select {
 	};
 
 	clear = () => {
+		this.data.items = [];
 		if (this.tomSelect != undefined) this.tomSelect.clear();
 		this.setDefaultValue();
 	};
@@ -329,6 +351,14 @@ export default class Select {
 		else this.element.disabled = true;
 	};
 
+	hide = () => {
+		this.element.parentElement.classList.add("d-none");
+	};
+
+	show = () => {
+		this.element.parentElement.classList.remove("d-none");
+	};
+
 	destroy = () => {
 		if (this.tomSelect != undefined) this.tomSelect.destroy();
 	};
@@ -339,16 +369,14 @@ export default class Select {
 
 	detectParentAndSetFunctions = () => {
 		setTimeout(() => {
-			if (!this.parentSelect)
-				this.parentSelect = Select.INSTANCES[this.parent];
-
-			if (this.parentSelect) {
-				this.parentSelect.setEventListener("change", (value) => {
+			Select.GetInstance(this.parent).setEventListener(
+				"change",
+				(value) => {
 					this.data.items = [];
-					this.setExtraLoadParam(this.parentSelect.id, value);
+					this.setExtraLoadParam(this.parent, value);
 					this.reload();
-				});
-			}
+				}
+			);
 		}, 500);
 	};
 }

@@ -12,11 +12,8 @@ class GroupUser extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        // "securityGroup" => [
-        //     "securityGroupId" => \Database\Repository\Security\Group::class
-        // ],
-        // "user" => [
-        //     "userId" => \Database\Repository\User\User::class
-        // ]
+        "securityGroup" => [
+            "securityGroupId" => \Database\Repository\Security\Group::class
+        ],
     ];
 }

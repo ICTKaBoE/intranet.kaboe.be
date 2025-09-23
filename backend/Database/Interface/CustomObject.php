@@ -69,7 +69,7 @@ class CustomObject extends stdClass
         foreach ($this->linkedAttributes as $la => $prop) {
             $attribute = key($prop);
 
-            if (is_null($this->$attribute) || Strings::isBlank($this->$attribute)) continue;
+            if (is_null($this->$attribute) || Strings::isBlank($this->$attribute) || (int)$this->$attribute == 0) continue;
 
             $repo = $prop[$attribute];
 
@@ -77,13 +77,18 @@ class CustomObject extends stdClass
                 $this->linked->$la = [];
 
                 foreach (explode(";", $this->$attribute) as $a) {
-                    $this->linked->$la[] = Arrays::firstOrNull((new $repo)->get($a));
+                    $this->linked->$la[] = (new $repo)->getById($a);
                 }
-            } else $this->linked->$la = Arrays::firstOrNull((new $repo)->get($this->$attribute));
+            } else $this->linked->$la = (new $repo)->getById($this->$attribute);
         }
     }
 
     public function init() {}
+
+    public function fillWithPostData()
+    {
+        foreach ($this->getKeys() as $key) $this->$key = \Router\Helpers::input()->post($key)?->getValue() ?? $this->$key;
+    }
 
     public function toArray($flatten = false)
     {

@@ -8,6 +8,6 @@ class Employee extends Repository
 {
     public function __construct()
     {
-        parent::__construct(self::ENDPOINT_EMPLOYEE, \Informat\Object\Employee::class, apiVersion: 2);
+        parent::__construct(self::ENDPOINT_EMPLOYEE, \Informat\Object\Employee::class, apiVersion: 2, structure: false);
     }
 }

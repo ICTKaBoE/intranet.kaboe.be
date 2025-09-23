@@ -6,9 +6,10 @@ use Ouzo\Utilities\Arrays;
 use JAMF\Repository\Device;
 use Ouzo\Utilities\Strings;
 use Database\Repository\School\School;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Management\IPad;
 use Database\Object\Management\IPad as ManagementIPad;
+use Database\Repository\Navigation\Setting;
 use Ouzo\Utilities\Clock;
 
 abstract class JAMF
@@ -39,14 +40,10 @@ abstract class JAMF
 
         $end = Clock::now();
 
-        $settings = [];
-        $settings["ipad"]["lastSyncTime"] = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->getByParentIdAndLink(0, 'management'));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
+        $repo = new Setting;
+        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, 'management')->id, "ipad.lastSyncTime");
+        $item->value = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
+        $repo->set($item);
 
         return true;
     }

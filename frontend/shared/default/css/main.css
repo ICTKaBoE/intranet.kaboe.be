@@ -1,63 +1,80 @@
+@media (min-width: 992px) {
+	:host,
+	:root {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+
 .footer {
 	padding: 1rem 0 !important;
 }
 
 .spinner-border {
-  --tblr-spinner-border-width: 5px;
-  --tblr-spinner-animation-speed: 1.5s;
+	--tblr-spinner-border-width: 5px;
+	--tblr-spinner-animation-speed: 1.5s;
 }
 
 .fc .fc-bg-event {
-  opacity: 1 !important;
+	opacity: 1 !important;
 }
 
 .fc-timegrid-event-harness > .fc-timegrid-event {
-  inset: 0 10px 0 0 !important
+	inset: 0 10px 0 0 !important;
+}
+
+.ts-control {
+	min-height: calc(1.5em + 0.75rem);
 }
 
 .navbar-brand-image.large {
-  height: 100px;
+	height: 100px;
 }
 
 .clock {
-  padding: 1rem;
-  border-radius: 6px;
-  letter-spacing: 0.5rem;
-  color: white;
+	padding: 1rem;
+	border-radius: 6px;
+	letter-spacing: 0.5rem;
+	color: white;
 }
 
 div[data-selectable] input[type="checkbox"] {
-  margin-right: 6px !important;
+	margin-right: 6px !important;
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator {
-  background: none;
+	background: none;
 }
 
 #headingOne {
-  margin-bottom: 0px;
+	margin-bottom: 0px;
 }
 
 .invalid-feedback:not(:empty) {
-  display: block !important;
-}
-
-.ms-15 {
-  margin-left: 15rem;
+	display: block !important;
 }
 
 div.dt-search {
-  text-align: start !important;
+	text-align: start !important;
 }
 
 div.dt-paging .pagination {
-  justify-content: end !important;
+	justify-content: end !important;
 }
 
 td:first-child {
-  white-space: nowrap;
+	white-space: nowrap;
 }
 
-.dropdown-menu.ts-dropdown .ts-dropdown-content .optgroup .dropdown-item {
-  padding-left: 2rem;
+.dropdown-menu.ts-dropdown
+	.ts-dropdown-content
+	.optgroup
+	.dropdown-item::before {
+	content: " ";
+}
+
+.steps {
+	border-left: none;
+	margin-bottom: 0;
+	flex-direction: row;
 }

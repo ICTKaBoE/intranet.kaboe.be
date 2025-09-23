@@ -38,7 +38,7 @@ window.edit = () => {
 	Form.GetInstance(`${pageId}Line`).prefillForm(
 		Table.GetInstance(`${pageId}Line`)
 			.getSelectedRowData()
-			.map((r) => r.guid ?? r.id)
+			.map((r) => r.guid || r.id)
 			.join("_")
 	);
 };
@@ -75,7 +75,7 @@ let btnDelete = new Button({
 			Form.GetInstance(`${pageId}LineDelete`).setLastLoadedId(
 				Table.GetInstance(`${pageId}Line`)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},

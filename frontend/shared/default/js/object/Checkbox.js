@@ -93,10 +93,10 @@ export default class Checkbox {
 			else this.inputs[item].checked = false;
 		});
 
-		if (this.onChange) {
-			if (this.onChange instanceof Function) this.onChange();
-			else window[this.onChange]();
-		}
+		// if (this.onChange) {
+		// 	if (this.onChange instanceof Function) this.onChange();
+		// 	else window[this.onChange]();
+		// }
 	};
 
 	getValue = () => {

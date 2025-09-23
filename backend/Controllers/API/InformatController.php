@@ -31,18 +31,12 @@ class InformatController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
+
             $this->appendToJson("defaultOrder", [[1, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
                 data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
+
                     [
                         "title" => "Naam",
                         "data" => "name"

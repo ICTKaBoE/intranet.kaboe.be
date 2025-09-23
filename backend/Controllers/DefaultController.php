@@ -11,7 +11,7 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use M365\AuthenticationManager;
 use Database\Repository\Setting\Setting;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
 use Helpers\CString;
 use Helpers\General;
@@ -184,6 +184,7 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{taskboard:url:short}}", "{{api:url}}/taskboard", $this->layout);
 		$this->layout = str_replace("{{list:url:short}}", "{{api:url}}/list", $this->layout);
 		$this->layout = str_replace("{{signage:url:short}}", "{{api:url}}/signage", $this->layout);
+		$this->layout = str_replace("{{notifications:url:short}}", "{{api:url}}/notification/notification", $this->layout);
 
 		$this->layout = str_replace("{{form:url:full}}", "{{api:url}}/form/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{calendar:url:full}}", "{{api:url}}/calendar/{{url:part.module}}/{{url:part.page}}", $this->layout);
@@ -194,11 +195,11 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{taskboard:url:full}}", "{{api:url}}/taskboard/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{list:url:full}}", "{{api:url}}/list/{{url:part.module}}/{{url:part.page}}", $this->layout);
 		$this->layout = str_replace("{{signage:url:full}}", "{{api:url}}/signage/{{url:part.module}}/{{url:part.page}}", $this->layout);
+		$this->layout = str_replace("{{notifications:url:full}}", "{{api:url}}/notification/notification", $this->layout);
 
 		$this->layout = str_replace("{{o365:connect}}", (string)AuthenticationManager::connect(), $this->layout);
 
-		$mode = (new Setting)->get("site.mode")[0]->value;
-		$apiUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . (Strings::equal($mode, "dev") ? "dev." : "") . "api.kaboe.be";
+		$apiUrl = (Helpers::url()->getScheme() ?? 'http') . "://" . (DEV_MODE ? "dev." : "") . "api.kaboe.be";
 		$this->layout = str_replace("{{api:url}}", $apiUrl, $this->layout);
 	}
 
@@ -354,7 +355,6 @@ class DefaultController extends stdClass
 		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 		if (!$module) return [];
 
-		Session::set("moduleSettingsId", $module->id);
 		if ($module->settings !== null) $settings = $module->settings;
 
 		return $settings;

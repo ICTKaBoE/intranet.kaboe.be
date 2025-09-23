@@ -28,7 +28,10 @@ export default class Signage {
 	}
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("sgn")) id = `sgn${id}`;
+		if (!id.startsWith("sgn"))
+			id = `sgn${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Signage.INSTANCES[id] || false;
 	};
 

@@ -27,7 +27,10 @@ export default class ColorInput {
 
 	static GetInstance = (id) => {
 		console.log(id);
-		if (!id.startsWith("cin")) id = `cin${id}`;
+		if (!id.startsWith("cin"))
+			id = `cin${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return ColorInput.INSTANCES[id] || false;
 	};
 

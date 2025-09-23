@@ -21,16 +21,17 @@ class Repository extends stdClass
     const ENDPOINT_STUDENT_REGISTRATIONS = self::ENDPOINT_STUDENT . "registrations/";
     const ENDPOINT_STUDENT_STUDENTS = self::ENDPOINT_STUDENT . "students/<id>/<extend>";
 
-    public function __construct($endpoint, $object, $extend = null, $apiVersion = 1, $shift = null)
+    public function __construct($endpoint, $object, $extend = null, $apiVersion = 1, $shift = null, $structure = true)
     {
         $this->endpoint = $endpoint;
         $this->object = $object;
         $this->extend = $extend;
         $this->apiVersion = $apiVersion;
         $this->shift = $shift;
+        $this->structure = $structure;
     }
 
-    public function get($instituteNumber, $id = null, $raw = false)
+    public function get($sourceId, $schoolyear, $instituteNumber, $id = null, $raw = false)
     {
         $endpoint = Path::normalize(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint));
         $endpoint = Path::normalize(str_replace("<extend>", $this->extend ?: "", $endpoint));
@@ -40,12 +41,10 @@ class Repository extends stdClass
             "InstituteNo" => $instituteNumber
         ];
 
-        $requestQuery = [
-            "schoolyear" => General::getSchoolyear(),
-            "structure" => Arrays::first((new Setting)->get("informat.structure"))->value
-        ];
+        $requestQuery['schoolYear'] = $schoolyear;
+        if ($this->structure) $requestQuery['structure'] = Arrays::first((new Setting)->get("informat.structure"))->value;
 
-        $result = $this->execute($endpoint, $requestHeaders, $requestQuery);
+        $result = $this->execute($sourceId, $endpoint, $requestHeaders, $requestQuery);
         if ($this->shift) $result = $result[$this->shift];
 
         $objects = [];
@@ -56,15 +55,13 @@ class Repository extends stdClass
         return $raw ? $result : $objects;
     }
 
-    private function execute($endpoint, $requestHeaders = [], $requestQueryBody = [], $method = self::METHOD_GET)
+    private function execute($sourceId, $endpoint, $requestHeaders = [], $requestQueryBody = [], $method = self::METHOD_GET)
     {
-        if (Connection::init()) {
+        if (Connection::init($sourceId)) {
             $requestHeaders['Api-Version'] = $this->apiVersion;
-            $requestHeaders["Authorization"] = Connection::GetTokenType() . " " . Connection::GetTokenValue();
+            $requestHeaders["Authorization"] = Connection::GetTokenType($sourceId) . " " . Connection::GetTokenValue($sourceId);
 
-            $options = [
-                'headers' => $requestHeaders
-            ];
+            $options = ['headers' => $requestHeaders];
             if ($method == self::METHOD_GET) $options['query'] = $requestQueryBody;
             else $options['body'] = $requestQueryBody;
 

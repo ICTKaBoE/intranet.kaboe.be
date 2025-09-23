@@ -12,6 +12,7 @@ class User extends CustomObject
         "id" => "int",
         "guid" => "string",
         "entraId" => "string",
+        "entraCompany" => "string",
         "informatEmployeeId" => "string",
         "mainSchoolId" => "int",
         "username" => "string",

@@ -2,7 +2,9 @@
 
 namespace Controllers\API;
 
-use ClanCats\Hydrahon\Query\Sql\Replace;
+use getID3;
+use Helpers\Form;
+use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -10,19 +12,21 @@ use Security\FileSystem;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Signage\Group as SignageGroup;
 use Database\Repository\Library\Book;
+use Database\Repository\Signage\Group;
 use Database\Repository\Signage\Media;
 use Database\Repository\Library\Author;
+use Database\Repository\Signage\Screen;
+use ClanCats\Hydrahon\Query\Sql\Replace;
+use Database\Repository\Signage\Playlist;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Signage\PlaylistItem;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\Signage\Group as SignageGroup;
 use Database\Object\Signage\Media as SignageMedia;
+use Database\Object\Signage\Screen as SignageScreen;
 use Database\Object\Signage\Playlist as SignagePlaylist;
 use Database\Object\Signage\PlaylistItem as SignagePlaylistItem;
-use Database\Object\Signage\Screen as SignageScreen;
-use Database\Repository\Signage\Group;
-use Database\Repository\Signage\Playlist;
-use Database\Repository\Signage\PlaylistItem;
-use Database\Repository\Signage\Screen;
-use getID3;
 
 class SignageController extends ApiController
 {
@@ -31,8 +35,8 @@ class SignageController extends ApiController
     {
         if (Strings::equal($view, self::VIEW_SIGNAGE)) {
             $screenRepo = new Screen;
-            if (!Helpers::url()->hasParam("code")) $this->setRedirect("https://dev.extranet.kaboe.be/signage/register?code=" . General::generateCode());
-            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("https://dev.extranet.kaboe.be/signage/notfound?code=" . Helpers::url()->getParam("code"));
+            if (!Helpers::url()->hasParam("code")) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . "extranet.kaboe.be/signage/register?code=" . General::generateCode());
+            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . ".extranet.kaboe.be/signage/notfound?code=" . Helpers::url()->getParam("code"));
             else {
                 $screen = $screenRepo->getByCode(Helpers::url()->getParam("code"));
                 $playlist = (new Playlist)->getByAssignedToAndAssignedToId(is_null($screen->linked->group) ? "S" : "G", is_null($screen->linked->group) ? $screen->id : $screen->groupId);
@@ -50,43 +54,19 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Toegewezen aan",
-                        "data" => "formatted.assignedTo",
-                        "width" => "300px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "playlist");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getPlaylistItem($view, $id = null)
@@ -97,18 +77,12 @@ class SignageController extends ApiController
         $playlist = Arrays::firstOrNull($playlistRepo->get(Helpers::url()->getParam("playlistId")));
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
+
             $this->appendToJson("defaultOrder", [[3, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
                 data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
+
                     [
                         "title" => "Naam",
                         "data" => "linked.media.alias"
@@ -123,7 +97,7 @@ class SignageController extends ApiController
 
             $items = $repo->getByPlaylistId($playlist->id);
             $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getScreen($view, $id = null)
@@ -134,49 +108,19 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Code",
-                        "data" => "code",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Groep",
-                        "data" => "linked.group.name",
-                        "width" => "200px",
-                        "defaultContent" => ""
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "screen");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getGroup($view, $id = null)
@@ -187,38 +131,19 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "group");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getMedia($view, $id = null)
@@ -229,48 +154,19 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Type",
-                        "data" => "type",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Alias",
-                        "data" => "alias"
-                    ],
-                    [
-                        "title" => "Duur",
-                        "data" => "length",
-                        "width" => "100px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "media");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     // Post functions
@@ -278,55 +174,52 @@ class SignageController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $assignedTo = Helpers::input()->post('assignedTo')->getValue();
-        $assignedToId = Helpers::input()->post('assignedToId')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "assignedTo" => ["mandatory" => true],
+            "assignedToId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT]
+        ];
 
-        if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($assignedTo) || Input::empty($assignedTo)) $this->setValidation("assignedTo", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($assignedToId) || Input::empty($assignedToId)) $this->setValidation("assignedToId", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Playlist;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new SignagePlaylist;
-                $item->schoolId = $schoolId;
-                $item->name = $name;
-                $item->assignedTo = $assignedTo;
-                $item->assignedToId = $assignedToId;
+                $item = $repo->getById($id) ?? new SignagePlaylist;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De playlist is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postPlaylistItem($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $playlistId = Helpers::input()->post('playlistId')->getValue();
-        $mediaId = Helpers::input()->post("mediaId")->getValue();
-        $duration = Helpers::input()->post("duration")->getValue();
+        $_fields = [
+            "playlistId" => ["mandatory" => true],
+            "mediaId" => ["mandatory" => true],
+            "duration" => ["mandatory" => true]
+        ];
 
-        if (!Input::check($mediaId, Input::INPUT_TYPE_INT) || Input::empty($mediaId)) $this->setValidation("mediaId", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new PlaylistItem;
-            $playlist = Arrays::firstOrNull((new Playlist)->get($playlistId));
-            $media = Arrays::firstOrNull((new Media)->get($mediaId));
+            $playlist = (new Playlist)->getById($fields["playlistId"]);
+            $media = (new Media)->getById($fields["mediaId"]);
 
-            $item = $id ? Arrays::first($repo->get($id)) : new SignagePlaylistItem;
-            $item->playlistId = $playlist->id;
-            $item->mediaId = $mediaId;
-            $item->duration = $media->type == "V" ? $media->duration : $duration;
+            $item = $repo->getById($id) ?? new SignagePlaylistItem;
+            $item->fillWithPostData();
+            $item->duration = $media->type == "V" ? $media->duration : $fields["duration"];
             $item->order = $id ? $item->order : count($repo->getByPlaylistId($playlist->id)) + 1;
 
             $repo->set($item);
@@ -345,7 +238,7 @@ class SignageController extends ApiController
         $repo = new PlaylistItem;
 
         foreach ($id as $_id) {
-            $origItem = Arrays::firstOrNull($repo->get($_id));
+            $origItem = $repo->getById($_id);
             $replaceItem = Arrays::firstOrNull(Arrays::filter($repo->getByPlaylistId($origItem->playlistId), fn($ri) => $ri->order == $origItem->order - 1));
             if (!$replaceItem) continue;
 
@@ -365,7 +258,7 @@ class SignageController extends ApiController
         $repo = new PlaylistItem;
 
         foreach ($id as $_id) {
-            $origItem = Arrays::firstOrNull($repo->get($_id));
+            $origItem = $repo->getById($_id);
             $replaceItem = Arrays::firstOrNull(Arrays::filter($repo->getByPlaylistId($origItem->playlistId), fn($ri) => $ri->order == $origItem->order + 1));
             if (!$replaceItem) continue;
 
@@ -383,95 +276,86 @@ class SignageController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $code = Helpers::input()->post('code')->getValue();
-        $groupId = Helpers::input()->post('groupId')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "code" => ["mandatory" => true],
+            "groupId" => ["type" => Input::INPUT_TYPE_INT]
+        ];
 
-        if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($code) || Input::empty($code)) $this->setValidation("code", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Screen;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new SignageScreen;
-                $item->schoolId = $schoolId;
-                $item->name = $name;
-                $item->code = $code;
-                $item->groupId = $groupId;
+                $item = $repo->getById($id) ?? new SignageScreen;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het scherm is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postGroup($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+        ];
 
-        if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Group;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new SignageGroup;
-                $item->schoolId = $schoolId;
-                $item->name = $name;
+                $item = $repo->getById($id) ?? new SignageGroup;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De groep is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postMedia($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $type = Helpers::input()->post('type')->getValue();
-        $alias = Helpers::input()->post('alias')->getValue();
-        $mediaImage = Helpers::input()->file('mediaImage');
-        $mediaVideo = Helpers::input()->file('mediaVideo');
-        $mediaLink = Helpers::input()->post('mediaLink');
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "type",
+            "alias" => ["mandatory" => true],
+            "mediaImage" => ["mandatory" => true, "type" => "file", "preconditions" => ["type" => "I"]],
+            "mediaVideo" => ["mandatory" => true, "type" => "file", "preconditions" => ["type" => "V"]],
+            "mediaLink" => ["mandatory" => true, "preconditions" => ["type" => "L"]]
+        ];
 
-        if (!Input::check($alias) || Input::empty($alias)) $this->setValidation("alias", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
-        if (Strings::equal($type, 'I') && $mediaImage[0]->getSize() == 0) $this->setValidation("mediaImage", state: self::VALIDATION_STATE_INVALID);
-        if (Strings::equal($type, 'V') && $mediaVideo[0]->getSize() == 0) $this->setValidation("mediaVideo", state: self::VALIDATION_STATE_INVALID);
-        if (Strings::equal($type, 'L') && (!Input::check($mediaLink) || Input::empty($mediaLink))) $this->setValidation("mediaLink", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Media;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new SignageMedia;
-                $item->schoolId = $schoolId;
-                $item->type = $type;
-                $item->alias = $alias;
-                $item->link = $mediaLink;
+                $item = $repo->getById($id) ?? new SignageMedia;
+                $item->fillWithPostData();
 
                 $nId = $repo->set($item);
-                if (!$id) $item = Arrays::first($repo->get($nId));
+                if (!$id) $item = $repo->getById($nId);
 
-                if (Arrays::contains(['I', 'V'], $type)) {
-                    $file = $type == 'I' ? $mediaImage[0] : $mediaVideo[0];
+                if (Arrays::contains(['I', 'V'], $fields["type"])) {
+                    $file = $fields["type"] == 'I' ? $fields["mediaImage"][0] : $fields["mediaVideo"][0];
                     if ($file && $file->getSize() > 0) {
                         FileSystem::CreateFolder(LOCATION_UPLOAD . "/signage");
                         $newName = $item->guid . "." . $file->getExtension();
@@ -488,10 +372,8 @@ class SignageController extends ApiController
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het media is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Delete functions    
@@ -501,7 +383,7 @@ class SignageController extends ApiController
         $repo = new Playlist;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -518,7 +400,7 @@ class SignageController extends ApiController
         $repo = new PlaylistItem;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -535,7 +417,7 @@ class SignageController extends ApiController
         $repo = new Screen;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -552,7 +434,7 @@ class SignageController extends ApiController
         $repo = new Group;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -570,7 +452,7 @@ class SignageController extends ApiController
         $playlistItemRepo = new PlaylistItem;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($playlistItemRepo->getByMediaId($item->id))) {
                 $this->setToast("Het media '{$item->alias}' kan niet worden verwijderd!<br />Deze is gekoppeld aan playlists!", self::VALIDATION_STATE_INVALID);

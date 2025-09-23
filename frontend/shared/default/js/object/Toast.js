@@ -1,3 +1,5 @@
+import Helpers from "./Helpers.js";
+
 export default class Toast {
 	static INSTANCE = null;
 
@@ -11,6 +13,7 @@ export default class Toast {
 
 	init = async () => {
 		this.getToastContainer();
+		if (this.container.dataset?.notifications) this.getNotifications();
 	};
 
 	getToastContainer = () => {
@@ -21,22 +24,34 @@ export default class Toast {
 		if (!Array.isArray(toasts)) toasts = [toasts];
 
 		for (const toast of toasts) {
-			this._show(toast.message, toast.type);
+			this._show(toast.message, toast?.type, toast?.link, toast?.delay);
 		}
 	};
 
-	_show = (message, type = "valid") => {
+	_show = (message, type = "valid", link = null, delay = 5000) => {
 		let toast = document.createElement("div");
 		toast.classList.add(
 			"toast",
 			"mb-2",
 			"align-items-center",
-			`text-bg-${type === "valid" ? "green" : "red"}`,
+			`text-bg-${
+				type === "normal"
+					? "primary"
+					: type === "valid"
+					? "green"
+					: "red"
+			}`,
 			"border-0"
 		);
 		toast.role = "alert";
 		toast.ariaLive = "assertive";
 		toast.ariaAtomic = true;
+		if (delay) toast.dataset.bsDelay = delay;
+		if (link) {
+			toast.onclick = () => {
+				window.location.href = link;
+			};
+		}
 
 		let dflex = document.createElement("div");
 		dflex.classList.add("d-flex");
@@ -58,5 +73,23 @@ export default class Toast {
 		toast.appendChild(dflex);
 		this.container.appendChild(toast);
 		bootstrap.Toast.getOrCreateInstance(toast).show();
+	};
+
+	getNotifications = () => {
+		Helpers.request({
+			url: this.container.dataset.notifications,
+			always: (data) => {
+				Helpers.processRequestResponse(data);
+			},
+		});
+
+		setInterval(() => {
+			Helpers.request({
+				url: this.container.dataset.notifications,
+				always: (data) => {
+					Helpers.processRequestResponse(data);
+				},
+			});
+		}, 60000);
 	};
 }

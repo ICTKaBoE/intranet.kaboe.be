@@ -30,10 +30,10 @@ class Employee extends CustomObject
 
     protected $linkedAttributes = [
         "birthCountry" => [
-            "birthCountryId" => \Database\Repository\Country::class
+            "birthCountryId" => \Database\Repository\General\Country::class
         ],
         "nationality" => [
-            "nationalityId" => \Database\Repository\Country::class
+            "nationalityId" => \Database\Repository\General\Country::class
         ]
     ];
 

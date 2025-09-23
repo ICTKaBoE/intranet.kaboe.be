@@ -120,7 +120,7 @@
 
                     <div class="col-lg-2 mb-3">
                         <label class="form-label" for="partyExternalCountryId">Land</label>
-                        <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/country" data-load-value="id" data-load-label="translatedName" required></select>
+                        <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="translatedName" required></select>
 
                     </div>
 

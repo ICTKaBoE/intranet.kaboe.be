@@ -9,8 +9,15 @@ window.deviceView = (info) => {
 	category = category.split("-")[0];
 
 	if (category == "O") {
+		document
+			.getElementById("subject")
+			.parentElement.classList.remove("d-none");
 		Select.GetInstance("assetId").disable();
 	} else {
+		document
+			.getElementById("subject")
+			.parentElement.classList.add("d-none");
+
 		let schoolId = Select.GetInstance("schoolId").getValue();
 		let roomId = Select.GetInstance("roomId").getValue();
 

@@ -2,16 +2,20 @@
 
 namespace Controllers;
 
+use Database\Object\Navigation\Setting as NavigationSetting;
+use stdClass;
+use Security\Code;
+use Router\Helpers;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Router\Helpers;
-use Security\Code;
-use stdClass;
+use Database\Repository\Navigation\Setting;
+use Database\Repository\Navigation\Navigation;
 
 class ApiController extends stdClass
 {
 	const VALIDATION_STATE_VALID = "valid";
 	const VALIDATION_STATE_INVALID = "invalid";
+	const VALIDATION_STATE_NORMAL = "normal";
 
 	const VIEW_FORM = "form";
 	const VIEW_CALENDAR = "calendar";
@@ -26,6 +30,8 @@ class ApiController extends stdClass
 	private $validation = [];
 	private $reload = false;
 	private $toast = [];
+	private $activeButton = [];
+	private $notActiveButton = [];
 
 	private $json = [];
 
@@ -63,7 +69,9 @@ class ApiController extends stdClass
 		if ($this->reloadTable) Arrays::setNestedValue($this->json, ['reloadTable'], $this->reloadTable);
 		if ($this->reloadCalendar) Arrays::setNestedValue($this->json, ['reloadCalendar'], $this->reloadCalendar);
 		if ($this->resetForm) Arrays::setNestedValue($this->json, ['resetForm'], $this->resetForm);
-		if ($this->returnToStep) Arrays::setNestedValue($this->json, ['returnToStep'], $this->returnToStep);
+		if ($this->activeStep) Arrays::setNestedValue($this->json, ['activeStep'], $this->activeStep);
+		if ($this->activeButton) Arrays::setNestedValue($this->json, ['activeButton'], $this->activeButton);
+		if ($this->notActiveButton) Arrays::setNestedValue($this->json, ['notActiveButton'], $this->notActiveButton);
 
 		Helpers::response()->json($this->json);
 	}
@@ -84,11 +92,13 @@ class ApiController extends stdClass
 		$this->error = $error;
 	}
 
-	protected function setToast($message, $type = self::VALIDATION_STATE_VALID)
+	protected function setToast($message, $type = self::VALIDATION_STATE_VALID, $link = null, $delay = null)
 	{
 		$this->toast[] = [
 			"type" => $type,
-			"message" => $message
+			"message" => $message,
+			"link" => $link,
+			"delay" => $delay
 		];
 	}
 
@@ -132,9 +142,19 @@ class ApiController extends stdClass
 		$this->resetForm = true;
 	}
 
-	protected function setReturnToStep()
+	protected function setActiveStep($activeStep)
 	{
-		$this->returnToStep = true;
+		$this->activeStep = $activeStep;
+	}
+
+	protected function setActiveButton($button)
+	{
+		$this->activeButton[] = $button;
+	}
+
+	protected function setNotActiveButton($button)
+	{
+		$this->notActiveButton[] = $button;
 	}
 
 	protected function appendToJson($key = [], $data = false)
@@ -148,7 +168,7 @@ class ApiController extends stdClass
 	protected function validationIsAllGood()
 	{
 		$validation = count($this->validation) == Arrays::count($this->validation, fn($v) => Strings::equal($v['state'], self::VALIDATION_STATE_VALID));
-		$toast = count($this->toast) == Arrays::count($this->toast, fn($t) => Strings::equal($t['type'], self::VALIDATION_STATE_VALID));
+		$toast = count($this->toast) == Arrays::count($this->toast, fn($t) => Arrays::contains([self::VALIDATION_STATE_VALID, self::VALIDATION_STATE_NORMAL], $t['type']));
 		$error = is_null($this->error);
 
 		return ($validation && $toast && $error);
@@ -157,5 +177,33 @@ class ApiController extends stdClass
 	protected function getValidation()
 	{
 		return $this->validation;
+	}
+
+	protected function getNavigationSettings($navigationLink)
+	{
+		$settings = [];
+		$navigation = (new Navigation)->getByParentIdAndLink(0, $navigationLink);
+		foreach ((new Setting)->getByNavigationId($navigation->id) as $setting) $settings[$setting->key] = $setting->value;
+		$this->appendToJson('fields', Arrays::flattenKeysRecursively($settings));
+	}
+
+	protected function postNavigationSettings($navigationLink)
+	{
+		$navigation = (new Navigation)->getByParentIdAndLink(0, $navigationLink);
+
+		$_settings = Helpers::input()->all();
+		$_settings = Arrays::mapKeys($_settings, fn($s) => str_replace("_", ".", $s));
+
+		$repo = new Setting;
+		foreach ($_settings as $k => $v) {
+			$item = $repo->getByNavigationIdAndKey($navigation->id, $k) ?? new NavigationSetting;
+			$item->navigationId = $navigation->id;
+			$item->key = $k;
+			$item->value = $v;
+
+			$repo->set($item);
+		}
+
+		$this->setToast("De instellingen zijn opgeslagen!");
 	}
 }

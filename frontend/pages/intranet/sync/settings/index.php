@@ -220,7 +220,7 @@
     <div class="col-12 col-lg-8">
         <div class="card mb-3">
             <div class="card-header">
-                <h2 class="card-title">Berichten - Personeel naar Privé E-Mail</h2>
+                <h2 class="card-title">Berichten - Personeel IN DIENST - Bericht naar Privé E-Mail</h2>
             </div>
 
             <div class="card-body">
@@ -243,18 +243,54 @@
 
         <div class="card mb-3">
             <div class="card-header">
-                <h2 class="card-title">Berichten - Leerling naar Secretariaat</h2>
+                <h2 class="card-title">Berichten - Personeel IN DIENST - Bericht naar Centrale Dienst</h2>
             </div>
 
             <div class="card-body">
                 <div class="col-12 mb-3">
-                    <label class="form-label" for="mail.template.student.subject">Onderwerp</label>
-                    <input type="text" name="mail.template.student.subject" id="mail.template.student.subject" class="form-control" />
+                    <label class="form-label" for="mail.template.employeecentral.subject">Onderwerp</label>
+                    <input type="text" name="mail.template.employeecentral.subject" id="mail.template.employeecentral.subject" class="form-control" />
                 </div>
 
                 <div class="col-12 mb-3">
-                    <label for="mail.template.student.body" class="form-label">Body</label>
-                    <input type="text" role="tinymce" name="mail.template.student.body" id="mail_template_student_body" class="form-control">
+                    <label for="mail.template.employeecentral.body" class="form-label">Body</label>
+                    <input type="text" role="tinymce" name="mail.template.employeecentral.body" id="mail_template_employeecentral_body" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Berichten - Personeel UIT DIENST - Bericht naar Privé E-Mail</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="mail.template.employeedisable.subject">Onderwerp</label>
+                    <input type="text" name="mail.template.employeedisable.subject" id="mail.template.employeedisable.subject" class="form-control" />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="mail.template.employeedisable.body" class="form-label">Body</label>
+                    <input type="text" role="tinymce" name="mail.template.employeedisable.body" id="mail_template_employeedisable_body" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Berichten - Personeel UIT DIENST - Bericht naar Centrale Dienst</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="mail.template.employeedisablecentral.subject">Onderwerp</label>
+                    <input type="text" name="mail.template.employeedisablecentral.subject" id="mail.template.employeedisablecentral.subject" class="form-control" />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="mail.template.employeedisablecentral.body" class="form-label">Body</label>
+                    <input type="text" role="tinymce" name="mail.template.employeedisablecentral.body" id="mail_template_employeedisablecentral_body" class="form-control">
                 </div>
             </div>
         </div>
@@ -273,6 +309,24 @@
                 <div class="col-12 mb-3">
                     <label for="mail.template.password.body" class="form-label">Body</label>
                     <input type="text" role="tinymce" name="mail.template.password.body" id="mail_template_password_body" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Berichten - Leerling naar Secretariaat</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="mail.template.student.subject">Onderwerp</label>
+                    <input type="text" name="mail.template.student.subject" id="mail.template.student.subject" class="form-control" />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="mail.template.student.body" class="form-label">Body</label>
+                    <input type="text" role="tinymce" name="mail.template.student.body" id="mail_template_student_body" class="form-control">
                 </div>
             </div>
         </div>

@@ -21,11 +21,11 @@ class StudentAddress extends CustomObject
     ];
 
     protected $linkedAttributes = [
-        "country" => ["countryId" => \Database\Repository\Country::class]
+        "country" => ["countryId" => \Database\Repository\General\Country::class]
     ];
 
     public function init()
     {
-        $this->formatted->full = CString::formatAddress($this->street, $this->number, $this->bus, $this->zipcode, $this->city, $this->linked->country->translatedName);
+        $this->formatted->full = CString::formatAddress($this->street, $this->number, $this->bus, $this->zipcode, $this->city, $this->linked->country->name);
     }
 }

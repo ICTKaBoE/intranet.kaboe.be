@@ -3,7 +3,7 @@
 namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
 use Router\Helpers;
 

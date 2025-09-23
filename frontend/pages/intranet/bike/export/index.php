@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="school">Scholen</label>
-                    <select name="school" id="school" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" multiple required></select>
+                    <select name="school" id="school" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" multiple required></select>
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">

@@ -2,24 +2,27 @@
 
 namespace Controllers\API;
 
+use Helpers\Table;
+use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
 use Security\Session;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Navigation;
 use Database\Repository\Library\Book;
+use Database\Repository\Library\Type;
 use Database\Repository\Library\Author;
 use Database\Repository\Library\Category;
+use Database\Repository\Library\BookHistory;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Navigation\Navigation;
 use Database\Object\Library\Book as LibraryBook;
 use Database\Object\Library\Author as LibraryAuthor;
-use Database\Object\Library\BookHistory as LibraryBookHistory;
 use Database\Object\Library\Category as LibraryCategory;
-use Database\Repository\Library\BookHistory;
-use Ouzo\Utilities\Clock;
-use Security\User;
+use Database\Object\Library\BookHistory as LibraryBookHistory;
 
 class LibraryController extends ApiController
 {
@@ -29,31 +32,19 @@ class LibraryController extends ApiController
         $repo = new Author;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "author");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getCategory($view, $id = null)
@@ -61,31 +52,19 @@ class LibraryController extends ApiController
         $repo = new Category;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "author");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getBook($view, $id = null)
@@ -98,58 +77,19 @@ class LibraryController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Categorie",
-                        "data" => "linked.category.name",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Auteur",
-                        "data" => "linked.author.name",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Titel",
-                        "data" => "title"
-                    ],
-                    [
-                        "title" => "#",
-                        "data" => "formatted.free",
-                        "width" => "50px"
-                    ],
-                    [
-                        "title" => "Momenteel uitgeleend aan",
-                        "data" => "lendTo",
-                        "width" => "300px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "book");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get();
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getBookHistory($view, $id = null)
@@ -158,7 +98,6 @@ class LibraryController extends ApiController
         $repo = new BookHistory;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
             $this->appendToJson("defaultOrder", [[3, "desc"]]);
             $this->appendToJson(
                 key: 'columns',
@@ -208,20 +147,15 @@ class LibraryController extends ApiController
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get($id);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getType($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['type'];
+        $repo = new Type;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
+            $this->appendToJson('items', $repo->get());
         }
     }
 

@@ -2,15 +2,15 @@
 
 namespace Controllers\API;
 
-use Security\GUID;
+use Helpers\Form;
+use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
-use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Navigation;
+use Database\Repository\Management\CCTV;
 use Database\Repository\Management\IPad;
 use Database\Repository\Management\Room;
 use Database\Repository\Management\Beamer;
@@ -20,9 +20,12 @@ use Database\Repository\Management\Printer;
 use Database\Repository\Management\Building;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\Firewall;
+use Database\Repository\Navigation\TableDef;
 use Database\Repository\Management\Patchpanel;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Management\AccessPoint;
 use Database\Repository\Management\ComputerBattery;
+use Database\Object\Management\CCTV as ManagementCCTV;
 use Database\Object\Management\Room as ManagementRoom;
 use Database\Repository\Management\ComputerUsageLogOn;
 use Database\Repository\Management\ComputerUsageOnOff;
@@ -34,14 +37,10 @@ use Database\Object\Management\Building as ManagementBuilding;
 use Database\Object\Management\Firewall as ManagementFirewall;
 use Database\Object\Management\Patchpanel as ManagementPatchpanel;
 use Database\Object\Management\AccessPoint as ManagementAccessPoint;
-use Database\Object\Management\CCTV as ManagementCCTV;
 use Database\Object\Management\ComputerBattery as ManagementComputerBattery;
-use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 use Database\Object\Management\ComputerUsageOnOff as ManagementComputerUsageOnOff;
-use Database\Repository\Helpdesk\Ticket;
-use Database\Repository\Management\CCTV;
-use Helpers\General;
-use Helpers\HTML;
+use Database\Repository\Helpdesk\Helpdesk;
+use Database\Repository\Navigation\Setting;
 
 class ManagementController extends ApiController
 {
@@ -66,60 +65,17 @@ class ManagementController extends ApiController
         if (Strings::equal($view, self::VIEW_TABLE)) {
             unset($filters['type']);
 
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[2, "asc"], [3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => HTML::Icon("devices-2"),
-                        "data" => "formatted.icon.type",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "50px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Merk/Model",
-                        "data" => "formatted.manModel",
-                        "width" => "300px"
-                    ],
-                    [
-                        "title" => "Operating System",
-                        "data" => "formatted.os",
-                        "width" => "200px"
-                    ],
-                    // [
-                    //     "title" => "Laatst gebruikt",
-                    //     "data" => "formatted.lastUsage",
-                    //     "width" => "300px"
-                    // ],
-                    // [
-                    //     "title" => HTML::Icon("battery", "Batterij Capaciteit"),
-                    //     "data" => "formatted.badge.capacity",
-                    //     "width" => "10px"
-                    // ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "computer");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
+
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
@@ -129,10 +85,10 @@ class ManagementController extends ApiController
 
     protected function getComputerBattery($view, $id = null)
     {
-        $computer = Arrays::first((new Computer)->get($id));
+        $computer = (new Computer)->getById($id);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
+
             $this->appendToJson("defaultOrder", [[0, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
@@ -172,10 +128,10 @@ class ManagementController extends ApiController
 
     protected function getComputerUsage($view, $id = null)
     {
-        $computer = Arrays::first((new Computer)->get($id));
+        $computer = (new Computer)->getById($id);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
+
             $this->appendToJson("childRows", true);
             $this->appendToJson("defaultOrder", [[1, "desc"]]);
             $this->appendToJson(
@@ -231,43 +187,19 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Volledige weergave",
-                        "data" => "formatted.full"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "building");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getRoom($view, $id = null)
@@ -279,53 +211,19 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Verdiep",
-                        "data" => "floor",
-                        "width" => "50px"
-                    ],
-                    [
-                        "title" => "Nummer",
-                        "data" => "number",
-                        "width" => "50px"
-                    ],
-                    [
-                        "title" => "Volledige weergave",
-                        "data" => "formatted.full"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "room");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getCabinet($view, $id = null)
@@ -338,53 +236,19 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Volledige weergave",
-                        "data" => "formatted.full"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "cabinet");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getPatchpanel($view, $id = null)
@@ -398,63 +262,19 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Netwerkkast",
-                        "data" => "linked.cabinet.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Aantal patchpunten",
-                        "data" => "patchpoints",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Volledige weergave",
-                        "data" => "formatted.full"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "patchpanel");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getFirewall($view, $id = null)
@@ -468,78 +288,21 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Netwerkkast",
-                        "data" => "linked.cabinet.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Hostnaam",
-                        "data" => "hostname"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "MAC Adres",
-                        "data" => "formatted.macaddress",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Beheerlink",
-                        "data" => "formatted.ip",
-                        "width" => "150px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "firewall");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getSwitch($view, $id = null)
@@ -553,83 +316,21 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"], [5, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Netwerkkast",
-                        "data" => "linked.cabinet.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "MAC Adres",
-                        "data" => "formatted.macaddress",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "# Poorten",
-                        "data" => "ports",
-                        "width" => "50px"
-                    ],
-                    [
-                        "title" => "Beheerslink",
-                        "data" => "formatted.ip",
-                        "width" => "150px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "switch");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getAccessPoint($view, $id = null)
@@ -642,73 +343,21 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "MAC Adres",
-                        "data" => "formatted.macaddress",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Beheerslink",
-                        "data" => "formatted.ip",
-                        "width" => "150px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "accesspoint");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getIpad($view, $id = null)
@@ -719,59 +368,16 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
-            $this->appendToJson("defaultOrder", [[0, "asc"], [1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "250px"
-                    ],
-                    [
-                        "title" => "Operating System",
-                        "data" => "formatted.os",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Batterij",
-                        "data" => "formatted.badge.battery",
-                        "orderable" => false,
-                        "width" => "75px"
-                    ],
-                    [
-                        "title" => "Opslag %",
-                        "data" => "formatted.badge.capacity",
-                        "orderable" => false,
-                        "width" => "75px"
-                    ],
-                    [
-                        "title" => "Opslag",
-                        "data" => "formatted.capacity",
-                        "orderable" => false,
-                        "width" => "200px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "ipad");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
@@ -789,63 +395,22 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "beamer");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+            $this->appendToJson('fields', $repo->getById($id));
         }
     }
 
@@ -859,88 +424,31 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Lokaal",
-                        "data" => "linked.room.formatted.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Mode",
-                        "data" => "formatted.mode",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "200px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "printer");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+            $this->appendToJson('fields', $repo->getById($id));
         }
     }
 
     protected function getPrinterMode($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['printer']['mode'];
-
-        if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
-        }
+        $items = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "management")->id, "printer.mode")->value;
+        $items = explode(PHP_EOL, $items);
+        $items = Arrays::map($items, fn($i) => ["id" => trim($i), "name" => trim($i)]);
+        $this->appendToJson('items', $items);
     }
 
     protected function getCctv($view, $id = null)
@@ -952,68 +460,21 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Gebouw",
-                        "data" => "linked.building.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Merk",
-                        "data" => "manufacturer",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Model",
-                        "data" => "model",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Serienummer",
-                        "data" => "serialnumber",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "MAC Adres",
-                        "data" => "formatted.macaddress",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Beheerslink",
-                        "data" => "formatted.ip",
-                        "width" => "150px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "cctv");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
+            $helpdeskRepo = new Helpdesk;
+            Arrays::each($items, fn($i) => $i->formatted->tickets = count($helpdeskRepo->getByMainCategoryAndAssetId($i->type, $i->id)));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     // Post functions
@@ -1085,405 +546,318 @@ class ManagementController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet aangeduid zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Building;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementBuilding;
-                $item->schoolId = $schoolId;
-                $item->name = $name;
+                $item = $repo->getById($id) ?? new ManagementBuilding;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het gebouw is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postRoom($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $floor = Helpers::input()->post('floor')->getValue();
-        $number = Helpers::input()->post('number')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "floor" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "number" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (Input::empty($floor)) $this->setValidation("floor", "Verdiep moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (Input::empty($number)) $this->setValidation("number", "Nummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Room;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementRoom;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->floor = $floor;
-                $item->number = $number;
+                $item = $repo->getById($id) ?? new ManagementRoom;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het lokaal is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postCabinet($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Cabinet;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementCabinet;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->name = $name;
+                $item = $repo->getById($id) ?? new ManagementCabinet;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De netwerkkast is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postPatchpanel($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $cabinetId = Helpers::input()->post('cabinetId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $patchpoints = Helpers::input()->post('patchpoints')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "cabinetId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "patchpoints",
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($cabinetId) || Input::empty($cabinetId)) $this->setValidation("cabinetId", "Netwerkkast moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Patchpanel;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementPatchpanel;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->cabinetId = $cabinetId;
-                $item->name = $name;
-                $item->patchpoints = $patchpoints;
+                $item = $repo->getById($id) ?? new ManagementPatchpanel;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het patchpaneel is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postFirewall($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $cabinetId = Helpers::input()->post('cabinetId')->getValue();
-        $hostname = Helpers::input()->post('hostname')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
-        $macaddress = Helpers::input()->post('macaddress')->getValue();
-        $ip = Helpers::input()->post('ip')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "cabinetId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "hostname" => ["mandatory" => true],
+            "manufacturer" => ["mandatory" => true],
+            "model" => ["mandatory" => true],
+            "serialnumber" => ["mandatory" => true],
+            "macaddress" => ["mandatory" => true, "type" => Input::INPUT_TYPE_MAC, "placeholder" => "__:__:__:__:__:__"],
+            "ip" => ["mandatory" => true, "type" => Input::INPUT_TYPE_IP],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($cabinetId) || Input::empty($cabinetId)) $this->setValidation("cabinetId", "Netwerkkast moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($hostname) || Input::empty($hostname)) $this->setValidation("hostname", "Hostnaam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($manufacturer) || Input::empty($manufacturer)) $this->setValidation("manufacturer", "Merk moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($model) || Input::empty($model)) $this->setValidation("model", "Model moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($serialnumber) || Input::empty($serialnumber)) $this->setValidation("serialnumber", "Serienummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($macaddress) || Input::empty($macaddress)) $this->setValidation("macaddress", "MAC Adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($ip) || Input::empty($ip)) $this->setValidation("ip", "Beheerslink moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Firewall;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementFirewall;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->cabinetId = $cabinetId;
-                $item->hostname = $hostname;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->serialnumber = $serialnumber;
-                $item->macaddress = $macaddress;
-                $item->ip = $ip;
+                $item = $repo->getById($id) ?? new ManagementFirewall;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De firewall is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postSwitch($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $cabinetId = Helpers::input()->post('cabinetId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
-        $macaddress = Helpers::input()->post('macaddress')->getValue();
-        $ports = Helpers::input()->post('ports')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $ip = Helpers::input()->post('ip')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "cabinetId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "serialnumber" => ["mandatory" => true],
+            "macaddress" => ["mandatory" => true, "type" => Input::INPUT_TYPE_MAC, "placeholder" => "__:__:__:__:__:__"],
+            "ports" => ["mandatory" => true, "type" => INPUT::INPUT_TYPE_INT],
+            "manufacturer" => ["mandatory" => true],
+            "model" => ["mandatory" => true],
+            "ip" => ["mandatory" => true, "type" => Input::INPUT_TYPE_IP],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($cabinetId) || Input::empty($cabinetId)) $this->setValidation("cabinetId", "Netwerkkast moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($serialnumber) || Input::empty($serialnumber)) $this->setValidation("serialnumber", "Serienummer moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($macaddress) || Input::empty($macaddress)) $this->setValidation("macaddress", "MAC Adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($ports) || Input::empty($ports)) $this->setValidation("ports", "# Poorten moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($manufacturer) || Input::empty($manufacturer)) $this->setValidation("manufacturer", "Merk moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($model) || Input::empty($model)) $this->setValidation("model", "Model moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($ip) || Input::empty($ip)) $this->setValidation("ip", "IP Adres moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new MSwitch;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementMSwitch;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->cabinetId = $cabinetId;
-                $item->name = $name;
-                $item->serialnumber = $serialnumber;
-                $item->macaddress = $macaddress;
-                $item->ports = $ports;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->ip = $ip;
+                $item = $repo->getById($id) ?? new ManagementMSwitch;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De switch is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postAccessPoint($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
-        $macaddress = Helpers::input()->post('macaddress')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $ip = Helpers::input()->post('ip')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "serialnumber" => ["mandatory" => true],
+            "macaddress" => ["mandatory" => true, "type" => Input::INPUT_TYPE_MAC, "placeholder" => "__:__:__:__:__:__"],
+            "manufacturer" => ["mandatory" => true],
+            "model" => ["mandatory" => true],
+            "ip" => ["mandatory" => true, "type" => Input::INPUT_TYPE_IP],
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new AccessPoint;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementAccessPoint;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->name = $name;
-                $item->serialnumber = $serialnumber;
-                $item->macaddress = $macaddress;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->ip = $ip;
+                $item = $repo->getById($id) ?? new ManagementAccessPoint;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het access point is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postBeamer($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "manufacturer",
+            "model",
+            "serialnumber"
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Beamer;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementBeamer;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->serialnumber = $serialnumber;
+                $item = $repo->getById($id) ?? new ManagementBeamer;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("Het access point is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postPrinter($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $roomId = Helpers::input()->post('roomId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $mode = Helpers::input()->post('mode')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "roomId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "mode",
+            "manufacturer",
+            "model",
+            "serialnumber"
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($roomId) || Input::empty($roomId)) $this->setValidation("roomId", "Lokaal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($mode) || Input::empty($mode)) $this->setValidation("mode", "Modus moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Printer;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementPrinter;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->roomId = $roomId;
-                $item->name = $name;
-                $item->mode = $mode;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->serialnumber = $serialnumber;
+                $item = $repo->getById($id) ?? new ManagementPrinter;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De printer is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postCctv($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $buildingId = Helpers::input()->post('buildingId')->getValue();
-        $name = Helpers::input()->post('name')->getValue();
-        $serialnumber = Helpers::input()->post('serialnumber')->getValue();
-        $macaddress = Helpers::input()->post('macaddress')->getValue();
-        $manufacturer = Helpers::input()->post('manufacturer')->getValue();
-        $model = Helpers::input()->post('model')->getValue();
-        $ip = Helpers::input()->post('ip')->getValue();
+        $_fields = [
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "name" => ["mandatory" => true],
+            "serialnumber",
+            "macaddress" => ["type" => Input::INPUT_TYPE_MAC, "placeholder" => "__:__:__:__:__:__"],
+            "manufacturer",
+            "model",
+            "ip"
+        ];
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($buildingId) || Input::empty($buildingId)) $this->setValidation("buildingId", "Gebouw moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new CCTV;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ManagementCCTV;
-                $item->schoolId = $schoolId;
-                $item->buildingId = $buildingId;
-                $item->name = $name;
-                $item->serialnumber = $serialnumber;
-                $item->macaddress = $macaddress;
-                $item->manufacturer = $manufacturer;
-                $item->model = $model;
-                $item->ip = $ip;
+                $item = $repo->getById($id) ?? new ManagementCCTV;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De CCTV-camera is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Delete functions    
@@ -1501,7 +875,7 @@ class ManagementController extends ApiController
         $pRepo = new Printer;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $attachtedTo = [];
 
             if (count($roomRepo->getByBuildingId($item->id))) $attachtedTo[] = "lokalen";
@@ -1541,7 +915,7 @@ class ManagementController extends ApiController
         $pRepo = new Printer;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $attachtedTo = [];
 
             if (count($cabinetRepo->getByRoomId($item->id))) $attachtedTo[] = "netwerkkasten";
@@ -1576,7 +950,7 @@ class ManagementController extends ApiController
         $sRepo = new MSwitch;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $attachtedTo = [];
 
             if (count($ppRepo->getByCabinetId($item->id))) $attachtedTo[] = "patchpanelen";
@@ -1604,7 +978,7 @@ class ManagementController extends ApiController
         $repo = new Patchpanel;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -1619,10 +993,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new Firewall;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("F", $item->id))) {
                 $this->setToast("De firewall '{$item->hostname}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
@@ -1643,10 +1017,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new MSwitch;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("S", $item->id))) {
                 $this->setToast("De switch '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
@@ -1667,10 +1041,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new AccessPoint;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("A", $item->id))) {
                 $this->setToast("Het access point '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
@@ -1691,10 +1065,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new Beamer;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("B", $item->id))) {
                 $this->setToast("De beamer '{$item->serialnumber}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
@@ -1715,10 +1089,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new Printer;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("P", $item->id))) {
                 $this->setToast("De printer '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);
@@ -1739,10 +1113,10 @@ class ManagementController extends ApiController
     {
         $id = explode("_", $id);
         $repo = new CCTV;
-        $ticketRepo = new Ticket;
+        $ticketRepo = new Helpdesk;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($ticketRepo->getByMainCategoryAndAssetId("A", $item->id))) {
                 $this->setToast("De CCTV-camera '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan helpdesk tickets!", self::VALIDATION_STATE_INVALID);

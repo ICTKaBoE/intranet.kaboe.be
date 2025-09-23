@@ -34,10 +34,10 @@ abstract class FileSystem
 		return $path;
 	}
 
-	static public function WriteFile($path, $content)
+	static public function WriteFile($path, $content, $append = false)
 	{
 		$path = Path::normalize($path);
-		$stream = fopen($path, "wb");
+		$stream = fopen($path, ($append ? "a+" : "wb"));
 		$result = fwrite($stream, $content);
 		fclose($stream);
 

@@ -2,14 +2,11 @@
 
 namespace Database\Object\Order;
 
-use Security\Session;
-use Ouzo\Utilities\Clock;
-use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
-use Database\Repository\Navigation;
-use Database\Interface\CustomObject;
 use Helpers\CString;
-use Helpers\HTML;
+use Ouzo\Utilities\Strings;
+use Database\Interface\CustomObject;
+use Database\Repository\Order\Category;
+use Database\Repository\Navigation\Navigation;
 
 class Line extends CustomObject
 {
@@ -39,20 +36,21 @@ class Line extends CustomObject
 
     public function init()
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $catRepo = new Category;
 
         $this->formatted->quotePrice = ($this->warrenty ? "Garantie" : ($this->quotePrice == 0 ? "" : CString::formatCurrency($this->quotePrice) . " " . ($this->quoteVatIncluded ? 'incl.' : 'excl.') . ' btw'));
 
-        $category = explode("-", $this->category);
-        $this->formatted->category = $settings['category'][$category[0]]['name'];
-        if (isset($category[1])) $this->formatted->category .= " - " . $settings['category'][$category[0]]['sub'][$category[1]];
+        $_category = explode("-", $this->category);
+        $category = $catRepo->getByIdAndCategoryId($_category[0], null);
+        $this->formatted->category = $category->name;
+        if (!is_null($_category[1])) $this->formatted->category .= " - " . $catRepo->getByIdAndCategoryId($_category[1], $category->id)->name;
 
-        if (Strings::equal($category[0], "L") || Strings::equal($category[0], "D")) $this->formatted->asset = "{$this->linked->computer->name} ({$this->linked->computer->formatted->manModel})";
-        else if (Strings::equal($category[0], "I")) $this->formatted->asset = "{$this->linked->ipad->name} ({$this->linked->ipad->model} / SN: {$this->linked->ipad->serialnumber})";
-        else if (Strings::equal($category[0], "B")) $this->formatted->asset = $this->linked->beamer->serialnumber;
-        else if (Strings::equal($category[0], "P")) $this->formatted->asset = "{$this->linked->printer->name} ({$this->linked->printer->formatted->manModel} / SN: {$this->linked->printer->serialnumber})";
-        else if (Strings::equal($category[0], "F")) $this->formatted->asset = "{$this->linked->firewall->hostname} ({$this->linked->firewall->formatted->manModel} / SN: {$this->linked->firewall->serialnumber})";
-        else if (Strings::equal($category[0], "S")) $this->formatted->asset = "{$this->linked->switch->name} ({$this->linked->switch->formatted->manModel} / SN: {$this->linked->switch->serialnumber})";
-        else if (Strings::equal($category[0], "A")) $this->formatted->asset = "{$this->linked->accesspoint->name} ({$this->linked->accesspoint->formatted->manModel} / SN: {$this->linked->accesspoint->serialnumber})";
+        if (Strings::equal($_category[0], "L") || Strings::equal($_category[0], "D")) $this->formatted->asset = "{$this->linked->computer->name} ({$this->linked->computer->formatted->manModel})";
+        else if (Strings::equal($_category[0], "I")) $this->formatted->asset = "{$this->linked->ipad->name} ({$this->linked->ipad->model} / SN: {$this->linked->ipad->serialnumber})";
+        else if (Strings::equal($_category[0], "B")) $this->formatted->asset = $this->linked->beamer->serialnumber;
+        else if (Strings::equal($_category[0], "P")) $this->formatted->asset = "{$this->linked->printer->name} ({$this->linked->printer->formatted->manModel} / SN: {$this->linked->printer->serialnumber})";
+        else if (Strings::equal($_category[0], "F")) $this->formatted->asset = "{$this->linked->firewall->hostname} ({$this->linked->firewall->formatted->manModel} / SN: {$this->linked->firewall->serialnumber})";
+        else if (Strings::equal($_category[0], "S")) $this->formatted->asset = "{$this->linked->switch->name} ({$this->linked->switch->formatted->manModel} / SN: {$this->linked->switch->serialnumber})";
+        else if (Strings::equal($_category[0], "A")) $this->formatted->asset = "{$this->linked->accesspoint->name} ({$this->linked->accesspoint->formatted->manModel} / SN: {$this->linked->accesspoint->serialnumber})";
     }
 }

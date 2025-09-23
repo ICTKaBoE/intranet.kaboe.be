@@ -38,7 +38,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
 
                 <div class="mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" disabled></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" disabled></select>
 
                 </div>
 

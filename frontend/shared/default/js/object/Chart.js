@@ -13,6 +13,8 @@ export default class Chart {
 		this.legendPosition = this.element.dataset.legendPosition || "bottom";
 		this.noDataText = this.element.dataset.noDataText || "Loading...";
 		this.formatter = this.element.dataset.formatter || false;
+		this.xaxisType = this.element.dataset.xaxisType || "category";
+		this.height = this.element.dataset.height || "350vh";
 
 		this.data = {};
 		this.extraData = {};
@@ -30,7 +32,10 @@ export default class Chart {
 	}
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("crt")) id = `crt${id}`;
+		if (!id.startsWith("crt"))
+			id = `crt${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Chart.INSTANCES[id] || false;
 	};
 
@@ -58,7 +63,7 @@ export default class Chart {
 				id: this.id,
 				type: this.type,
 				fontFamily: "inherit",
-				height: "350vh",
+				height: this.height,
 				parentHeightOffset: 0,
 				toolbar: {
 					show: false,
@@ -97,7 +102,7 @@ export default class Chart {
 				axisBorder: {
 					show: false,
 				},
-				type: "category",
+				type: this.xaxisType,
 			},
 			yaxis: {
 				labels: {
@@ -121,6 +126,10 @@ export default class Chart {
 			},
 			fill: {},
 			series: [],
+			annotations: {
+				position: "back",
+				yaxis: [],
+			},
 			noData: {
 				text: this.noDataText,
 			},
@@ -147,12 +156,20 @@ export default class Chart {
 			};
 		}
 
-		// if (this.data.labels) this.options.labels = this.data.labels;
-		// if (this.data.series) this.options.series = this.data.series;
-		// if (this.data.colors) this.options.colors = this.data.colors;
-		// if (this.data.yaxis) this.options.yaxis = this.data.yaxis;
-		// if (this.data.xaxis?.categories)
-		// 	this.options.xaxis.categories = this.data.xaxis.categories;
+		if (this.type == "donut" || this.type == "pie") {
+			this.options.plotOptions = {
+				pie: {
+					donut: {
+						labels: {
+							show: true,
+							total: {
+								show: true,
+							},
+						},
+					},
+				},
+			};
+		}
 	};
 
 	createChart = () => {
@@ -169,6 +186,7 @@ export default class Chart {
 	};
 
 	updateChart = () => {
+		if (this.data.options) this.apexChart.updateOptions(this.data.options);
 		if (this.data.series) this.apexChart.updateSeries(this.data.series);
 	};
 

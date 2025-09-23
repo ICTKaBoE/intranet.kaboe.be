@@ -2,9 +2,6 @@
 
 namespace Controllers\API\Cron;
 
-use Database\Object\Mail\Mail as MailMail;
-use Database\Object\Mail\Receiver as MailReceiver;
-use Security\GUID;
 use Security\Input;
 use Helpers\General;
 use M365\Repository\Team;
@@ -13,25 +10,25 @@ use Ouzo\Utilities\Clock;
 use M365\Repository\Group;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use function Ramsey\Uuid\v1;
 use M365\Repository\AuditLog;
+use Database\Repository\Mail\Mail;
+use Database\Repository\Mail\Receiver;
 use Database\Repository\School\School;
 use Database\Repository\Setting\Setting;
-use Database\Repository\Mail\Mail;
-use Database\Repository\Navigation;
-use Database\Repository\Mail\Receiver;
-use Database\Repository\Security\Group as SecurityGroup;
-use Database\Object\User\User as ObjectUser;
-
+use Database\Object\Mail\Mail as MailMail;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Security\GroupUser;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Management\Computer;
-use Database\Repository\User\User as RepositoryUser;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Repository\Informat\EmployeeOwnfield;
 use M365\Repository\Computer as RepositoryComputer;
+use Database\Repository\User\User as RepositoryUser;
 use Database\Repository\Management\ComputerUsageLogOn;
+use Database\Repository\Security\Group as SecurityGroup;
 use Database\Object\Management\Computer as ManagementComputer;
+use Database\Repository\Navigation\Setting as NavigationSetting;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Management\ComputerUsageLogOn as ManagementComputerUsageLogOn;
 
@@ -39,7 +36,6 @@ abstract class M365
 {
     static public function ImportUsers()
     {
-        $settings = new Setting;
         $securityGroupRepo = new SecurityGroup;
         $sguRepo = new GroupUser;
         $userRepo = new RepositoryUser;
@@ -48,13 +44,15 @@ abstract class M365
 
         foreach ($securityGroups as $sg) {
             $sguRepo->delete(["securityGroupId" => $sg->id]);
-            $members = (new User)->getGroupMembersByGroupId($sg->m365GroupId, ['id', 'mail', 'employeeId', 'surname', 'givenName']);
+            $members = (new User)->getGroupMembersByGroupId($sg->m365GroupId, ['id', 'mail', 'employeeId', 'surname', 'givenName', 'companyName']);
 
             foreach ($members as $member) {
                 if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
-                $user = $userRepo->getByEntraId($member->getId()) ?? $userRepo->getByInformatEmployeeId($member->getEmployeeId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
+                $user = $userRepo->getByEntraId($member->getId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
+
                 if ($user) {
                     $user->entraId = $member->getId();
+                    $user->entraCompany = $member->getCompanyName();
                     $userRepo->set($user);
 
                     if ($sguRepo->getBySecurityGroupIdAndUserId($sg->id, $user->id)) continue;
@@ -99,14 +97,10 @@ abstract class M365
 
         $end = Clock::now();
 
-        $settings = [];
-        $settings["computer"]["lastSyncTime"] = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->getByParentIdAndLink(0, 'management'));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
+        $repo = new NavigationSetting;
+        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, 'management')->id, "computer.lastSyncTime");
+        $item->value = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
+        $repo->set($item);
 
         return true;
     }
@@ -135,15 +129,15 @@ abstract class M365
 
     static public function SyncClassTeams()
     {
-        $navRepo = new Navigation;
-        $_settings = Arrays::first($navRepo->getByParentIdAndLink(0, 'sync'))->settings;
-        $_minDepartmentCodes = $_settings['minimum']['departmentCode'];
-        $_minGrade = General::convert($_settings['minimum']['grade'], 'int');
-        $_minYear = General::convert($_settings['minimum']['year'], 'int');
-        $_classOwner = $_settings['default']['teams']['owner'];
-        $_templateId = $_settings['default']['teams']['template'];
-        $_rule = $_settings['default']['teams']['rule']['class'];
-        $_name = $_settings['default']['teams']['name']['class'];
+        $settingRepo = new NavigationSetting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
+        $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
+        $_minYear = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.year")->value, 'int');
+        $_classOwner = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.owner")->value;
+        $_templateId = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.template")->value;
+        $_rule = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.rule.class")->value;
+        $_name = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.name.class")->value;
 
         $teamsRepo = new Team;
         $groupsRepo = new Group;
@@ -218,10 +212,10 @@ abstract class M365
 
     static public function SyncSchoolTeams()
     {
-        $navRepo = new Navigation;
-        $_settings = Arrays::first($navRepo->getByParentIdAndLink(0, 'sync'))->settings;
-        $_rule = $_settings['default']['teams']['rule']['school'];
-        $_name = $_settings['default']['teams']['name']['school'];
+        $settingRepo = new NavigationSetting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $_rule = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.rule.school")->value;
+        $_name = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.name.school")->value;
 
         $teamsRepo = new Team;
         $groupsRepo = new Group;
@@ -266,12 +260,12 @@ abstract class M365
 
     static public function WarnUserPasswordExpiration()
     {
-        $navRepo = new Navigation;
-        $_settings = Arrays::first($navRepo->getByParentIdAndLink(0, 'sync'))->settings;
-        $_days = $_settings['default']['password']['expiration']['days'];
-        $_startFrom = $_settings['default']['password']['expiration']['start'];
-        $_subject = $_settings['mail']['template']['password']['subject'];
-        $_body = $_settings['mail']['template']['password']['body'];
+        $settingRepo = new NavigationSetting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $_days = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.days")->value;
+        $_startFrom = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.start")->value;
+        $_subject = $settingRepo->getByNavigationIdAndKey($navigation->id, "mail.template.password.subject")->value;
+        $_body = $settingRepo->getByNavigationIdAndKey($navigation->id, "mail.template.password.body")->value;
         $employeeRepo = new Employee;
 
         $mailRepo = new Mail;

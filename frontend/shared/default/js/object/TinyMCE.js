@@ -20,6 +20,7 @@ export default class TinyMCE {
 		let options = {
 			selector: `#${this.id}`,
 			height: 300,
+			license_key: "gpl",
 			menubar: false,
 			statusbar: false,
 			plugins: [

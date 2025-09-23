@@ -1,5 +1,3 @@
-import Helpers from "./Helpers.js";
-
 export default class DatePicker {
 	static INSTANCES = {};
 

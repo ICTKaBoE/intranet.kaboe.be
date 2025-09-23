@@ -8,6 +8,9 @@
 		],
 		"\\Controllers\\PAGE\\INTRANET\\ContactStudentIdController": [
 			"/contact/student/*"
+		],
+		"\\Controllers\\PAGE\\INTRANET\\RegistrationNewController": [
+			"/registration/new/*"
 		]
 	},
 	"extranet": {

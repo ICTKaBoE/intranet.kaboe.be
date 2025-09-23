@@ -18,6 +18,10 @@ class RegistrationClass extends CustomObject
         "current" => "bool"
     ];
 
+    protected $linkedAttributes = [
+        "informatRegistration" => ["informatRegistrationId" => \Database\Repository\Informat\Registration::class]
+    ];
+
     public function init()
     {
         $this->formatted->dates = Clock::at($this->start)->format("d/m/Y") . (is_null($this->end) ? "" : " - " . Clock::at($this->end)->format("d/m/Y"));

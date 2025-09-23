@@ -2,6 +2,7 @@ import Select from "./Select.js";
 import Toast from "./Toast.js";
 import Table from "./Table.js";
 import Calendar from "./Calendar.js";
+import Button from "./Button.js";
 
 export default class Helpers {
 	static toggleWait = () => {
@@ -95,6 +96,8 @@ export default class Helpers {
 	};
 
 	static formatValue = (value, type, format = {}, originalData = null) => {
+		if (null == value) return "";
+
 		switch (type) {
 			case "double":
 				{
@@ -186,7 +189,18 @@ export default class Helpers {
 		if (data.reload) location.reload();
 		if (data.reloadTable) Table.ReloadAll();
 		if (data.reloadCalendar) Calendar.ReloadAll();
-		if (data.download) Helpers.precessDownload(data.download);
+		if (data.download) window.open(data.download, "_blank");
+		if (data.activeButton) {
+			data.activeButton.forEach((btn) => {
+				Button.GetInstance(btn).show();
+			});
+		}
+
+		if (data.notActiveButton) {
+			data.notActiveButton.forEach((btn) => {
+				Button.GetInstance(btn).hide();
+			});
+		}
 	};
 
 	static cleanRowIndexes = (rows) => {
@@ -207,15 +221,6 @@ export default class Helpers {
 
 	static sleep = (delay) =>
 		new Promise((resolve) => setTimeout(resolve, delay));
-
-	static precessDownload = (link) => {
-		let a = document.createElement("a");
-		a.type = "download";
-		a.href = link;
-		a.click();
-
-		a = null;
-	};
 
 	static CheckAllLoaded = (callback) => {
 		let intv = setInterval(() => {

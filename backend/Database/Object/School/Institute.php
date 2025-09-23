@@ -10,6 +10,7 @@ class Institute extends CustomObject
         "id" => "int",
         "schoolId" => "int",
         "number" => "string",
+        "sourceId" => "string",
         "deleted" => "boolean"
     ];
 

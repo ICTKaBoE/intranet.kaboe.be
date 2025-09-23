@@ -3,7 +3,7 @@
 namespace Controllers\COMPONENT;
 
 use Controllers\ComponentController;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
@@ -54,15 +54,14 @@ class NavbarComponentController extends ComponentController
 		$navigationRepo = new Navigation;
 		$domain = Helpers::url()->getHost();
 		$routeGroup = (new Group)->getByDomain($domain);
+		$moduleItem = Arrays::firstOrNull($navigationRepo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 
-		$activeItem = Arrays::firstOrNull(Arrays::filter($navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, 0), fn($tli) => $tli->order >= 0 && User::canAccess($tli->minimumRights) && $tli->formatted->active));
-
-		if ($activeItem) {
-			$topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $activeItem->id);
+		if ($moduleItem->order >= 0 && User::canAccess($moduleItem->id) && $moduleItem->formatted->active) {
+			$topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $moduleItem->id);
 
 			foreach ($topLevelItems as $tli) {
 				if ($tli->order < 0) continue;
-				if (!User::canAccess($tli->minimumRights)) continue;
+				if (!User::canAccess($tli->id)) continue;
 
 				$subLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $tli->id);
 
@@ -72,7 +71,7 @@ class NavbarComponentController extends ComponentController
 
 				if (count($subLevelItems)) {
 					foreach ($subLevelItems as $sli) {
-						if (!User::canAccess($sli->minimumRights)) continue;
+						if (!User::canAccess($sli->id)) continue;
 
 						$sliTemplate = self::TEMPLATE_NAVBAR_SUBITEM;
 						if ($sli->icon) $sliTemplate = str_replace("{{navbar:subitem:ifIcon}}", self::TEMPLATE_NAVBAR_SUBITEM_ICON, $sliTemplate);

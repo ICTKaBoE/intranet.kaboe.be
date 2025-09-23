@@ -10,7 +10,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="type">Type</label>
-                        <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-load-value="id" data-load-label="name" data-default-value="HW" required></select>
+                        <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="HW" required></select>
                     </div>
                 </div>
             </div>

@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="schoolId">School</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
             </div>
 
             <div class="col-lg-4 mb-3">
@@ -118,7 +118,7 @@
 
             <div class="col-lg-2 mb-3">
                 <label class="form-label" for="partyExternalCountryId">Land</label>
-                <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/country" data-load-value="id" data-load-label="translatedName" required></select>
+                <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="translatedName" required></select>
             </div>
 
             <div class="col-lg-8 mb-3">

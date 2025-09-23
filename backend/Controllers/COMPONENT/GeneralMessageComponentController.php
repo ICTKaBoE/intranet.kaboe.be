@@ -6,10 +6,10 @@ use Router\Helpers;
 use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Module;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
 use Controllers\ComponentController;
-use Database\Repository\GeneralMessage;
+use Database\Repository\General\Message;
 
 class GeneralMessageComponentController extends ComponentController
 {
@@ -38,7 +38,7 @@ class GeneralMessageComponentController extends ComponentController
         $routeGroup = (new Group)->getByDomain($domain);
         $module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 
-        $messages = (new GeneralMessage)->getByNavigationId($module->id ?: 0);
+        $messages = (new Message)->getByNavigationId($module->id ?: 0);
         $messages = Arrays::filter($messages, fn($m) => $m->show);
 
         if (empty($messages)) $this->layout = str_replace("{{messages:style:display}}", "d-none", $this->layout);

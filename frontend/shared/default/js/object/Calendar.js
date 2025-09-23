@@ -35,7 +35,10 @@ export default class Calendar {
 	}
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("cal")) id = `cal${id}`;
+		if (!id.startsWith("cal"))
+			id = `cal${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Calendar.INSTANCES[id] || false;
 	};
 
@@ -54,6 +57,7 @@ export default class Calendar {
 			initialView: this.view,
 			weekends: this.weekends,
 			locale: "nl",
+			firstDay: 1,
 			headerToolbar: {
 				start: "prevYear,prev",
 				center: "title",

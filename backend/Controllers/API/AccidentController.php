@@ -3,6 +3,8 @@
 namespace Controllers\API;
 
 use Helpers\ZIP;
+use Helpers\Form;
+use Helpers\Table;
 use Security\GUID;
 use Security\User;
 use Router\Helpers;
@@ -15,12 +17,19 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Accident as ObjectAccident;
-use Database\Repository\Accident;
-use Database\Repository\Informat\Employee;
-use Database\Repository\Navigation;
+use Database\Repository\Accident\Party;
 use Database\Repository\School\Address;
+use Database\Repository\Accident\Status;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Database\Repository\Accident\Accident;
+use Database\Repository\Accident\Document;
+use Database\Repository\Accident\Location;
+use Database\Repository\Informat\Employee;
+use Database\Repository\Navigation\Setting;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\Accident\Accident as ObjectAccident;
+use Database\Object\Accident\Document as AccidentDocument;
 
 class AccidentController extends ApiController
 {
@@ -35,60 +44,17 @@ class AccidentController extends ApiController
                 'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $this->appendToJson("checkbox", false);
-            $this->appendToJson("defaultOrder", [[1, "desc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "title" => "#",
-                        "data" => "formatted.number",
-                        "width" => "120px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => "Klas",
-                        "data" => "linked.informatClass.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Getroffen leerling",
-                        "data" => "linked.informatStudent.formatted.fullNameReversed"
-                    ],
-                    [
-                        "title" => "Locatie",
-                        "data" => "formatted.location",
-                        "width" => "300px"
-                    ],
-                    [
-                        "title" => "Ongeval te wijten aan...",
-                        "data" => "formatted.party",
-                        "width" => "250px"
-                    ],
-                    [
-                        "title" => "Aangegeven op",
-                        "data" => "formatted.creationDateTime",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "type" => "date",
-                        "width" => "200px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "mine");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get($id, filters: $filters);
-
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getDeclarations($view, $id = null)
@@ -100,132 +66,89 @@ class AccidentController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[2, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "#",
-                        "data" => "formatted.number",
-                        "width" => "120px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => "Klas",
-                        "data" => "linked.informatClass.name",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Getroffen leerling",
-                        "data" => "linked.informatStudent.formatted.fullNameReversed"
-                    ],
-                    [
-                        "title" => "Locatie",
-                        "data" => "formatted.location",
-                        "width" => "300px"
-                    ],
-                    [
-                        "title" => "Ongeval te wijten aan...",
-                        "data" => "formatted.party",
-                        "width" => "250px"
-                    ],
-                    [
-                        "title" => "Aangegeven door",
-                        "data" => "linked.creatorUser.formatted.fullNameReversed",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Aangegeven op",
-                        "data" => "formatted.creationDateTime",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "type" => "date",
-                        "width" => "200px"
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "declarations");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get($id, filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+    }
+
+    protected function getDocuments($view, $id = null)
+    {
+        $repo = new Document;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            $filters = [];
+
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "documents");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get($id, filters: $filters);
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_SELECT)) $this->appendToJson('items', $repo->get());
+        else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getStatus($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['status'];
-
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
+            $this->appendToJson('items', (new Status)->get());
         }
     }
 
     protected function getLocation($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $locations = $settings['location'];
+        $catRepo = new Location;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_optgroups = [];
-            $_cateogries = [];
+            $mainCategories = $catRepo->getMainCategoryOnly();
+            $optgroups = $items = [];
 
-            foreach ($locations as $k => $v) {
-                if ($v['sub']) {
-                    $_optgroups[] = ["id" => $k, "name" => $v['name']];
+            foreach ($mainCategories as $mainCategory) {
+                $subCategories = $catRepo->getByCategoryId($mainCategory->id);
 
-                    foreach ($v['sub'] as $_k => $_v) $_cateogries[] = ['optgroup' => $k, 'optgroupName' => $v['name'], "id" => "{$k}-{$_k}", "name" => $_v];
+                if ($subCategories) {
+                    $optgroups[] = $mainCategory;
+                    foreach ($subCategories as $subCategory) {
+                        $subCategory->optgroup = $mainCategory->id;
+                        $subCategory->optgroupName = $mainCategory->name;
+                        $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
+
+                        $items[] = $subCategory;
+                    }
                 } else {
-                    $_optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
-                    $_cateogries[] = ["optgroup" => SELECT_OTHER_ID, "id" => $k, ...$v];
+                    $mainCategory->optgroup = SELECT_OTHER_ID;
+                    $items[] = $mainCategory;
                 }
             }
 
-            $this->appendToJson('optgroups', $_optgroups);
-            $this->appendToJson('items', $_cateogries);
+            $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+
+            $this->appendToJson('optgroups', $optgroups);
+            $this->appendToJson('items', $items);
         }
     }
 
     protected function getParty($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $parties = $settings['parties'];
-
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_parties = [];
-
-            foreach ($parties as $k => $v) $_parties[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_parties);
+            $this->appendToJson('items', (new Party)->get());
         }
     }
 
     protected function getSettings($view)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        $this->getNavigationSettings("accident");
     }
 
     // Post functions
@@ -242,146 +165,138 @@ class AccidentController extends ApiController
     protected function post($view, $id = null)
     {
         if ($id == "add") $id = null;
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "accident");
         $repo = new Accident;
 
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $informatSubgroupId = Helpers::input()->post('informatSubgroupId')->getValue();
-        $informatStudentId = Helpers::input()->post('informatStudentId')->getValue();
-        $datetime = Helpers::input()->post('datetime')->getValue();
-        $description = Helpers::input()->post('description')->getValue();
-        $location = Helpers::input()->post('location')->getValue();
-        $exactLocation = Helpers::input()->post('exactLocation')->getValue();
-        $transport = Helpers::input()->post('transport')->getValue();
-        $supervision = General::convert(Helpers::input()->post('supervision')->getValue(), "bool");
-        $informatSupervisorId = Helpers::input()->post('informatSupervisorId')->getValue();
-        $party = Helpers::input()->post('party')->getValue();
-        $partyExternalName = Helpers::input()->post('partyExternalName')->getValue();
-        $partyExternalFirstName = Helpers::input()->post('partyExternalFirstName')->getValue();
-        $partyExternalSex = Helpers::input()->post('partyExternalSex')->getValue();
-        $partyExternalStreet = Helpers::input()->post('partyExternalStreet')->getValue();
-        $partyExternalNumber = Helpers::input()->post('partyExternalNumber')->getValue();
-        $partyExternalBus = Helpers::input()->post('partyExternalBus')->getValue();
-        $partyExternalZipcode = Helpers::input()->post('partyExternalZipcode')->getValue();
-        $partyExternalCity = Helpers::input()->post('partyExternalCity')->getValue();
-        $partyExternalCountryId = Helpers::input()->post('partyExternalCountryId')->getValue();
-        $partyExternalCompany = Helpers::input()->post('partyExternalCompany')->getValue();
-        $partyExternalPolicyNumber = Helpers::input()->post('partyExternalPolicyNumber')->getValue();
-        $partyOtherFullName = Helpers::input()->post('partyOtherFullName')->getValue();
-        $partyOtherFullAddress = Helpers::input()->post('partyOtherFullAddress')->getValue();
-        $partyOtherBirthDay = Helpers::input()->post('partyOtherBirthDay')->getValue();
-        $partyInstallReason = Helpers::input()->post('partyInstallReason')->getValue();
-        $police = General::convert(Helpers::input()->post('police')->getValue(), "bool");
-        $policeName = Helpers::input()->post('policeName')->getValue();
-        $policePVNumber = Helpers::input()->post('policePVNumber')->getValue();
-        $status = Helpers::input()->post("status");
-        $informatStudentRelationId = Helpers::input()->post("informatStudentRelationId");
-        $informatStudentEmailId = Helpers::input()->post("informatStudentEmailId");
-        $informatStudentNumberId = Helpers::input()->post("informatStudentNumberId");
-        $informatStudentBankId = Helpers::input()->post("informatStudentBankId");
-        $informatStudentAddressId = Helpers::input()->post("informatStudentAddressId");
-        $witnessId = Helpers::input()->post('witnessId');
+        $_fields = [
+            "status" => ["default" => "N"],
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "informatSubgroupId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "informatStudentId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "datetime" => ["mandatory" => true],
+            "description" => ["mandatory" => true],
+            "location" => ["mandatory" => true],
+            "exactLocation",
+            "transport",
+            "supervision" => ["convert" => "bool"],
+            "informatSupervisionId" => ["type" => Input::INPUT_TYPE_INT],
+            "party",
+            "partyExternalName",
+            "partyExternalFirstName",
+            "partyExternalSex",
+            "partyExternalStreet",
+            "partyExternalNumber",
+            "partyExternalBus",
+            "partyExternalZipcode",
+            "partyExternalCity",
+            "partyExternalCountryId" => ["type" => Input::INPUT_TYPE_INT],
+            "partyExternalCompany",
+            "partyExternalPolicyNumber",
+            "partyOtherFullName",
+            "partyOtherFullAddress",
+            "partyOtherBirthDay",
+            "partyInstallReason",
+            "police" => ["convert" => "bool"],
+            "policeName",
+            "policePVNumber",
+            "informatStudentRelationId" => ["default" => null, "type" => Input::INPUT_TYPE_INT],
+            "informatStudentEmailId" => ["default" => null, "type" => Input::INPUT_TYPE_INT],
+            "informatStudentNumberId" => ["default" => null, "type" => Input::INPUT_TYPE_INT],
+            "informatStudentBankId" => ["default" => null, "type" => Input::INPUT_TYPE_INT],
+            "informatStudentAddressId" => ["default" => null, "type" => Input::INPUT_TYPE_INT],
+            "witnessId" => ["default" => null, "type" => Input::INPUT_TYPE_INT]
+        ];
 
-        if (!$id) {
-            if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatSubgroupId, Input::INPUT_TYPE_INT) || Input::empty($informatSubgroupId)) $this->setValidation("informatSubgroupId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($informatStudentId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentId)) $this->setValidation("informatStudentId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($datetime) || Input::empty($datetime)) $this->setValidation("datetime", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($location) || Input::empty($location)) $this->setValidation("location", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($description) || Input::empty($description)) $this->setValidation("description", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if (Arrays::first(explode("-", $fields["location"])) == "O") {
+            if (!Input::check($fields["exactLocation"]) || Input::empty($fields["exactLocation"])) $this->setValidation("exactLocation", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["transport"]) || Input::empty($fields["transport"])) $this->setValidation("transport", state: self::VALIDATION_STATE_INVALID);
         }
 
-        if (Arrays::first(explode("-", $location)) == "O") {
-            if (!Input::check($exactLocation) || Input::empty($exactLocation)) $this->setValidation("exactLocation", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($transport) || Input::empty($transport)) $this->setValidation("transport", state: self::VALIDATION_STATE_INVALID);
+        if ($fields["party"] == "E") {
+            if (!Input::check($fields["partyExternalName"]) || Input::empty($fields["partyExternalName"])) $this->setValidation("partyExternalName", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalFirstName"]) || Input::empty($fields["partyExternalFirstName"])) $this->setValidation("partyExternalFirstName", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalSex"]) || Input::empty($fields["partyExternalSex"])) $this->setValidation("partyExternalSex", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalStreet"]) || Input::empty($fields["partyExternalStreet"])) $this->setValidation("partyExternalStreet", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalNumber"]) || Input::empty($fields["partyExternalNumber"])) $this->setValidation("partyExternalNumber", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalZipcode"]) || Input::empty($fields["partyExternalZipcode"])) $this->setValidation("partyExternalZipcode", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalCity"]) || Input::empty($fields["partyExternalCity"])) $this->setValidation("partyExternalCity", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalCountryId"]) || Input::empty($fields["partyExternalCountryId"])) $this->setValidation("partyExternalCountryId", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyExternalCompany"]) || Input::empty($fields["partyExternalCompany"])) $this->setValidation("partyExternalCompany", state: self::VALIDATION_STATE_INVALID);
+        } else if ($fields["party"] == "O") {
+            if (!Input::check($fields["partyOtherFullName"]) || Input::empty($fields["partyOtherFullName"])) $this->setValidation("partyOtherFullName", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyOtherFullAddress"]) || Input::empty($fields["partyOtherFullAddress"])) $this->setValidation("partyOtherFullAddress", state: self::VALIDATION_STATE_INVALID);
+            if (!Input::check($fields["partyOtherBirthDay"]) || Input::empty($fields["partyOtherBirthDay"])) $this->setValidation("partyOtherBirthDay", state: self::VALIDATION_STATE_INVALID);
+        } else if ($fields["party"] == "I") {
+            if (!Input::check($fields["partyInstallReason"]) || Input::empty($fields["partyInstallReason"])) $this->setValidation("partyInstallReason", state: self::VALIDATION_STATE_INVALID);
         }
 
-        if ($party == "E") {
-            if (!Input::check($partyExternalName) || Input::empty($partyExternalName)) $this->setValidation("partyExternalName", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalFirstName) || Input::empty($partyExternalFirstName)) $this->setValidation("partyExternalFirstName", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalSex) || Input::empty($partyExternalSex)) $this->setValidation("partyExternalSex", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalStreet) || Input::empty($partyExternalStreet)) $this->setValidation("partyExternalStreet", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalNumber) || Input::empty($partyExternalNumber)) $this->setValidation("partyExternalNumber", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalZipcode) || Input::empty($partyExternalZipcode)) $this->setValidation("partyExternalZipcode", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalCity) || Input::empty($partyExternalCity)) $this->setValidation("partyExternalCity", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalCountryId) || Input::empty($partyExternalCountryId)) $this->setValidation("partyExternalCountryId", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyExternalCompany) || Input::empty($partyExternalCompany)) $this->setValidation("partyExternalCompany", state: self::VALIDATION_STATE_INVALID);
-        } else if ($party == "O") {
-            if (!Input::check($partyOtherFullName) || Input::empty($partyOtherFullName)) $this->setValidation("partyOtherFullName", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyOtherFullAddress) || Input::empty($partyOtherFullAddress)) $this->setValidation("partyOtherFullAddress", state: self::VALIDATION_STATE_INVALID);
-            if (!Input::check($partyOtherBirthDay) || Input::empty($partyOtherBirthDay)) $this->setValidation("partyOtherBirthDay", state: self::VALIDATION_STATE_INVALID);
-        } else if ($party == "I") {
-            if (!Input::check($partyInstallReason) || Input::empty($partyInstallReason)) $this->setValidation("partyInstallReason", state: self::VALIDATION_STATE_INVALID);
+        if ($fields["police"]) {
+            if (!Input::check($fields["policeName"]) || Input::empty($fields["policeName"])) $this->setValidation("policeName", state: self::VALIDATION_STATE_INVALID);
         }
 
-        if ($police) {
-            if (!Input::check($policeName) || Input::empty($policeName)) $this->setValidation("policeName", state: self::VALIDATION_STATE_INVALID);
+        if ($fields["supervision"]) {
+            if (!Input::check($fields["informatSupervisorId"], Input::INPUT_TYPE_INT) || Input::empty($fields["informatSupervisorId"])) $this->setValidation("informatSupervisorId", state: self::VALIDATION_STATE_INVALID);
         }
-
-        if ($supervision) {
-            if (!Input::check($informatSupervisorId, Input::INPUT_TYPE_INT) || Input::empty($informatSupervisorId)) $this->setValidation("informatSupervisorId", state: self::VALIDATION_STATE_INVALID);
-        }
-
-        // if ($id) {
-        //     if (!Input::check($informatStudentRelationId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentRelationId)) $this->setValidation("informatStudentRelationId", state: self::VALIDATION_STATE_INVALID);
-        //     if (!Input::check($informatStudentEmailId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentEmailId)) $this->setValidation("informatStudentEmailId", state: self::VALIDATION_STATE_INVALID);
-        //     if (!Input::check($informatStudentNumberId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentNumberId)) $this->setValidation("informatStudentNumberId", state: self::VALIDATION_STATE_INVALID);
-        //     if (!Input::check($informatStudentBankId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentBankId)) $this->setValidation("informatStudentBankId", state: self::VALIDATION_STATE_INVALID);
-        //     if (!Input::check($informatStudentAddressId, Input::INPUT_TYPE_INT) || Input::empty($informatStudentAddressId)) $this->setValidation("informatStudentAddressId", state: self::VALIDATION_STATE_INVALID);
-        // }
 
         if ($this->validationIsAllGood()) {
-            $accident = $id ? Arrays::firstOrNull($repo->get($id)) : (new ObjectAccident);
-            if (!$accident->number) $accident->number = $settings['lastNumber'] + 1;
+            $accident = $repo->getById($id) ?? (new ObjectAccident);
+            $accident->fillWithPostData();
+            if (!$accident->number) $accident->number = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber")->value + 1;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
-            $accident->status = $status?->getValue() ?: "N";
-            $accident->schoolId = $schoolId;
-            $accident->informatSubgroupId = $informatSubgroupId;
-            $accident->informatStudentId = $informatStudentId;
-            if ($informatStudentRelationId) $accident->informatStudentRelationId = $informatStudentRelationId->getValue();
-            if ($informatStudentEmailId) $accident->informatStudentEmailId = $informatStudentEmailId->getValue();
-            if ($informatStudentNumberId) $accident->informatStudentNumberId = $informatStudentNumberId->getValue();
-            if ($informatStudentBankId) $accident->informatStudentBankId = $informatStudentBankId->getValue();
-            if ($informatStudentAddressId) $accident->informatStudentAddressId = $informatStudentAddressId->getValue();
-            $accident->datetime = Clock::at($datetime)->format("Y-m-d H:i:s");
-            $accident->description = $description;
-            $accident->location = $location;
-            $accident->exactLocation = $exactLocation;
-            $accident->transport = $transport;
-            $accident->supervision = $supervision;
-            $accident->informatSupervisorId = $informatSupervisorId;
-            $accident->witnessId = $witnessId?->getValue() ?: ((new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId))->id;
-            $accident->party = $party;
-            $accident->partyExternalName = $partyExternalName;
-            $accident->partyExternalFirstName = $partyExternalFirstName;
-            $accident->partyExternalSex = $partyExternalSex;
-            $accident->partyExternalStreet = $partyExternalStreet;
-            $accident->partyExternalNumber = $partyExternalNumber;
-            $accident->partyExternalBus = $partyExternalBus;
-            $accident->partyExternalZipcode = $partyExternalZipcode;
-            $accident->partyExternalCity = $partyExternalCity;
-            $accident->partyExternalCountryId = $partyExternalCountryId;
-            $accident->partyExternalCompany = $partyExternalCompany;
-            $accident->partyExternalPolicyNumber = $partyExternalPolicyNumber;
-            $accident->partyOtherFullName = $partyOtherFullName;
-            $accident->partyOtherFullAddress = $partyOtherFullAddress;
-            $accident->partyOtherBirthDay = $partyOtherBirthDay;
-            $accident->partyInstallReason = $partyInstallReason;
-            $accident->police = $police;
-            $accident->policeName = $policeName;
-            $accident->policePVNumber = $policePVNumber;
+            $accident->datetime = Clock::at($fields["datetime"])->format("Y-m-d H:i:s");
+            $accident->witnessId = (!is_null($fields["witnessId"]) ? $fields["witnessId"] : (User::getLoggedInUser()->informatEmployeeId ? ((new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId))->id : null));
 
             $repo->set($accident);
 
             if (!$id) {
-                $navItem = Arrays::first($navRepo->get(Session::get("moduleSettingsId")));
-                $navItem->settings['lastNumber']++;
-                $navRepo->set($navItem, ['settings']);
+                $settingItem = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber");
+                $settingItem->value++;
+                $settingsRepo->set($settingItem);
             }
 
             $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
+    protected function postDocuments($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $_fields = [
+            "alias" => ["mandatory" => true],
+            "file" => ["type" => "file"]
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Document;
+            $file = $fields["file"];
+
+            $item = $repo->getById($id) ?? new AccidentDocument;
+            $origName = $item->name;
+            $item->fillWithPostData();
+            $item->guid = $item->guid ?? GUID::create();
+
+            if ($file && $file[0]->getSize() > 0) {
+                $item->name = $file[0]->getFilename();
+                $item->ext = $file[0]->getExtension();
+                FileSystem::CreateFolder(LOCATION_UPLOAD . "/accident");
+                $file[0]->move(LOCATION_UPLOAD . "/accident/{$item->guid}.{$item->ext}");
+            } else {
+                $item->name = $origName;
+            }
+
+            $repo->set($item);
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postDeclarationsPrint($view, $id = null)
@@ -392,16 +307,18 @@ class AccidentController extends ApiController
             $id = explode("_", $id);
             $arepo = new Accident;
 
-            $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+            $settingsRepo = new Setting;
+            $navigation = (new Navigation)->getByParentIdAndLink(0, "accident");
             $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
             $filename = "Ongevallen - Aangiftes.zip";
+            $templateFile = (new Document)->getById($settingsRepo->getByNavigationIdAndKey($navigation->id, "default.document")->value);
 
             foreach ($id as $_id) {
-                $item = $arepo->get($_id)[0];
-                $item->linked->school->linked->address = Arrays::firstOrNull((new Address)->getBySchoolId($item->schoolId));
+                $item = $arepo->getById($_id);
+                $item->linked->school->linked->address = (new Address)->getBySchoolId($item->schoolId);
 
-                $saveFilename = $folder . "/{$_id}." . $settings['blancoForm']['ext'];
-                $template = new TemplateProcessor(LOCATION_UPLOAD . "/" . $settings['blancoForm']['file']);
+                $saveFilename = $folder . "/{$_id}.{$templateFile->ext}";
+                $template = new TemplateProcessor(LOCATION_UPLOAD . "/accident/{$templateFile->guid}.{$templateFile->ext}");
 
                 foreach ($item->toArray(true) as $key => $value) $template->setValue("accident:{$key}", $value);
                 foreach ($item->linked->school->toArray(true) as $key => $value) $template->setValue("school:{$key}", $value);
@@ -409,7 +326,7 @@ class AccidentController extends ApiController
                 foreach ($item->linked?->supervisor?->toArray(true) ?: [] as $key => $value) $template->setValue("supervisor:{$key}", $value);
                 foreach ($item->linked?->witness?->toArray(true) ?: [] as $key => $value) $template->setValue("witness:{$key}", $value);
                 foreach ($item->linked?->informatStudentAddress?->toArray(true) ?: [] as $key => $value) $template->setValue("student:address.{$key}", $value);
-                foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) $template->setValue("setting:{$key}", $value);
+                foreach (Arrays::flattenKeysRecursively($settingsRepo->getByNavigationId($navigation->id)) as $setting) $template->setValue("setting:{$setting->key}", $setting->value);
                 foreach (User::getLoggedInUser()->toArray(true) as $key => $value) $template->setValue("user:{$key}", $value);
 
                 $template->setValue("represent:name", $item->linked->informatStudentRelation->formatted->fullNameReversed);
@@ -472,7 +389,7 @@ class AccidentController extends ApiController
 
                 $template->setValue("date:now", Clock::nowAsString("d/m/Y H:i:s"));
 
-                foreach ($template->getVariables() as $var) $template->setValue($var, '/');
+                foreach ($template->getVariables() as $var) $template->setValue($var, '');
                 $template->saveAs($saveFilename);
 
                 $convert = (new Convert)->convert($saveFilename, $folder . "/{$_id}.pdf");
@@ -493,33 +410,7 @@ class AccidentController extends ApiController
 
     protected function postSettings()
     {
-        $_settings = Helpers::input()->all();
-        $file = Helpers::input()->file("blancoForm_original")[0];
-        unset($_settings['blancoForm_original']);
-
-        if ($file && $file->getSize() > 0) {
-            FileSystem::CreateFolder(LOCATION_UPLOAD);
-            $origFilename = $file->getFilename();
-            $origExt = $file->getExtension();
-            $newName = GUID::create() . "." . $file->getExtension();
-
-            if ($file->move(LOCATION_UPLOAD . "/{$newName}")) {
-                $_settings['blancoForm.original'] = $origFilename;
-                $_settings['blancoForm.ext'] = $origExt;
-                $_settings['blancoForm.file'] = $newName;
-            }
-        }
-
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("accident");
     }
 
     // Delete functions

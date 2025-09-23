@@ -83,4 +83,30 @@ abstract class CString
 		preg_match($pattern, $string, $matches);
 		return $matches[1] ?? '';
 	}
+
+	public static function getStreetFromAddress($input)
+	{
+		$address = "";
+
+		$matches = array();
+		if (preg_match('/(?P<address>[^\d]+) (?P<number>\d+.?)/', $input, $matches)) {
+			$address = $matches['address'];
+		} else { // no number found, it is only address
+			$address = $input;
+		}
+
+		return $address ?? false;
+	}
+
+	public static function getHouseNumberFromAddress($input)
+	{
+		$number = "";
+
+		$matches = array();
+		if (preg_match('/(?P<address>[^\d]+) (?P<number>\d+.?)/', $input, $matches)) {
+			$number = $matches['number'];
+		}
+
+		return $number ?? false;
+	}
 }

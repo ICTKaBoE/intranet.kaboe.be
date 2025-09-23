@@ -19,7 +19,14 @@ class SchoolController extends ApiController
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->get();
+            $_items = $repo->get();
+            $_optgroups = $items = [];
+            $virtual = Arrays::filter($_items, fn($i) => $i->virtual);
+            $_items = Arrays::filter($_items, fn($i) => !$i->virtual);
+            foreach ($virtual as $v) $_optgroups[] = ["id" => $v->id, "name" => $v->name];
+            foreach ($_items as $i) $items[] = ["optgroup" => $i->parentSchoolId, ...$i->toArray()];
+
+            $this->appendToJson('optgroups', $_optgroups);
             $this->appendToJson('items', $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) {
         } else if (Strings::equal($view, self::VIEW_LIST)) {
@@ -27,6 +34,12 @@ class SchoolController extends ApiController
             $items = Arrays::map($items, fn($i) => $i->toArray(true));
             $this->appendToJson('raw', General::processTemplate($items));
         }
+    }
+
+    protected function getAll($view, $id = null)
+    {
+        $repo = new School;
+        if (Strings::equal($view, self::VIEW_SELECT)) $this->appendToJson('items', Arrays::map($repo->get(), fn($i) => $i = $i->toArray(true)));
     }
 
     protected function getAddress($view, $id = null)

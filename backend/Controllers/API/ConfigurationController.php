@@ -2,7 +2,9 @@
 
 namespace Controllers\API;
 
+use Helpers\Form;
 use Helpers\HTML;
+use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -10,17 +12,21 @@ use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\GeneralMessage as ObjectGeneralMessage;
-use Database\Object\Route\Group as ObjectSchool;
-use Database\Repository\Setting\Setting;
-use Database\Repository\Navigation;
+use Database\Repository\Setting\Tab;
+use Database\Repository\School\School;
 use Database\Repository\Security\Group;
-use Database\Repository\GeneralMessage;
+use Database\Repository\General\Message;
+use Database\Repository\Setting\Setting;
 use Database\Repository\Security\GroupUser;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\Route\Group as ObjectSchool;
+use Database\Repository\Security\GroupNavigation;
+use Database\Object\General\Message as GeneralMessage;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
-use Database\Repository\School\School;
-use Database\Repository\Setting\Tab;
+use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
+use Database\Repository\General\MessageType;
 
 class ConfigurationController extends ApiController
 {
@@ -62,6 +68,9 @@ class ConfigurationController extends ApiController
             ];
 
             $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "&"));
+        } else if (Strings::equal($view, self::VIEW_PS)) {
+            $items = $repo->get();
+            $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray()));
         }
     }
 
@@ -70,29 +79,17 @@ class ConfigurationController extends ApiController
         $repo = new School;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "schools");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $group = Arrays::firstOrNull($repo->get($id));
+            $group = $repo->getById($id);
             $this->appendToJson('fields', $group);
         }
     }
@@ -102,73 +99,12 @@ class ConfigurationController extends ApiController
         $repo = new Group;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => HTML::Icon("eye", "Read"),
-                        "data" => "formatted.icon.read",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("plus", "Create"),
-                        "data" => "formatted.icon.create",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("pencil", "Update"),
-                        "data" => "formatted.icon.update",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("trash", "Delete"),
-                        "data" => "formatted.icon.delete",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("file-export", "Export"),
-                        "data" => "formatted.icon.export",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("settings", "Change Settings"),
-                        "data" => "formatted.icon.changeSettings",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => HTML::Icon("cloud-network", "Administrator"),
-                        "data" => "formatted.icon.admin",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "groups");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
             $this->appendToJson("rows", $items);
@@ -176,80 +112,41 @@ class ConfigurationController extends ApiController
             $items = $repo->get($id);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $group = Arrays::firstOrNull($repo->get($id));
+            $group = $repo->getById($id);
             $members = (new GroupUser)->getBySecurityGroupId($group->id);
+            $applications = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "P");
+            $links = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "L");
 
             $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
+            $group->applications = join(";", Arrays::map($applications, fn($a) => $a->navigationId));
+            $group->links = join(";", Arrays::map($links, fn($a) => $a->navigationId));
             $this->appendToJson('fields', $group);
         }
     }
 
     protected function getMessagesType($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['messages']['type'];
-
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
+            $this->appendToJson('items', (new MessageType)->get());
         }
     }
 
     protected function getMessages($view, $id = null)
     {
-        $repo = new GeneralMessage;
+        $repo = new Message;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[2, "asc"], [3, "asc"], [1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Type",
-                        "data" => "mapped.type",
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Module",
-                        "data" => "linked.navigation.name",
-                        "defaultContent" => "Algemeen"
-                    ],
-                    [
-                        "title" => "Geldig van",
-                        "data" => "formatted.from",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Geldig tot",
-                        "data" => "formatted.until",
-                        "render" => [
-                            "_" => "display",
-                            "sort" => "sort"
-                        ],
-                        "width" => "200px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "messages");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $group = Arrays::firstOrNull($repo->get($id));
+            $group = $repo->getById($id);
             $this->appendToJson('fields', $group);
         }
     }
@@ -279,30 +176,26 @@ class ConfigurationController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $name = Helpers::input()->post('name')->getValue();
-        $color = Helpers::input()->post('color')->getValue();
-        $intuneOrderIdPrefix = Helpers::input()->post('intuneOrderIdPrefix')->getValue();
-        $jamfIpadPrefix = Helpers::input()->post('jamfIpadPrefix')->getValue();
-        $adJobTitlePrefix = Helpers::input()->post('adJobTitlePrefix')->getValue();
-        $adOuPart = Helpers::input()->post('adOuPart')->getValue();
-        $adSecGroupPart = Helpers::input()->post('adSecGroupPart')->getValue();
-        $syncUpdateMail = Helpers::input()->post('syncUpdateMail')->getValue();
+        $_fields = [
+            "name" => ["mandatory" => true],
+            "color",
+            "intuneOrderIdPrefix",
+            "jamfIpadPrefix",
+            "adJobTitlePrefix",
+            "adOuPart",
+            "adSecGroupPart",
+            "syncUpdateMail"
+        ];
 
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new School;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ObjectSchool;
-                $item->name = $name;
-                $item->color = $color;
-                $item->intuneOrderIdPrefix = $intuneOrderIdPrefix;
-                $item->jamfIpadPrefix = $jamfIpadPrefix;
-                $item->adJobTitlePrefix = $adJobTitlePrefix;
-                $item->adOuPart = $adOuPart;
-                $item->adSecGroupPart = $adSecGroupPart;
-                $item->syncUpdateMail = $syncUpdateMail;
+                $item = $repo->getById($id) ?? new ObjectSchool;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
@@ -316,27 +209,23 @@ class ConfigurationController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $name = Helpers::input()->post('name')->getValue();
-        $read = Helpers::input()->post('read')->getValue();
-        $create = Helpers::input()->post('create')->getValue();
-        $update = Helpers::input()->post('update')->getValue();
-        $delete = Helpers::input()->post('delete')->getValue();
-        $export = Helpers::input()->post('export')->getValue();
-        $changeSettings = Helpers::input()->post('changeSettings')->getValue();
-        $admin = Helpers::input()->post('admin')->getValue();
-        $m365GroupId = Helpers::input()->post('m365GroupId')->getValue();
-        $members = Helpers::input()->post('members')->getValue();
+        $_fields = [
+            "name" => ["mandatory" => true],
+            "m365GroupId",
+            "members",
+            "applications",
+            "links"
+        ];
 
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Group;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ObjectSecurityGroup;
-                $item->name = $name;
-                $item->permission = [(int)General::convert($read, "bool"), (int)General::convert($create, "bool"), (int)General::convert($update, "bool"), (int)General::convert($delete, "bool"), (int)General::convert($export, "bool"), (int)General::convert($changeSettings, "bool"), (int)General::convert($admin, "bool")];
-                $item->m365GroupId = $m365GroupId;
+                $item = $repo->getById($id) ?? new ObjectSecurityGroup;
+                $item->fillWithPostData();
 
                 $newId = $repo->set($item);
                 if (!$item->id) $item->id = $newId;
@@ -344,54 +233,102 @@ class ConfigurationController extends ApiController
                 $sguRepo = new GroupUser;
                 $sguRepo->delete(["securityGroupId" => $item->id]);
 
-                foreach (explode(";", $members) as $member) {
+                foreach (explode(";", $fields["members"]) as $member) {
                     $sguRepo->set(new ObjectSecurityGroupUser([
                         "securityGroupId" => $item->id,
                         "userId" => $member
                     ]));
                 }
+
+                $sgnRepo = new GroupNavigation;
+                $sgnRepo->delete(["securityGroupId" => $item->id]);
+
+                if ($fields["applications"]) {
+                    $navRepo = new Navigation;
+
+                    foreach (explode(";", $fields["applications"]) as $application) {
+                        $navItem = $navRepo->getById($application);
+
+                        $sgnRepo->set(new SecurityGroupNavigation([
+                            "securityGroupId" => $item->id,
+                            "navigationId" => $navItem->id
+                        ]));
+
+                        while ($navItem->parentId !== 0 || $navItem->folderId !== 0) {
+                            $navItem = $navRepo->getById($navItem->folderId !== 0 ? $navItem->folderId : $navItem->parentId);
+                            $doesExists = $sgnRepo->get(filters: ['securityGroupId' => $item->id, "navigationId" => $navItem->id]);
+
+                            if (!$doesExists) {
+                                $sgnRepo->set(new SecurityGroupNavigation([
+                                    "securityGroupId" => $item->id,
+                                    "navigationId" => $navItem->id
+                                ]));
+                            }
+                        }
+                    }
+                }
+
+                if ($fields["links"]) {
+                    $navRepo = new Navigation;
+
+                    foreach (explode(";", $fields["links"]) as $link) {
+                        $navItem = $navRepo->getById($link);
+
+                        $sgnRepo->set(new SecurityGroupNavigation([
+                            "securityGroupId" => $item->id,
+                            "navigationId" => $navItem->id
+                        ]));
+
+                        while ($navItem->parentId !== 0 || $navItem->folderId !== 0) {
+                            $navItem = $navRepo->getById($navItem->folderId !== 0 ? $navItem->folderId : $navItem->parentId);
+                            $doesExists = $sgnRepo->get(filters: ['securityGroupId' => $item->id, "navigationId" => $navItem->id]);
+
+                            if (!$doesExists) {
+                                $sgnRepo->set(new SecurityGroupNavigation([
+                                    "securityGroupId" => $item->id,
+                                    "navigationId" => $navItem->id
+                                ]));
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De gebruikersgroep is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postMessages($view, $id = null)
     {
         if ($id == "add") $id = null;
 
-        $from = Helpers::input()->post('from')->getValue();
-        $until = Helpers::input()->post('until')->getValue();
-        $type = Helpers::input()->post('type')->getValue();
-        $navigationId = Helpers::input()->post('navigationId')->getValue();
-        $content = Helpers::input()->post('content')->getValue();
+        $_fields = [
+            "from" => ["mandatory" => true],
+            "until" => ["default" => null],
+            "type" => ["mandatory" => true],
+            "navigationId" => ["type" => Input::INPUT_TYPE_INT],
+            "content" => ["mandatory" => true]
+        ];
 
-        if (!Input::check($from) || Input::empty($from)) $this->setValidation("from", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($content) || Input::empty($content)) $this->setValidation("content", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
-            $repo = new GeneralMessage;
+            $repo = new Message;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ObjectGeneralMessage;
-                $item->from = str_replace("T", " ", $from);
-                $item->until = str_replace("T", " ", $until) ?: null;
-                $item->type = $type;
-                $item->navigationId = $navigationId;
-                $item->content = $content;
+                $item = $repo->getById($id) ?? new GeneralMessage;
+                $item->fillWithPostData();
+                $item->from = str_replace("T", " ", $item->from);
+                $item->until = str_replace("T", " ", $item->until) ?: null;
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De afstand is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Delete functions
@@ -401,7 +338,7 @@ class ConfigurationController extends ApiController
         $repo = new Group;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -415,10 +352,10 @@ class ConfigurationController extends ApiController
     protected function deleteMessages($view, $id = null)
     {
         $id = explode("_", $id);
-        $repo = new GeneralMessage;
+        $repo = new Message;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 

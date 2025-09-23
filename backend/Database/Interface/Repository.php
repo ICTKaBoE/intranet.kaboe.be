@@ -56,6 +56,12 @@ class Repository extends stdClass
         return $objects;
     }
 
+    public function getById($id)
+    {
+        if (is_null($id) || $id == 0) return null;
+        return Arrays::firstOrNull($this->get($id));
+    }
+
     public function get($id = null, $order = true, $deleted = false, $filters = [])
     {
         $statement = $this->prepareSelect($id, $order, $deleted, $filters);

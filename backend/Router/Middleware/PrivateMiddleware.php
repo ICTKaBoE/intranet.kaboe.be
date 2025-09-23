@@ -23,7 +23,7 @@ class PrivateMiddleware implements IMiddleware
     static private function checkDatabaseVersion()
     {
         if (!Code::CheckDatabaseVersion()) {
-            $errorlocation = Arrays::first((new Setting)->get(id: "page.default.error"))->value;
+            $errorlocation = (new Setting)->getById("page.default.error")->value;
             Helpers::redirect("{$errorlocation}501", 501);
         }
     }
@@ -32,14 +32,12 @@ class PrivateMiddleware implements IMiddleware
     {
         $directory = "/" . Helpers::getDomainFolder();
         $folder = Helpers::getDirectory();
-        $defaultPage = Arrays::first((new Setting)->get((User::isSignedIn() ? "page.default.afterLogin" : "page.default.login")))->value;
+        $defaultPage = (new Setting)->getById((User::isSignedIn() ? "page.default.afterLogin" : "page.default.login"))->value;
 
         if (User::isSignedIn()) {
             if (Strings::isBlank(str_replace($directory, "", $folder)) && !Strings::startsWith($folder, "{$directory}/error") && !Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage);
         } else {
-            $redirect = Helpers::url();
-            $redirect = $redirect->getScheme() . "://" . $redirect->getHost() . $redirect->getPath();
-
+            $redirect = Helpers::url()->getParam("redirect") ?? Helpers::url()->getScheme() . "://" . Helpers::url()->getHost() . Helpers::url()->getPath();
             if (!Strings::equal($folder, $defaultPage)) Helpers::redirect($defaultPage . ($redirect ? "?redirect={$redirect}" : ""));
         }
     }
@@ -47,7 +45,7 @@ class PrivateMiddleware implements IMiddleware
     static private function checkFileExistance()
     {
         $folder = Helpers::getDirectory();
-        $errorlocation = Arrays::first((new Setting)->get(id: "page.default.error"))->value;
+        $errorlocation = (new Setting)->getById("page.default.error")->value;
         if (!file_exists(LOCATION_FRONTEND_PAGES . $folder)) Helpers::redirect("{$errorlocation}404", 404);
     }
 }

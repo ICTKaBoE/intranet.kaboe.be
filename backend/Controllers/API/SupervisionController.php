@@ -5,25 +5,25 @@ namespace Controllers\API;
 use Helpers\PDF;
 use Helpers\ZIP;
 use Helpers\Date;
+use Helpers\Form;
 use Helpers\Excel;
 use Security\User;
-use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School\School;
 use Database\Repository\Holliday;
-use Database\Repository\Navigation;
+use Database\Repository\User\Address;
+use Database\Repository\School\School;
 use Database\Repository\SupervisionEvent;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Database\Repository\Navigation\Setting;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\User\User as RepositoryUser;
 use Database\Object\SupervisionEvent as ObjectSupervisionEvent;
-use Database\Repository\User\Address;
 
 class SupervisionController extends ApiController
 {
@@ -56,54 +56,55 @@ class SupervisionController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        return $this->getNavigationSettings("supervision");
     }
 
     // Post functions
     protected function postFill($view, $id = null)
     {
-        $schoolId = Helpers::input()->post('schoolId')?->getValue();
-        $date = Helpers::input()->post('date')?->getValue();
-        $start = Helpers::input()->post('start')?->getValue();
-        $end = Helpers::input()->post('end')?->getValue();
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "supervision");
 
-        if (!Input::check($schoolId, Input::INPUT_TYPE_INT) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        $_fields = [
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "date",
+            "start",
+            "end"
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
-            $start = $date . " " . $start;
-            $end = $date . " " . $end;
+            $fields['start'] = $fields['date'] . " " . $fields['start'];
+            $fields['end'] = $fields['date'] . " " . $fields['end'];
 
-            $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-
-            if (General::convert($settings['block']['past']['enabled'], "bool")) {
+            if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.enabled")->value, "bool")) {
                 $pastDate = Clock::now()->toDateTime();
-                if ($settings['block']['past']['amount'] !== 0) $pastDate->modify("-" . $settings['block']['past']['amount']);
+                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value);
                 $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-                if ($settings['lastPayDate'] && $pastDate->isBeforeOrEqualTo(Clock::at($settings['lastPayDate']))) $pastDate = Clock::at($settings['lastPayDate']);
+                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value);
 
-                if (Clock::at($date)->isBefore($pastDate)) $this->setToast("U kan geen middagtoezicht inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
+                if (Clock::at($fields['date'])->isBefore($pastDate)) $this->setToast("U kan geen middagtoezicht inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
             }
 
-            if (General::convert($settings['block']['future']['enabled'], "bool")) {
+            if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.enabled")->value, "bool")) {
                 $futureDate = Clock::now()->toDateTime();
-                if ($settings['block']['future']['amount'] !== 0) $futureDate->modify("+" . $settings['block']['future']['amount']);
+                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value);
                 $futureDate = Clock::at($futureDate->format('Y-m-d'));
 
-                if (Clock::at($date)->isAfter($futureDate)) $this->setToast("U kan geen middagtoezicht inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
+                if (Clock::at($fields['date'])->isAfter($futureDate)) $this->setToast("U kan geen middagtoezicht inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
             }
 
             if ($this->validationIsAllGood()) {
                 $hollidayRepo = new Holliday;
-                $isHolliday = $hollidayRepo->dateContainsHolliday($start);
+                $isHolliday = $hollidayRepo->dateContainsHolliday($fields['start']);
 
                 $supervisionEventRepo = new SupervisionEvent;
 
-                $hasOverlap = $supervisionEventRepo->detectOverlap($start, $end, User::getLoggedInUser()->id, $id);
-                $spansMoreThenOneDay = !Strings::equal(Clock::at($start)->format("Y-m-d"), Clock::at($end)->format("Y-m-d"));
+                $hasOverlap = $supervisionEventRepo->detectOverlap($fields['start'], $fields['end'], User::getLoggedInUser()->id, $id);
+                $spansMoreThenOneDay = !Strings::equal(Clock::at($fields['start'])->format("Y-m-d"), Clock::at($fields['end'])->format("Y-m-d"));
 
                 if ($isHolliday) {
                     $this->setValidation("start", "Starttijdstip mag niet in een vakantie/feestdag liggen", self::VALIDATION_STATE_INVALID);
@@ -114,13 +115,11 @@ class SupervisionController extends ApiController
                     if (!empty($hasOverlap)) $this->setToast("Je overlapt met een andere toezicht...", self::VALIDATION_STATE_INVALID);
                     else if ($spansMoreThenOneDay) $this->setToast("Een toezicht kan niet doorgaan in de nacht...", self::VALIDATION_STATE_INVALID);
                     else {
-                        $existingEvent = (!is_null($id) ? $supervisionEventRepo->get($id)[0] : new ObjectSupervisionEvent);
-
+                        $existingEvent = $supervisionEventRepo->getById($id) ?? new ObjectSupervisionEvent;
+                        $existingEvent->fillWithPostData();
                         $existingEvent->userId = User::getLoggedInUser()->id;
-                        $existingEvent->schoolId = $schoolId;
-
-                        if (!is_null($start)) $existingEvent->start = Clock::at($start)->format("Y-m-d H:i:s");
-                        if (!is_null($end)) $existingEvent->end = Clock::at($end)->format("Y-m-d H:i:s");
+                        if (!is_null($fields['start'])) $existingEvent->start = Clock::at($fields['start'])->format("Y-m-d H:i:s");
+                        if (!is_null($fields['end'])) $existingEvent->end = Clock::at($fields['end'])->format("Y-m-d H:i:s");
 
                         $supervisionEventRepo->set($existingEvent);
 
@@ -136,53 +135,42 @@ class SupervisionController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $_settings = Helpers::input()->all();
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("supervision");
     }
 
     protected function postExport($view, $id = null)
     {
-        $per = Helpers::input()->post('per')->getValue();
-        $school = Helpers::input()->post('school');
+        $_fields = [
+            "per",
+            "school" => ["mandatory" => true],
+            "start" => ["mandatory" => true],
+            "end" => ["mandatory" => true],
+            "exportAs"
+        ];
 
-        if (!is_null($school)) $school = $school->getValue();
-        if (is_array($school) && !Strings::contains($school, ";")) {
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if (is_array($fields['school']) && !Strings::contains($fields['school'], ";")) {
             $s = [];
-            foreach ($school as $sch)
+            foreach ($fields['school'] as $sch)
                 $s[] = $sch->getValue();
 
-            $school = $s;
-        } else if (Strings::contains($school, ";")) {
-            $school = explode(";", $school);
-        } else $school = [$school];
-        $start = Helpers::input()->post('start')->getValue();
-        $end = Helpers::input()->post('end')->getValue();
-        $exportAs = Helpers::input()->post('exportAs')->getValue();
-
-        if (Input::empty($school)) $this->setValidation("school", "Scholen moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($start) || Input::empty($start)) $this->setValidation("start", "Start datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($end) || Input::empty($end)) $this->setValidation("end", "Eind datum moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+            $fields['school'] = $s;
+        } else if (Strings::contains($fields['school'], ";")) {
+            $fields['school'] = explode(";", $fields['school']);
+        } else $fields['school'] = [$fields['school']];
 
         if ($this->validationIsAllGood()) {
-            $start .= " 00:00:00";
-            $end .= " 23:59:59";
+            $fields['start'] .= " 00:00:00";
+            $fields['end'] .= " 23:59:59";
 
-            if (Strings::equal($per, "school") && Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end);
-            else if (Strings::equal($per, "school") && Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end);
-            else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "xlsx")) $this->exportPerTeacherAsXlsx($school, $start, $end);
-            else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "pdf")) $this->exportPerTeacherAsPdf($school, $start, $end);
-        }
+            if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'xlsx')) $this->exportPerSchoolAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'pdf')) $this->exportPerSchoolAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "xlsx")) $this->exportPerTeacherAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "pdf")) $this->exportPerTeacherAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
 
-        if (!$this->validationIsAllGood()) $this->setHttpCode(400);
         $this->handle();
     }
 
@@ -193,7 +181,7 @@ class SupervisionController extends ApiController
         $repo = new SupervisionEvent;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -207,8 +195,7 @@ class SupervisionController extends ApiController
     // Export functions
     protected function exportPerSchoolAsXlsx($schoolIds, $start, $end)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "supervision")->id, "lastPayDate")->value;
 
         $schoolRepo = new School();
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
@@ -342,8 +329,7 @@ class SupervisionController extends ApiController
 
     protected function exportPerSchoolAsPdf($schoolIds, $start, $end)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "supervision")->id, "lastPayDate")->value;
 
         $schoolRepo = new School();
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
@@ -440,8 +426,7 @@ class SupervisionController extends ApiController
 
     protected function exportPerTeacherAsXlsx($schoolIds, $start, $end)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "supervision")->id, "lastPayDate")->value;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
         $filename = "Middagtoezichten - Export Per Leerkracht.xlsx";
@@ -558,8 +543,7 @@ class SupervisionController extends ApiController
 
     protected function exportPerTeacherAsPdf($schoolIds, $start, $end)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "supervision")->id, "lastPayDate")->value;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
         $zipFileName = "Middagtoezichten - Export Per Leerkracht.zip";
@@ -689,7 +673,7 @@ class SupervisionController extends ApiController
         $events = $eventRepo->getBySchoolId($schoolId);
         $events = Arrays::filter($events, fn($e) => Clock::at($e->start)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->end)->isBeforeOrEqualTo(Clock::at($end)));
 
-        Arrays::each($events, fn($e) => $e->user = Arrays::firstOrNull($userRepo->get($e->userId))->formatted->fullNameReversed);
+        Arrays::each($events, fn($e) => $e->user = $userRepo->getById($e->userId)->formatted->fullNameReversed);
         $events = Arrays::orderBy($events, "user");
 
         foreach ($events as $event) $eventsGrouped[$event->user][Clock::at($event->start)->format("F Y")]['time'] += $event->diffInMinutes;

@@ -27,7 +27,10 @@ export default class Button {
 	};
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("btn")) id = `btn${id}`;
+		if (!id.startsWith("btn"))
+			id = `btn${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Button.INSTANCES[id] || false;
 	};
 

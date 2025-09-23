@@ -32,22 +32,9 @@ Calendar.ScanAndCreate();
 DatePicker.ScanAndCreate();
 Chart.ScanAndCreate();
 List.ScanAndCreate();
+ColorInput.ScanAndCreate();
 
-window.checkAllLoadedCallback = () => {
-	setTimeout(() => {
-		ColorInput.ScanAndCreate();
-		Form.ScanAndCreate();
-		Signage.ScanAndCreate();
-	}, 250);
-};
-
-Helpers.CheckAllLoaded(window.checkAllLoadedCallback);
-
-$(document).ready(() => {
-	$("*[data-bs-dismiss='modal']").on("click", (e) => {
-		try {
-			let parentId = $(e.target).parents().filter(".modal.show")[0].id;
-			Helpers.toggleModal(parentId.replace("modal-", ""));
-		} catch {}
-	});
-});
+setTimeout(() => {
+	Form.ScanAndCreate();
+	Signage.ScanAndCreate();
+}, 250);

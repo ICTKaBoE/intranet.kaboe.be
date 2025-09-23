@@ -6,8 +6,9 @@ use Helpers\HTML;
 use Helpers\CString;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Interface\CustomObject;
+use Database\Repository\Bike\DistanceType;
 
 class Distance extends CustomObject
 {
@@ -28,7 +29,8 @@ class Distance extends CustomObject
         "userAddress" => ['startId' => \Database\Repository\User\Address::class],
         "startSchool" => ['startId' => \Database\Repository\School\Address::class],
         "endSchool" => ["endSchoolId" => \Database\Repository\School\School::class],
-        "userMainSchool" => ["userMainSchoolId" => \Database\Repository\School\School::class]
+        "userMainSchool" => ["userMainSchoolId" => \Database\Repository\School\School::class],
+        // "typeName" => ["type" => \Database\Repository\Bike\DistanceType::class]
     ];
 
     private $textColors = [
@@ -39,7 +41,7 @@ class Distance extends CustomObject
     public function init()
     {
         $this->startAddress = (Strings::equal($this->type, "HW") ? $this->linked->userAddress->formatted->address : $this->linked->startSchool->formatted->addressWithSchool);
-        $this->mapped->type = Arrays::first((new Navigation)->getByParentIdAndLink(0, "bike"))->settings['distance']['type'][$this->type]['name'];
+        $this->mapped->type = (new DistanceType)->getById($this->type)->name;
         $this->formatted->distance = CString::formatNumber($this->distance, 2) . "km";
         $this->formatted->distanceWithDouble = $this->formatted->distance . " (" . CString::formatNumber($this->distance * 2, 2) . "km)";
         $this->formatted->badge->color = HTML::Badge("", null, $this->color, ["rounded-circle", "p-2"], ["margin-top" => "2px"]);

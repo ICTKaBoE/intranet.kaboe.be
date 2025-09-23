@@ -2,104 +2,69 @@
 
 namespace Controllers\API;
 
+use Helpers\Form;
+use Helpers\Table;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Sync;
 use Controllers\ApiController;
-use Database\Repository\Navigation;
+use Database\Repository\Sync\Sync;
+use Database\Repository\Navigation\TableDef;
+use Database\Repository\Navigation\Navigation;
 
 class SyncController extends ApiController
 {
 
     protected function getEmployee($view, $id = null)
     {
-        $this->getList($view, $id, "E");
+        $repo = new Sync;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            $filters = [
+                "type" => "E"
+            ];
+
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "sync")->id, "employee");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", array_values($items));
+        }
     }
 
     protected function getStudent($view, $id = null)
     {
-        $this->getList($view, $id, "S");
+        $repo = new Sync;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            $filters = [
+                "type" => "S"
+            ];
+
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "sync")->id, "student");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", array_values($items));
+        }
     }
 
     protected function getList($view, $id = null, $type = null)
     {
         $repo = new Sync;
 
-        if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                "type" => $type
-            ];
-
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[3, "asc"], [4, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Komende actie",
-                        "data" => "formatted.badge.nextAction",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "1px"
-                    ],
-                    [
-                        "title" => "Informat ID",
-                        "data" => "employeeId",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "1px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "linked.employee.name",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Voornaam",
-                        "data" => "linked.employee.firstName",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "E-Mail",
-                        "data" => "setEmail",
-                    ],
-                    [
-                        "title" => "Wachtwoord",
-                        "data" => "setPassword",
-                        "width" => "150px"
-                    ],
-                    [
-                        "title" => "Laatste actie",
-                        "data" => "formatted.badge.lastAction",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "1px"
-                    ],
-                    [
-                        "title" => "Laatste Sync/Foutmelding",
-                        "data" => "formatted.lastSyncWithError",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "widht" => "1px"
-                    ]
-                ]
-            );
-
-            $items = $repo->get(filters: $filters);
-            $this->appendToJson("rows", array_values($items));
-        } else if (Strings::equal($view, self::VIEW_PS)) {
+        if (Strings::equal($view, self::VIEW_PS)) {
             $items = $repo->get();
             $items = Arrays::orderBy($items, "type");
             $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray()));
@@ -108,10 +73,7 @@ class SyncController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        $this->getNavigationSettings("sync");
     }
 
     protected function postEmployeeChangePassword($view, $id = null)
@@ -129,22 +91,26 @@ class SyncController extends ApiController
         $repo = new Sync;
         $id = explode("_", $id);
 
-        $random = General::convert(Helpers::input()->post('random')->getValue(), 'bool');
-        $password = Helpers::input()->post('password')->getValue();
+        $_fields = [
+            "random" => ["convert" => "bool"],
+            "password" => ["type" => "string", "mandatory" => true, "preconditions" => ["random" => false]]
+        ];
 
-        if (!$random && (!Input::check($password) || Input::empty($password))) $this->setToast("Gelieve te kiezen voor een random wachtwoord of zelf een wachtwoord in te vullen!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             foreach ($id as $_id) {
-                $item = Arrays::firstOrNull($repo->get($_id));
+                $item = $repo->getById($_id);
 
                 if (!is_null($item->action) && $item->action !== "U") {
                     $this->setToast("Kan het wachtwoord van '{$item->linked->employee->formatted->fullNameReversed}' niet wijzigen!", self::VALIDATION_STATE_INVALID);
                     continue;
                 }
 
+                $item->fillWithPostData();
                 $item->action = "U";
-                $item->password = ($random ? User::generatePassword() : $password);
+                if ($fields['random']) $item->password = User::generatePassword();
                 $item->setPassword = $item->password;
 
                 $repo->set($item);
@@ -154,22 +120,13 @@ class SyncController extends ApiController
 
             $this->setCloseModal();
             $this->setReloadTable();
+            $this->setResetForm();
         }
     }
 
     protected function postSettings($view, $id = null)
     {
-        $_settings = Helpers::input()->all();
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("sync");
     }
 
     protected function postUpdate($view, $id = null)
@@ -177,24 +134,20 @@ class SyncController extends ApiController
         if (!$id) {
             $this->setError("No ID given...");
         } else {
+            $_fields = [
+                "action" => ["default" => null],
+                "lastAction" => ["default" => null],
+                "lastError" => ["default" => null],
+                "lastSync" => ["default" => null],
+            ];
+
+            [$invalid, $fields] = Form::Validate($_fields);
+            Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
             $repo = new Sync;
 
-            $action = Helpers::input()->post("action")->getValue();
-            $lastAction = Helpers::input()->post("lastAction")->getValue();
-            $lastError = Helpers::input()->post("lastError")->getValue();
-            $lastSync = Helpers::input()->post("lastSync")->getValue();
-
-            if (Strings::isBlank($action)) $action = null;
-            if (Strings::isBlank($lastAction)) $lastAction = null;
-            if (Strings::isBlank($lastError)) $lastError = null;
-            if (Strings::isBlank($lastSync)) $lastSync = null;
-
-            $item = Arrays::first($repo->get($id));
-
-            $item->action = $action;
-            $item->lastAction = $lastAction;
-            $item->lastError = $lastError;
-            $item->lastSync = $lastSync;
+            $item = $repo->getById($id);
+            $item->fillWithPostData();
 
             $repo->set($item);
         }

@@ -8,6 +8,11 @@ use Security\Code;
 
 class CronController extends ApiController
 {
+    const ACTION_IMPORT = "import";
+    const ACTION_SYNC = "sync";
+    const ACTION_PASS_EXP = "passexp";
+    const ACTION_MAIL = "sendmail";
+
     public function index($action)
     {
         Code::noTimeLimit();

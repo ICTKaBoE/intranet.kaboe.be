@@ -12,13 +12,11 @@
                         <input type="text" class="form-control" name="lastNumber" id="lastNumber">
                         <button class="btn" type="button" id="btnResetLastNumber">Reset</button>
                     </div>
-
                 </div>
 
                 <div class="col-12 mb-3">
                     <label class="form-label" for="format">Formaat</label>
                     <input type="text" name="format" id="format" class="form-control" required />
-
                 </div>
 
                 <div class="col-12 mb-3">

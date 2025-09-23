@@ -24,7 +24,7 @@ class PublicMiddleware implements IMiddleware
     static private function checkDatabaseVersion()
     {
         if (!Code::CheckDatabaseVersion()) {
-            $errorlocation = Arrays::first((new Setting)->get(id: "page.default.error"))->value;
+            $errorlocation = (new Setting)->getById("page.default.error")->value;
             Helpers::redirect("{$errorlocation}501", 501);
         }
     }
@@ -32,7 +32,7 @@ class PublicMiddleware implements IMiddleware
     static private function checkFileExistance()
     {
         $folder = Helpers::getDirectory();
-        $errorlocation = Arrays::first((new Setting)->get(id: "page.default.error"))->value;
+        $errorlocation = (new Setting)->getById("page.default.error")->value;
         if (!file_exists(LOCATION_FRONTEND_PAGES . $folder)) Helpers::redirect("{$errorlocation}404", 404);
     }
 }

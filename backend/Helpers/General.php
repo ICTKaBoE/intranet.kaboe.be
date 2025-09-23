@@ -24,6 +24,7 @@ abstract class General
         else if ($type == "datetime") $value = Clock::at($value)->format("Y-m-d H:i:s");
         else if ($type == "json") $value = json_decode($value ?: "{}", true);
         else if ($type == "base64") $value = base64_decode($value);
+        else if ($type == "*") $value = $value;
 
         return $value;
     }
@@ -163,12 +164,12 @@ abstract class General
         return $randomString;
     }
 
-    static public function getSchoolyear($date = null)
+    static public function getSchoolyear($date = null, $lengthFirst = 4, $lengthLast = 2)
     {
         if (is_null($date)) $date = Clock::now();
         else $date = Clock::at($date);
 
-        return $date->format("n") <= 8 ? ($date->format("Y") - 1) . "-" . $date->format("y") : $date->format("Y") . "-" . ($date->format("y") + 1);
+        return $date->format("n") < 8 ? ($date->format($lengthFirst == 4 ? "Y" : "y") - 1) . "-" . $date->format($lengthLast == 2 ? "y" : "Y") : $date->format($lengthFirst == 4 ? "Y" : "y") . "-" . ($date->format($lengthLast == 2 ? "y" : "Y") + 1);
     }
 
     static public function getSchoolyearStart($date = null)
@@ -176,7 +177,7 @@ abstract class General
         if (is_null($date)) $date = Clock::now();
         else $date = Clock::at($date);
 
-        return ($date->format("n") <= 8 ? ($date->format("Y") - 1) : $date->format("Y")) . "-09-01";
+        return ($date->format("n") < 8 ? ($date->format("Y") - 1) : $date->format("Y")) . "-09-01";
     }
 
     static public function getSchoolyearEnd($date = null)
@@ -184,7 +185,7 @@ abstract class General
         if (is_null($date)) $date = Clock::now();
         else $date = Clock::at($date);
 
-        return ($date->format("n") <= 8 ? $date->format("Y") : ($date->format("Y") + 1)) . "-08-31";
+        return ($date->format("n") < 8 ? $date->format("Y") : ($date->format("Y") + 1)) . "-08-31";
     }
 
     static public function getSchoolyearStartBySchoolyear($schoolyear = null)

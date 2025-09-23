@@ -6,8 +6,9 @@ use Helpers\HTML;
 use Helpers\CString;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
-use Database\Repository\Navigation;
+use Database\Repository\Navigation\Navigation;
 use Database\Interface\CustomObject;
+use Database\Repository\Management\Treshhold;
 
 class ComputerBattery extends CustomObject
 {
@@ -36,9 +37,7 @@ class ComputerBattery extends CustomObject
 
     private function createCapacityBadge()
     {
-        $settings = Arrays::firstOrNull((new Navigation)->getByParentIdAndLink(0, "management"))->settings['computer']['batteryTreshhold'];
-        $level = Arrays::firstOrNull(Arrays::filter($settings, fn($s) => $this->capacity <= $s['max'] && $this->capacity >= $s['min']));
-
-        $this->formatted->badge->capacity = HTML::Badge($this->formatted->capacity, backgroundColor: $level['color']);
+        $level = (new Treshhold)->getByTypeAndPercentageBetween("computer.battery", $this->capacity);
+        $this->formatted->badge->capacity = HTML::Badge($this->formatted->capacity, backgroundColor: $level->color);
     }
 }

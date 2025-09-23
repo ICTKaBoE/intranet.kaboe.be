@@ -1,6 +1,7 @@
 **/downloads
 **/uploads
 **/powershell
+**/logs
 **/*.old
 **/*.bak
 info.php

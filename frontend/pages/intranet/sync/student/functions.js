@@ -8,7 +8,7 @@ import Component from "../../../../shared/default/js/object/Component.js";
 let btnChangePassword = new Button({
 	options: {
 		type: Button.TYPE_ICON,
-		icon: "lock-password",
+		icon: "password",
 		title: "Wijzig Wachtwoord",
 		bgColor: "danger",
 		modal: "changePassword",
@@ -16,7 +16,7 @@ let btnChangePassword = new Button({
 			Form.GetInstance(`${pageId}ChangePassword`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},

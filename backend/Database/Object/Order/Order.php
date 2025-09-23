@@ -8,8 +8,9 @@ use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Navigation;
 use Database\Interface\CustomObject;
+use Database\Repository\Order\Status;
+use Database\Repository\Navigation\Navigation;
 
 class Order extends CustomObject
 {
@@ -36,20 +37,20 @@ class Order extends CustomObject
 
     public function init()
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $status = (new Status)->getById($this->status);
 
-        $this->formatted->badge->status = HTML::Badge($settings['status'][$this->status]['name'], backgroundColor: $settings['status'][$this->status]['color'], style: ["margin-top" => "2px"]);
+        $this->formatted->badge->status = $status->formatted->badge->name;
         $this->formatted->acceptor = is_array($this->linked->acceptorUser) ? join('<br />', Arrays::map($this->linked->acceptorUser, fn($a) => $a->formatted->fullName)) : $this->linked->acceptorUser->formatted->fullName;
 
         $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/order/accept/{$this->guid}";
-        $this->_lockedForm = !Arrays::contains(["N"], $this->status);
+        $this->_lockedForm = !Arrays::contains(["N", "WQ"], $this->status);
 
         $this->createNumber();
     }
 
     private function createNumber()
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $settings = (new Navigation)->getByParentIdAndLink(0, "order")->settings;
         $this->formatted->number = $settings['format'];
 
         if (Strings::contains($this->formatted->number, "#")) {

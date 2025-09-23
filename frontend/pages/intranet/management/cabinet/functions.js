@@ -79,7 +79,7 @@ let btnDelete = new Button({
 			Form.GetInstance(`${pageId}Delete`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},

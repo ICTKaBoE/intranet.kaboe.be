@@ -3,7 +3,9 @@
 namespace Controllers\API;
 
 use stdClass;
+use Helpers\Form;
 use Helpers\HTML;
+use Helpers\Table;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
@@ -14,14 +16,18 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Mail\Mail;
-use Database\Repository\Navigation;
 use Database\Repository\Order\Line;
 use Database\Repository\Order\Order;
+use Database\Repository\Order\Status;
 use Database\Repository\Mail\Receiver;
+use Database\Repository\Order\Category;
 use Database\Repository\Order\Supplier;
 use Database\Object\Mail\Mail as MailMail;
-use Database\Object\Order\Order as OrderOrder;
+use Database\Repository\Navigation\Setting;
 use Database\Object\Order\Line as OrderLine;
+use Database\Repository\Navigation\TableDef;
+use Database\Object\Order\Order as OrderOrder;
+use Database\Repository\Navigation\Navigation;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Object\Order\Supplier as OrderSupplier;
 
@@ -30,40 +36,43 @@ class OrderController extends ApiController
     // Get Functions
     protected function getStatus($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['status'];
+        $repo = new Status;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
+            $this->appendToJson('items', $repo->get());
         }
     }
 
     protected function getCategory($view, $id = null)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $categories = $settings['category'];
+        $catRepo = new Category;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_optgroups = [];
-            $_cateogries = [];
+            $mainCategories = $catRepo->getMainCategoryOnly();
+            $optgroups = $items = [];
 
-            foreach ($categories as $k => $v) {
-                if ($v['sub']) {
-                    $_optgroups[] = ["id" => $k, "name" => $v['name']];
+            foreach ($mainCategories as $mainCategory) {
+                $subCategories = $catRepo->getByCategoryId($mainCategory->id);
 
-                    foreach ($v['sub'] as $_k => $_v) $_cateogries[] = ['optgroup' => $k, 'optgroupName' => $v['name'], "id" => "{$k}-{$_k}", "name" => $_v];
+                if ($subCategories) {
+                    $optgroups[] = $mainCategory;
+                    foreach ($subCategories as $subCategory) {
+                        $subCategory->optgroup = $mainCategory->id;
+                        $subCategory->optgroupName = $mainCategory->name;
+                        $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
+
+                        $items[] = $subCategory;
+                    }
                 } else {
-                    $_optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
-                    $_cateogries[] = ["optgroup" => SELECT_OTHER_ID, "id" => $k, ...$v];
+                    $mainCategory->optgroup = SELECT_OTHER_ID;
+                    $items[] = $mainCategory;
                 }
             }
 
-            $this->appendToJson('optgroups', $_optgroups);
-            $this->appendToJson('items', $_cateogries);
+            $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+
+            $this->appendToJson('optgroups', $optgroups);
+            $this->appendToJson('items', $items);
         }
     }
 
@@ -76,61 +85,19 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "desc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "#",
-                        "data" => "formatted.number",
-                        "width" => "120px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Status",
-                        "data" => "formatted.badge.status",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => "Aangemaakt door",
-                        "data" => "linked.creatorUser.formatted.fullName",
-                        "width" => "150px",
-                    ],
-                    [
-                        "title" => "Goed te keuren door",
-                        "data" => "formatted.acceptor",
-                        "width" => "150px",
-                        "defaultContent" => ""
-                    ],
-                    [
-                        "title" => "Leverancier",
-                        "data" => "linked.supplier.name",
-                        "width" => "150px",
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "order");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getOrderLine($view, $id = null)
@@ -145,18 +112,12 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
+
             $this->appendToJson("defaultOrder", [[3, 'asc'], [5, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
                 data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
+
                     [
                         "title" => "#",
                         "data" => "amount",
@@ -188,7 +149,7 @@ class OrderController extends ApiController
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getAccept($view, $id = null)
@@ -200,61 +161,19 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "desc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "#",
-                        "data" => "formatted.number",
-                        "width" => "120px"
-                    ],
-                    [
-                        "title" => "School",
-                        "data" => "linked.school.formatted.badge.name",
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "100px"
-                    ],
-                    [
-                        "title" => "Status",
-                        "data" => "formatted.badge.status",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => "Aangemaakt door",
-                        "data" => "linked.creatorUser.formatted.fullName",
-                        "width" => "150px",
-                    ],
-                    [
-                        "title" => "Goed te keuren door",
-                        "data" => "formatted.acceptor",
-                        "width" => "150px",
-                        "defaultContent" => ""
-                    ],
-                    [
-                        "title" => "Leverancier",
-                        "data" => "linked.supplier.name",
-                        "width" => "150px",
-                    ],
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "accept");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getAcceptLine($view, $id = null)
@@ -269,7 +188,7 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", false);
+
             $this->appendToJson("defaultOrder", [[2, 'asc'], [4, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
@@ -305,7 +224,7 @@ class OrderController extends ApiController
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getSupplier($view, $id = null)
@@ -314,53 +233,24 @@ class OrderController extends ApiController
         $filters = [];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[1, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "title" => "Naam",
-                        "data" => "name"
-                    ],
-                    [
-                        "title" => "Contactpersoon",
-                        "data" => "contactName"
-                    ],
-                    [
-                        "title" => "E-mail",
-                        "data" => "email",
-                        "width" => "200px"
-                    ],
-                    [
-                        "title" => "Telefoon",
-                        "data" => "phone",
-                        "width" => "150px"
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "supplier");
+
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
 
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', Arrays::firstOrNull($repo->get($id)));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
     protected function getSettings($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        $this->getNavigationSettings("order");
     }
 
     protected function getQuotes($view, $id = null)
@@ -369,7 +259,7 @@ class OrderController extends ApiController
         if (!$id) $id = Helpers::url()->getParam('orderId');
 
         if (Strings::equal($view, self::VIEW_LIST)) {
-            $order = Arrays::first($repo->get($id));
+            $order = $repo->getById($id);
             $quotes = [];
             if ($order->quoteLink) $quotes[] = $order->quoteLink;
             if (FileSystem::PathExists(LOCATION_UPLOAD . "/order/{$order->guid}.pdf")) $quotes[] = "{$order->guid}.pdf";
@@ -398,51 +288,51 @@ class OrderController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
 
-        $status = Helpers::input()->post('status')->getValue();
-        $schoolId = Helpers::input()->post('schoolId')->getValue();
-        $acceptorUserId = Helpers::input()->post('acceptorUserId')->getValue();
-        $supplierId = Helpers::input()->post('supplierId')->getValue();
-        $quoteLink = Helpers::input()->post("quoteLink")?->getValue();
-        $quoteFile = Helpers::input()->file("quoteFile")[0];
+        $repo = new Order;
 
-        if (!Input::check($schoolId) || Input::empty($schoolId)) $this->setValidation("schoolId", "School moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($acceptorUserId) || Input::empty($acceptorUserId)) $this->setValidation("acceptorUserId", "Goed te keuren door moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        $_fields = [
+            "status",
+            "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "acceptorUserId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "supplierId",
+            "quoteLink",
+            "quoteFile" => ["type" => "file"]
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Order;
 
-            $item = $id ? Arrays::first($repo->get($id)) : new OrderOrder;
-            if (!$item->number) $item->number = $settings['lastNumber'] + 1;
+            $item = $repo->getById($id) ?? new OrderOrder;
+            $item->fillWithPostData();
+            if (!$item->number) $item->number = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber")->value + 1;
             if (!$id) $item->creatorUserId = User::getLoggedInUser()->id;
-            $item->status = $status;
-            $item->schoolId = $schoolId;
-            $item->acceptorUserId = $acceptorUserId;
-            $item->supplierId = $supplierId;
-            $item->quoteLink = $quoteLink ?? $item->quoteLink;
+            $item->quoteLink = $fields["quoteLink"] ?? $item->quoteLink;
 
             $newId = $repo->set($item);
             if (!$id) $item->id = $newId;
-            $item = Arrays::first($repo->get($item->id));
+            $item = $repo->getById($item->id);
 
-            if ($quoteFile && $quoteFile->getSize() > 0) {
+            if ($fields["quoteFile"][0] && $fields["quoteFile"][0]->getSize() > 0) {
                 $location = LOCATION_UPLOAD . "/order";
                 FileSystem::CreateFolder($location);
 
-                if ($quoteFile->move("{$location}/{$item->guid}." . $quoteFile->getExtension())) {
-                    $item->quoteFile = "{$item->guid}." . $quoteFile->getExtension();
+                if ($fields["quoteFile"][0]->move("{$location}/{$item->guid}." . $fields["quoteFile"][0]->getExtension())) {
+                    $item->quoteFile = "{$item->guid}." . $fields["quoteFile"][0]->getExtension();
                     $repo->set($item);
                 }
             }
 
             // Update settings
             if (!$id) {
-                $navItem = Arrays::first($navRepo->get(Session::get("moduleSettingsId")));
-                $navItem->settings['lastNumber']++;
-                $navItem->settings = $navItem->settings;
-                $navRepo->set($navItem, ['settings']);
+                $settingItem = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber");
+                $settingItem->value++;
+                $settingsRepo->set($settingItem);
             }
 
             // Mail
@@ -450,49 +340,45 @@ class OrderController extends ApiController
             else if (Strings::equal($item->status, "WA")) $this->mailAccept($item->id);
             else if (Strings::equal($item->status, "A") || Strings::equal($item->status, "D")) $this->mailStatus($item->id);
             else if (Strings::equal($item->status, "O")) $this->mailOrder($id);
-        }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De bon is opgeslagen!");
-            $this->setReturn();
-        }
+            if (!$id) $this->setRedirect("/../{$item->guid}");
+            else $this->setReturn();
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postOrderLine($view, $id = null)
     {
-        $orderId = Helpers::input()->post('orderId')->getValue();
-        $amount = Helpers::input()->post('amount')->getValue();
-        $category = Helpers::input()->post('category')->getValue();
-        $assetId = Helpers::input()->post('assetId')->getValue();
-        $clarifycation = Helpers::input()->post('clarifycation')->getValue();
-        $quotePrice = Helpers::input()->post('quotePrice')->getValue();
-        $quoteVatIncluded = Helpers::input()->post('quoteVatIncluded')?->getValue();
-        $warrenty = Helpers::input()->post('warrenty')?->getValue();
 
-        if (!Input::check($amount) || Input::empty($amount)) $this->setValidation("amount", "Aantal moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($category) || Input::empty($category)) $this->setValidation("category", "Categorie moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        $_fields = [
+            "orderId",
+            "amount" => ["mandatory" => true],
+            "category" => ["mandatory" => true],
+            "assetId" => ["type" => Input::INPUT_TYPE_INT],
+            "clarifycation",
+            "quotePrice" => ["type" => Input::INPUT_TYPE_FLOAT],
+            "quoteVatIncluded" => ["type" => Input::INPUT_TYPE_BOOL, "convert" => "bool"],
+            "warrenty" => ["type" => Input::INPUT_TYPE_BOOL, "convert" => "bool"]
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
-            if (!Arrays::contains(["O"], Arrays::first(explode("-", $category)))) {
-                if (!Input::check($assetId) || Input::empty($assetId)) $this->setValidation("assetId", "Toestel moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+            if (!Arrays::contains(["O"], Arrays::first(explode("-", $fields["category"])))) {
+                if (!Input::check($fields["assetId"]) || Input::empty($fields["assetId"])) $this->setValidation("assetId", self::VALIDATION_STATE_INVALID);
             } else {
-                if (!Input::check($clarifycation) || Input::empty($clarifycation)) $this->setValidation("clarifycation", "Verduidelijking moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+                if (!Input::check($fields["clarifycation"]) || Input::empty($fields["clarifycation"])) $this->setValidation("clarifycation", self::VALIDATION_STATE_INVALID);
             }
 
             if ($this->validationIsAllGood()) {
                 $pRepo = new Order;
-                $order = Arrays::firstOrNull($pRepo->get($orderId));
+                $order = $pRepo->getById($fields["orderId"]);
 
                 $repo = new Line;
-                $line = $id ? Arrays::firstOrNull($repo->get($id)) : new OrderLine;
+                $line = $repo->getById($id) ?? new OrderLine;
+                $line->fillWithPostData();
                 $line->orderId = $order->id;
-                $line->amount = $amount;
-                $line->category = $category;
-                $line->assetId = Arrays::contains(["O"], Arrays::first(explode("-", $category))) ? "" : $assetId;
-                $line->clarifycation = $clarifycation;
-                $line->quotePrice = $quotePrice ?: 0;
-                $line->quoteVatIncluded = Input::convertToBool($quoteVatIncluded);
-                $line->warrenty = Input::convertToBool($warrenty);
+                $line->assetId = Arrays::contains(["O"], Arrays::first(explode("-", $fields["category"]))) ? "" : $fields["assetId"];
                 $repo->set($line);
             }
         }
@@ -501,7 +387,7 @@ class OrderController extends ApiController
             $this->setToast("De lijn is opgeslagen!");
             $this->setCloseModal();
             $this->setReloadTable();
-        }
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postOrderRequestQuote($view, $id = null)
@@ -510,7 +396,7 @@ class OrderController extends ApiController
         $repo = new Order;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->status = "QR";
             $repo->set($item);
 
@@ -529,7 +415,7 @@ class OrderController extends ApiController
         $repo = new Order;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->status = "WA";
             $repo->set($item);
 
@@ -547,7 +433,7 @@ class OrderController extends ApiController
         $repo = new Order;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->status = "O";
             $repo->set($item);
 
@@ -563,47 +449,34 @@ class OrderController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $name = Helpers::input()->post('name')->getValue();
-        $contactName = Helpers::input()->post('contactName')->getValue();
-        $email = Helpers::input()->post('email')->getValue();
-        $phone = Helpers::input()->post('phone')->getValue();
+        $_fields = [
+            "name" => ["mandatory" => true],
+            "contactName" => ["mandatory" => true],
+            "email" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_EMAIL],
+            "phone",
+        ];
 
-        if (!Input::check($name) || Input::empty($name)) $this->setValidation("name", "Naam moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
-        if (!Input::check($email) || Input::empty($email)) $this->setValidation("email", "E-mail moet ingevuld zijn!", self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Supplier;
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new OrderSupplier;
-                $item->name = $name;
-                $item->contactName = $contactName;
-                $item->email = $email;
-                $item->phone = $phone;
+                $item = $repo->getById($id) ?? new OrderSupplier;
+                $item->fillWithPostData();
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De leverancier is opgeslagen!");
-            $this->setReturn();
-        }
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postSettings($view, $id = null)
     {
-        $_settings = Helpers::input()->all();
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("order");
     }
 
     // Delete functions     
@@ -613,7 +486,7 @@ class OrderController extends ApiController
         $repo = new Order;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -627,7 +500,7 @@ class OrderController extends ApiController
         $repo = new Line;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
             $item->deleted = 1;
             $repo->set($item);
 
@@ -642,7 +515,7 @@ class OrderController extends ApiController
         $pRepo = new Order;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($pRepo->getBySupplierId($item->id))) {
                 $this->setToast("De leverancier '{$item->name}' kan niet worden verwijderd!<br />Deze is gekoppeld aan bestellingen!", self::VALIDATION_STATE_INVALID);
@@ -666,14 +539,16 @@ class OrderController extends ApiController
         $lRepo = new Line;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
 
-        $h = $repo->get($id)[0];
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+
+        $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settings['mail']['template']['quote']['subject'];
-        $body = $settings['mail']['template']['quote']['body'];
+        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.body")->value;
+
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
             $body = str_replace("{{{$key}}}", $value, $body);
@@ -711,7 +586,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['quote']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
 
         $mId = $mailRepo->set($mail);
 
@@ -728,14 +603,16 @@ class OrderController extends ApiController
         $lRepo = new Line;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
 
-        $h = $repo->get($id)[0];
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+
+        $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settings['mail']['template']['order']['subject'];
-        $body = $settings['mail']['template']['order']['body'];
+        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.body")->value;
+
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
             $body = str_replace("{{{$key}}}", $value, $body);
@@ -773,7 +650,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['order']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
 
         $mId = $mailRepo->set($mail);
 
@@ -789,14 +666,16 @@ class OrderController extends ApiController
         $repo = new Order;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
 
-        $h = $repo->get($id)[0];
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+
+        $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settings['mail']['template']['accept']['subject'];
-        $body = $settings['mail']['template']['accept']['body'];
+        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.body")->value;
+
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
             $body = str_replace("{{{$key}}}", $value, $body);
@@ -804,7 +683,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['accept']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
 
         $mId = $mailRepo->set($mail);
 
@@ -820,14 +699,16 @@ class OrderController extends ApiController
         $repo = new Order;
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
-        $navRepo = new Navigation;
-        $settings = Arrays::first($navRepo->get(Session::get("moduleSettingsId")))->settings;
 
-        $h = $repo->get($id)[0];
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+
+        $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settings['mail']['template']['status']['subject'];
-        $body = $settings['mail']['template']['status']['body'];
+        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.body")->value;
+
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
             $body = str_replace("{{{$key}}}", $value, $body);
@@ -835,7 +716,7 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settings['mail']['template']['status']['reply'], "boolean")) $mail->replyTo = $settings['mail']['reply'];
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
 
         $mId = $mailRepo->set($mail);
 

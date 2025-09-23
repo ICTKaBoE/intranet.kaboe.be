@@ -63,7 +63,7 @@ let btnPrint = new Button({
 			Form.GetInstance(`${pageId}Print`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
-					.map((r) => r.guid ?? r.id)
+					.map((r) => r.guid || r.id)
 					.join("_")
 			);
 		},

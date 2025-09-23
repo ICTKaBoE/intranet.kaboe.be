@@ -26,7 +26,7 @@ class Address extends CustomObject
         //     "userId" => \Database\Repository\User\User::class
         // ],
         "country" => [
-            "countryId" => \Database\Repository\Country::class
+            "countryId" => \Database\Repository\General\Country::class
         ]
     ];
 

@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
 
                 </div>
 
@@ -36,7 +36,7 @@
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="macaddress">MAC Adres</label>
-                    <input type="text" name="macaddress" id="macaddress" class="form-control" required />
+                    <input type="text" name="macaddress" id="macaddress" class="form-control" data-mask="**:**:**:**:**:**" required />
 
                 </div>
             </div>

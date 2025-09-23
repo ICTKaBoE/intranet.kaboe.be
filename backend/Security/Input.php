@@ -30,6 +30,27 @@ abstract class Input
 			case self::INPUT_TYPE_INT:
 				return filter_var($input, FILTER_VALIDATE_INT);
 				break;
+			case self::INPUT_TYPE_DOMAIN:
+				return filter_var($input, FILTER_VALIDATE_DOMAIN);
+				break;
+			case self::INPUT_TYPE_BOOL:
+				return filter_var($input, FILTER_VALIDATE_BOOL);
+				break;
+			case self::INPUT_TYPE_FLOAT:
+				return filter_var($input, FILTER_VALIDATE_FLOAT);
+				break;
+			case self::INPUT_TYPE_IP:
+				return filter_var($input, FILTER_VALIDATE_IP);
+				break;
+			case self::INPUT_TYPE_MAC:
+				return filter_var($input, FILTER_VALIDATE_MAC);
+				break;
+			case self::INPUT_TYPE_REGEXP:
+				return filter_var($input, FILTER_VALIDATE_REGEXP);
+				break;
+			case self::INPUT_TYPE_URL:
+				return filter_var($input, FILTER_VALIDATE_URL);
+				break;
 			case self::INPUT_TYPE_ARRAY:
 				return is_array($input);
 				break;

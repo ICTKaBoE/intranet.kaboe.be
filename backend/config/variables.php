@@ -1,8 +1,9 @@
 <?php
 
 // Security group permissions: read, create, update, delete, export, changeSettings
-define("VERSION_DB", "4.4.0");
+define("VERSION_DB", "4.5.0");
 define("URL_MAIN", "kaboe.be");
+define("DEV_MODE", str_starts_with($_SERVER["HTTP_HOST"], "dev"));
 
 define("LOCATION_ROOT", dirname(dirname(__DIR__)));
 define("LOCATION_FRONTEND", LOCATION_ROOT . "/frontend");
@@ -23,7 +24,7 @@ define("SECURITY_SESSION_ISSIGNEDIN", sha1("isSignedIn"));
 define("SECURITY_SESSION_SIGNINMETHOD_LOCAL", "local");
 define("SECURITY_SESSION_SIGNINMETHOD_M365", "m365");
 
-if (str_starts_with($_SERVER["HTTP_HOST"], "dev")) {
+if (DEV_MODE) {
 	define("DB_SERVER", "localhost");
 	define("DB_DATABASE", "db_intranet_v4");
 	define("DB_USERNAME", "root");
@@ -47,12 +48,6 @@ define("SELECT_OTHER_ID", "O");
 define("SELECT_OTHER_VALUE", "Andere");
 define("SELECT_ALL_ID", 0);
 define("SELECT_ALL_VALUE", "Alle");
-
-define("CURRENT_SCHOOLYEAR", date('n') <= 8 ? (date("Y") - 1) . "-" . date("y") : date("Y") . "-" . (date("y") + 1));
-// define("CURRENT_SCHOOLYEAR", "2023-24");
-define("CURRENT_SCHOOLYEAR_START", (date('n') <= 8 ? (date("Y") - 1) : date("Y")) . "-09-01");
-define("CURRENT_SCHOOLYEAR_END", (date("n") <= 8 ? date("Y") : (date("Y") + 1)) . "-08-31");
-define("INFORMAT_REFERENCE_DATE", "2024-01-01");
 
 define("EMAIL_SUFFIX", "coltd.be");
 define("EMAIL_SUFFIX_STUDENT", "student.coltd.be");

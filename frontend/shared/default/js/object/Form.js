@@ -1,4 +1,3 @@
-import Button from "./Button.js";
 import Helpers from "./Helpers.js";
 import Select from "./Select.js";
 import DatePicker from "./DatePicker.js";
@@ -25,10 +24,9 @@ export default class Form {
 		this.lockedValue = this.element.dataset.lockedValue || false;
 		this.noReserAfterSubmit =
 			this.element.dataset.noReserAfterSubmit || false;
-		this.actionField = this.element.dataset.actionField || false;
 
 		this.defaultStates = {};
-		this.buttons = {};
+		this.hasSteps = $(this.element).find("div[data-step]").length > 0;
 		this.activeStep = 0;
 		this.lastLoadedId = null;
 		this.locked = false;
@@ -44,32 +42,24 @@ export default class Form {
 	};
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("frm")) id = `frm${id}`;
+		if (!id.startsWith("frm"))
+			id = `frm${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Form.INSTANCES[id] || false;
 	};
 
 	init = () => {
-		// this.createActionField();
 		this.checkDefaultStates();
 		this.disableAutocomplete();
 		this.disableValidation();
 		this.setRequireds();
-		this.createSteps();
+		if (this.hasSteps) this.setActiveStep(1);
+		// this.createSteps();
 		this.attachDefaultEvents();
 
 		if (this.prefillId) this.prefillForm(this.prefillId);
 		else if (this.prefill) this.prefillForm();
-	};
-
-	createActionField = () => {
-		if (!this.actionField) return;
-
-		let actionField = document.createElement("input");
-		actionField.type = "hidden";
-		actionField.name = this.actionField;
-		actionField.id = this.actionField;
-
-		this.element.appendChild(actionField);
 	};
 
 	checkDefaultStates = () => {
@@ -104,102 +94,15 @@ export default class Form {
 			});
 	};
 
-	createSteps = () => {
-		let steps = $(this.element).find("div[data-step]");
-		if (steps.length == 0) return;
-
-		let stepsContainer = $(this.element).find(
-			"div[role='form-steps-controller']"
-		)[0];
-		if (!stepsContainer.classList.contains("row"))
-			stepsContainer.classList.add("row");
-		if (!stepsContainer.classList.contains("ms-auto"))
-			stepsContainer.classList.add("me-auto");
-
-		// PREV BUTTON
-		let buttonPrevStepContainer = document.createElement("div");
-		buttonPrevStepContainer.classList.add("col-auto");
-
-		let buttonPrevStep = document.createElement("button");
-		buttonPrevStep.type = "button";
-		buttonPrevStep.onclick = () => {
-			this.setActiveStep(this.activeStep - 1);
-			this.submit(true);
-		};
-		buttonPrevStep.classList.add(
-			"btn",
-			"btn-icon",
-			"btn-secondary",
-			"d-inline-block"
-		);
-
-		let buttonPrevStepIcon = document.createElement("i");
-		buttonPrevStepIcon.classList.add("icon", "ti", "ti-chevron-left");
-
-		buttonPrevStep.appendChild(buttonPrevStepIcon);
-		buttonPrevStepContainer.appendChild(buttonPrevStep);
-
-		stepsContainer.appendChild(buttonPrevStepContainer);
-
-		// STEP BUTTONS
-		let stepsSubContainer = document.createElement("div");
-		stepsSubContainer.classList.add("col");
-
-		let stepsCounter = document.createElement("ul");
-		stepsCounter.classList.add("steps", "steps-green", "steps-counter");
-
-		for (let i = 0; i < steps.length; i++) {
-			let step = document.createElement("li");
-			step.classList.add("step-item");
-			step.dataset.counter = i + 1;
-			step.onclick = () => {
-				this.setActiveStep(step.dataset.counter);
-				this.submit(true);
-			};
-			if (steps[i].hasAttribute("data-step-title"))
-				step.innerHTML = steps[i].dataset.stepTitle;
-			stepsCounter.appendChild(step);
-		}
-
-		stepsSubContainer.appendChild(stepsCounter);
-		stepsContainer.appendChild(stepsSubContainer);
-
-		// NEXT BUTTON
-		let buttonNextStepContainer = document.createElement("div");
-		buttonNextStepContainer.classList.add("col-auto");
-
-		let buttonNextStep = document.createElement("button");
-		buttonNextStep.type = "button";
-		buttonNextStep.onclick = () => {
-			this.setActiveStep(this.activeStep + 1);
-			this.submit(true);
-		};
-		buttonNextStep.classList.add(
-			"btn",
-			"btn-icon",
-			"btn-secondary",
-			"d-inline-block"
-		);
-
-		let buttonNextStepIcon = document.createElement("i");
-		buttonNextStepIcon.classList.add("icon", "ti", "ti-chevron-right");
-
-		buttonNextStep.appendChild(buttonNextStepIcon);
-		buttonNextStepContainer.appendChild(buttonNextStep);
-
-		stepsContainer.appendChild(buttonNextStepContainer);
-		this.setActiveStep(1);
-	};
-
 	setActiveStep = (counter) => {
 		this.activeStep =
 			counter <= 1
 				? 1
-				: counter >= $(this.element).find("div[data-step]").length
-				? $(this.element).find("div[data-step]").length
+				: counter >= this.getSteps()
+				? this.getSteps()
 				: counter;
 
-		if ($(this.element).find("div[data-step]").length == 0) return;
+		if (this.getSteps() == 0) return;
 
 		$("div[data-step]")
 			.filter(`div[data-step="${this.activeStep}"]`)
@@ -208,13 +111,41 @@ export default class Form {
 			.filter(`div[data-step!="${this.activeStep}"]`)
 			.addClass("d-none");
 
-		$("li.step-item")
-			.filter(`li[data-counter="${this.activeStep}"]`)
-			.addClass("active");
-		$("li.step-item")
-			.filter(`li[data-counter!="${this.activeStep}"]`)
-			.removeClass("active");
+		$("[role='step-title']").html(
+			`${this.getActiveStepObject().dataset.step}/${this.getSteps()}: ${
+				this.getActiveStepObject().dataset.title
+			}`
+		);
+
+		let activeStepObj = this.getActiveStepObject();
+
+		if (activeStepObj.hasAttribute("data-before-load")) {
+			window[activeStepObj.dataset.beforeLoad]();
+		}
 	};
+
+	setPreviousStep = () => {
+		this.submit(true);
+	};
+
+	setNextStep = () => {
+		this.submit(true);
+	};
+
+	getStepObjects = () => $(this.element).find("div[data-step]");
+	getSteps = () => this.getStepObjects().length;
+
+	getActiveStep = () => this.activeStep;
+	getActiveStepObject = () =>
+		$("div[data-step]").filter(`div[data-step="${this.activeStep}"]`)[0];
+	getPrevStepObject = () =>
+		$("div[data-step]").filter(
+			`div[data-step="${this.activeStep - 1}"]`
+		)[0];
+	getNextStepObject = () =>
+		$("div[data-step]").filter(
+			`div[data-step="${this.activeStep + 1}"]`
+		)[0];
 
 	attachDefaultEvents = () => {
 		this.attachEvent("submit", (e) => {
@@ -229,17 +160,11 @@ export default class Form {
 		this.element.addEventListener(on, cb);
 	};
 
-	attachButton = (button) => {
-		if (!button instanceof Button) return;
-
-		this.buttons[button.id] = button;
-	};
-
 	reset = () => {
 		this.element.reset();
 		this.lastLoadedId = null;
 		this.resetValidation();
-		// this.setActiveStep(0);
+		this.setActiveStep(1);
 
 		$(this.element)
 			.find(":input")
@@ -278,46 +203,53 @@ export default class Form {
 			});
 	};
 
-	getSubmitData = () => {
+	getSubmitData = (stepCheck = false, stepDirection = "+") => {
 		let data = {};
+		let elements = $(this.element).find(":input,[role]");
+		if (stepCheck) {
+			elements = $(this.element)
+				.find(`[data-step=${this.activeStep}]`)
+				.find(":input,[role]");
 
-		$(this.element)
-			.find(":input,[role]")
-			.each((id, el) => {
-				if (null === el) return;
-				if (el.type === "checkbox" || el.type === "radio") return;
+			data["_step_"] = this.activeStep;
+			data["_stepDirection_"] = stepDirection;
+		}
 
-				let name = el.name;
-				let value = el.value;
+		elements.each((id, el) => {
+			if (null === el) return;
+			if (el.type === "checkbox" || el.type === "radio") return;
 
-				if (el.role === "select") {
-					let v = Select.GetInstance(el.id).getValue();
-					data[name] = typeof v == "string" ? v : v.join(";");
-				} else if (el.role === "tinymce")
-					data[name] = TinyMCE.INSTANCES[el.id].getValue();
-				else if (el.role === "checkbox") {
-					name = Checkbox.GetInstance(el.id).getName();
-					data[name] = Checkbox.GetInstance(el.id).getValue();
-				} else if (el.role === "colorinput") {
-					name = ColorInput.GetInstance(el.id).getName();
-					data[name] = ColorInput.GetInstance(el.id).getValue();
-				} else if (el.type === "file") {
-					data[name] = [];
+			let name = el.name;
+			let value = el.value;
 
-					for (let i = 0; i < el.files.length; i++) {
-						data[name].push(el.files[i]);
-					}
-				} else data[name] = value;
+			if (el.role === "select") {
+				let v = Select.GetInstance(el.id).getValue();
+				data[name] = typeof v == "string" ? v : v.join(";");
+			} else if (el.role === "tinymce")
+				data[name] = TinyMCE.INSTANCES[el.id].getValue();
+			else if (el.role === "checkbox") {
+				name = Checkbox.GetInstance(el.id).getName();
+				data[name] = Checkbox.GetInstance(el.id).getValue();
+			} else if (el.role === "colorinput") {
+				name = ColorInput.GetInstance(el.id).getName();
+				data[name] = ColorInput.GetInstance(el.id).getValue();
+			} else if (el.type === "file") {
+				data[name] = [];
 
-				if (!name) delete data[name];
-			});
+				for (let i = 0; i < el.files.length; i++) {
+					data[name].push(el.files[i]);
+				}
+			} else data[name] = value;
+
+			if (!name) delete data[name];
+		});
 
 		return data;
 	};
 
-	submit = (stepCheck = false) => {
+	submit = (stepCheck = false, stepDirection = "+") => {
 		let data = new FormData();
-		let submitData = this.getSubmitData();
+		let submitData = this.getSubmitData(stepCheck, stepDirection);
 
 		Object.keys(submitData).forEach((k) => {
 			if (Array.isArray(submitData[k])) {
@@ -333,7 +265,8 @@ export default class Form {
 		};
 
 		let fail = (returnData) => {
-			if (returnData.statusCode === 500)
+			if (returnData.status == 400) this.enable();
+			if (returnData.status === 500)
 				alert(
 					"Er is een fout gebeurd bij het indienen van het formulier!"
 				);
@@ -346,7 +279,7 @@ export default class Form {
 
 			Helpers.processRequestResponse(data);
 			this.processValidation(data.validation);
-			if (data.returnToStep) this.setActiveStep(this.activeStep - 1);
+			if (data.activeStep) this.setActiveStep(data.activeStep);
 			if (data.resetForm) this.reset();
 			if (data.setId) this.prefillForm(data.setId);
 
@@ -354,7 +287,7 @@ export default class Form {
 				window[this.afterSubmit]();
 			}
 
-			if (!stepCheck || data.returnToStep) {
+			if (stepCheck || data.activeStep) {
 				setTimeout(() => {
 					this.enable();
 				}, 500);
@@ -364,7 +297,6 @@ export default class Form {
 		let url = new URL(
 			this.action + (this.lastLoadedId ? `/${this.lastLoadedId}` : "")
 		);
-		if (stepCheck) url.searchParams.set("stepCheck", null);
 		if (new URL(window.location.href).searchParams.has("redirect"))
 			url.searchParams.set(
 				"redirect",
@@ -389,7 +321,7 @@ export default class Form {
 			.removeClass("is-valid")
 			.removeClass("is-invalid");
 
-		$(this.element).find("[data-feedback-input]").html("");
+		$(this.element).find("*.invalid-feedback").remove();
 	};
 
 	processValidation = (data) => {
@@ -407,8 +339,11 @@ export default class Form {
 
 			if (validation.feedback)
 				$(this.element)
-					.find(`[data-feedback-input='${input}']`)
-					.html(validation.feedback);
+					.find(`[name='${input}']`)
+					.parent()
+					.append(
+						`<p class='invalid-feedback'>${validation.feedback}</p>`
+					);
 		});
 	};
 
@@ -488,7 +423,13 @@ export default class Form {
 				break;
 
 			default:
-				field.value = value;
+				{
+					field.value = value;
+					if (field.hasAttribute("data-mask")) {
+						field.focus();
+						field.blur();
+					}
+				}
 				break;
 		}
 	};
@@ -504,9 +445,6 @@ export default class Form {
 	};
 
 	setActiveType = (type) => {
-		if (this.actionField)
-			document.getElementById(this.actionField).value = type;
-
 		$(this.element)
 			.find("[data-form-type]")
 			.each((id, el) => {
@@ -522,5 +460,13 @@ export default class Form {
 
 	setLastLoadedId = (id) => {
 		this.lastLoadedId = id;
+	};
+
+	hide = () => {
+		this.element.classList.add("d-none");
+	};
+
+	show = () => {
+		this.element.classList.remove("d-none");
 	};
 }

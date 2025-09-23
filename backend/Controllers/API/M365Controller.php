@@ -25,13 +25,13 @@ class M365Controller extends ApiController
             // With the authorization code, we can retrieve access tokens and other data.
             try {
                 AuthenticationManager::acquireToken();
-
                 Session::set(SECURITY_SESSION_ISSIGNEDIN, [
                     'method' => SECURITY_SESSION_SIGNINMETHOD_M365,
                     'id' => Session::get("oid")
                 ]);
 
                 $loginUser = (new User)->getByEntraId(Session::get("oid"));
+
                 if ($loginUser) {
                     $userLoginHistory = new ObjectUserLoginHistory([
                         "userId" => $loginUser->id,

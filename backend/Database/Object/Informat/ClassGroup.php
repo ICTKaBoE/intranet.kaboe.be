@@ -12,6 +12,7 @@ class ClassGroup extends CustomObject
         "informatGuid" => "string",
         "schoolInstituteId" => "int",
         "schoolyear" => "string",
+        "administrativeGroupCode" => "string",
         "departmentCode" => "string",
         "grade" => "int",
         "year" => "int",

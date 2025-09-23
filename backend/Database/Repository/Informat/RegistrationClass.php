@@ -38,7 +38,7 @@ class RegistrationClass extends Repository
 
     public function getByInformatClassgroupId($informatClassgroupId)
     {
-        $statement = $this->prepareSelect(filters: ['informatClassgroupId' => $informatClassgroupId]);
+        $statement = $this->prepareSelect(filters: ['informatClassGroupId' => $informatClassgroupId]);
         return $this->executeSelect($statement);
     }
 }

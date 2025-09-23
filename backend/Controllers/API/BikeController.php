@@ -5,27 +5,31 @@ namespace Controllers\API;
 use Helpers\PDF;
 use Helpers\ZIP;
 use Helpers\Date;
+use Helpers\Form;
 use Helpers\Excel;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\School\School;
 use Database\Repository\Bike\Event;
-use Database\Repository\Navigation;
-use Database\Repository\Bike\Distance;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use Database\Repository\User\User as RepositoryUser;
-use Database\Object\Bike\Event as ObjectBikeEvent;
-use Database\Object\Bike\Distance as ObjectBikeDistance;
 use Database\Repository\Bike\Price;
 use Database\Repository\User\Address;
+use Database\Repository\Bike\Distance;
+use Database\Repository\School\School;
+use Database\Repository\Bike\DistanceType;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use Database\Repository\Navigation\Setting;
+use Database\Repository\Navigation\Navigation;
+use Database\Object\Bike\Event as ObjectBikeEvent;
+use Database\Repository\User\User as RepositoryUser;
+use Database\Object\Bike\Distance as ObjectBikeDistance;
+use Database\Repository\Navigation\TableDef;
+use Helpers\Table;
 
 class BikeController extends ApiController
 {
@@ -51,60 +55,17 @@ class BikeController extends ApiController
                 'type' => Helpers::url()->getParam("type")
             ];
 
-            $this->appendToJson("checkbox", true);
-            $this->appendToJson("defaultOrder", [[2, "asc"]]);
-            $this->appendToJson(
-                key: 'columns',
-                data: [
-                    [
-                        "type" => "checkbox",
-                        "data" => null,
-                        "orderable" => false,
-                        "searchable" => false,
-                        "width" => "20px"
-                    ],
-                    [
-                        "data" => "formatted.badge.color",
-                        "width" => "20px",
-                        "orderable" => false,
-                        "searchable" => false
-                    ],
-                    [
-                        "title" => "Alias",
-                        "data" => "alias",
-                        "width" => "10%",
-                        "priority" => 1
-                    ],
-                    [
-                        "title" => "Type",
-                        "data" => "mapped.type",
-                        "width" => "10%",
-                        "priority" => 2
-                    ],
-                    [
-                        "title" => "Start Locatie",
-                        "data" => "startAddress",
-                    ],
-                    [
-                        "title" => "Eindbestemming",
-                        "data" => "linked.endSchool.name",
-                        "width" => "10%",
-                        "priority" => 4
-                    ],
-                    [
-                        "type" => "double",
-                        "title" => "Afstand",
-                        "data" => "formatted.distanceWithDouble",
-                        "width" => "10%",
-                        "priority" => 3
-                    ]
-                ]
-            );
+            $navRepo = new Navigation;
+            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "bike")->id, "distance");
 
-            $distances = $repo->get(filters: $filters);
-            $this->appendToJson("rows", $distances);
+            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get(filters: $filters);
+            $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->get($id)[0]);
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
         else if (Strings::equal($view, self::VIEW_LIST)) {
             $type = Helpers::input()->get('type')->getValue();
             $items = $repo->getByUserIdAndType($currentUserId, $type);
@@ -115,15 +76,10 @@ class BikeController extends ApiController
 
     protected function getDistanceType($view, $id)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $statuses = $settings['distance']['type'];
+        $repo = new DistanceType;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $_statuses = [];
-
-            foreach ($statuses as $k => $v) $_statuses[] = ["id" => $k, ...$v];
-
-            $this->appendToJson('items', $_statuses);
+            $this->appendToJson('items', $repo->get());
         }
     }
 
@@ -134,7 +90,6 @@ class BikeController extends ApiController
 
         if (Strings::equal($view, self::VIEW_CALENDAR)) {
             $items = $repo->getByUserIdAndTypeDistanceMoreThenZero($currentUserId, $type);
-            // $items = Arrays::filter($items, fn($i) => $i->distance > 0);
 
             Arrays::each($items, fn($i) => $this->appendToJson(data: [
                 "start" => $i->date,
@@ -149,12 +104,9 @@ class BikeController extends ApiController
         }
     }
 
-    protected function getSettings($view)
+    protected function getSettings($view, $id = null)
     {
-        $repo = new Navigation;
-        $_settings = Arrays::first($repo->get(Session::get("moduleSettingsId")))->settings;
-
-        $this->appendToJson('fields', Arrays::flattenKeysRecursively($_settings));
+        return $this->getNavigationSettings("bike");
     }
 
     // Post Functions
@@ -171,19 +123,17 @@ class BikeController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $alias = Helpers::input()->post('alias')->getValue();
-        $type = Helpers::input()->post('type')->getValue();
-        $startId = Helpers::input()->post('startId')->getValue();
-        $endSchoolId = Helpers::input()->post('endSchoolId')->getValue();
-        $distance = Helpers::input()->post('distance')->getValue();
-        $color = Helpers::input()->post('color')->getValue();
+        $_fields = [
+            "alias" => ["mandatory" => true],
+            "type" => ["mandatory" => true],
+            "startId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "endSchoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "distance" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_FLOAT],
+            "color" => ["mandatory" => true],
+        ];
 
-        if (!Input::check($alias) || Input::empty($alias)) $this->setValidation("alias", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($type) || Input::empty($type)) $this->setValidation("type", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($startId) || Input::empty($startId)) $this->setValidation("startId", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($endSchoolId) || Input::empty($endSchoolId)) $this->setValidation("endSchoolId", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($distance) || Input::empty($distance)) $this->setValidation("distance", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($color) || Input::empty($color)) $this->setValidation("color", state: self::VALIDATION_STATE_INVALID);
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
             $repo = new Distance;
@@ -191,11 +141,11 @@ class BikeController extends ApiController
             foreach ($repo->getByUserId(User::getLoggedInUser()->id) as $_distance) {
                 if (Strings::equal($_distance->id, $id) || Strings::equal($_distance->guid, $id)) continue;
 
-                if (Strings::equal($_distance->alias, $alias)) {
+                if (Strings::equal($_distance->alias, $fields['alias'])) {
                     $this->setValidation("alias", state: self::VALIDATION_STATE_INVALID);
-                    $this->setToast("Er bestaat al een afstand met alias '{$alias}'!", self::VALIDATION_STATE_INVALID);
+                    $this->setToast("Er bestaat al een afstand met alias '{$fields['alias']}'!", self::VALIDATION_STATE_INVALID);
                 }
-                if (Strings::equal($_distance->type, $type) && Strings::equal($_distance->startId, $startId) && Strings::equal($_distance->endSchoolId, $endSchoolId)) {
+                if (Strings::equal($_distance->type, $fields['type']) && Strings::equal($_distance->startId, $fields['startId']) && Strings::equal($_distance->endSchoolId, $fields['endSchoolId'])) {
                     $this->setValidation("startId", state: self::VALIDATION_STATE_INVALID);
                     $this->setToast("Er bestaat al een rit met hetzelfde startlocatie en school!", self::VALIDATION_STATE_INVALID);
                 }
@@ -203,56 +153,56 @@ class BikeController extends ApiController
             }
 
             if ($this->validationIsAllGood()) {
-                $item = $id ? Arrays::first($repo->get($id)) : new ObjectBikeDistance;
+                $item = $repo->getById($id) ?? new ObjectBikeDistance;
+                $item->fillWithPostData();
                 $item->userId = User::getLoggedInUser()->id;
-                $item->alias = $alias;
-                $item->type = $type;
-                $item->startId = $startId;
-                $item->endSchoolId = $endSchoolId;
-                $item->distance = $distance;
-                $item->color = $color;
 
                 $repo->set($item);
             }
         }
 
-        if ($this->validationIsAllGood()) {
-            $this->setToast("De afstand is opgeslagen!");
-            $this->setReturn();
-        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function postEvent($view, $id, $type)
     {
-        $date = Helpers::input()->post('date')->getValue();
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
+        $settingsRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "bike");
 
-        if (General::convert($settings['block']['past']['enabled'], 'bool')) {
+        $_fields = [
+            "date" => ["mandatory" => true],
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.enabled")->value, 'bool')) {
             $pastDate = Clock::now()->toDateTime();
-            if ($settings['block']['past']['amount'] !== 0) $pastDate->modify("-" . $settings['block']['past']['amount']);
+            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value);
             $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-            if ($settings['lastPayDate'] && $pastDate->isBeforeOrEqualTo(Clock::at($settings['lastPayDate']))) $pastDate = Clock::at($settings['lastPayDate']);
+            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value);
 
-            if (Clock::at($date)->isBefore($pastDate)) $this->setToast("U kan geen rit inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
+            if (Clock::at($fields['date'])->isBefore($pastDate)) $this->setToast("U kan geen rit inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
         }
 
-        if (General::convert($settings['block']['future']['enabled'], 'bool')) {
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.enabled")->value, 'bool')) {
             $futureDate = Clock::now()->toDateTime();
-            if ($settings['block']['future']['amount'] !== 0) $futureDate->modify("+" . $settings['block']['future']['amount']);
+            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount") !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value);
             $futureDate = Clock::at($futureDate->format('Y-m-d'));
 
-            if (Clock::at($date)->isAfter($futureDate)) $this->setToast("U kan geen rit inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
+            if (Clock::at($fields['date'])->isAfter($futureDate)) $this->setToast("U kan geen rit inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
         }
 
         if ($this->validationIsAllGood()) {
-            $rDate = Clock::at($date)->format("d/m/Y");
+            $rDate = Clock::at($fields['date'])->format("d/m/Y");
 
             $currentUserId = User::getLoggedInUser()->id;
             $repo = new Event;
             $dRepo = new Distance;
 
-            $item = $repo->getByUserIdTypeAndDate($currentUserId, $type, $date) ?? new ObjectBikeEvent;
+            $item = $repo->getByUserIdTypeAndDate($currentUserId, $type, $fields['date']) ?? new ObjectBikeEvent;
             $distances = $dRepo->getByUserIdAndType($currentUserId, $type);
 
             $distance = null;
@@ -270,7 +220,8 @@ class BikeController extends ApiController
                 }
             }
 
-            $item->date = $date;
+            // $item->date = $date;
+            $item->fillWithPostData();
             $item->bikeDistanceId = $distance->id;
             $item->type = $type;
             $item->userId = $currentUserId;
@@ -280,8 +231,9 @@ class BikeController extends ApiController
             $item->alias = $distance->alias;
             $item->color = $distance->color;
             $item->userMainSchoolId = User::getLoggedInUser()->mainSchoolId;
-            $item->pricePerKm = (new Price)->getBetween($date)->amount;
+            $item->pricePerKm = (new Price)->getBetween($item->date)->amount;
             $repo->set($item);
+
             if ($distance == null) $this->setToast("Rit op datum {$rDate} verwijderd!");
             else $this->setToast("Rit '{$distance->alias} ({$distance->formatted->distance})' op datum {$rDate} opgeslagen!");
             $this->setReloadCalendar();
@@ -290,49 +242,41 @@ class BikeController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $_settings = Helpers::input()->all();
-        $settings = [];
-        foreach ($_settings as $k => $v) $settings[str_replace("_", ".", $k)] = $v;
-        $settings = General::normalizeArray($settings);
-
-        $repo = new Navigation;
-        $item = Arrays::first($repo->get(Session::get("moduleSettingsId")));
-        $item->settings = array_replace_recursive($item->settings, $settings);
-
-        $repo->set($item, ['settings']);
-        $this->setToast("De instellingen zijn opgeslagen!");
+        $this->postNavigationSettings("bike");
     }
 
     protected function postExport($view, $id = null)
     {
-        $type = Helpers::input()->post('type')->getValue();
-        $per = Helpers::input()->post('per')->getValue();
-        $school = Helpers::input()->post('school');
-        $start = Helpers::input()->post('start')->getValue();
-        $end = Helpers::input()->post('end')->getValue();
-        $exportAs = Helpers::input()->post('exportAs')->getValue();
+        $_fields = [
+            "type",
+            "per",
+            "school" => ["mandatory" => true],
+            "start" => ["mandatory" => true],
+            "end" => ["mandatory" => true],
+            "exportAs"
+        ];
 
-        if (!is_null($school)) $school = $school->getValue();
-        if (is_array($school) && !Strings::contains($school, ";")) {
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if (is_array($fields['school']) && !Strings::contains($fields['school'], ";")) {
             $s = [];
-            foreach ($school as $sch)
+            foreach ($fields['school'] as $sch)
                 $s[] = $sch->getValue();
 
-            $school = $s;
-        } else if (Strings::contains($school, ";")) {
-            $school = explode(";", $school);
-        } else $school = [$school];
-
-        if (Input::empty($school)) $this->setValidation("school", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($start) || Input::empty($start)) $this->setValidation("start", state: self::VALIDATION_STATE_INVALID);
-        if (!Input::check($end) || Input::empty($end)) $this->setValidation("end", state: self::VALIDATION_STATE_INVALID);
+            $fields['school'] = $s;
+        } else if (Strings::contains($fields['school'], ";")) {
+            $fields['school'] = explode(";", $fields['school']);
+        } else $fields['school'] = [$fields['school']];
 
         if ($this->validationIsAllGood()) {
-            if (Strings::equal($per, "school") && Strings::equal($exportAs, 'xlsx')) $this->exportPerSchoolAsXlsx($school, $start, $end, $type);
-            else if (Strings::equal($per, "school") && Strings::equal($exportAs, 'pdf')) $this->exportPerSchoolAsPdf($school, $start, $end, $type);
-            else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "xlsx")) $this->exportPerTeacherAsXlsx($school, $start, $end, $type);
-            else if (Strings::equal($per, "teacher") && Strings::equal($exportAs, "pdf")) $this->exportPerTeacherAsPdf($school, $start, $end, $type);
+            if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'xlsx')) $this->exportPerSchoolAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'pdf')) $this->exportPerSchoolAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "xlsx")) $this->exportPerTeacherAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "pdf")) $this->exportPerTeacherAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+
+        $this->handle();
     }
 
     // Delete Functions
@@ -343,7 +287,7 @@ class BikeController extends ApiController
         $bikeEventRepo = new Event;
 
         foreach ($id as $_id) {
-            $item = Arrays::first($repo->get($_id));
+            $item = $repo->getById($_id);
 
             if (count($bikeEventRepo->getByBikeDistanceId($item->id))) {
                 $this->setToast("De afstand '{$item->alias}' kan niet worden verwijderd!<br />Deze is gekoppeld aan ritten!", self::VALIDATION_STATE_INVALID);
@@ -363,12 +307,12 @@ class BikeController extends ApiController
     // Export functions
     protected function exportPerSchoolAsXlsx($schoolIds, $start, $end, $type)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $typeFull = (new DistanceType)->getById($type)->name;
 
         $schoolRepo = new School();
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per School - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ".xlsx";
+        $filename = "Fietsvergoeding - Export Per School - {$typeFull}.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
         // $overview = [];
@@ -377,7 +321,7 @@ class BikeController extends ApiController
 
         $excel = new Excel("{$folder}/{$filename}");
         $excel->setSheetTitle(0, "Overzicht");
-        $excel->setCellValue(0, "A1:P1", "Fietsvergoeding - Overzicht per school - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk"), true, 14);
+        $excel->setCellValue(0, "A1:P1", "Fietsvergoeding - Overzicht per school - {$typeFull}", true, 14);
         $excel->setCellValue(0, "A2", "Startdatum");
         $excel->setCellValue(0, "B2", Clock::at($start)->format("d/m/Y"));
         $excel->setCellValue(0, "A3", "Einddatum");
@@ -410,7 +354,7 @@ class BikeController extends ApiController
 
             $school = $schoolRepo->get($schoolId)[0];
             $excel->createSheet($index + 1, $school->name);
-            $excel->setCellValue($index + 1, "A1:P1", "Fietsvergoeding - {$school->name} - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk"), true, 14);
+            $excel->setCellValue($index + 1, "A1:P1", "Fietsvergoeding - {$school->name} - {$typeFull}", true, 14);
             $excel->setCellValue($index + 1, "A2", "Startdatum");
             $excel->setCellValue($index + 1, "B2", Clock::at($start)->format("d/m/Y"));
             $excel->setCellValue($index + 1, "A3", "Einddatum");
@@ -501,12 +445,12 @@ class BikeController extends ApiController
 
     protected function exportPerSchoolAsPdf($schoolIds, $start, $end, $type)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $typeFull = (new DistanceType)->getById($type)->name;
 
         $schoolRepo = new School();
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per School - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ".zip";
+        $filename = "Fietsvergoeding - Export Per School - {$typeFull}.zip";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
         foreach ($schoolIds as $index => $schoolId) {
@@ -514,7 +458,7 @@ class BikeController extends ApiController
             $groupedEvents = $this->getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type);
 
             $school = $schoolRepo->get($schoolId)[0];
-            $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Fietsvergoeding - Overzicht - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ": {$school->name}");
+            $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Fietsvergoeding - Overzicht - {$typeFull}: {$school->name}");
 
             $pdf->AddPage();
             $pdf->Cell(60, 10, 'Startdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
@@ -598,11 +542,11 @@ class BikeController extends ApiController
 
     protected function exportPerTeacherAsXlsx($schoolIds, $start, $end, $type)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $typeFull = (new DistanceType)->getById($type)->name;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per Leerkracht - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ".xlsx";
+        $filename = "Fietsvergoeding - Export Per Leerkracht - {$typeFull}.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
         $excel = new Excel("{$folder}/{$filename}");
@@ -625,7 +569,7 @@ class BikeController extends ApiController
             if ($index == 0) $excel->setSheetTitle($index, $user->formatted->fullNameReversed);
             else $excel->createSheet($index, $user->formatted->fullNameReversed);
 
-            $excel->setCellValue($index, "A1:E1", "Fietsvergoeding - Overzicht - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ": {$user->formatted->fullNameReversed}", true, 14);
+            $excel->setCellValue($index, "A1:E1", "Fietsvergoeding - Overzicht - {$typeFull}: {$user->formatted->fullNameReversed}", true, 14);
             $excel->setCellValue($index, "A2", "Hoofdschool");
             $excel->setCellValue($index, "B2:E2", $user->linked->mainSchool->name);
             $excel->setCellValue($index, "A3", "Huidig adres");
@@ -713,11 +657,11 @@ class BikeController extends ApiController
 
     protected function exportPerTeacherAsPdf($schoolIds, $start, $end, $type)
     {
-        $settings = Arrays::first((new Navigation)->get(Session::get("moduleSettingsId")))->settings;
-        $lastPayDate = $settings["lastPayDate"];
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $typeFull = (new DistanceType)->getById($type)->name;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per Leerkracht - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ".zip";
+        $filename = "Fietsvergoeding - Export Per Leerkracht - {$typeFull}.zip";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
         $groupedEvents = $this->getEventsGroupedByMonthByTeacherBySchool($start, $end, $schoolIds, $type);
 
@@ -728,7 +672,7 @@ class BikeController extends ApiController
             $events = $userEvent['events'];
 
             $userTotalSingle = $userTotalDouble = $userTotalPrice = 0;
-            $pdf = new PDF($user->fullNameReversed, "{$folder}/{$user->formatted->fullNameReversed}.pdf", "P", "Fietsvergoeding - Overzicht - " . (Strings::equal($type, "HW") ? "Woon-Werk" : "Werk-Werk") . ": {$user->fullNameReversed}");
+            $pdf = new PDF($user->fullNameReversed, "{$folder}/{$user->formatted->fullNameReversed}.pdf", "P", "Fietsvergoeding - Overzicht - {$typeFull}: {$user->fullNameReversed}");
 
             $pdf->AddPage();
             $pdf->Cell(60, 10, 'Hoofdschool', ln: 0, align: 'L', calign: 'C', valign: 'C');
@@ -840,7 +784,7 @@ class BikeController extends ApiController
         $events = $eventRepo->getByUserMainSchoolIdAndType($schoolId, $type);
         $events = Arrays::filter($events, fn($e) => Clock::at($e->date)->isAfterOrEqualTo(Clock::at($start)) && Clock::at($e->date)->isBeforeOrEqualTo(Clock::at($end)));
 
-        Arrays::each($events, fn($e) => $e->user = Arrays::first($userRepo->get($e->userId))->formatted->fullNameReversed);
+        Arrays::each($events, fn($e) => $e->user = $userRepo->getById($e->userId)->formatted->fullNameReversed);
         $events = Arrays::filter($events, fn($e) => !is_null($e->distance) && !Strings::equal($e->distance, 0));
         $events = Arrays::orderBy($events, "user");
 

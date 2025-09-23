@@ -15,6 +15,7 @@ export default class Table {
 		this.doubleClickAction =
 			this.element.dataset.doubleClickAction || false;
 		this.small = this.element.hasAttribute("data-small");
+		this.checkbox = this.element.hasAttribute("data-checkbox");
 		this.noSearch = this.element.hasAttribute("data-no-search");
 		this.noInfo = this.element.hasAttribute("data-no-info");
 		this.noPaging = this.element.hasAttribute("data-no-paging");
@@ -114,7 +115,10 @@ export default class Table {
 	};
 
 	static GetInstance = (id) => {
-		if (!id.startsWith("tbl")) id = `tbl${id}`;
+		if (!id.startsWith("tbl"))
+			id = `tbl${
+				String(id).charAt(0).toUpperCase() + String(id).slice(1)
+			}`;
 		return Table.INSTANCES[id] || false;
 	};
 
@@ -157,11 +161,19 @@ export default class Table {
 	};
 
 	createDataTable = () => {
-		this.tableOptions.columns = this.data.columns;
-		this.tableOptions.data = this.data.rows;
-		this.tableOptions.select = this.data.checkbox;
+		this.data.columns.forEach((c) => {
+			if (!Object.hasOwn(c, "defaultContent")) c.defaultContent = "";
+		});
 
-		if (this.data.checkbox) {
+		if (this.checkbox) {
+			this.data.columns.unshift({
+				type: "checkbox",
+				data: null,
+				orderable: false,
+				searchable: false,
+				width: "20px",
+			});
+
 			this.tableOptions.columnDefs.push({
 				orderable: false,
 				render: DataTable.render.select(),
@@ -169,7 +181,13 @@ export default class Table {
 			});
 		}
 
-		this.tableOptions.order = this.data.defaultOrder || [[1, "asc"]];
+		this.tableOptions.order = this.data.defaultOrder || [
+			[this.checkbox ? 1 : 0, "asc"],
+		];
+
+		this.tableOptions.columns = this.data.columns;
+		this.tableOptions.data = this.data.rows;
+		this.tableOptions.select = this.checkbox;
 		this.datatable = $(this.element).DataTable(this.tableOptions);
 
 		this.datatable.on("select deselect", () => this.checkButtonStates());

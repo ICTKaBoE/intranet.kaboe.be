@@ -9,6 +9,8 @@ class School extends CustomObject
 {
     protected $objectAttributes = [
         "id" => "int",
+        "virtual" => "boolean",
+        "parentSchoolId" => "int",
         "name" => "string",
         "color" => "string",
         "intuneOrderIdPrefix" => "string",
@@ -21,11 +23,18 @@ class School extends CustomObject
         "deleted" => "boolean"
     ];
 
+    protected $linkedAttributes = [
+        "parentSchool" => ['parentSchoolId' => \Database\Repository\School\School::class]
+    ];
+
     public function init()
     {
+        $this->formatted->nameWithParent = ($this->linked->parentSchool ? $this->linked->parentSchool->name . " - " : "") . $this->name;
         $this->formatted->badge->name = HTML::Badge($this->name, style: [
             "margin-top" => "2px",
             "background-color" => $this->color
         ]);
+
+        $this->formatted->icon->virtual = HTML::Icon($this->virtual ? "cloud" : "building");
     }
 }
