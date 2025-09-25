@@ -5,18 +5,16 @@ namespace Controllers\API;
 use Helpers\Date;
 use Router\Helpers;
 use Helpers\General;
-use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Helpdesk\Helpdesk;
-use Database\Repository\Helpdesk\Ticket;
-use Database\Repository\Navigation\Navigation;
+use Database\Repository\Helpdesk\Status;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\ComputerUsageOnOff;
 use Database\Repository\TempReg\TempReg;
-use Helpers\CString;
+use Database\Repository\TempReg\Treshhold;
 
 class ReportController extends ApiController
 {
@@ -170,12 +168,11 @@ class ReportController extends ApiController
                 ]
             ]);
 
-            $settings = (new Navigation)->getByParentIdAndLink(0, "report")->settings;
-            $treshholds = Arrays::map($settings['foodtemp']['treshhold'], fn($t) => [
+            $treshholds = Arrays::map((new Treshhold)->get(), fn($t) => [
                 'label' => ['text' => ''],
-                'y' => $t['min'],
-                'y2' => $t['max'],
-                'fillColor' => $t['color']
+                'y' => $t->min,
+                'y2' => $t->max,
+                'fillColor' => $t->color
             ]);
             $this->appendToJson(['options', 'annotations', 'yaxis'], $treshholds);
         }
@@ -183,14 +180,14 @@ class ReportController extends ApiController
 
     public function getHelpdesk($view, $id = null)
     {
-        $status = (new Navigation)->getByParentIdAndLink(0, "helpdesk")->settings['status'];
-        $labels = array_values(Arrays::map($status, fn($s) => $s['name']));
+        $statusses = (new Status)->get();
+        $labels = array_values(Arrays::map($statusses, fn($s) => $s->name));
         $series = [];
 
         $ticketRepo = new Helpdesk;
 
-        foreach ($status as $code => $details) {
-            $series[] = count($ticketRepo->getByStatus($code));
+        foreach ($statusses as $status) {
+            $series[] = count($ticketRepo->getByStatus($status->id));
         }
 
         $this->appendToJson(['options', 'labels'], $labels);

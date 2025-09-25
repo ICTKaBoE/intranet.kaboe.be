@@ -16,7 +16,7 @@ class GroupNavigation extends CustomObject
             "securityGroupId" => \Database\Repository\Security\Group::class
         ],
         "navigation" => [
-            "navigationId" => \Database\Repository\Navigation::class
+            "navigationId" => \Database\Repository\Navigation\Navigation::class
         ]
     ];
 }

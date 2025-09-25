@@ -38,7 +38,6 @@ abstract class Sync
         Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Schoolyear: " . General::getSchoolyear());
 
-
         $prepareEmployee = self::PrepareEmployee();
         $prepareStudent = self::PrepareStudent();
 
@@ -115,6 +114,7 @@ abstract class Sync
             }
 
             foreach (explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.employee")->value) as $mof) {
+                $mof = Strings::trimToNull($mof);
                 foreach ($schools as $school) {
                     $school = $schoolRepo->getByName($school);
                     if (Strings::isBlank($school->adSecGroupPart)) continue;
@@ -322,6 +322,7 @@ abstract class Sync
 
         $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
         $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
+        $_minDepartmentCodes = Arrays::map($_minDepartmentCodes, fn($m) => Strings::trimToNull($m));
         $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
         $_minYear = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.year")->value, 'int');
         $_photo = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.student")->value, 'bool');
@@ -396,6 +397,7 @@ abstract class Sync
             }
 
             foreach (explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.student")->value) as $mof) {
+                $mof = Strings::trimToNull($mof);
                 if (is_null($school->adSecGroupPart)) continue;
                 $mof = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $mof);
 
@@ -519,7 +521,7 @@ abstract class Sync
         }
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing e-mails for students");
-        self::createStudentMail($create, $update, $enable, $disable);
+        //self::createStudentMail($create, $update, $enable, $disable);
 
         return true;
     }
