@@ -226,7 +226,7 @@ class HelpdeskController extends ApiController
             "priority",
             "status",
             "category" => ["mandatory" => true],
-            "subject" => ["mandatory" => true, "preconditions" => ["category" => "O"]],
+            "subject",
             "roomId" => ["mandatory" => false, 'type' => Input::INPUT_TYPE_INT],
             "assetId" => ["mandatory" => false, 'type' => Input::INPUT_TYPE_INT],
             "content",

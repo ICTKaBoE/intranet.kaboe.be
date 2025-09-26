@@ -93,8 +93,7 @@ class TempregController extends ApiController
             "pasta" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
             "vegetables" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
             "meat" => ["type" => Input::INPUT_TYPE_FLOAT, "default" => 0],
-            "notes",
-            ["default" => null]
+            "notes" => ["default" => null]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);

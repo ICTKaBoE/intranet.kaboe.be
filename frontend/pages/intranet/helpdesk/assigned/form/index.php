@@ -82,7 +82,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
 
                 <div class="mb-2 d-none">
                     <label for="subject" class="form-label">Onderwerp</label>
-                    <input type="text" name="subject" id="subject" class="form-control" readonly />
+                    <input type="text" name="subject" id="subject" class="form-control" />
                 </div>
 
                 <div class="mb-2">
