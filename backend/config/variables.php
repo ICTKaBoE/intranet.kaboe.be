@@ -34,7 +34,7 @@ if (DEV_MODE) {
 	define("DB_SERVER", "ID459940_kaboebe.db.webhosting.be");
 	define("DB_DATABASE", "ID459940_kaboebe");
 	define("DB_USERNAME", "ID459940_kaboebe");
-	define("DB_PASSWORD", "kaboebe2025");
+	define("DB_PASSWORD", "PianomanPA125");
 	define("DB_CHARSET", "utf8mb4");
 }
 

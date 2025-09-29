@@ -7,6 +7,7 @@ use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Navigation\Navigation;
 use Database\Interface\CustomObject;
+use Database\Repository\Navigation\Setting;
 
 class Printer extends CustomObject
 {
@@ -32,8 +33,7 @@ class Printer extends CustomObject
 
     public function init()
     {
-        $settings = (new Navigation)->getByParentIdAndLink(0, "management")->settings;
-        $this->formatted->mode = $settings['printer']['mode'][$this->mode]['name'];
+        $this->formatted->mode = $this->mode;
         $this->formatted->manModel = "{$this->manufacturer} {$this->model}";
     }
 }

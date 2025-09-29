@@ -7,6 +7,7 @@ use Ouzo\Utilities\Strings;
 use Database\Repository\Mapping;
 use Database\Repository\Navigation\Navigation;
 use Database\Interface\CustomObject;
+use Database\Repository\Bike\DistanceType;
 
 class Event extends CustomObject
 {
@@ -42,7 +43,7 @@ class Event extends CustomObject
     public function init()
     {
         $this->startAddress = (Strings::equal($this->type, "HW") ? $this->linked->userAddress->formatted->address : $this->linked->startSchool->formatted->addressWithSchool);
-        $this->mapped->type = (new Navigation)->getByParentIdAndLink(0, "bike")->settings['distance']['type'][$this->type]['name'];
+        $this->mapped->type = (new DistanceType)->getById($this->type)->name;
         $this->formatted->distance = CString::formatNumber($this->distance, 2) . "km";
         $this->formatted->distanceWithDouble = $this->formatted->distance . " (" . CString::formatNumber($this->distance * 2, 2) . "km)";
 

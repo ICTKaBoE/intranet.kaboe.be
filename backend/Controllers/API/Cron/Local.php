@@ -18,6 +18,7 @@ use Database\Object\User\User as ObjectUser;
 use Database\Repository\Informat\EmployeeAddress;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Object\User\Address as ObjectUserAddress;
+use Database\Repository\Navigation\Setting;
 
 abstract class Local
 {
@@ -47,11 +48,12 @@ abstract class Local
         $userRepo = new User;
         $schoolRepo = new School;
 
-        $_settings = (new Navigation)->getByParentIdAndLink(0, 'sync')->settings;
-        $_status = $_settings['informat']['ownfield']['status'];
-        $_mainSchool = $_settings['informat']['ownfield']['mainSchool'];
-        $_format = $_settings['format']['email'];
-        $_firstName = $_settings['informat']['ownfield']['createEmailWith'];
+        $settingRepo = new Setting;
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
+        $_mainSchool = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.mainSchool")->value;
+        $_format = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;
+        $_firstName = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
 
         // Temp disable users
         foreach ($userRepo->get() as $user) {
@@ -66,13 +68,13 @@ abstract class Local
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$employee->informatId} - {$employee->name} {$employee->firstName}");
 
             try {
-                $firstName = (Strings::equalsIgnoreCase(($employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_firstName)->value ?: "Voornaam"), "voornaam") ? $employee->firstName : $employee->extraFirstName);
+                $firstName = (Strings::equalsIgnoreCase(($employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_firstName)->value ?? "Voornaam"), "voornaam") ? $employee->firstName : $employee->extraFirstName);
                 $email = Input::createEmail($_format, $firstName, $employee->name, EMAIL_SUFFIX);
-                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? new ObjectUser;
 
                 $mainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool);
                 $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
 
+                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? new ObjectUser;
                 $user->informatEmployeeId = $employee->informatId;
                 $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id ?: 0;
                 $user->username = $email;

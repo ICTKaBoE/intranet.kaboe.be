@@ -11,6 +11,7 @@ use Ouzo\Utilities\Strings;
 use Database\Interface\CustomObject;
 use Database\Repository\Order\Status;
 use Database\Repository\Navigation\Navigation;
+use Database\Repository\Navigation\Setting;
 
 class Order extends CustomObject
 {
@@ -50,8 +51,8 @@ class Order extends CustomObject
 
     private function createNumber()
     {
-        $settings = (new Navigation)->getByParentIdAndLink(0, "order")->settings;
-        $this->formatted->number = $settings['format'];
+        $settings = (new Navigation)->getByParentIdAndLink(0, "order");
+        $this->formatted->number = (new Setting)->getByNavigationIdAndKey($settings->id, "format")->value;
 
         if (Strings::contains($this->formatted->number, "#")) {
             $count = substr_count($this->formatted->number, "#");
