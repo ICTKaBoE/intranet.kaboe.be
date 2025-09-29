@@ -16,7 +16,7 @@ abstract class Form
         foreach ($toValidate as $key => $value) {
             if (is_int($key)) $$value = Helpers::input()->post($value)?->getValue();
             else if (!is_int($key) && Arrays::getValue($value, "type") == "file") $$key = Helpers::input()->file($key);
-            else  $$key = Helpers::input()->post($key)?->getValue();
+            else $$key = Helpers::input()->post($key)?->getValue();
 
             $fields[is_int($key) ? $value : $key] = is_int($key) ? $$value : $$key;
 

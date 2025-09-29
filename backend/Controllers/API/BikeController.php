@@ -352,7 +352,7 @@ class BikeController extends ApiController
             $schoolTotalDistancePerMonth = [];
             $groupedEvents = $this->getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type);
 
-            $school = $schoolRepo->get($schoolId)[0];
+            $school = $schoolRepo->getById($schoolId);
             $excel->createSheet($index + 1, $school->name);
             $excel->setCellValue($index + 1, "A1:P1", "Fietsvergoeding - {$school->name} - {$typeFull}", true, 14);
             $excel->setCellValue($index + 1, "A2", "Startdatum");
@@ -457,7 +457,7 @@ class BikeController extends ApiController
             $schoolTotalDistance = $schoolTotalPrice = 0;
             $groupedEvents = $this->getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type);
 
-            $school = $schoolRepo->get($schoolId)[0];
+            $school = $schoolRepo->getById($schoolId);
             $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Fietsvergoeding - Overzicht - {$typeFull}: {$school->name}");
 
             $pdf->AddPage();

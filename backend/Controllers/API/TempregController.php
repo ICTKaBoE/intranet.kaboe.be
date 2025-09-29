@@ -107,7 +107,7 @@ class TempregController extends ApiController
             $repo->set($item);
         }
 
-        if ($this->validationIsAllGood()) $this->setReturn();
+        if ($this->validationIsAllGood()) $this->setResetForm();
         else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 

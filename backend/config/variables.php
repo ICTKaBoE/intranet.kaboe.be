@@ -1,7 +1,7 @@
 <?php
 
 // Security group permissions: read, create, update, delete, export, changeSettings
-define("VERSION_DB", "4.5.0");
+define("VERSION_DB", "4.6.0");
 define("URL_MAIN", "kaboe.be");
 define("DEV_MODE", str_starts_with($_SERVER["HTTP_HOST"], "dev"));
 

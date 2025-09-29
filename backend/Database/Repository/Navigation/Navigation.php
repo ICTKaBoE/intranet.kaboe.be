@@ -71,4 +71,10 @@ class Navigation extends Repository
         $items = $this->executeSelect($statement);
         return Arrays::filter($items, fn($i) => Arrays::contains(explode(",", $i->routeGroupId), $routeGroupId));
     }
+
+    public function getDefaultByParentId($parentId)
+    {
+        $statement = $this->prepareSelect(filters: ['default' => 1, 'parentId' => $parentId]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
 }

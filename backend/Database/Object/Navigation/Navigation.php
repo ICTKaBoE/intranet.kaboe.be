@@ -3,6 +3,8 @@
 namespace Database\Object\Navigation;
 
 use Database\Interface\CustomObject;
+use Database\Repository\Navigation\Navigation as NavigationNavigation;
+use Database\Repository\Navigation\Setting;
 use Helpers\HTML;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Strings;
@@ -17,6 +19,7 @@ class Navigation extends CustomObject
         "folderId" => "int",
         "type" => "string",
         "order" => "int",
+        "default" => "boolean",
         "link" => "string",
         "name" => "string",
         "icon" => "string",
@@ -33,7 +36,7 @@ class Navigation extends CustomObject
 
     public function init()
     {
-        $default = $this->settings["_"] ?: null;
+        $default = $this->type == "M" ? (new Setting)->getByNavigationIdAndKey($this->id, "_")->value : null;
 
         $this->formatted->link = $this->type == "L" ? $this->link : ($this->type == "F" ? "#{$this->link}" : Path::normalize("/" . ($this->linked->parent && $this->linked->parent->type !== "F" ? $this->linked->parent->formatted->link . "/" : "") . $this->link));
         $this->formatted->linkWithDefault = $this->formatted->link . ($default ? "/{$default}" : "");
