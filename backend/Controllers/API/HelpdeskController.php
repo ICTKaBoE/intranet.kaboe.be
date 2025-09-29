@@ -335,7 +335,10 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.new.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.new.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -368,7 +371,10 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.update.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.update.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -401,7 +407,10 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assigned.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assigned.reply")->value, "bool"))   $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -434,7 +443,10 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assignedUpdate.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assignedUpdate.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 

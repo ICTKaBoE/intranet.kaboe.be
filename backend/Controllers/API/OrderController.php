@@ -541,7 +541,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -586,7 +586,10 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -605,7 +608,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -650,7 +653,10 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -668,7 +674,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -683,7 +689,10 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
@@ -701,7 +710,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -716,7 +725,10 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.reply")->value, "bool")) $mail->replyTo = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply")->value;
+        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        ];
 
         $mId = $mailRepo->set($mail);
 
