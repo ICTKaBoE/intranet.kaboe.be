@@ -12,6 +12,7 @@ use Ouzo\Utilities\Strings;
 use M365\AuthenticationManager;
 use Database\Repository\Setting\Setting;
 use Database\Repository\Navigation\Navigation;
+use Database\Repository\Navigation\Setting as NavigationSetting;
 use Database\Repository\Route\Group;
 use Helpers\CString;
 use Helpers\General;
@@ -225,8 +226,8 @@ class DefaultController extends stdClass
 		$settings = $this->getModuleSettings();
 
 		if (!$settings) return;
-		foreach (Arrays::flattenKeysRecursively($settings) as $key => $value) {
-			$this->layout = str_replace('{{module:' . $key . '}}', $value, $this->layout);
+		foreach ($settings as $setting) {
+			$this->layout = str_replace('{{module:' . $setting->key . '}}', $setting->value, $this->layout);
 		}
 	}
 
@@ -355,8 +356,7 @@ class DefaultController extends stdClass
 		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
 		if (!$module) return [];
 
-		if ($module->settings !== null) $settings = $module->settings;
-
+		$settings = (new NavigationSetting)->getByNavigationId($module->id);
 		return $settings;
 	}
 }

@@ -1,7 +1,7 @@
 <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto">
     <div class="card-body">
         <div class="row">
-            <h1 class="card-title">Informatie leerling en ongeval</h1>
+            <h1 class="card-title">Algemene informatie</h1>
         </div>
 
         <div class="row">

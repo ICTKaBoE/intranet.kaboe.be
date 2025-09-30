@@ -27,13 +27,17 @@ class Absent extends CustomObject
         "paymentOfSubstitute" => "string",
         "paymentOfSubstituteOther" => "string",
         "absentNoteReceived" => "string",
-        "notes" => "string"
+        "notes" => "string",
+        "finished" => "boolean",
+        "finishedByUserId" => "int",
+        "deleted" => "boolean"
     ];
 
     protected $linkedAttributes = [
         "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
         "school" => ["schoolId" => \Database\Repository\School\School::class],
         "absentUser" => ["absentUserId" => \Database\Repository\User\User::class],
+        "finishedByUser" => ["finishedByUserId" => \Database\Repository\User\User::class]
     ];
 
     public function init()

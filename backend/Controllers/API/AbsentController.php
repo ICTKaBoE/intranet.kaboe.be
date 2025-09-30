@@ -126,7 +126,8 @@ class AbsentController extends ApiController
             "paymentOfSubstitute" => ["mandatory" => true],
             "paymentOfSubstituteOther" => ["mandatory" => true, "preconditions" => ["paymentOfSubstitute" => "O"]],
             "absentNoteReceived" => ["mandatory" => true],
-            "notes"
+            "notes",
+            "finished" => ["convert" => "bool", "default" => 0]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -135,7 +136,9 @@ class AbsentController extends ApiController
         if ($this->validationIsAllGood()) {
             $item = $repo->getById($id) ?? (new AbsentAbsent);
             $item->fillWithPostData();
-            $item->creatorUserId = User::getLoggedInUser()->id;
+            if (!$item->creatorUserId) $item->creatorUserId = User::getLoggedInUser()->id;
+            if ($fields['finished']) $item->finishedByUserId = User::getLoggedInUser()->id;
+            else $item->finishedByUserId = NULL;
 
             $repo->set($item);
 

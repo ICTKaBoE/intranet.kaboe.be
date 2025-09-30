@@ -1,7 +1,7 @@
 <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto" data-prefill-id="{{url:part.id}}">
     <div class="card-body">
         <div class="row">
-            <h1 class="card-title">Informatie leerling en ongeval</h1>
+            <h1 class="card-title">Algemene informatie</h1>
         </div>
 
         <div class="row">
@@ -79,10 +79,14 @@
         </div>
 
         <div class="row">
-            <div class="col">
+            <div class="col-12 mb-3">
                 <label class="form-label" for="notes">Opmerkingen</label>
                 <textarea name="notes" id="notes" rows="10" class="form-control"></textarea>
             </div>
+        </div>
+
+        <div class="row">
+            <div class="col" id="chbFinished" role="checkbox" data-type="checkbox" data-name="finished" data-text="Afgewerkt"></div>
         </div>
     </div>
 
