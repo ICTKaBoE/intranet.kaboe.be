@@ -57,5 +57,7 @@ class Absent extends CustomObject
         $this->formatted->end = new stdClass;
         $this->formatted->end->display = Strings::equal($this->end, "-0001-11-30") ? null : Clock::at($this->end)->format("d/m/Y");
         $this->formatted->end->sort = Strings::equal($this->end, "-0001-11-30") ? null : Clock::at($this->end)->format("U");
+
+        $this->_lockedForm = $this->finished;
     }
 }
