@@ -303,6 +303,9 @@ class ManagementController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+        else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
+        }
     }
 
     protected function getSwitch($view, $id = null)
@@ -331,6 +334,9 @@ class ManagementController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+        else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
+        }
     }
 
     protected function getAccessPoint($view, $id = null)
@@ -358,6 +364,9 @@ class ManagementController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+        else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
+        }
     }
 
     protected function getIpad($view, $id = null)
@@ -411,6 +420,8 @@ class ManagementController extends ApiController
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', $repo->getById($id));
+        } else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
         }
     }
 
@@ -440,6 +451,8 @@ class ManagementController extends ApiController
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $this->appendToJson('fields', $repo->getById($id));
+        } else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
         }
     }
 
@@ -475,6 +488,9 @@ class ManagementController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+        else if (Strings::equal($view, self::VIEW_PS)) {
+            $this->appendToJson("items", $repo->get(), fn($i) => $i->toArray());
+        }
     }
 
     // Post functions
