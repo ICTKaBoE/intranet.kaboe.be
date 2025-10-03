@@ -16,6 +16,7 @@ class Beamer extends CustomObject
         "manufacturer" => "string",
         "model" => "string",
         "serialnumber" => "string",
+        "ip" => "string",
         "deleted" => "boolean"
     ];
 
@@ -24,4 +25,9 @@ class Beamer extends CustomObject
         "building" => ["buildingId" => \Database\Repository\Management\Building::class],
         "room" => ["roomId" => \Database\Repository\Management\Room::class]
     ];
+
+    public function init()
+    {
+        $this->formatted->ip = CString::formatLink($this->ip);
+    }
 }

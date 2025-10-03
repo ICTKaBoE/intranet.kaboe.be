@@ -22,6 +22,7 @@ class Printer extends CustomObject
         "manufacturer" => "string",
         "model" => "string",
         "serialnumber" => "string",
+        "ip" => "string",
         "deleted" => "boolean"
     ];
 
@@ -35,5 +36,6 @@ class Printer extends CustomObject
     {
         $this->formatted->mode = $this->mode;
         $this->formatted->manModel = "{$this->manufacturer} {$this->model}";
+        $this->formatted->ip = CString::formatLink($this->ip);
     }
 }

@@ -36,19 +36,27 @@
             </div>
 
             <div class="row">
-                <div class="col-12 col-lg-4 mb-3">
+                <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="manufacturer">Merk</label>
                     <input type="text" name="manufacturer" id="manufacturer" class="form-control" required />
 
                 </div>
-                <div class="col-12 col-lg-4 mb-3">
+                <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="model">Model</label>
                     <input type="text" name="model" id="model" class="form-control" required />
 
                 </div>
-                <div class="col-12 col-lg-4 mb-3">
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="serialnumber">Serienummer</label>
                     <input type="text" name="serialnumber" id="serialnumber" class="form-control" required />
+
+                </div>
+                <div class="col-12 col-lg-6 mb-3">
+                    <label class="form-label" for="ip">IP</label>
+                    <input type="text" name="ip" id="ip" class="form-control" required />
 
                 </div>
             </div>
