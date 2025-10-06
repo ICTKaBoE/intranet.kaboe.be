@@ -2,6 +2,11 @@ import Button from "../../../../shared/default/js/object/Button.js";
 import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
+window.edit = () => {
+	let selected = Table.GetInstance(pageId).getSelectedRowData();
+	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
+};
+
 let btnAdd = new Button({
 	options: {
 		type: Button.TYPE_ICON,
@@ -14,4 +19,18 @@ let btnAdd = new Button({
 	},
 });
 
-Component.addActionButton(btnAdd);
+let btnEdit = new Button({
+	options: {
+		type: Button.TYPE_ICON,
+		icon: "pencil",
+		title: "Bewerken",
+		bgColor: "orange",
+		onclick: "edit",
+	},
+});
+
+Component.addActionButton(btnAdd, btnEdit);
+
+$(document).ready(() => {
+	Table.GetInstance(pageId).attachButton(btnEdit, "==1");
+});
