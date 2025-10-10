@@ -26,7 +26,7 @@ define("SECURITY_SESSION_SIGNINMETHOD_M365", "m365");
 
 if (DEV_MODE) {
 	define("DB_SERVER", "localhost");
-	define("DB_DATABASE", "db_intranet_v4");
+	define("DB_DATABASE", "db_intranet");
 	define("DB_USERNAME", "root");
 	define("DB_PASSWORD", "");
 	define("DB_CHARSET", "utf8mb4");
