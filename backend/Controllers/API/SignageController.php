@@ -30,8 +30,8 @@ class SignageController extends ApiController
     {
         if (Strings::equal($view, self::VIEW_SIGNAGE)) {
             $screenRepo = new Screen;
-            if (!Helpers::url()->hasParam("code")) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . "extranet.kaboe.be/signage/register?code=" . General::generateCode());
-            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . ".extranet.kaboe.be/signage/notfound?code=" . Helpers::url()->getParam("code"));
+            if (!Helpers::url()->hasParam("code")) $this->setRedirect("https://" . (DEV_MODE ? "dev." : "") . "extranet.kaboe.be/signage/register?code=" . General::generateCode());
+            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("https://" . (DEV_MODE ? "dev." : "") . ".extranet.kaboe.be/signage/notfound?code=" . Helpers::url()->getParam("code"));
             else {
                 $screen = $screenRepo->getByCode(Helpers::url()->getParam("code"));
                 $playlist = (new Playlist)->getByAssignedToAndAssignedToId(is_null($screen->linked->group) ? "S" : "G", is_null($screen->linked->group) ? $screen->id : $screen->groupId);
@@ -69,7 +69,6 @@ class SignageController extends ApiController
         $playlist = Arrays::firstOrNull($playlistRepo->get(Helpers::url()->getParam("playlistId")));
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-
             $this->appendToJson("defaultOrder", [[3, "asc"]]);
             $this->appendToJson(
                 key: 'columns',
@@ -202,6 +201,7 @@ class SignageController extends ApiController
 
             $item = $repo->getById($id) ?? new SignagePlaylistItem;
             $item->fillWithPostData();
+            $item->playlistId = $playlist->id;
             $item->duration = $media->type == "V" ? $media->duration : $fields["duration"];
             $item->order = $id ? $item->order : count($repo->getByPlaylistId($playlist->id)) + 1;
 

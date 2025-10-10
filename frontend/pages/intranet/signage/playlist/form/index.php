@@ -44,7 +44,7 @@
                     <h2 class="card-title">Media</h2>
                 </div>
 
-                <table role="table" id="tbl{{page:id}}Item" data-source="{{table:url:full}}Item" data-no-paging data-no-info data-double-click-action="edit" data-extra="[playlistId={{url:part.id}}]"></table>
+                <table role="table" id="tbl{{page:id}}Item" data-source="{{table:url:full}}Item" data-no-paging data-no-info data-double-click-action="edit" data-extra="[playlistId={{url:part.id}}]" data-checkbox></table>
             </div>
         </div>
 

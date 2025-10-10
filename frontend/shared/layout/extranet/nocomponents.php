@@ -10,7 +10,7 @@
 <body data-bs-theme="{{layout:theme}}">
 	{{content:page}}
 
-	{{component:toast}};
+	{{component:toast}}
 
 	<script>
 		let pageId = "{{page:id}}";
