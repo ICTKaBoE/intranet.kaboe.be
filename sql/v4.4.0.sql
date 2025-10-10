@@ -1,4 +1,0 @@
-INSERT INTO tbl_route (routeGroupId, `method`, route, controller, callback, apiNoAuth, deleted) VALUES(2, 'ANY', '{view}/report/{what?}/{id?}', '\Controllers\API\ReportController', 'any', 1, 0);
-
-UPDATE tbl_setting SET settingTabId=1, name='DB Versie', `type`='input', `options`=NULL, value=0x342E342E30, readonly=1, `order`=99, deleted=0 WHERE id='db.version';
-UPDATE tbl_setting SET settingTabId=1, name='Versie', `type`='input', `options`=NULL, value=0x342E342E30, readonly=0, `order`=3, deleted=0 WHERE id='site.version';

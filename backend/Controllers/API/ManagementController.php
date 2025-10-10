@@ -20,7 +20,6 @@ use Database\Repository\Management\Printer;
 use Database\Repository\Management\Building;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\Firewall;
-use Database\Repository\Navigation\TableDef;
 use Database\Repository\Management\Patchpanel;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Management\AccessPoint;
@@ -65,10 +64,7 @@ class ManagementController extends ApiController
         if (Strings::equal($view, self::VIEW_TABLE)) {
             unset($filters['type']);
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "computer");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -187,10 +183,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "building");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -211,10 +204,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "room");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -236,10 +226,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "cabinet");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -262,10 +249,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "patchpanel");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -288,10 +272,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "firewall");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -319,10 +300,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "switch");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -349,10 +327,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "accesspoint");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -377,10 +352,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "ipad");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -404,10 +376,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "beamer");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -435,10 +404,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "printer");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -458,7 +424,7 @@ class ManagementController extends ApiController
 
     protected function getPrinterMode($view, $id = null)
     {
-        $items = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "management")->id, "printer.mode")->value;
+        $items = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("management")->id, "printer.mode")->value;
         $items = explode(PHP_EOL, $items);
         $items = Arrays::map($items, fn($i) => ["id" => trim($i), "name" => trim($i)]);
         $this->appendToJson('items', $items);
@@ -473,10 +439,7 @@ class ManagementController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "management")->id, "cctv");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 

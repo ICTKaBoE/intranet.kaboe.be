@@ -375,7 +375,7 @@ let btnReadEID = new Button({
 		text: "Lees eID In",
 		bgColor: "blue",
 		onclick: () => {
-			window.location.href = "../../readEID.php";
+			window.location.href = "../../read_eid.php";
 		},
 	},
 });

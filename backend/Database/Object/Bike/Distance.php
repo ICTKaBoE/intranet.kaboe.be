@@ -13,16 +13,16 @@ use Database\Repository\Bike\DistanceType;
 class Distance extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "userId" => "int",
-        "type" => "string",
-        "startId" => "int",
-        "endSchoolId" => "int",
-        "distance" => "double",
-        "alias" => "string",
-        "color" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "userId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "startId" => self::TYPE_INTEGER,
+        "endSchoolId" => self::TYPE_INTEGER,
+        "distance" => self::TYPE_DOUBLE,
+        "alias" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

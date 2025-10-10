@@ -8,7 +8,7 @@ class Order extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_order", \Database\Object\Order\Order::class, orderField: 'number', orderDirection: 'DESC');
+        parent::__construct("tbl_order", \Database\Object\Order\Order::class, orderField: 'id', orderDirection: self::ORDER_DIRECTION_DESC);
     }
 
     public function getBySupplierId($supplierId)

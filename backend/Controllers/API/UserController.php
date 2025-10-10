@@ -132,22 +132,6 @@ class UserController extends ApiController
             $items = $repo->get(filters: $filters);
             $items = Arrays::map($items, fn($i) => $i = $i->toArray(true));
             $this->appendToJson('items', $items);
-        } else if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "users");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
-            $this->appendToJson('defaultOrder', $defaultOrder);
-            $this->appendToJson('columns', $columns);
-
-            $items = $repo->get(filters: $filters);
-            Arrays::each($items, function ($i) use ($loginRepo) {
-                $lastLogin = $loginRepo->getByUserId($i->id);
-                $lastLogin = Arrays::firstOrNull($lastLogin);
-
-                $i->formatted->lastLogin = $lastLogin ? Clock::at($lastLogin->timestamp)->plusHours(1)->format("d/m/Y H:i:s") . " (" . (Strings::equal($lastLogin->source, "local") ? "Lokaal" : "Office 365") . ")" : null;
-            });
-            $this->appendToJson("rows", $items);
         }
     }
 

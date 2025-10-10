@@ -27,10 +27,7 @@ class SyncController extends ApiController
                 "type" => "E"
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "sync")->id, "employee");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -48,10 +45,7 @@ class SyncController extends ApiController
                 "type" => "S"
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "sync")->id, "student");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -147,7 +141,7 @@ class SyncController extends ApiController
             $repo = new Sync;
 
             $item = $repo->getById($id);
-            $item->fillWithPostData();
+            $item->fillWithPostData($fields);
 
             $repo->set($item);
         }

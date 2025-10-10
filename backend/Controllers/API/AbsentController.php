@@ -2,8 +2,6 @@
 
 namespace Controllers\API;
 
-use Helpers\PDF;
-use Helpers\ZIP;
 use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
@@ -19,10 +17,7 @@ use Database\Repository\Absent\Note;
 use Database\Repository\Absent\Absent;
 use Database\Repository\School\School;
 use Database\Repository\Absent\Payment;
-use Database\Repository\Accident\Status;
 use Database\Repository\Absent\Substitute;
-use Database\Repository\Navigation\TableDef;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Absent\Absent as AbsentAbsent;
 
 class AbsentController extends ApiController
@@ -38,10 +33,7 @@ class AbsentController extends ApiController
                 'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "absent")->id, "mine");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -60,10 +52,7 @@ class AbsentController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "absent")->id, "all");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -198,9 +187,6 @@ class AbsentController extends ApiController
         foreach ($schoolIds as $index => $schoolId) {
             $school = $schoolRepo->getById($schoolId);
 
-            $schoolRow = $startRow;
-            $schoolColumn = $startColumn;
-
             if ($index == 0) $excel->setSheetTitle($index, $school->name);
             else $excel->createSheet($index, $school->name);
 
@@ -210,51 +196,36 @@ class AbsentController extends ApiController
             $excel->setCellValue($index, "A3", "Einddatum");
             $excel->setCellValue($index, "B3", is_null(Strings::trimToNull($end)) ? "" : Clock::at($end)->format("d/m/Y"));
 
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Aangegeven op", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Door", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Afwezige", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Volume", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Wordt vervangen door", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Start", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Einde", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Betaling vervanger", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Ziektebriefje ontvangen", true);
-            $schoolColumn++;
-            $excel->setCellValue($index, "{$schoolColumn}{$schoolRow}", "Opmerking", true);
-            $schoolRow++;
+            $table = [];
+            $table["header"] = [
+                "Aangegeven op",
+                "Door",
+                "Afwezige",
+                "Volume",
+                "Wordt vervangen door",
+                "Start",
+                "Einde",
+                "Betaling vervanger",
+                "Ziektebriefje ontvangen",
+                "Opmerking"
+            ];
 
-            foreach ($items[$schoolId] as $item) {
-                $itemColumn = $startColumn;
-
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->creationDateTime->display);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->linked->creatorUser->formatted->fullNameReversed);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->linked->absentUser->formatted->fullNameReversed);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->volume);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->substituteBy);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->start->display);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->end->display);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->paymentOfSubstitute);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->formatted->absentNoteReceived);
-                $itemColumn++;
-                $excel->setCellValue($index, "{$itemColumn}{$schoolRow}", $item->notes);
-                $schoolRow++;
+            foreach ($items[$schoolId] as $i => $item) {
+                $table["data"][$i] = [
+                    $item->formatted->creationDateTime->display,
+                    $item->linked->creatorUser->formatted->fullNameReversed,
+                    $item->linked->absentUser->formatted->fullNameReversed,
+                    $item->volume,
+                    $item->formatted->substituteBy,
+                    $item->formatted->start->display,
+                    $item->formatted->end->display,
+                    $item->formatted->paymentOfSubstitute,
+                    $item->formatted->absentNoteReceived,
+                    $item->notes
+                ];
             }
+
+            $excel->table($index, $startColumn, $startRow, $table);
         }
 
         $excel->save();

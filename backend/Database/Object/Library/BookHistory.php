@@ -9,16 +9,16 @@ use Ouzo\Utilities\Strings;
 class BookHistory extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "bookId" => "int",
-        "lenderUserId" => "int",
-        "receiverUserId" => "int",
-        "lenderType" => "string",
-        "returnerType" => "string",
-        "lenderInformatId" => "int",
-        "returnerInformatId" => "int",
-        "lendDateTime" => "datetime",
-        "returnDateTime" => "datetime"
+        "id" => self::TYPE_INTEGER,
+        "bookId" => self::TYPE_INTEGER,
+        "lenderUserId" => self::TYPE_INTEGER,
+        "receiverUserId" => self::TYPE_INTEGER,
+        "lenderType" => self::TYPE_STRING,
+        "returnerType" => self::TYPE_STRING,
+        "lenderInformatId" => self::TYPE_INTEGER,
+        "returnerInformatId" => self::TYPE_INTEGER,
+        "lendDateTime" => self::TYPE_DATETIME,
+        "returnDateTime" => self::TYPE_DATETIME
     ];
 
     protected $linkedAttributes = [

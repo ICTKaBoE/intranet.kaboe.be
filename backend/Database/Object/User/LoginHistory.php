@@ -7,10 +7,10 @@ use Database\Interface\CustomObject;
 class LoginHistory extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "userId" => "int",
-        "source" => "string",
-        "timestamp" => "datetime"
+        "id" => self::TYPE_INTEGER,
+        "userId" => self::TYPE_INTEGER,
+        "source" => self::TYPE_STRING,
+        "timestamp" => self::TYPE_DATETIME
     ];
 
     protected $linkedAttributes = [

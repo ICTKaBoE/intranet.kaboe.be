@@ -7,8 +7,8 @@ use Database\Interface\CustomObject;
 class GroupUser extends CustomObject
 {
     protected $objectAttributes = [
-        "securityGroupId" => "int",
-        "userId" => "int"
+        "securityGroupId" => self::TYPE_INTEGER,
+        "userId" => self::TYPE_INTEGER
     ];
 
     protected $linkedAttributes = [

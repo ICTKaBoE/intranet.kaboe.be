@@ -9,23 +9,23 @@ use Database\Interface\CustomObject;
 class Employee extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatId" => "int",
-        "informatGuid" => "string",
-        "name" => "string",
-        "firstName" => "string",
-        "extraFirstName" => "string",
-        "basenumber" => "string",
-        "sex" => "string",
-        "birthDate" => "date",
-        "birthPlace" => "string",
-        "birthCountryId" => "string",
-        "nationalityId" => "string",
-        "insz" => "string",
-        "bis" => "string",
-        "iban" => "string",
-        "bic" => "string",
-        "active" => "bool"
+        "id" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "firstName" => self::TYPE_STRING,
+        "extraFirstName" => self::TYPE_STRING,
+        "basenumber" => self::TYPE_STRING,
+        "sex" => self::TYPE_STRING,
+        "birthDate" => self::TYPE_DATE,
+        "birthPlace" => self::TYPE_STRING,
+        "birthCountryId" => self::TYPE_STRING,
+        "nationalityId" => self::TYPE_STRING,
+        "insz" => self::TYPE_STRING,
+        "bis" => self::TYPE_STRING,
+        "iban" => self::TYPE_STRING,
+        "bic" => self::TYPE_STRING,
+        "active" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

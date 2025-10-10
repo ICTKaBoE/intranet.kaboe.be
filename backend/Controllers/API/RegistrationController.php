@@ -334,37 +334,37 @@ class RegistrationController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) {
-            $eidData = Session::get('eidData');
-            Session::remove("eidData");
+            // $eidData = Session::get('eidData');
+            // Session::remove("eidData");
 
-            if ($eidData) {
-                $nationalityRepo = new Nationality;
+            // if ($eidData) {
+            //     $nationalityRepo = new Nationality;
 
-                $this->appendToJson('fields', [
-                    'cardNumber' => $eidData->beid_card_number,
-                    'insz' => $eidData->sub,
-                    'birthDate' => $eidData->birthdate,
-                    'addressCity' => $eidData->address->locality,
-                    'addressStreet' => CString::getStreetFromAddress($eidData->address->street_address),
-                    'addressNumber' => preg_replace('/[^0-9]/', '', CString::getHouseNumberFromAddress($eidData->address->street_address)),
-                    'addressBus' => preg_replace('/[^a-zA-Z]/', '', CString::getHouseNumberFromAddress($eidData->address->street_address)),
-                    'addressZipcode' => $eidData->address->postal_code,
-                    'sex' => strtoupper(substr($eidData->gender, 0, 1)),
-                    'chipNumber' => $eidData->beid_chip_number,
-                    'photo' => $eidData->photo,
-                    'type' => $eidData->beid_document_type,
-                    'firstName' => $eidData->given_name,
-                    'middleName' => $eidData->middle_name,
-                    'birthPlace' => $eidData->place_of_birth->locality,
-                    'cardValidUntil' => $eidData->beid_card_validity_end,
-                    'cardDeliveredAt' => $eidData->beid_card_delivery_municipality,
-                    'fullName' => $eidData->name,
-                    'nationalityId' => $nationalityRepo->getByName($eidData->beid_nationality)->id,
-                    'name' => $eidData->family_name,
-                    'age' => $eidData->age,
-                    'cardValidFrom' => $eidData->beid_card_validity_begin
-                ]);
-            } else $this->appendToJson('fields', []);
+            //     $this->appendToJson('fields', [
+            //         'cardNumber' => $eidData->beid_card_number,
+            //         'insz' => $eidData->sub,
+            //         'birthDate' => $eidData->birthdate,
+            //         'addressCity' => $eidData->address->locality,
+            //         'addressStreet' => CString::getStreetFromAddress($eidData->address->street_address),
+            //         'addressNumber' => preg_replace('/[^0-9]/', '', CString::getHouseNumberFromAddress($eidData->address->street_address)),
+            //         'addressBus' => preg_replace('/[^a-zA-Z]/', '', CString::getHouseNumberFromAddress($eidData->address->street_address)),
+            //         'addressZipcode' => $eidData->address->postal_code,
+            //         'sex' => strtoupper(substr($eidData->gender, 0, 1)),
+            //         'chipNumber' => $eidData->beid_chip_number,
+            //         'photo' => $eidData->photo,
+            //         'type' => $eidData->beid_document_type,
+            //         'firstName' => $eidData->given_name,
+            //         'middleName' => $eidData->middle_name,
+            //         'birthPlace' => $eidData->place_of_birth->locality,
+            //         'cardValidUntil' => $eidData->beid_card_validity_end,
+            //         'cardDeliveredAt' => $eidData->beid_card_delivery_municipality,
+            //         'fullName' => $eidData->name,
+            //         'nationalityId' => $nationalityRepo->getByName($eidData->beid_nationality)->id,
+            //         'name' => $eidData->family_name,
+            //         'age' => $eidData->age,
+            //         'cardValidFrom' => $eidData->beid_card_validity_begin
+            //     ]);
+            // } else $this->appendToJson('fields', []);
         }
     }
 
@@ -913,8 +913,8 @@ class RegistrationController extends ApiController
             $_stepDirection = Helpers::input()->post("_stepDirection_")->getValue();
 
             if ($_stepDirection == "+") {
-                // $invalid = Form::Validate(self::REGISTRATION_FIELDS[$_step]);
-                // Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue(self::REGISTRATION_FIELDS, [$_step, $k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+                [$invalid, $fields] = Form::Validate(self::REGISTRATION_FIELDS[$_step]);
+                Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue(self::REGISTRATION_FIELDS, [$_step, $k, "fieldError"]), self::VALIDATION_STATE_INVALID));
             }
 
             if ($this->validationIsAllGood()) {

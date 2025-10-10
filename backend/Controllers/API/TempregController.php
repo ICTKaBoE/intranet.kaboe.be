@@ -29,7 +29,7 @@ class TempregController extends ApiController
     protected function getPerson($view, $id = null)
     {
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "tempreg");
+        $navigation = (new Navigation)->getByLink("tempreg");
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             if (Helpers::url()->getParam("schoolId")) {
@@ -55,11 +55,7 @@ class TempregController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "tempreg")->id, "overview");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 

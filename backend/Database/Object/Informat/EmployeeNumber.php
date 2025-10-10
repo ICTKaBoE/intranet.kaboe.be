@@ -8,12 +8,12 @@ use Helpers\HTML;
 class EmployeeNumber extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatEmployeeId" => "int",
-        "informatGuid" => "string",
-        "number" => "string",
-        "type" => "string",
-        "category" => "string"
+        "id" => self::TYPE_INTEGER,
+        "informatEmployeeId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "number" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
+        "category" => self::TYPE_STRING
     ];
 
     public function init()

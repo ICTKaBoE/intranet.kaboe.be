@@ -7,7 +7,7 @@ use Database\Interface\CustomObject;
 class Mapping extends CustomObject
 {
     protected $objectAttributes = [
-        "key" => "string",
-        "value" => "string"
+        "key" => self::TYPE_STRING,
+        "value" => self::TYPE_STRING
     ];
 }

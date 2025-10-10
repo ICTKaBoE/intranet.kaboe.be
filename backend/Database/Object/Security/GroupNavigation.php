@@ -7,8 +7,8 @@ use Database\Interface\CustomObject;
 class GroupNavigation extends CustomObject
 {
     protected $objectAttributes = [
-        "securityGroupId" => "int",
-        "navigationId" => "int"
+        "securityGroupId" => self::TYPE_INTEGER,
+        "navigationId" => self::TYPE_INTEGER
     ];
 
     protected $linkedAttributes = [

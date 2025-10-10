@@ -8,7 +8,7 @@ class Message extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_general_message", \Database\Object\General\Message::class, orderField: 'from', orderDirection: 'DESC');
+        parent::__construct("tbl_general_message", \Database\Object\General\Message::class, orderField: 'from', orderDirection: self::ORDER_DIRECTION_DESC);
     }
 
     public function getByNavigationId($navigationId)

@@ -12,19 +12,19 @@ use Database\Repository\Bike\DistanceType;
 class Event extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "date" => "date",
-        "bikeDistanceId" => "int",
-        "type" => "string",
-        "userId" => "int",
-        "startId" => "int",
-        "endSchoolId" => "int",
-        "distance" => "double",
-        "alias" => "string",
-        "color" => "string",
-        "pricePerKm" => "double",
-        "userMainSchoolId" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "date" => self::TYPE_DATE,
+        "bikeDistanceId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "userId" => self::TYPE_INTEGER,
+        "startId" => self::TYPE_INTEGER,
+        "endSchoolId" => self::TYPE_INTEGER,
+        "distance" => self::TYPE_DOUBLE,
+        "alias" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING,
+        "pricePerKm" => self::TYPE_DOUBLE,
+        "userMainSchoolId" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

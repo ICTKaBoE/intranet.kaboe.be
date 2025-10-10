@@ -22,7 +22,7 @@ abstract class Form
 
             if (is_array($value)) {
                 if (Arrays::getValue($value, 'placeholder')) $$key = str_replace(Arrays::getValue($value, 'placeholder'), "", $$key);
-                if (Arrays::getValue($value, 'convert')) $$key = General::convert($$key, Arrays::getValue($value, "convert"));
+                if (Arrays::getValue($value, 'convert') || Arrays::getValue($value, 'type')) $$key = General::convert($$key, Arrays::getValue($value, "convert", Arrays::getValue($value, 'type')));
                 if (Arrays::getValue($value, 'default')) $$key = $$key ?: Arrays::getValue($value, "default");
                 $fields[$key] = $$key;
 

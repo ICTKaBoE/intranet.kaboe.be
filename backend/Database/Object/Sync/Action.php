@@ -7,8 +7,8 @@ use Database\Interface\CustomObject;
 class Action extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "string",
-        "name" => "string",
-        "color" => "string"
+        "id" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING
     ];
 }

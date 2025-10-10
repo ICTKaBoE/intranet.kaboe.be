@@ -7,14 +7,14 @@ use Database\Interface\CustomObject;
 class Source extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "string",
-        "tokenType" => "string",
-        "tokenUntil" => "datetime",
-        "tokenValue" => "string",
-        "identityEndpoint" => "string",
-        "identityGrantType" => "string",
-        "identityClientId" => "string",
-        "identityClientSecret" => "string",
-        "identityScope" => "string"
+        "id" => self::TYPE_STRING,
+        "tokenType" => self::TYPE_STRING,
+        "tokenUntil" => self::TYPE_DATETIME,
+        "tokenValue" => self::TYPE_STRING,
+        "identityEndpoint" => self::TYPE_STRING,
+        "identityGrantType" => self::TYPE_STRING,
+        "identityClientId" => self::TYPE_STRING,
+        "identityClientSecret" => self::TYPE_STRING,
+        "identityScope" => self::TYPE_STRING
     ];
 }

@@ -24,7 +24,6 @@ use Database\Repository\Helpdesk\Category;
 use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\Helpdesk\Priority;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\TableDef;
 use Database\Repository\Navigation\Navigation;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Object\Helpdesk\Thread as HelpdeskThread;
@@ -45,10 +44,7 @@ class HelpdeskController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "helpdesk")->id, "mine");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -67,10 +63,7 @@ class HelpdeskController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "helpdesk")->id, "tickets");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -91,10 +84,7 @@ class HelpdeskController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "helpdesk")->id, "assigned");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -215,9 +205,6 @@ class HelpdeskController extends ApiController
     {
         if ($id == "add") $id = null;
 
-        $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
-
         $repo = new Helpdesk;
         $threadRepo = new Thread;
 
@@ -249,13 +236,14 @@ class HelpdeskController extends ApiController
 
         if ($this->validationIsAllGood()) {
             $helpdesk = $repo->getById($id) ?? (new HelpdeskHelpdesk);
-            $helpdesk->fillWithPostData();
-            if (!$helpdesk->number) $helpdesk->number = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber")->value + 1;
-            if (!$helpdesk->creatorUserId) $helpdesk->creatorUserId = User::getLoggedInUser()->id;
+
             if ($fields['assignedToUserId']) {
                 if ($helpdesk->assignedToUserId != $fields['assignedToUserId']) $mailAssignedTo = true;
                 $helpdesk->assignedToUserId = $fields['assignedToUserId'];
             }
+
+            $helpdesk->fillWithPostData();
+            if (!$helpdesk->creatorUserId) $helpdesk->creatorUserId = User::getLoggedInUser()->id;
             $helpdesk->lastActionDateTime = Clock::nowAsString("Y-m-d H:i:s");
 
             $newId = $repo->set($helpdesk);
@@ -283,13 +271,6 @@ class HelpdeskController extends ApiController
                     $helpdesk->status = "O";
                     $repo->set($helpdesk);
                 }
-            }
-
-            // Update settings
-            if (!$id) {
-                $settingItem = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber");
-                $settingItem->value++;
-                $settingsRepo->set($settingItem);
             }
 
             // Mail
@@ -320,7 +301,7 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -356,7 +337,7 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;
@@ -392,7 +373,7 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;
@@ -428,7 +409,7 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
+        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;

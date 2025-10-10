@@ -2,6 +2,7 @@
 
 namespace Helpers;
 
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -63,6 +64,34 @@ class Excel
 		}
 
 		if ($link) $sheet->getCell($range)->getHyperlink()->setUrl($link);
+	}
+
+	public function table($sheetIndex, $startColumn, $startRow, $table)
+	{
+		$header = Arrays::getValue($table, "header", []);
+		$data = Arrays::getValue($table, "data", []);
+
+		$col = $startColumn;
+		$row = $startRow;
+
+		foreach ($header as $h) {
+			if (is_array($h)) $this->setCellValue($sheetIndex, "{$col}{$row}", Arrays::getValue($h, "text"), Arrays::getValue($h, "bold", true), border: Arrays::getValue($h, "border", "b"), borderStyle: Arrays::getValue($h, "borderStyle", Border::BORDER_THIN), link: Arrays::getValue($h, "link"));
+			else $this->setCellValue($sheetIndex, "{$col}{$row}", $h, true, border: "b");
+			$col++;
+		}
+
+		$row++;
+
+		foreach ($data as $r) {
+			$col = $startColumn;
+
+			foreach ($r as $d) {
+				if (is_array($d)) $this->setCellValue($sheetIndex, "{$col}{$row}", Arrays::getValue($d, "text"), Arrays::getValue($d, "bold", false), border: Arrays::getValue($d, "border", ""), borderStyle: Arrays::getValue($d, "borderStyle", Border::BORDER_NONE), link: Arrays::getValue($d, "link"));
+				else $this->setCellValue($sheetIndex, "{$col}{$row}", $d, false, border: "");
+				$col++;
+			}
+			$row++;
+		}
 	}
 
 	public function save()

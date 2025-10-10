@@ -8,7 +8,7 @@ class Accident extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_accident", \Database\Object\Accident\Accident::class, orderField: 'creationDateTime', orderDirection: 'DESC');
+        parent::__construct("tbl_accident", \Database\Object\Accident\Accident::class, orderField: 'creationDateTime', orderDirection: self::ORDER_DIRECTION_DESC);
     }
 
     public function getByCreatorUserId($creatorUserId)

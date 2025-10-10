@@ -7,11 +7,11 @@ use Database\Interface\CustomObject;
 class Institute extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "schoolId" => "int",
-        "number" => "string",
-        "sourceId" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "number" => self::TYPE_STRING,
+        "sourceId" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -13,14 +13,14 @@ use Database\Repository\Management\Treshhold;
 class ComputerBattery extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "computerId" => "int",
-        "batteryId" => "string",
-        "lastCheck" => "datetime",
-        "designCapacity" => "int",
-        "fullChargeCapacity" => "int",
-        "cycleCount" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "computerId" => self::TYPE_INTEGER,
+        "batteryId" => self::TYPE_STRING,
+        "lastCheck" => self::TYPE_DATETIME,
+        "designCapacity" => self::TYPE_INTEGER,
+        "fullChargeCapacity" => self::TYPE_INTEGER,
+        "cycleCount" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

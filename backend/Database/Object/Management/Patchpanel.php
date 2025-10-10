@@ -8,15 +8,15 @@ use Helpers\CString;
 class Patchpanel extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "buildingId" => "int",
-        "roomId" => "int",
-        "cabinetId" => "int",
-        "name" => "string",
-        "patchpoints" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "buildingId" => self::TYPE_INTEGER,
+        "roomId" => self::TYPE_INTEGER,
+        "cabinetId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "patchpoints" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

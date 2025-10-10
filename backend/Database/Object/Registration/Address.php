@@ -7,17 +7,17 @@ use Database\Interface\CustomObject;
 class Address extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "registrationId" => "int",
-        "followNumber" => "int",
-        "communication" => "boolean",
-        "street" => "string",
-        "number" => "int",
-        "bus" => "string",
-        "zipcode" => "string",
-        "city" => "string",
-        "countryId" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "registrationId" => self::TYPE_INTEGER,
+        "followNumber" => self::TYPE_INTEGER,
+        "communication" => self::TYPE_BOOLEAN,
+        "street" => self::TYPE_STRING,
+        "number" => self::TYPE_INTEGER,
+        "bus" => self::TYPE_STRING,
+        "zipcode" => self::TYPE_STRING,
+        "city" => self::TYPE_STRING,
+        "countryId" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 }

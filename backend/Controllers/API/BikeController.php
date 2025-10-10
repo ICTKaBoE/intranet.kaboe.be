@@ -28,7 +28,6 @@ use Database\Repository\Navigation\Navigation;
 use Database\Object\Bike\Event as ObjectBikeEvent;
 use Database\Repository\User\User as RepositoryUser;
 use Database\Object\Bike\Distance as ObjectBikeDistance;
-use Database\Repository\Navigation\TableDef;
 use Helpers\Table;
 
 class BikeController extends ApiController
@@ -55,10 +54,7 @@ class BikeController extends ApiController
                 'type' => Helpers::url()->getParam("type")
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "bike")->id, "distance");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -168,7 +164,7 @@ class BikeController extends ApiController
     protected function postEvent($view, $id, $type)
     {
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "bike");
+        $navigation = (new Navigation)->getByLink("bike");
 
         $_fields = [
             "date" => ["mandatory" => true],
@@ -307,7 +303,7 @@ class BikeController extends ApiController
     // Export functions
     protected function exportPerSchoolAsXlsx($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
         $schoolRepo = new School();
@@ -315,7 +311,6 @@ class BikeController extends ApiController
         $filename = "Fietsvergoeding - Export Per School - {$typeFull}.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
-        // $overview = [];
         $startRow = 6;
         $startColumn = "A";
 
@@ -329,23 +324,16 @@ class BikeController extends ApiController
         $excel->setCellValue(0, "A4", "Laatste uitbetalingsdatum");
         $excel->setCellValue(0, "B4", Clock::at($lastPayDate)->format("d/m/Y"));
 
+        $overviewTable = [];
         $overviewTotalDistance = $overviewTotalPrice = 0;
-        $overviewRow = $startRow;
-        $overviewColumn = $startColumn;
 
-        $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "School", true, border: "b");
-        $overviewColumn++;
+        $overviewTable = [];
+        $overviewTable["header"] = ["School"];
 
-        foreach ($monthsBetweenDates as $month) {
-            $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", $month, true, border: "b");
-            $overviewColumn++;
-        }
+        foreach ($monthsBetweenDates as $month) $overviewTable["header"][] = $month;
 
-        $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "Totaal", true, border: "bl");
-        $overviewColumn++;
-        $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "", true, border: "b");
-
-        $overviewRow++;
+        $overviewTable["header"][] = ["text" => "Totaal", "border" => "bl"];
+        $overviewTable["header"][] = "";
 
         foreach ($schoolIds as $index => $schoolId) {
             $schoolTotalDistance = $schoolTotalPrice = 0;
@@ -362,90 +350,64 @@ class BikeController extends ApiController
             $excel->setCellValue($index + 1, "A4", "Laatste uitbetalingsdatum");
             $excel->setCellValue($index + 1, "B4", Clock::at($lastPayDate)->format("d/m/Y"));
 
-            $schoolRow = $startRow;
-            $schoolColumn = $startColumn;
+            $schoolTable = [];
+            $schoolTable["header"] = ["Leerkracht"];
 
-            $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "Leerkracht", true, border: "b");
-            $schoolColumn++;
+            foreach ($monthsBetweenDates as $month) $schoolTable["header"][] = $month;
 
-            foreach ($monthsBetweenDates as $month) {
-                $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", $month, true, border: "b");
-                $schoolColumn++;
-            }
+            $schoolTable["header"][] = ["text" => "Totaal", "border" => "bl"];
+            $schoolTable["header"][] = "";
 
-            $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "Totaal", true, border: "bl");
-            $schoolColumn++;
-            $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "", true, border: "b");
-
-            $schoolRow++;
-
+            $schoolTableRow = 0;
             foreach ($groupedEvents as $user => $events) {
                 $userTotalDistance = $userTotalPrice = 0;
 
-                $schoolColumn = $startColumn;
-                $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", $user);
-                $schoolColumn++;
+                $schoolTable["data"][$schoolTableRow][] = $user;
 
                 foreach ($monthsBetweenDates as $month) {
-                    $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", number_format(($events[$month]['distance'] ?? 0), 2, ",", ".") . " km");
+                    $schoolTable["data"][$schoolTableRow][] = number_format(($events[$month]['distance'] ?? 0), 2, ",", ".") . " km";
                     $userTotalDistance += $events[$month]['distance'] ?? 0;
                     $schoolTotalDistancePerMonth[$month] += $events[$month]['distance'] ?? 0;
                     $userTotalPrice += $events[$month]['price'] ?? 0;
-                    $schoolColumn++;
                 }
 
-                $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", number_format($userTotalDistance, 2, ",", ".") . " km", border: "l");
-                $schoolColumn++;
-                $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "€ " . number_format($userTotalPrice, 2, ",", "."));
+                $schoolTable["data"][$schoolTableRow][] = ["text" => number_format($userTotalDistance, 2, ",", ".") . " km", "border" => "l"];
+                $schoolTable["data"][$schoolTableRow][] = "€ " . number_format($userTotalPrice, 2, ",", ".");
 
                 $schoolTotalDistance += $userTotalDistance;
                 $schoolTotalPrice += $userTotalPrice;
-
-                $schoolRow++;
+                $schoolTableRow++;
             }
 
-            $schoolColumn = $startColumn;
-            $schoolColumn++;
-            foreach ($monthsBetweenDates as $month) $schoolColumn++;
+            $schoolTable["data"][$schoolTableRow][] = "";
+            foreach ($monthsBetweenDates as $month) $schoolTable["data"][$schoolTableRow][] = "";
+            $schoolTable["data"][$schoolTableRow][] = ["text" => number_format($schoolTotalDistance, 2, ",", ".") . " km", "border" => "t", "borderStyle" => Border::BORDER_DOUBLE];
+            $schoolTable["data"][$schoolTableRow][] = ["text" => "€ " . number_format($schoolTotalPrice, 2, ",", "."), "border" => "t", "borderStyle" => Border::BORDER_DOUBLE];
 
-            $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", number_format($schoolTotalDistance, 2, ",", ".") . " km", border: "t", borderStyle: Border::BORDER_DOUBLE);
-            $schoolColumn++;
-            $excel->setCellValue($index + 1, "{$schoolColumn}{$schoolRow}", "€ " . number_format($schoolTotalPrice, 2, ",", "."), border: "t", borderStyle: Border::BORDER_DOUBLE);
+            $overviewTable["data"][$index][] = ["text" => $school->name, "link" => "sheet://'{$school->name}'!A1"];
+            foreach ($monthsBetweenDates as $month) $overviewTable["data"][$index][] = number_format(($schoolTotalDistancePerMonth[$month] ?? 0), 2, ",", ".") . " km";
+            $overviewTable["data"][$index][] = ["text" => number_format(($schoolTotalDistance ?? 0), 2, ",", ".") . " km", "border" => "l"];
+            $overviewTable["data"][$index][] = "€ " .  number_format(($schoolTotalPrice ?? 0), 2, ",", ".");
 
-            $overviewColumn = $startColumn;
-            $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", $school->name, true, link: "sheet://'{$school->name}'!A1");
-            $overviewColumn++;
-
-            foreach ($monthsBetweenDates as $month) {
-                $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", number_format(($schoolTotalDistancePerMonth[$month] ?? 0), 2, ",", ".") . " km");
-                $overviewColumn++;
-            }
-
-            $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", number_format(($schoolTotalDistance ?? 0), 2, ",", ".") . " km", border: "l");
-            $overviewColumn++;
-            $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "€ " .  number_format(($schoolTotalPrice ?? 0), 2, ",", "."));
+            $excel->table($index + 1, $startColumn, $startRow, $schoolTable);
 
             $overviewTotalDistance += $schoolTotalDistance;
             $overviewTotalPrice += $schoolTotalPrice;
-
-            $overviewRow++;
         }
 
-        $overviewColumn = $startColumn;
-        $overviewColumn++;
-        foreach ($monthsBetweenDates as $month) $overviewColumn++;
+        $overviewTable["data"][count($schoolIds)][] = "";
+        foreach ($monthsBetweenDates as $month) $overviewTable["data"][count($schoolIds)][] = "";
+        $overviewTable["data"][count($schoolIds)][] = ["text" => number_format(($overviewTotalDistance ?? 0), 2, ",", ".") . " km", "border" => "tl", "borderStyle" => Border::BORDER_DOUBLE];
+        $overviewTable["data"][count($schoolIds)][] = ["text" => "€ " .  number_format(($overviewTotalPrice ?? 0), 2, ",", "."), "border" => "t", "borderStyle" => Border::BORDER_DOUBLE];
 
-        $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", number_format(($overviewTotalDistance ?? 0), 2, ",", ".") . " km", border: "t", borderStyle: Border::BORDER_DOUBLE);
-        $overviewColumn++;
-        $excel->setCellValue(0, "{$overviewColumn}{$overviewRow}", "€ " .  number_format(($overviewTotalPrice ?? 0), 2, ",", "."), border: "t", borderStyle: Border::BORDER_DOUBLE);
-
+        $excel->table(0, $startColumn, $startRow, $overviewTable);
         $excel->save();
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
     protected function exportPerSchoolAsPdf($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
         $schoolRepo = new School();
@@ -542,7 +504,7 @@ class BikeController extends ApiController
 
     protected function exportPerTeacherAsXlsx($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
@@ -556,8 +518,8 @@ class BikeController extends ApiController
         $startColumn = "A";
 
         foreach ($groupedEvents as $username => $userEvent) {
-            $userRow = $startRow;
-            $userColumn = $startColumn;
+            $row = 0;
+            $table = [];
 
             $userTotalSingle = $userTotalDouble = $userTotalPrice = 0;
 
@@ -583,72 +545,96 @@ class BikeController extends ApiController
             $excel->setCellValue($index, "A7", "Laatste uitbetalingsdatum");
             $excel->setCellValue($index, "B7:E7", Clock::at($lastPayDate)->format("d/m/Y"));
 
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Datum", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Afstand - Enkel", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Afstand - Dubbel", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Vergoeding/km", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Vergoeding totaal", true);
-            $userRow++;
+            $table["header"] = [
+                "Datum",
+                "Afstand - Enkel",
+                "Afstand - Dubbel",
+                "Vergoeding/km",
+                "Vergoeding totaal"
+            ];
 
             foreach ($monthsBetweenDates as $month) {
                 $monthTotalSingle = $monthTotalDouble = $monthTotalPrice = 0;
 
-                $monthColumn = $startColumn;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}:E{$userRow}", $month, true);
-                $userRow++;
+                $table["data"][$row][] = ["text" => $month, "bold" => true];
+                $row++;
 
                 foreach ($events[$month] as $event) {
-                    $eventColumn = $startColumn;
-                    $excel->setCellValue($index, "{$eventColumn}{$userRow}", Clock::at($event->date)->format("d/m/Y"));
-                    $eventColumn++;
-                    $excel->setCellValue($index, "{$eventColumn}{$userRow}", number_format($event->distance, 2, ",", ".") . " km");
-                    $eventColumn++;
-                    $excel->setCellValue($index, "{$eventColumn}{$userRow}", number_format($event->distance * 2, 2, ",", ".") . " km");
-                    $eventColumn++;
-                    $excel->setCellValue($index, "{$eventColumn}{$userRow}", "€ " . number_format($event->pricePerKm, 2, ",", "."));
-                    $eventColumn++;
-                    $excel->setCellValue($index, "{$eventColumn}{$userRow}", "€ " . number_format($event->pricePerKm * ($event->distance * 2), 2, ",", "."));
-
-                    $userRow++;
+                    $table["data"][$row] = [
+                        Clock::at($event->date)->format("d/m/Y"),
+                        number_format($event->distance, 2, ",", ".") . " km",
+                        number_format($event->distance * 2, 2, ",", ".") . " km",
+                        "€ " . number_format($event->pricePerKm, 2, ",", "."),
+                        "€ " . number_format($event->pricePerKm * ($event->distance * 2), 2, ",", ".")
+                    ];
 
                     $monthTotalSingle += $event->distance;
                     $monthTotalDouble += $event->distance * 2;
                     $monthTotalPrice += $event->pricePerKm * ($event->distance * 2);
+                    $row++;
                 }
 
-                $monthColumn = $startColumn;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}", count($events[$month] ?? []) . " rit(ten)", border: 't', borderStyle: Border::BORDER_DOUBLE);
-                $monthColumn++;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}", number_format($monthTotalSingle, 2, ",", ".") . " km", border: 't', borderStyle: Border::BORDER_DOUBLE);
-                $monthColumn++;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}", number_format($monthTotalDouble, 2, ",", ".") . " km", border: 't', borderStyle: Border::BORDER_DOUBLE);
-                $monthColumn++;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}", "", border: 't', borderStyle: Border::BORDER_DOUBLE);
-                $monthColumn++;
-                $excel->setCellValue($index, "{$monthColumn}{$userRow}", "€ " . number_format($monthTotalPrice, 2, ",", "."), border: 't', borderStyle: Border::BORDER_DOUBLE);
+                $table["data"][$row] = [
+                    [
+                        "text" => count($events[$month] ?? []) . " rit(ten)",
+                        "border" => "t",
+                        "borderStyle" => Border::BORDER_DOUBLE
+                    ],
+                    [
+                        "text" => number_format($monthTotalSingle, 2, ",", ".") . " km",
+                        "border" => "t",
+                        "borderStyle" => Border::BORDER_DOUBLE
+                    ],
+                    [
+                        "text" => number_format($monthTotalDouble, 2, ",", ".") . " km",
+                        "border" => "t",
+                        "borderStyle" => Border::BORDER_DOUBLE
+                    ],
+                    [
+                        "text" => "",
+                        "border" => "t",
+                        "borderStyle" => Border::BORDER_DOUBLE
+                    ],
+                    [
+                        "text" => "€ " . number_format($monthTotalPrice, 2, ",", "."),
+                        "border" => "t",
+                        "borderStyle" => Border::BORDER_DOUBLE
+                    ]
+                ];
 
-                $userRow++;
-                $userRow++;
+                $row++;
+                $table["data"][$row] = [];
 
                 $userTotalSingle += $monthTotalSingle;
                 $userTotalDouble += $monthTotalDouble;
                 $userTotalPrice += $monthTotalPrice;
+                $row++;
             }
 
-            $userColumn = $startColumn;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "Totaal", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", number_format($userTotalSingle, 2, ",", ".") . " km", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", number_format($userTotalDouble, 2, ",", ".") . " km", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "", true);
-            $userColumn++;
-            $excel->setCellValue($index, "{$userColumn}{$userRow}", "€ " . number_format($userTotalPrice, 2, ",", "."), true);
+            $table["data"][$row] = [
+                [
+                    "text" => "Totaal",
+                    "bold" => true
+                ],
+                [
+                    "text" => number_format($userTotalSingle, 2, ",", ".") . " km",
+                    "bold" => true
+                ],
+                [
+                    "text" => number_format($userTotalDouble, 2, ",", ".") . " km",
+                    "bold" => true
+                ],
+                [
+                    "text" => "",
+                    "bold" => true
+                ],
+                [
+                    "text" => "€ " . number_format($userTotalPrice, 2, ",", "."),
+                    "bold" => true
+                ],
+            ];
+
+            $excel->table($index, $startColumn, $startRow, $table);
         }
 
         $excel->save();
@@ -657,7 +643,7 @@ class BikeController extends ApiController
 
     protected function exportPerTeacherAsPdf($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
         $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));

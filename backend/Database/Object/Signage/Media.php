@@ -8,16 +8,16 @@ use Security\FileSystem;
 class Media extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "type" => "string",
-        "alias" => "string",
-        "link" => "string",
-        "size" => "double",
-        "length" => "string",
-        "duration" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "alias" => self::TYPE_STRING,
+        "link" => self::TYPE_STRING,
+        "size" => self::TYPE_DOUBLE,
+        "length" => self::TYPE_STRING,
+        "duration" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

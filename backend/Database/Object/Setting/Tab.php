@@ -8,12 +8,12 @@ use Helpers\HTML;
 class Tab extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "string",
-        "name" => "string",
-        "icon" => "string",
-        "order" => "int",
-        "default" => "boolean",
-        "deleted" => "boolean"
+        "id" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "icon" => self::TYPE_STRING,
+        "order" => self::TYPE_INTEGER,
+        "default" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

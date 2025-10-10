@@ -8,20 +8,20 @@ use Database\Interface\CustomObject;
 class StudentRelation extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatStudentId" => "int",
-        "informatId" => "int",
-        "informatGuid" => "string",
-        "type" => "string",
-        "name" => "string",
-        "firstName" => "string",
-        "insz" => "string",
-        "birthDate" => "date",
-        "sex" => "string",
-        "nationalityId" => "int",
-        "job" => "string",
-        "civilStatus" => "string",
-        "rank" => "int"
+        "id" => self::TYPE_INTEGER,
+        "informatStudentId" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "firstName" => self::TYPE_STRING,
+        "insz" => self::TYPE_STRING,
+        "birthDate" => self::TYPE_DATE,
+        "sex" => self::TYPE_STRING,
+        "nationalityId" => self::TYPE_INTEGER,
+        "job" => self::TYPE_STRING,
+        "civilStatus" => self::TYPE_STRING,
+        "rank" => self::TYPE_INTEGER
     ];
 
     public function init()

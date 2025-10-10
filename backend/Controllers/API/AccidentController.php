@@ -9,8 +9,6 @@ use Security\GUID;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
-use Helpers\General;
-use Security\Session;
 use Security\FileSystem;
 use CloudMersive\Convert;
 use Ouzo\Utilities\Clock;
@@ -26,7 +24,6 @@ use Database\Repository\Accident\Document;
 use Database\Repository\Accident\Location;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\TableDef;
 use Database\Repository\Navigation\Navigation;
 use Database\Object\Accident\Accident as ObjectAccident;
 use Database\Object\Accident\Document as AccidentDocument;
@@ -44,10 +41,7 @@ class AccidentController extends ApiController
                 'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "mine");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id), false);
+            [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -66,10 +60,7 @@ class AccidentController extends ApiController
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
             ];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "declarations");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -86,10 +77,7 @@ class AccidentController extends ApiController
         if (Strings::equal($view, self::VIEW_TABLE)) {
             $filters = [];
 
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "accident")->id, "documents");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -165,8 +153,6 @@ class AccidentController extends ApiController
     protected function post($view, $id = null)
     {
         if ($id == "add") $id = null;
-        $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "accident");
         $repo = new Accident;
 
         $_fields = [
@@ -245,18 +231,11 @@ class AccidentController extends ApiController
         if ($this->validationIsAllGood()) {
             $accident = $repo->getById($id) ?? (new ObjectAccident);
             $accident->fillWithPostData();
-            if (!$accident->number) $accident->number = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber")->value + 1;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
             $accident->datetime = Clock::at($fields["datetime"])->format("Y-m-d H:i:s");
             $accident->witnessId = (!is_null($fields["witnessId"]) ? $fields["witnessId"] : (User::getLoggedInUser()->informatEmployeeId ? ((new Employee)->getByInformatId(User::getLoggedInUser()->informatEmployeeId))->id : null));
 
             $repo->set($accident);
-
-            if (!$id) {
-                $settingItem = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber");
-                $settingItem->value++;
-                $settingsRepo->set($settingItem);
-            }
 
             $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
@@ -308,7 +287,7 @@ class AccidentController extends ApiController
             $arepo = new Accident;
 
             $settingsRepo = new Setting;
-            $navigation = (new Navigation)->getByParentIdAndLink(0, "accident");
+            $navigation = (new Navigation)->getByLink("accident");
             $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
             $filename = "Ongevallen - Aangiftes.zip";
             $templateFile = (new Document)->getById($settingsRepo->getByNavigationIdAndKey($navigation->id, "default.document")->value);

@@ -49,7 +49,7 @@ abstract class Local
         $schoolRepo = new School;
 
         $settingRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $navigation = (new Navigation)->getByLink("sync");
         $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
         $_mainSchool = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.mainSchool")->value;
         $_format = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;

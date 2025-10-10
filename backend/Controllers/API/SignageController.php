@@ -12,16 +12,11 @@ use Security\FileSystem;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Library\Book;
 use Database\Repository\Signage\Group;
 use Database\Repository\Signage\Media;
-use Database\Repository\Library\Author;
 use Database\Repository\Signage\Screen;
-use ClanCats\Hydrahon\Query\Sql\Replace;
 use Database\Repository\Signage\Playlist;
-use Database\Repository\Navigation\TableDef;
 use Database\Repository\Signage\PlaylistItem;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Signage\Group as SignageGroup;
 use Database\Object\Signage\Media as SignageMedia;
 use Database\Object\Signage\Screen as SignageScreen;
@@ -54,10 +49,7 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "playlist");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -108,10 +100,7 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "screen");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -131,10 +120,7 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "group");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -154,10 +140,7 @@ class SignageController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "signage")->id, "media");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 

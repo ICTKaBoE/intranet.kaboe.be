@@ -8,12 +8,12 @@ use Database\Interface\CustomObject;
 class SupervisionEvent extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "userId" => "int",
-        "schoolId" => "int",
-        "start" => "datetime",
-        "end" => "datetime",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "userId" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "start" => self::TYPE_DATETIME,
+        "end" => self::TYPE_DATETIME,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

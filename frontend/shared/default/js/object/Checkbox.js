@@ -77,11 +77,15 @@ export default class Checkbox {
 	};
 
 	enable = () => {
-		this.element.removeAttribute("disabled");
+		$.each(this.inputs, function (i, el) {
+			el.removeAttribute("disabled");
+		});
 	};
 
 	disable = () => {
-		this.element.setAttribute("disabled", null);
+		$.each(this.inputs, function (i, el) {
+			el.setAttribute("disabled", null);
+		});
 	};
 
 	setValue = (value) => {

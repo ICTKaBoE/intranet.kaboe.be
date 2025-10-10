@@ -9,11 +9,11 @@ use Helpers\HTML;
 class Document extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "alias" => "string",
-        "name" => "string",
-        "ext" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "alias" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "ext" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 }

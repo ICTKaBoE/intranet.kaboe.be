@@ -8,13 +8,13 @@ use Helpers\CString;
 class Room extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "buildingId" => "int",
-        "floor" => "int",
-        "number" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "buildingId" => self::TYPE_INTEGER,
+        "floor" => self::TYPE_INTEGER,
+        "number" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

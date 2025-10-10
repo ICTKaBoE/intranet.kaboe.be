@@ -5,6 +5,7 @@ namespace Security;
 use DirectoryIterator;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Path;
+use Ouzo\Utilities\Strings;
 use Router\Helpers;
 
 abstract class FileSystem
@@ -20,7 +21,7 @@ abstract class FileSystem
 	static public function PathExists($path)
 	{
 		$path = Path::normalize($path);
-		return file_exists($path);
+		return count(glob($path)) > 0;
 	}
 
 	static public function GetDownloadLink($path)
@@ -49,6 +50,11 @@ abstract class FileSystem
 		return unlink($path);
 	}
 
+	static public function RemoveDirectory($path)
+	{
+		return rmdir($path);
+	}
+
 	static public function unifyPath($path)
 	{
 		$path = str_replace(LOCATION_ROOT, "", $path);
@@ -58,7 +64,7 @@ abstract class FileSystem
 	static public function getFiles($path)
 	{
 		if (!self::PathExists($path)) return false;
-		return array_values(array_diff(scandir(Path::normalize($path)), [".", ".."]));
+		return glob(Path::normalize($path));
 	}
 
 	static public function getLatestFile($path)
@@ -81,5 +87,13 @@ abstract class FileSystem
 		}
 
 		return rtrim($path, "/") . "/{$filePath}";
+	}
+
+	static public function GetContent($path)
+	{
+		if (!self::PathExists($path)) return false;
+		$path = Path::normalize($path);
+
+		return file_get_contents($path);
 	}
 }

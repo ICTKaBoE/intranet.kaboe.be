@@ -8,19 +8,19 @@ use Helpers\HTML;
 class School extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "virtual" => "boolean",
-        "parentSchoolId" => "int",
-        "name" => "string",
-        "color" => "string",
-        "intuneOrderIdPrefix" => "string",
-        "jamfIpadPrefix" => "string",
-        "adJobTitlePrefix" => "string",
-        "adOuPart" => "string",
-        "adSecGroupPart" => "string",
-        "syncUpdateMail" => "list",
-        "dynamicTeam" => "boolean",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "virtual" => self::TYPE_BOOLEAN,
+        "parentSchoolId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING,
+        "intuneOrderIdPrefix" => self::TYPE_STRING,
+        "jamfIpadPrefix" => self::TYPE_STRING,
+        "adJobTitlePrefix" => self::TYPE_STRING,
+        "adOuPart" => self::TYPE_STRING,
+        "adSecGroupPart" => self::TYPE_STRING,
+        "syncUpdateMail" => self::TYPE_LIST,
+        "dynamicTeam" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

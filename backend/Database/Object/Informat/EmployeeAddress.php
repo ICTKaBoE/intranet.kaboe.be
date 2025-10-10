@@ -8,16 +8,16 @@ use Helpers\CString;
 class EmployeeAddress extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatEmployeeId" => "int",
-        "informatGuid" => "string",
-        "street" => "string",
-        "number" => "int",
-        "bus" => "string",
-        "zipcode" => "string",
-        "city" => "string",
-        "countryId" => "int",
-        "current" => "bool"
+        "id" => self::TYPE_INTEGER,
+        "informatEmployeeId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "street" => self::TYPE_STRING,
+        "number" => self::TYPE_INTEGER,
+        "bus" => self::TYPE_STRING,
+        "zipcode" => self::TYPE_STRING,
+        "city" => self::TYPE_STRING,
+        "countryId" => self::TYPE_INTEGER,
+        "current" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -14,16 +14,16 @@ use Database\Repository\Navigation\Navigation;
 class TempReg extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "schoolId" => "int",
-        "datetime" => "datetime",
-        "name" => "string",
-        "soup" => "double",
-        "pasta" => "double",
-        "vegetables" => "double",
-        "meat" => "double",
-        "notes" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "datetime" => self::TYPE_DATETIME,
+        "name" => self::TYPE_STRING,
+        "soup" => self::TYPE_DOUBLE,
+        "pasta" => self::TYPE_DOUBLE,
+        "vegetables" => self::TYPE_DOUBLE,
+        "meat" => self::TYPE_DOUBLE,
+        "notes" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

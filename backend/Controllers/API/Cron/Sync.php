@@ -56,7 +56,7 @@ abstract class Sync
         $m365UserRepo = new RepositoryUser;
         $informatEmployeeRepo = new Employee;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
         $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
         $_firstName = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
         $_photo = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.employee")->value, 'bool');
@@ -320,7 +320,7 @@ abstract class Sync
         $informatRegistrationClassRepo = new RegistrationClass;
         $informatClassgroupRepo = new ClassGroup;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
         $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
         $_minDepartmentCodes = Arrays::map($_minDepartmentCodes, fn($m) => Strings::trimToNull($m));
         $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
@@ -534,7 +534,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
         $_mainSchool = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.mainSchool")->value;
         $_mailType = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.mailType")->value;
 
@@ -577,7 +577,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
         $_mailType = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.mailType")->value;
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
@@ -614,7 +614,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
 
@@ -672,7 +672,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
 
@@ -715,7 +715,7 @@ abstract class Sync
         $informatClassgroupRepo = new ClassGroup;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByParentIdAndLink(0, 'sync');
+        $navigation = (new Navigation)->getByLink('sync');
 
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;

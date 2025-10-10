@@ -10,11 +10,11 @@ use stdClass;
 class ComputerUsageOnOff extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "computerId" => "int",
-        "startup" => "datetime",
-        "shutdown" => "datetime",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "computerId" => self::TYPE_INTEGER,
+        "startup" => self::TYPE_DATETIME,
+        "shutdown" => self::TYPE_DATETIME,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

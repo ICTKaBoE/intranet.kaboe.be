@@ -76,7 +76,7 @@ class OrderController extends ApiController
         }
     }
 
-    protected function getOrder($view, $id = null)
+    protected function getAll($view, $id = null)
     {
         $repo = new Order;
         $filters = [
@@ -85,10 +85,7 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "order");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -100,7 +97,7 @@ class OrderController extends ApiController
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
-    protected function getOrderLine($view, $id = null)
+    protected function getAllLine($view, $id = null)
     {
         $pRepo = new Order;
         $orderIds = Arrays::filter(explode(";", Helpers::url()->getParam("orderId")), fn($i) => Strings::isNotBlank($i));
@@ -161,10 +158,7 @@ class OrderController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "accept");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -233,10 +227,7 @@ class OrderController extends ApiController
         $filters = [];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "order")->id, "supplier");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -281,15 +272,12 @@ class OrderController extends ApiController
     // Post functions
     protected function postAccept($view, $id = null)
     {
-        $this->postOrder($view, $id);
+        $this->postAll($view, $id);
     }
 
-    protected function postOrder($view, $id = null)
+    protected function postAll($view, $id = null)
     {
         if ($id == "add") $id = null;
-
-        $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "helpdesk");
 
         $repo = new Order;
 
@@ -310,7 +298,6 @@ class OrderController extends ApiController
 
             $item = $repo->getById($id) ?? new OrderOrder;
             $item->fillWithPostData();
-            if (!$item->number) $item->number = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber")->value + 1;
             if (!$id) $item->creatorUserId = User::getLoggedInUser()->id;
             $item->quoteLink = $fields["quoteLink"] ?? $item->quoteLink;
 
@@ -328,13 +315,6 @@ class OrderController extends ApiController
                 }
             }
 
-            // Update settings
-            if (!$id) {
-                $settingItem = $settingsRepo->getByNavigationIdAndKey($navigation->id, "lastNumber");
-                $settingItem->value++;
-                $settingsRepo->set($settingItem);
-            }
-
             // Mail
             if (Strings::equal($item->status, "QR")) $this->mailQuote($item->id);
             else if (Strings::equal($item->status, "WA")) $this->mailAccept($item->id);
@@ -346,7 +326,7 @@ class OrderController extends ApiController
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
-    protected function postOrderLine($view, $id = null)
+    protected function postAllLine($view, $id = null)
     {
 
         $_fields = [
@@ -541,7 +521,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
+        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -608,7 +588,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
+        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -674,7 +654,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
+        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
@@ -710,7 +690,7 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "order");
+        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;

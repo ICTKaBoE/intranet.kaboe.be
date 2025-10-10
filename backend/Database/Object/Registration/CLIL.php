@@ -7,14 +7,14 @@ use Database\Interface\CustomObject;
 class CLIL extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "schoolyearId" => "int",
-        "studyyearId" => "int",
-        "fieldId" => "int",
-        "name" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "schoolyearId" => self::TYPE_INTEGER,
+        "studyyearId" => self::TYPE_INTEGER,
+        "fieldId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

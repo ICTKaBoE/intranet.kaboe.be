@@ -5,8 +5,6 @@ namespace Controllers\COMPONENT;
 use Router\Helpers;
 use Controllers\ComponentController;
 use Database\Repository\Navigation\Navigation;
-use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
 
 class PageTitleComponentController extends ComponentController
 {
@@ -22,7 +20,7 @@ class PageTitleComponentController extends ComponentController
 		$page = Helpers::getPage();
 
 		$navigationRepo = new Navigation;
-		$moduleNavigation = $navigationRepo->getByParentIdAndLink(0, $module);
+		$moduleNavigation = $navigationRepo->getByLink($module);
 		$pageNavigation = is_null($page) ? null : $navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page);
 
 		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);

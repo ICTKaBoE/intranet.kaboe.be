@@ -7,13 +7,13 @@ use Database\Interface\CustomObject;
 class Playlist extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "name" => "string",
-        "assignedTo" => "string",
-        "assignedToId" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "assignedTo" => self::TYPE_STRING,
+        "assignedToId" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -11,12 +11,12 @@ use Ouzo\Utilities\Clock;
 class Schoolyear extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "name" => "string",
-        "visibleFrom" => "date",
-        "visibleUntil" => "date",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "name" => self::TYPE_STRING,
+        "visibleFrom" => self::TYPE_DATE,
+        "visibleUntil" => self::TYPE_DATE,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

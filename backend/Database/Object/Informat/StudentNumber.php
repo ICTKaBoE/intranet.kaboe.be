@@ -8,12 +8,12 @@ use Database\Interface\CustomObject;
 class StudentNumber extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatStudentId" => "int",
-        "informatId" => "int",
-        "number" => "string",
-        "type" => "string",
-        "category" => "string"
+        "id" => self::TYPE_INTEGER,
+        "informatStudentId" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "number" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
+        "category" => self::TYPE_STRING
     ];
 
     public function init()

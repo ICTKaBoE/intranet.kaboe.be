@@ -17,15 +17,15 @@ class Setting extends CustomObject
     ];
 
     protected $objectAttributes = [
-        "id" => "string",
-        "settingTabId" => "int",
-        "name" => "string",
-        "type" => "string",
-        "options" => "list",
-        "value" => "string",
-        "readonly" => "boolean",
-        "order" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_STRING,
+        "settingTabId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
+        "options" => self::TYPE_LIST,
+        "value" => self::TYPE_STRING,
+        "readonly" => self::TYPE_BOOLEAN,
+        "order" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

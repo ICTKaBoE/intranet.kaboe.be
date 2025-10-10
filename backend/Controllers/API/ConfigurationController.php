@@ -3,22 +3,23 @@
 namespace Controllers\API;
 
 use Helpers\Form;
-use Helpers\HTML;
 use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
+use Database\Repository\User\User;
 use Database\Repository\Setting\Tab;
 use Database\Repository\School\School;
 use Database\Repository\Security\Group;
 use Database\Repository\General\Message;
 use Database\Repository\Setting\Setting;
+use Database\Repository\User\LoginHistory;
 use Database\Repository\Security\GroupUser;
-use Database\Repository\Navigation\TableDef;
+use Database\Repository\General\MessageType;
 use Database\Repository\Navigation\Navigation;
 use Database\Object\Route\Group as ObjectSchool;
 use Database\Repository\Security\GroupNavigation;
@@ -26,7 +27,6 @@ use Database\Object\General\Message as GeneralMessage;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
-use Database\Repository\General\MessageType;
 
 class ConfigurationController extends ApiController
 {
@@ -79,10 +79,7 @@ class ConfigurationController extends ApiController
         $repo = new School;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "schools");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -94,15 +91,37 @@ class ConfigurationController extends ApiController
         }
     }
 
+    protected function getUsers($view, $id = null)
+    {
+        $repo = new User;
+        $loginRepo = new LoginHistory;
+
+        $filters = [
+            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
+        ];
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            [$defaultOrder, $columns] = Table::Format(checkbox: false);
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get(filters: $filters);
+            Arrays::each($items, function ($i) use ($loginRepo) {
+                $lastLogin = $loginRepo->getByUserId($i->id);
+                $lastLogin = Arrays::firstOrNull($lastLogin);
+
+                $i->formatted->lastLogin = $lastLogin ? Clock::at($lastLogin->timestamp)->plusHours(1)->format("d/m/Y H:i:s") . " (" . (Strings::equal($lastLogin->source, "local") ? "Lokaal" : "Office 365") . ")" : null;
+            });
+            $this->appendToJson("rows", $items);
+        }
+    }
+
     protected function getGroups($view, $id = null)
     {
         $repo = new Group;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "groups");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -136,10 +155,7 @@ class ConfigurationController extends ApiController
         $repo = new Message;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "configuration")->id, "messages");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 

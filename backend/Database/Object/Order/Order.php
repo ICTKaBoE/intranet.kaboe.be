@@ -16,17 +16,16 @@ use Database\Repository\Navigation\Setting;
 class Order extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "number" => "int",
-        "schoolId" => "int",
-        "creatorUserId" => "int",
-        "acceptorUserId" => "string",
-        "supplierId" => "int",
-        "quoteLink" => "string",
-        "quoteFile" => "string",
-        "status" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "creatorUserId" => self::TYPE_INTEGER,
+        "acceptorUserId" => self::TYPE_STRING,
+        "supplierId" => self::TYPE_INTEGER,
+        "quoteLink" => self::TYPE_STRING,
+        "quoteFile" => self::TYPE_STRING,
+        "status" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [
@@ -58,7 +57,7 @@ class Order extends CustomObject
             $count = substr_count($this->formatted->number, "#");
             $hashes = "";
             for ($i = 0; $i < $count; $i++) $hashes .= "#";
-            $this->formatted->number = str_replace($hashes, str_pad($this->number, $count, 0, STR_PAD_LEFT), $this->formatted->number);
+            $this->formatted->number = str_replace($hashes, str_pad($this->id, $count, 0, STR_PAD_LEFT), $this->formatted->number);
         }
 
         if (Strings::contains($this->formatted->number, "Y")) {

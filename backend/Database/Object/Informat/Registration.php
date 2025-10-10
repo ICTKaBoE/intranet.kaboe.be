@@ -8,19 +8,19 @@ use Database\Interface\CustomObject;
 class Registration extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatId" => "int",
-        "informatGuid" => "string",
-        "informatStudentId" => "int",
-        "schoolInstituteId" => "int",
-        "basenumber" => "string",
-        "departmentCode" => "string",
-        "grade" => "int",
-        "year" => "int",
-        "start" => "date",
-        "end" => "date",
-        "status" => "int",
-        "current" => "bool"
+        "id" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "informatStudentId" => self::TYPE_INTEGER,
+        "schoolInstituteId" => self::TYPE_INTEGER,
+        "basenumber" => self::TYPE_STRING,
+        "departmentCode" => self::TYPE_STRING,
+        "grade" => self::TYPE_INTEGER,
+        "year" => self::TYPE_INTEGER,
+        "start" => self::TYPE_DATE,
+        "end" => self::TYPE_DATE,
+        "status" => self::TYPE_INTEGER,
+        "current" => self::TYPE_BOOLEAN
     ];
 
     public function init()

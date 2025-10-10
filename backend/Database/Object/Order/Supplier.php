@@ -7,13 +7,13 @@ use Database\Interface\CustomObject;
 class Supplier extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "name" => "string",
-        "contactName" => "string",
-        "email" => "string",
-        "phone" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "name" => self::TYPE_STRING,
+        "contactName" => self::TYPE_STRING,
+        "email" => self::TYPE_STRING,
+        "phone" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

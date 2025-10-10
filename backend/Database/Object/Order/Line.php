@@ -11,16 +11,16 @@ use Database\Repository\Navigation\Navigation;
 class Line extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "orderId" => "int",
-        "amount" => "int",
-        "category" => "string",
-        "assetId" => "int",
-        "clarifycation" => "string",
-        "quotePrice" => "double",
-        "quoteVatIncluded" => "boolean",
-        "warrenty" => "boolean",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "orderId" => self::TYPE_INTEGER,
+        "amount" => self::TYPE_INTEGER,
+        "category" => self::TYPE_STRING,
+        "assetId" => self::TYPE_INTEGER,
+        "clarifycation" => self::TYPE_STRING,
+        "quotePrice" => self::TYPE_DOUBLE,
+        "quoteVatIncluded" => self::TYPE_BOOLEAN,
+        "warrenty" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -13,14 +13,14 @@ use Database\Repository\General\MessageType;
 class Message extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "navigationId" => "int",
-        "from" => "datetime",
-        "until" => "datetime",
-        "content" => "string",
-        "type" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "navigationId" => self::TYPE_INTEGER,
+        "from" => self::TYPE_DATETIME,
+        "until" => self::TYPE_DATETIME,
+        "content" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

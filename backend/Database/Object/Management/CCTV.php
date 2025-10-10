@@ -8,17 +8,17 @@ use Helpers\CString;
 class CCTV extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "buildingId" => "int",
-        "name" => "string",
-        "serialnumber" => "string",
-        "macaddress" => "string",
-        "manufacturer" => "string",
-        "model" => "string",
-        "ip" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "buildingId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "serialnumber" => self::TYPE_STRING,
+        "macaddress" => self::TYPE_STRING,
+        "manufacturer" => self::TYPE_STRING,
+        "model" => self::TYPE_STRING,
+        "ip" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

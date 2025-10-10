@@ -9,20 +9,20 @@ use Helpers\HTML;
 class Document extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "type" => "string",
-        "order" => "int",
-        "schoolyearId" => "int",
-        "schoolId" => "int",
-        "studyyearId" => "int",
-        "fieldId" => "int",
-        "alias" => "string",
-        "name" => "string",
-        "ext" => "string",
-        "copies" => "int",
-        "dependOn" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "type" => self::TYPE_STRING,
+        "order" => self::TYPE_INTEGER,
+        "schoolyearId" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "studyyearId" => self::TYPE_INTEGER,
+        "fieldId" => self::TYPE_INTEGER,
+        "alias" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "ext" => self::TYPE_STRING,
+        "copies" => self::TYPE_INTEGER,
+        "dependOn" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

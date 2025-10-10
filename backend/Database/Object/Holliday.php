@@ -11,13 +11,13 @@ use stdClass;
 class Holliday extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "schoolId" => "int",
-        "name" => "string",
-        "start" => "datetime",
-        "end" => "datetime",
-        "fullDay" => "bool",
-        "deleted" => "bool"
+        "id" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "start" => self::TYPE_DATETIME,
+        "end" => self::TYPE_DATETIME,
+        "fullDay" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

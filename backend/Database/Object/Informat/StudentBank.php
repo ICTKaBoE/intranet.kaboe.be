@@ -17,11 +17,11 @@ class StudentBank extends CustomObject
     ];
 
     protected $objectAttributes = [
-        "id" => "int",
-        "informatStudentId" => "int",
-        "type" => "string",
-        "iban" => "string",
-        "bic" => "string"
+        "id" => self::TYPE_INTEGER,
+        "informatStudentId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "iban" => self::TYPE_STRING,
+        "bic" => self::TYPE_STRING
     ];
 
     public function init()

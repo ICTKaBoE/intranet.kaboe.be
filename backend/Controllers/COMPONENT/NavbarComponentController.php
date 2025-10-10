@@ -5,8 +5,6 @@ namespace Controllers\COMPONENT;
 use Controllers\ComponentController;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
-use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
 use Router\Helpers;
 use Security\User;
 
@@ -54,7 +52,7 @@ class NavbarComponentController extends ComponentController
 		$navigationRepo = new Navigation;
 		$domain = Helpers::url()->getHost();
 		$routeGroup = (new Group)->getByDomain($domain);
-		$moduleItem = Arrays::firstOrNull($navigationRepo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
+		$moduleItem = $navigationRepo->getByLink(Helpers::getModule());
 
 		if ($moduleItem->order >= 0 && User::canAccess($moduleItem->id) && $moduleItem->formatted->active) {
 			$topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $moduleItem->id);

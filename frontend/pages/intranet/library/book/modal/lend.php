@@ -11,7 +11,6 @@
                     <div class="col">
                         <label class="form-label" for="lenderType">Type persoon</label>
                         <select name="lenderType" id="lenderType" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-load-value="id" data-load-label="name" data-on-change="setLender" required></select>
-
                     </div>
                 </div>
 

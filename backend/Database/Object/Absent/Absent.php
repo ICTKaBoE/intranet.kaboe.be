@@ -13,24 +13,24 @@ use Ouzo\Utilities\Strings;
 class Absent extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "creatorUserId" => "int",
-        "creationDateTime" => "datetime",
-        "schoolId" => "int",
-        "absentUserId" => "int",
-        "substituteBy" => "string",
-        "substituteByOther" => "string",
-        "volume" => "string",
-        "start" => "date",
-        "end" => "date",
-        "paymentOfSubstitute" => "string",
-        "paymentOfSubstituteOther" => "string",
-        "absentNoteReceived" => "string",
-        "notes" => "string",
-        "finished" => "boolean",
-        "finishedByUserId" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "creatorUserId" => self::TYPE_INTEGER,
+        "creationDateTime" => self::TYPE_DATETIME,
+        "schoolId" => self::TYPE_INTEGER,
+        "absentUserId" => self::TYPE_INTEGER,
+        "substituteBy" => self::TYPE_STRING,
+        "substituteByOther" => self::TYPE_STRING,
+        "volume" => self::TYPE_STRING,
+        "start" => self::TYPE_DATE,
+        "end" => self::TYPE_DATE,
+        "paymentOfSubstitute" => self::TYPE_STRING,
+        "paymentOfSubstituteOther" => self::TYPE_STRING,
+        "absentNoteReceived" => self::TYPE_STRING,
+        "notes" => self::TYPE_STRING,
+        "finished" => self::TYPE_BOOLEAN,
+        "finishedByUserId" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

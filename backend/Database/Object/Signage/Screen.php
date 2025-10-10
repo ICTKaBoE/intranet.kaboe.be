@@ -7,13 +7,13 @@ use Database\Interface\CustomObject;
 class Screen extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "code" => "string",
-        "name" => "string",
-        "groupId" => "int",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "code" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "groupId" => self::TYPE_INTEGER,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

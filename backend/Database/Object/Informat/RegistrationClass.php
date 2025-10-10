@@ -8,14 +8,14 @@ use Ouzo\Utilities\Clock;
 class RegistrationClass extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatGuid" => "string",
-        "informatRegistrationId" => "int",
-        "informatClassGroupId" => "int",
-        "rank" => "int",
-        "start" => "date",
-        "end" => "date",
-        "current" => "bool"
+        "id" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "informatRegistrationId" => self::TYPE_INTEGER,
+        "informatClassGroupId" => self::TYPE_INTEGER,
+        "rank" => self::TYPE_INTEGER,
+        "start" => self::TYPE_DATE,
+        "end" => self::TYPE_DATE,
+        "current" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

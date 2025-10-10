@@ -7,17 +7,17 @@ use Database\Interface\CustomObject;
 class Book extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "authorId" => "int",
-        "categoryId" => "int",
-        "amount" => "int",
-        "free" => "int",
-        "title" => "string",
-        "isdn" => "string",
-        "lendTo" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "authorId" => self::TYPE_INTEGER,
+        "categoryId" => self::TYPE_INTEGER,
+        "amount" => self::TYPE_INTEGER,
+        "free" => self::TYPE_INTEGER,
+        "title" => self::TYPE_STRING,
+        "isdn" => self::TYPE_STRING,
+        "lendTo" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

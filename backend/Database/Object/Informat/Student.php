@@ -11,15 +11,15 @@ use Ouzo\Utilities\Clock;
 class Student extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatId" => "int",
-        "informatGuid" => "string",
-        "name" => "string",
-        "firstName" => "string",
-        "sex" => "string",
-        "birthDate" => "date",
-        "birthPlace" => "string",
-        "isdn" => "string",
+        "id" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "informatGuid" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "firstName" => self::TYPE_STRING,
+        "sex" => self::TYPE_STRING,
+        "birthDate" => self::TYPE_DATE,
+        "birthPlace" => self::TYPE_STRING,
+        "isdn" => self::TYPE_STRING,
     ];
 
     // protected $decodeAttributes = [

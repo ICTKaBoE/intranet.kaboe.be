@@ -9,21 +9,21 @@ use Security\Input;
 class User extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "entraId" => "string",
-        "entraCompany" => "string",
-        "informatEmployeeId" => "string",
-        "mainSchoolId" => "int",
-        "username" => "string",
-        "password" => "string",
-        "name" => "string",
-        "firstName" => "string",
-        "bankAccount" => "string",
-        "active" => "boolean",
-        "api" => "boolean",
-        "system" => "boolean",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "entraId" => self::TYPE_STRING,
+        "entraCompany" => self::TYPE_STRING,
+        "informatEmployeeId" => self::TYPE_STRING,
+        "mainSchoolId" => self::TYPE_INTEGER,
+        "username" => self::TYPE_STRING,
+        "password" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "firstName" => self::TYPE_STRING,
+        "bankAccount" => self::TYPE_STRING,
+        "active" => self::TYPE_BOOLEAN,
+        "api" => self::TYPE_BOOLEAN,
+        "system" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -4,6 +4,7 @@ use Database\Database;
 use Ouzo\Utilities\Arrays;
 use Router\Helpers;
 use Security\Code;
+use Security\FileSystem;
 
 require_once "./backend/autoload.php";
 Code::noTimeLimit();
@@ -12,7 +13,7 @@ ob_end_flush();
 ob_implicit_flush();
 
 $version = Helpers::url()->getParam("v");
-$file = file_get_contents("./sql/v{$version}.sql");
+$file = FileSystem::GetContent("./sql/v{$version}.sql");
 $file = preg_replace('/^--.+$/m', "", $file);
 $lines = explode(";", $file);
 $lines = Arrays::map($lines, fn($l) => trim($l));
@@ -33,6 +34,10 @@ try {
     }
 
     $db->commit();
+    echo "Committed!<br />";
+    echo "Removing directory...<br />";
+    foreach (FileSystem::getFiles("./sql") as $file) FileSystem::RemoveFile("./sql/{$file}");
+    FileSystem::RemoveDirectory("./sql");
     echo "DONE!";
 } catch (\Exception $e) {
     $db->rollback();

@@ -9,12 +9,12 @@ use Database\Interface\CustomObject;
 class ComputerUsageLogOn extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "computerId" => "int",
-        "username" => "string",
-        "logon" => "datetime",
-        "logoff" => "datetime",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "computerId" => self::TYPE_INTEGER,
+        "username" => self::TYPE_STRING,
+        "logon" => self::TYPE_DATETIME,
+        "logoff" => self::TYPE_DATETIME,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     public function init()

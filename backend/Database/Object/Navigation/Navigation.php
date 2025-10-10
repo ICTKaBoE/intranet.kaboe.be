@@ -13,19 +13,18 @@ use Router\Helpers;
 class Navigation extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "routeGroupId" => "string",
-        "parentId" => "int",
-        "folderId" => "int",
-        "type" => "string",
-        "order" => "int",
-        "default" => "boolean",
-        "link" => "string",
-        "name" => "string",
-        "icon" => "string",
-        "color" => "string",
-        "settings" => "json",
-        "deleted" => "boolean",
+        "id" => self::TYPE_INTEGER,
+        "routeGroupId" => self::TYPE_STRING,
+        "parentId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "order" => self::TYPE_INTEGER,
+        "default" => self::TYPE_BOOLEAN,
+        "link" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "icon" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING,
+        "settings" => self::TYPE_JSON,
+        "deleted" => self::TYPE_BOOLEAN,
     ];
 
     protected $linkedAttributes = [
@@ -38,7 +37,17 @@ class Navigation extends CustomObject
     {
         $default = $this->type == "M" ? (new Setting)->getByNavigationIdAndKey($this->id, "_")->value : null;
 
-        $this->formatted->link = $this->type == "L" ? $this->link : ($this->type == "F" ? "#{$this->link}" : Path::normalize("/" . ($this->linked->parent && $this->linked->parent->type !== "F" ? $this->linked->parent->formatted->link . "/" : "") . $this->link));
+        $this->formatted->link =
+            $this->type == "L" ?
+            $this->link : (
+                $this->type == "F" ?
+                "#{$this->id}" :
+                Path::normalize("/" . (
+                    $this->linked->parent && $this->linked->parent->type !== "F" ?
+                    $this->linked->parent->formatted->link . "/" :
+                    ""
+                ) . $this->link)
+            );
         $this->formatted->linkWithDefault = $this->formatted->link . ($default ? "/{$default}" : "");
 
         $this->formatted->active = Strings::contains(Helpers::getReletiveUrl(), $this->formatted->link);

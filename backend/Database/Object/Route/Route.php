@@ -8,14 +8,14 @@ use Ouzo\Utilities\Path;
 class Route extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "routeGroupId" => "int",
-        "method" => "string",
-        "route" => "string",
-        "controller" => "string",
-        "callback" => "string",
-        "apiNoAuth" => "boolean",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "routeGroupId" => self::TYPE_INTEGER,
+        "method" => self::TYPE_STRING,
+        "route" => self::TYPE_STRING,
+        "controller" => self::TYPE_STRING,
+        "callback" => self::TYPE_STRING,
+        "apiNoAuth" => self::TYPE_BOOLEAN,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

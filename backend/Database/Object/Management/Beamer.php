@@ -8,16 +8,16 @@ use Helpers\CString;
 class Beamer extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "buildingId" => "int",
-        "roomId" => "int",
-        "manufacturer" => "string",
-        "model" => "string",
-        "serialnumber" => "string",
-        "ip" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "buildingId" => self::TYPE_INTEGER,
+        "roomId" => self::TYPE_INTEGER,
+        "manufacturer" => self::TYPE_STRING,
+        "model" => self::TYPE_STRING,
+        "serialnumber" => self::TYPE_STRING,
+        "ip" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

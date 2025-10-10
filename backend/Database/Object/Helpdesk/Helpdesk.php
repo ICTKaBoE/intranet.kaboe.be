@@ -20,21 +20,20 @@ use Helpers\HTML;
 class Helpdesk extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "number" => "int",
-        "creatorUserId" => "int",
-        "assignedToUserId" => "int",
-        "status" => "string",
-        "priority" => "string",
-        "schoolId" => "int",
-        "roomId" => "int",
-        "category" => "string",
-        "subject" => "string",
-        "assetId" => "int",
-        "creationDateTime" => "datetime",
-        "lastActionDateTime" => "datetime",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "creatorUserId" => self::TYPE_INTEGER,
+        "assignedToUserId" => self::TYPE_INTEGER,
+        "status" => self::TYPE_STRING,
+        "priority" => self::TYPE_STRING,
+        "schoolId" => self::TYPE_INTEGER,
+        "roomId" => self::TYPE_INTEGER,
+        "category" => self::TYPE_STRING,
+        "subject" => self::TYPE_STRING,
+        "assetId" => self::TYPE_INTEGER,
+        "creationDateTime" => self::TYPE_DATETIME,
+        "lastActionDateTime" => self::TYPE_DATETIME,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [
@@ -85,13 +84,13 @@ class Helpdesk extends CustomObject
 
     private function createNumber()
     {
-        $this->formatted->number = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, "helpdesk")->id, "format")->value;
+        $this->formatted->number = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("helpdesk")->id, "format")->value;
 
         if (Strings::contains($this->formatted->number, "#")) {
             $count = substr_count($this->formatted->number, "#");
             $hashes = "";
             for ($i = 0; $i < $count; $i++) $hashes .= "#";
-            $this->formatted->number = str_replace($hashes, str_pad($this->number, $count, 0, STR_PAD_LEFT), $this->formatted->number);
+            $this->formatted->number = str_replace($hashes, str_pad($this->id, $count, 0, STR_PAD_LEFT), $this->formatted->number);
         }
 
         if (Strings::contains($this->formatted->number, "Y")) {

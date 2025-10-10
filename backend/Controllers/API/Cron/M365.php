@@ -98,7 +98,7 @@ abstract class M365
         $end = Clock::now();
 
         $repo = new NavigationSetting;
-        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByParentIdAndLink(0, 'management')->id, "computer.lastSyncTime");
+        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByLink('management')->id, "computer.lastSyncTime");
         $item->value = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
         $repo->set($item);
 
@@ -130,7 +130,7 @@ abstract class M365
     static public function SyncClassTeams()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $navigation = (new Navigation)->getByLink("sync");
         $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
         $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
         $_minYear = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.year")->value, 'int');
@@ -213,7 +213,7 @@ abstract class M365
     static public function SyncSchoolTeams()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $navigation = (new Navigation)->getByLink("sync");
         $_rule = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.rule.school")->value;
         $_name = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.name.school")->value;
 
@@ -261,7 +261,7 @@ abstract class M365
     static public function WarnUserPasswordExpiration()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByParentIdAndLink(0, "sync");
+        $navigation = (new Navigation)->getByLink("sync");
         $_days = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.days")->value;
         $_startFrom = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.start")->value;
         $_subject = $settingRepo->getByNavigationIdAndKey($navigation->id, "mail.template.password.subject")->value;

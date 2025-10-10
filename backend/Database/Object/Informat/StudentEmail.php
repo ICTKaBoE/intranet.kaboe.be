@@ -8,11 +8,11 @@ use Helpers\HTML;
 class StudentEmail extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "informatStudentId" => "int",
-        "informatId" => "int",
-        "email" => "string",
-        "type" => "string"
+        "id" => self::TYPE_INTEGER,
+        "informatStudentId" => self::TYPE_INTEGER,
+        "informatId" => self::TYPE_INTEGER,
+        "email" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING
     ];
 
     public function init()

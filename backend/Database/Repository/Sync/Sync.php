@@ -9,7 +9,7 @@ class Sync extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_sync", \Database\Object\Sync\Sync::class, orderField: 'lastSync', orderDirection: 'DESC', deletedField: false, guidField: false);
+        parent::__construct("tbl_sync", \Database\Object\Sync\Sync::class, orderField: 'lastSync', orderDirection: self::ORDER_DIRECTION_DESC, deletedField: false, guidField: false);
     }
 
     public function getByEmployeeId($employeeId)

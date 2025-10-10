@@ -20,9 +20,8 @@ class IndexController extends ApiController
         $domain = str_replace(["https", "http", "://", "/"], "", Strings::equalsIgnoreCase(Helpers::request()->getHost(), Helpers::request()->getReferer()) ? Helpers::request()->getHost() : Helpers::request()->getReferer());
         $routeGroup = (new Group)->getByDomain($domain);
 
-        $folder = Helpers::url()->getParams();
-        $folderId = $navigationRepo->getByParentIdAndLink(0, $folder)?->id ?? 0;
-        $topLevelItems = $navigationRepo->getByRouteGroupIdParentIdAndFolderId($routeGroup->id, 0, $folderId);
+        $folder = Helpers::url()->getParam("folder", 0);
+        $topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $folder);
         $topLevelItems = Arrays::filter($topLevelItems, fn($tli) => $tli->order >= 0);
 
         $items = [];

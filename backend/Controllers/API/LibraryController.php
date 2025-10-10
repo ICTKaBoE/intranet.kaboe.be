@@ -6,8 +6,6 @@ use Helpers\Table;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
-use Helpers\General;
-use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
@@ -17,8 +15,6 @@ use Database\Repository\Library\Type;
 use Database\Repository\Library\Author;
 use Database\Repository\Library\Category;
 use Database\Repository\Library\BookHistory;
-use Database\Repository\Navigation\TableDef;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Library\Book as LibraryBook;
 use Database\Object\Library\Author as LibraryAuthor;
 use Database\Object\Library\Category as LibraryCategory;
@@ -32,10 +28,7 @@ class LibraryController extends ApiController
         $repo = new Author;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "author");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -52,10 +45,7 @@ class LibraryController extends ApiController
         $repo = new Category;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "author");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
@@ -77,10 +67,7 @@ class LibraryController extends ApiController
         ];
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $navRepo = new Navigation;
-            $navItem = $navRepo->getByParentIdAndLink($navRepo->getByParentIdAndLink(0, "library")->id, "book");
-
-            [$defaultOrder, $columns] = Table::Format((new TableDef)->getByNavigationId($navItem->id));
+            [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 

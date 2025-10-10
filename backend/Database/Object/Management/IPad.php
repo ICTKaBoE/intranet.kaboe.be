@@ -12,20 +12,20 @@ use Database\Repository\Navigation\Navigation;
 class IPad extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "schoolId" => "int",
-        "jamfId" => "string",
-        "serialnumber" => "string",
-        "model" => "string",
-        "osPrefix" => "string",
-        "osVersion" => "string",
-        "name" => "string",
-        "batteryLevel" => "int",
-        "totalCapacity" => "double",
-        "availableCapacity" => "double",
-        "lastCheckin" => "datetime",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "schoolId" => self::TYPE_INTEGER,
+        "jamfId" => self::TYPE_STRING,
+        "serialnumber" => self::TYPE_STRING,
+        "model" => self::TYPE_STRING,
+        "osPrefix" => self::TYPE_STRING,
+        "osVersion" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "batteryLevel" => self::TYPE_INTEGER,
+        "totalCapacity" => self::TYPE_DOUBLE,
+        "availableCapacity" => self::TYPE_DOUBLE,
+        "lastCheckin" => self::TYPE_DATETIME,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

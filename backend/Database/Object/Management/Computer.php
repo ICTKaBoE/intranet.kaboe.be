@@ -13,19 +13,19 @@ use Ouzo\Utilities\Clock;
 class Computer extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "guid" => "string",
-        "entraId" => "string",
-        "schoolId" => "int",
-        "type" => "string",
-        "name" => "string",
-        "orderId" => "string",
-        "enrollmentProfileName" => "string",
-        "osType" => "string",
-        "osVersion" => "string",
-        "manufacturer" => "string",
-        "model" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "guid" => self::TYPE_GUID,
+        "entraId" => self::TYPE_STRING,
+        "schoolId" => self::TYPE_INTEGER,
+        "type" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "orderId" => self::TYPE_STRING,
+        "enrollmentProfileName" => self::TYPE_STRING,
+        "osType" => self::TYPE_STRING,
+        "osVersion" => self::TYPE_STRING,
+        "manufacturer" => self::TYPE_STRING,
+        "model" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [

@@ -10,7 +10,15 @@ use stdClass;
 
 class Repository extends stdClass
 {
-    public function __construct($table, $object, $idField = 'id', $orderField = 'order', $orderDirection = 'ASC', $deletedField = 'deleted', $guidField = 'guid')
+    const ORDER_DIRECTION_ASC = "ASC";
+    const ORDER_DIRECTION_DESC = "DESC";
+
+    const DEFAULT_FIELD_ID = "id";
+    const DEFAULT_FIELD_ORDER = "order";
+    const DEFAULT_FIELD_DELETED = "deleted";
+    const DEFAULT_FIELD_GUID = "guid";
+
+    public function __construct($table, $object, $idField = self::DEFAULT_FIELD_ID, $orderField = self::DEFAULT_FIELD_ORDER, $orderDirection = self::ORDER_DIRECTION_ASC, $deletedField = self::DEFAULT_FIELD_DELETED, $guidField = self::DEFAULT_FIELD_GUID)
     {
         $this->db = Database::getInstance();
         $this->table = $table;
@@ -121,6 +129,6 @@ class Repository extends stdClass
 
     public function deleteWhereDeleteTrue()
     {
-        $this->repoTable->delete()->where("deleted", 1)->execute();
+        $this->repoTable->delete()->where($this->deletedField, 1)->execute();
     }
 }

@@ -8,7 +8,7 @@ class TempReg extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_tempreg", \Database\Object\TempReg\TempReg::class, orderField: 'datetime', orderDirection: 'DESC', guidField: false);
+        parent::__construct("tbl_tempreg", \Database\Object\TempReg\TempReg::class, orderField: 'datetime', orderDirection: self::ORDER_DIRECTION_DESC, guidField: false);
     }
 
     public function getBySchoolId($schoolId)

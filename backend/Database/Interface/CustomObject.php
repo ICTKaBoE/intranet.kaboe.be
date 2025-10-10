@@ -11,6 +11,19 @@ use stdClass;
 
 class CustomObject extends stdClass
 {
+    const TYPE_INTEGER = "int";
+    const TYPE_DOUBLE = "double";
+    const TYPE_STRING = "string";
+    const TYPE_DATE = "date";
+    const TYPE_TIME = "time";
+    const TYPE_DATETIME = "datetime";
+    const TYPE_BOOLEAN = "boolean";
+    const TYPE_JSON = "json";
+    const TYPE_URL = "url";
+    const TYPE_LIST = "list";
+    const TYPE_GUID = "guid";
+    const TYPE_ALL = "*";
+
     protected $objectAttributes = [];
     protected $encodeAttributes = [];
     protected $decodeAttributes = [];
@@ -68,8 +81,7 @@ class CustomObject extends stdClass
 
         foreach ($this->linkedAttributes as $la => $prop) {
             $attribute = key($prop);
-
-            if (is_null($this->$attribute) || Strings::isBlank($this->$attribute) || (int)$this->$attribute == 0) continue;
+            if (is_null($this->$attribute) || Strings::isBlank($this->$attribute)) continue;
 
             $repo = $prop[$attribute];
 
@@ -85,9 +97,9 @@ class CustomObject extends stdClass
 
     public function init() {}
 
-    public function fillWithPostData()
+    public function fillWithPostData($fields = [])
     {
-        foreach ($this->getKeys() as $key) $this->$key = \Router\Helpers::input()->post($key)?->getValue() ?? $this->$key;
+        foreach ($this->getKeys() as $key) $this->$key = $fields[$key] ?? \Router\Helpers::input()->post($key)?->getValue() ?? $this->$key;
     }
 
     public function toArray($flatten = false)

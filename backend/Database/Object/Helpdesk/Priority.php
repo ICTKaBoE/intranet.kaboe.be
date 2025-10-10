@@ -8,9 +8,9 @@ use Database\Interface\CustomObject;
 class Priority extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "string",
-        "name" => "string",
-        "color" => "string"
+        "id" => self::TYPE_STRING,
+        "name" => self::TYPE_STRING,
+        "color" => self::TYPE_STRING
     ];
 
     public function init()

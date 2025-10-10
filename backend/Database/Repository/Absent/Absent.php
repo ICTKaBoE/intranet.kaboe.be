@@ -8,7 +8,7 @@ class Absent extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_absent", \Database\Object\Absent\Absent::class, orderField: 'creationDateTime', orderDirection: 'DESC');
+        parent::__construct("tbl_absent", \Database\Object\Absent\Absent::class, orderField: 'creationDateTime', orderDirection: self::ORDER_DIRECTION_DESC);
     }
 
     public function getByCreatorUserId($creatorUserId)

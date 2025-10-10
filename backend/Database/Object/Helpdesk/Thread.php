@@ -8,12 +8,12 @@ use Ouzo\Utilities\Clock;
 class Thread extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "int",
-        "ticketId" => "int",
-        "creationDateTime" => "datetime",
-        "creatorId" => "int",
-        "content" => "string",
-        "deleted" => "boolean"
+        "id" => self::TYPE_INTEGER,
+        "ticketId" => self::TYPE_INTEGER,
+        "creationDateTime" => self::TYPE_DATETIME,
+        "creatorId" => self::TYPE_INTEGER,
+        "content" => self::TYPE_STRING,
+        "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [
