@@ -2,10 +2,10 @@
 
 namespace Database\Object\Navigation;
 
-use Database\Interface\CustomObject;
-use Database\Repository\Navigation\Navigation as NavigationNavigation;
+use Security\CustomObject;
 use Database\Repository\Navigation\Setting;
 use Helpers\HTML;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
@@ -17,6 +17,7 @@ class Navigation extends CustomObject
         "routeGroupId" => self::TYPE_STRING,
         "parentId" => self::TYPE_INTEGER,
         "type" => self::TYPE_STRING,
+        "management" => self::TYPE_BOOLEAN,
         "order" => self::TYPE_INTEGER,
         "default" => self::TYPE_BOOLEAN,
         "link" => self::TYPE_STRING,
@@ -53,10 +54,8 @@ class Navigation extends CustomObject
         $this->formatted->active = Strings::contains(Helpers::getReletiveUrl(), $this->formatted->link);
         $this->formatted->target = $this->type == "L" ? "_blank" : "_self";
 
-        $this->name = $this->type == "L" ? $this->name . HTML::Icon("external-link", class: ['ms-2']) : $this->name;
-        $this->name = $this->type == "F" ? $this->name . HTML::Icon("folder", class: ['ms-2']) : $this->name;
-
         $this->formatted->icon->dashboard = HTML::Icon($this->icon, style: ["font-size" => "4rem"]);
+        $this->formatted->badge = Arrays::contains(["F", "L"], $this->type) ? "<span class='badge badge-icononly badge-lg bg-{$this->color} text-white badge-notification'>" . HTML::Icon($this->type == "F" ? "folder" : ($this->type == "L" ? "link" : "")) . "</span>" : "";
 
         $this->formatted->isActive = $this->formatted->active ? 'active' : '';
         $this->formatted->isShow = $this->formatted->active ? 'show' : '';

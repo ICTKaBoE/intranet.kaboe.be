@@ -19,6 +19,7 @@ export default class Table {
 		this.noSearch = this.element.hasAttribute("data-no-search");
 		this.noInfo = this.element.hasAttribute("data-no-info");
 		this.noPaging = this.element.hasAttribute("data-no-paging");
+		this.pagingButtons = this.element.dataset.pagingButtons || 5;
 		this.childRowFormatFunction =
 			this.element.dataset.childRowFormat || false;
 
@@ -75,7 +76,7 @@ export default class Table {
 						className: "col-12 col-lg-6 pe-3",
 						features: {
 							paging: {
-								buttons: 5,
+								buttons: this.pagingButtons,
 							},
 						},
 					},
@@ -93,7 +94,7 @@ export default class Table {
 						className: "col-12 col-lg-6 pe-3 mb-2",
 						features: {
 							paging: {
-								buttons: 5,
+								buttons: this.pagingButtons,
 							},
 						},
 					},
@@ -147,6 +148,8 @@ export default class Table {
 	createStructure = () => {
 		if (!this.element.classList.contains("table"))
 			this.element.classList.add("table");
+		if (this.small && !this.element.classList.contains("table-sm"))
+			this.element.classList.add("table-sm");
 	};
 
 	getData = () => {
@@ -161,12 +164,12 @@ export default class Table {
 	};
 
 	createDataTable = () => {
-		this.data.columns.forEach((c) => {
+		this.data?.columns.forEach((c) => {
 			if (!Object.hasOwn(c, "defaultContent")) c.defaultContent = "";
 		});
 
 		if (this.checkbox) {
-			this.data.columns.unshift({
+			this.data?.columns.unshift({
 				type: "checkbox",
 				data: null,
 				orderable: false,
@@ -181,12 +184,12 @@ export default class Table {
 			});
 		}
 
-		this.tableOptions.order = this.data.defaultOrder || [
+		this.tableOptions.order = this.data?.defaultOrder || [
 			[this.checkbox ? 1 : 0, "asc"],
 		];
 
-		this.tableOptions.columns = this.data.columns;
-		this.tableOptions.data = this.data.rows;
+		this.tableOptions.columns = this.data?.columns;
+		this.tableOptions.data = this.data?.rows;
 		this.tableOptions.select = this.checkbox;
 		this.datatable = $(this.element).DataTable(this.tableOptions);
 
@@ -201,7 +204,7 @@ export default class Table {
 			});
 		}
 
-		if (this.data.childRows) {
+		if (this.data?.childRows) {
 			let dt = this.datatable;
 			let fn = this.childRowFormatFunction;
 			this.datatable.on("requestChild", (e, row) => {
@@ -234,13 +237,13 @@ export default class Table {
 
 	checkButtonStates = () => {
 		let count = this.datatable.rows({ selected: true }).count();
+		// if (count == 0) count = -1;
 
 		for (let btn in this.buttons) {
 			if (Object.hasOwnProperty.call(this.buttons, btn)) {
-				let button = this.buttons[btn];
-
-				if (eval(count + button.showIf)) button.button.enable();
-				else button.button.disable();
+				if (eval(`${count}${this.buttons[btn].showIf}`))
+					this.buttons[btn].button.enable();
+				else this.buttons[btn].button.disable();
 			}
 		}
 	};
@@ -251,9 +254,32 @@ export default class Table {
 		}, this.autoRefresh * 1000);
 	};
 
+	addRow = (data, allowDuplicate = true, checkDuplicateField = null) => {
+		if (allowDuplicate == false && checkDuplicateField) {
+			let found = false;
+			$(this.element)
+				.find("td.sorting_1")
+				.each((i, x) => {
+					if (!found)
+						found = x.innerHTML == data[checkDuplicateField];
+				});
+			if (found) return;
+		}
+
+		this.datatable.row.add(data).draw();
+	};
+
+	deleteSelectedRows = () => {
+		this.datatable.row(".selected").remove().draw(false);
+	};
+
 	reload = async () => {
 		await this.getData();
-		this.datatable.clear().rows.add(this.data.rows).draw();
+		this.datatable
+			.clear()
+			.rows.add(this.data?.rows ?? [])
+			.draw();
+		this.datatable.columns.adjust().draw();
 	};
 
 	search = (value) => {
@@ -271,6 +297,14 @@ export default class Table {
 
 	clearExtraData = () => {
 		this.extraData = {};
+	};
+
+	selectAllRows = () => {
+		$(this.element).find("thead tr td input.form-check-input").click();
+	};
+
+	deselectAllRows = () => {
+		$(this.element).find("thead tr td input.form-check-input").click();
 	};
 
 	appendSource = (value) => {

@@ -17,7 +17,7 @@ class NavigationComponentController extends ComponentController
 										</li>{{navbar:items}}';
 
     private const TEMPLATE_NAVBAR_ITEM_WITH_SUB =    '<li class="nav-item dropdown {{navbar:item:formatted.isActive}}">
-														<a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{navbar:item:formatted.isAriaExpanded}}">
+														<a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{navbar:item:formatted.isAriaExpanded}}">
 															{{navbar:item:ifIcon}}
 															<span class="nav-link-title">{{navbar:item:name}}</span>
 														</a>

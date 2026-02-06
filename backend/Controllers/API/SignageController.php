@@ -25,13 +25,15 @@ use Database\Object\Signage\PlaylistItem as SignagePlaylistItem;
 
 class SignageController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "signage";
+
     // Get Functions
     protected function getList($view, $id = null)
     {
         if (Strings::equal($view, self::VIEW_SIGNAGE)) {
             $screenRepo = new Screen;
-            if (!Helpers::url()->hasParam("code")) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . "extranet.kaboe.be/signage/register?code=" . General::generateCode());
-            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("https://" . DEV_MODE ? "dev." : "" . ".extranet.kaboe.be/signage/notfound?code=" . Helpers::url()->getParam("code"));
+            if (!Helpers::url()->hasParam("code")) $this->setRedirect("/register?code=" . General::generateCode());
+            else if (!$screenRepo->getByCode(Helpers::url()->getParam("code"))) $this->setRedirect("/notfound?code=" . Helpers::url()->getParam("code"));
             else {
                 $screen = $screenRepo->getByCode(Helpers::url()->getParam("code"));
                 $playlist = (new Playlist)->getByAssignedToAndAssignedToId(is_null($screen->linked->group) ? "S" : "G", is_null($screen->linked->group) ? $screen->id : $screen->groupId);
@@ -340,14 +342,14 @@ class SignageController extends ApiController
                 if (Arrays::contains(['I', 'V'], $fields["type"])) {
                     $file = $fields["type"] == 'I' ? $fields["mediaImage"][0] : $fields["mediaVideo"][0];
                     if ($file && $file->getSize() > 0) {
-                        FileSystem::CreateFolder(LOCATION_UPLOAD . "/signage");
+                        FileSystem::CreateFolder(LOCATION_FILES . "/signage");
                         $newName = $item->guid . "." . $file->getExtension();
 
-                        if ($file->move(LOCATION_UPLOAD . "/signage/{$newName}")) {
+                        if ($file->move(LOCATION_FILES . "/signage/{$newName}")) {
                             $item->link = $newName;
                             $item->size = $file->getSize();
-                            $item->length = (new getID3)->analyze(LOCATION_UPLOAD . "/signage/{$newName}")["playtime_string"];
-                            $item->duration = (new getID3)->analyze(LOCATION_UPLOAD . "/signage/{$newName}")["playtime_seconds"];
+                            $item->length = (new getID3)->analyze(LOCATION_FILES . "/signage/{$newName}")["playtime_string"];
+                            $item->duration = (new getID3)->analyze(LOCATION_FILES . "/signage/{$newName}")["playtime_seconds"];
                             $repo->set($item);
                         }
                     }

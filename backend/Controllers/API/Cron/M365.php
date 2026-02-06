@@ -2,6 +2,7 @@
 
 namespace Controllers\API\Cron;
 
+use Helpers\Log;
 use Security\Input;
 use Helpers\General;
 use M365\Repository\Team;
@@ -16,7 +17,9 @@ use Database\Repository\Mail\Receiver;
 use Database\Repository\School\School;
 use Database\Repository\Setting\Setting;
 use Database\Object\Mail\Mail as MailMail;
+use Database\Object\User\User as UserUser;
 use Database\Repository\Informat\Employee;
+use Database\Repository\General\Schoolyear;
 use Database\Repository\Security\GroupUser;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Management\Computer;
@@ -36,6 +39,8 @@ abstract class M365
 {
     static public function ImportUsers()
     {
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import M365 Users...");
+
         $securityGroupRepo = new SecurityGroup;
         $sguRepo = new GroupUser;
         $userRepo = new RepositoryUser;
@@ -48,20 +53,26 @@ abstract class M365
 
             foreach ($members as $member) {
                 if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
-                $user = $userRepo->getByEntraId($member->getId()) ?? Arrays::firstOrNull($userRepo->getByUsername($member->getMail())) ?? null;
 
-                if ($user) {
-                    $user->entraId = $member->getId();
-                    $user->entraCompany = $member->getCompanyName();
-                    $userRepo->set($user);
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "User: {$member->getEmployeeId()} - {$member->getSurname()} {$member->getGivenName()}");
+                $user = $userRepo->getByEntraId($member->getId()) ?? (new UserUser);
 
-                    if ($sguRepo->getBySecurityGroupIdAndUserId($sg->id, $user->id)) continue;
-                    $sgu = new ObjectSecurityGroupUser;
-                    $sgu->securityGroupId = $sg->id;
-                    $sgu->userId = $user->id;
+                $user->entraId = $member->getId();
+                $user->entraCompany = $member->getCompanyName();
+                $user->informatEmployeeId = $member->getEmployeeId();
+                $user->mainSchoolId = 0;
+                $user->username = $member->getMail();
+                $user->name = $member->getSurname();
+                $user->firstName = $member->getGivenName();
+                $nId = $userRepo->set($user);
+                if (!$user->id) $user = $userRepo->getById($nId);
 
-                    $sguRepo->set($sgu);
-                }
+                if ($sguRepo->getBySecurityGroupIdAndUserId($sg->id, $user->id)) continue;
+                $sgu = new ObjectSecurityGroupUser;
+                $sgu->securityGroupId = $sg->id;
+                $sgu->userId = $user->id;
+
+                $sguRepo->set($sgu);
             }
         }
 
@@ -98,7 +109,7 @@ abstract class M365
         $end = Clock::now();
 
         $repo = new NavigationSetting;
-        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByLink('management')->id, "computer.lastSyncTime");
+        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByLinkAndType('management', "M")->id, "computer.lastSyncTime");
         $item->value = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
         $repo->set($item);
 
@@ -130,7 +141,7 @@ abstract class M365
     static public function SyncClassTeams()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByLink("sync");
+        $navigation = (new Navigation)->getByLinkAndType("sync", "M");
         $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
         $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
         $_minYear = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.year")->value, 'int');
@@ -144,7 +155,7 @@ abstract class M365
         $employeeRepo = new Employee;
         $m365UserRepo = new User;
         $employeeOwnfieldRepo = new EmployeeOwnfield;
-        $classes = (new ClassGroup)->getBySchoolyear(General::getSchoolyear());
+        $classes = (new ClassGroup)->getBySchoolyear(_CURRENT_SCHOOLYEAR_);
 
         $defaultOwner = Input::check($_classOwner, Input::INPUT_TYPE_EMAIL) ? $m365UserRepo->getByEmail($_classOwner)->getId() : $_classOwner;
 
@@ -213,7 +224,7 @@ abstract class M365
     static public function SyncSchoolTeams()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByLink("sync");
+        $navigation = (new Navigation)->getByLinkAndType("sync", "M");
         $_rule = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.rule.school")->value;
         $_name = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.teams.name.school")->value;
 
@@ -261,7 +272,7 @@ abstract class M365
     static public function WarnUserPasswordExpiration()
     {
         $settingRepo = new NavigationSetting;
-        $navigation = (new Navigation)->getByLink("sync");
+        $navigation = (new Navigation)->getByLinkAndType("sync", "M");
         $_days = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.days")->value;
         $_startFrom = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.password.expiration.start")->value;
         $_subject = $settingRepo->getByNavigationIdAndKey($navigation->id, "mail.template.password.subject")->value;

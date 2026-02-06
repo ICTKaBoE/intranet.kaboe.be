@@ -2,12 +2,12 @@
 
 namespace Database\Object\EHBO;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class FirstHelp extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
+        "id" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING
     ];
 }

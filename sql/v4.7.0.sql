@@ -235,7 +235,7 @@ ALTER TABLE tbl_order DROP COLUMN `number`;
 DELETE FROM tbl_navigation_setting WHERE `key`="lastNumber";
 
 UPDATE tbl_navigation SET parentId = folderId WHERE folderId <> 0;
-UPDATE tbl_navigation SET link = NULL WHERE `type` = "F"
+UPDATE tbl_navigation SET link = NULL WHERE `type` = "F";
 ALTER TABLE tbl_navigation DROP COLUMN folderId;
 
 ALTER TABLE tbl_navigation ADD CONSTRAINT tbl_navigation_unique UNIQUE KEY (parentId,link);

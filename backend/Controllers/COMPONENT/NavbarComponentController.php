@@ -5,6 +5,7 @@ namespace Controllers\COMPONENT;
 use Controllers\ComponentController;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Route\Group;
+use Ouzo\Utilities\Arrays;
 use Router\Helpers;
 use Security\User;
 
@@ -17,29 +18,11 @@ class NavbarComponentController extends ComponentController
 											</a>
 										</li>{{navbar:items}}';
 
-	private const TEMPLATE_NAVBAR_ITEM_WITH_SUB =	'<li class="nav-item dropdown {{navbar:item:formatted.isActive}}">
-														<a class="nav-link dropdown-toggle {{navbar:item:formatted.isShow}}" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{navbar:item:formatted.isAriaExpanded}}">
-															{{navbar:item:ifIcon}}
-															<span class="nav-link-title">{{navbar:item:name}}</span>
-														</a>
-														<div class="dropdown-menu {{navbar:item:formatted.isShow}}">
-															<div class="dropdown-menu-columns">
-																<div class="dropdown-menu-column">
-																	{{navbar:item:subitems}}
-																</div>
-															</div>
-														</div>
-													</li>{{navbar:items}}';
-
-	private const TEMPLATE_NAVBAR_SUBITEM = '<a class="dropdown-item" href="{{navbar:subitem:formatted.link}}" target="{{navbar:subitem:formatted.target}}">{{navbar:subitem:ifIcon}}{{navbar:subitem:name}}</a>{{navbar:item:subitems}}';
-
 	private const TEMPLATE_NAVBAR_ITEM_ICON = 	'<span class="nav-link-icon">
 													<i class="icon ti ti-{{navbar:item:icon}}"></i>
 												</span>';
 
-	private const TEMPLATE_NAVBAR_SUBITEM_ICON = 	'<span class="nav-link-icon">
-														<i class="icon ti ti-{{navbar:subitem:icon}}"></i>
-													</span>';
+	private const TEMPLATE_MAGEMENT = '<div class="hr-text">Beheer</div>{{navbar:items}}';
 
 	public function __construct($arguments = [])
 	{
@@ -51,35 +34,37 @@ class NavbarComponentController extends ComponentController
 	{
 		$navigationRepo = new Navigation;
 		$domain = Helpers::url()->getHost();
-		$routeGroup = (new Group)->getByDomain($domain);
-		$moduleItem = $navigationRepo->getByLink(Helpers::getModule());
+		$moduleItem = $navigationRepo->getByLinkAndType(Helpers::getModule(), "M");
 
 		if ($moduleItem->order >= 0 && User::canAccess($moduleItem->id) && $moduleItem->formatted->active) {
-			$topLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $moduleItem->id);
+			$topLevelItems = $navigationRepo->getByParentId($moduleItem->id);
+			$nonMgmt = Arrays::filter($topLevelItems, fn($i) => !$i->management);
+			$mgmt = Arrays::filter($topLevelItems, fn($i) => $i->management);
 
-			foreach ($topLevelItems as $tli) {
+			foreach ($nonMgmt as $tli) {
 				if ($tli->order < 0) continue;
 				if (!User::canAccess($tli->id)) continue;
 
-				$subLevelItems = $navigationRepo->getByRouteGroupIdAndParentId($routeGroup->id, $tli->id);
-
-				$template = (count($subLevelItems) ? self::TEMPLATE_NAVBAR_ITEM_WITH_SUB : self::TEMPLATE_NAVBAR_ITEM);
+				$template = self::TEMPLATE_NAVBAR_ITEM;
 				if ($tli->icon) $template = str_replace("{{navbar:item:ifIcon}}", self::TEMPLATE_NAVBAR_ITEM_ICON, $template);
 				foreach ($tli->toArray(true) as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?: "", $template);
 
-				if (count($subLevelItems)) {
-					foreach ($subLevelItems as $sli) {
-						if (!User::canAccess($sli->id)) continue;
-
-						$sliTemplate = self::TEMPLATE_NAVBAR_SUBITEM;
-						if ($sli->icon) $sliTemplate = str_replace("{{navbar:subitem:ifIcon}}", self::TEMPLATE_NAVBAR_SUBITEM_ICON, $sliTemplate);
-						foreach ($sli->toArray(true) as $key => $value) $sliTemplate = str_replace("{{navbar:subitem:{$key}}}", $value ?: "", $sliTemplate);
-
-						$template = str_replace("{{navbar:item:subitems}}", $sliTemplate, $template);
-					}
-				}
-
 				$this->layout = str_replace("{{navbar:items}}", $template, $this->layout);
+			}
+
+			if (count($mgmt)) {
+				$this->layout = str_replace("{{navbar:items}}", self::TEMPLATE_MAGEMENT, $this->layout);
+
+				foreach ($mgmt as $tli) {
+					if ($tli->order < 0) continue;
+					if (!User::canAccess($tli->id)) continue;
+
+					$template = self::TEMPLATE_NAVBAR_ITEM;
+					if ($tli->icon) $template = str_replace("{{navbar:item:ifIcon}}", self::TEMPLATE_NAVBAR_ITEM_ICON, $template);
+					foreach ($tli->toArray(true) as $key => $value) $template = str_replace("{{navbar:item:{$key}}}", $value ?: "", $template);
+
+					$this->layout = str_replace("{{navbar:items}}", $template, $this->layout);
+				}
 			}
 		}
 	}

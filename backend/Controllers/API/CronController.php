@@ -2,80 +2,56 @@
 
 namespace Controllers\API;
 
-use Controllers\ApiController;
-use Ouzo\Utilities\Strings;
+use Helpers\Log;
 use Security\Code;
+use Ouzo\Utilities\Clock;
+use Controllers\ApiController;
+use Database\Repository\General\Schoolyear;
+use Database\Repository\Setting\Setting;
+use Helpers\General;
+use Security\Session;
 
 class CronController extends ApiController
 {
-    const ACTION_IMPORT = "import";
-    const ACTION_SYNC = "sync";
-    const ACTION_PASS_EXP = "passexp";
-    const ACTION_MAIL = "sendmail";
-
-    public function index($action)
+    public function index($part, $function)
     {
         Code::noTimeLimit();
+        Session::Close();
 
-        if (Strings::equalsIgnoreCase($action, "importCountries")) {
-            if (\Controllers\API\Cron\Country::Import()) $this->appendToJson('importCountries', 'passed');
-            else $this->appendToJson('importCountries', 'failed');
+        define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
+        define("_LOGLOCATION_", "cron/{$part}");
+        define("_CURRENT_SCHOOLYEAR_", (new Schoolyear)->getCurrent()->name);
+
+        Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Schoolyear: " . _CURRENT_SCHOOLYEAR_);
+
+        $part = ucfirst($part);
+        $function = ucfirst($function);
+
+        $class = "\\Controllers\\API\\Cron\\{$part}";
+
+        if (!class_exists($class)) $this->setHttpCode(404);
+        else if (!method_exists($class, $function)) $this->setHttpCode(404);
+        else {
+            $settingRepo = new Setting;
+            $settingId = "cron.{$part}.{$function}.active";
+            $setting = $settingRepo->getById($settingId);
+
+            if (General::convert($setting->value, 'bool') == false) {
+                $setting->value = 1;
+                $settingRepo->set($setting);
+
+                if ($class::$function()) $this->setHttpCode(200);
+                else $this->setHttpCode(400);
+
+                $setting->value = 0;
+                $settingRepo->set($setting);
+            } else {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Instance already running!");
+            }
         }
 
-        if (Strings::equalsIgnoreCase($action, "importInformat")) {
-            if (\Controllers\API\Cron\Informat::Import()) $this->appendToJson('importInformat', 'passed');
-            else $this->appendToJson('importInformat', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "importM365Users")) {
-            if (\Controllers\API\Cron\M365::ImportUsers()) $this->appendToJson('importM365Users', 'passed');
-            else $this->appendToJson('importM365Users', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "importM365Computers")) {
-            if (\Controllers\API\Cron\M365::ImportComputers()) $this->appendToJson('importM365Computers', 'passed');
-            else $this->appendToJson('importM365Computers', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "importM365SignIns")) {
-            if (\Controllers\API\Cron\M365::ImportSignInTimes()) $this->appendToJson('importM365SignIns', 'passed');
-            else $this->appendToJson('importM365SignIns', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "local")) {
-            if (\Controllers\API\Cron\Local::Prepare()) $this->appendToJson('local', 'passed');
-            else $this->appendToJson('local', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "importJamfIpads")) {
-            if (\Controllers\API\Cron\JAMF::ImportIPads()) $this->appendToJson('importJamfIpads', 'passed');
-            else $this->appendToJson('importJamfIpads', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "sync")) {
-            if (\Controllers\API\Cron\Sync::Prepare()) $this->appendToJson('sync', 'passed');
-            else $this->appendToJson('sync', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "sendMails")) {
-            if (\Controllers\API\Cron\Mail::Send()) $this->appendToJson('sendMails', 'passed');
-            else $this->appendToJson('sendMails', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "m365SyncClassTeams")) {
-            if (\Controllers\API\Cron\M365::SyncClassTeams()) $this->appendToJson('m365SyncClassTeams', 'passed');
-            else $this->appendToJson('m365SyncClassTeams', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "m365SyncSchoolTeams")) {
-            if (\Controllers\API\Cron\M365::SyncSchoolTeams()) $this->appendToJson('m365SyncSchoolTeams', 'passed');
-            else $this->appendToJson('m365SyncSchoolTeams', 'failed');
-        }
-
-        if (Strings::equalsIgnoreCase($action, "m365WarnUserPasswordExpiration")) {
-            if (\Controllers\API\Cron\M365::WarnUserPasswordExpiration()) $this->appendToJson('m365WarnUserPasswordExpiration', 'passed');
-            else $this->appendToJson('m365WarnUserPasswordExpiration', 'failed');
-        }
+        Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
 
         $this->handle();
     }

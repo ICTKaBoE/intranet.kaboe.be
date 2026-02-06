@@ -14,6 +14,7 @@
         <div class="navbar-nav flex-row d-lg-none">
             <div class="nav-link d-flex lh-1 text-reset p-0">
                 <span class="avatar avatar-sm me-2">{{user:initials}}</span>
+                <a href="/user/logout" class="avatar avatar-sm me-2"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
                 <a href="/user/logout" class="avatar avatar-sm"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
             </div>
         </div>

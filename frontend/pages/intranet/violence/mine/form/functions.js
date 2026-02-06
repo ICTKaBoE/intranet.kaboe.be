@@ -11,37 +11,43 @@ window.anonymousView = (info) => {
 
 window.formView = (info) => {
 	let val = Select.GetInstance("form").getValue();
+	val = val.split(";").map((i) => parseInt(i));
 
-	if (val === "O" || val.split(";").includes("O"))
+	if (val.includes(window.SELECT_OTHER_ID))
 		document.getElementById("form-O").classList.remove("d-none");
 	else document.getElementById("form-O").classList.add("d-none");
 };
 
 window.outView = (info) => {
 	let val = Select.GetInstance("out").getValue();
+	val = val.split(";").map((i) => parseInt(i));
 
-	if (val === "O" || val.split(";").includes("O"))
+	if (val.includes(window.SELECT_OTHER_ID))
 		document.getElementById("out-O").classList.remove("d-none");
 	else document.getElementById("out-O").classList.add("d-none");
 };
 
 window.intentionView = (info) => {
 	let val = Select.GetInstance("intention").getValue();
+	val = val.split(";").map((i) => parseInt(i));
 
-	if (val === "O" || val.split(";").includes("O"))
+	if (val.includes(window.SELECT_OTHER_ID))
 		document.getElementById("intention-O").classList.remove("d-none");
 	else document.getElementById("intention-O").classList.add("d-none");
 };
 
 window.causeView = (info) => {
 	let val = Select.GetInstance("cause").getValue();
+	val = val.split(";").map((i) => parseInt(i));
 
-	if (val === "O" || val.split(";").includes("O"))
+	if (val.includes(window.SELECT_OTHER_ID))
 		document.getElementById("cause-O").classList.remove("d-none");
 	else document.getElementById("cause-O").classList.add("d-none");
 };
 
 $(document).ready(() => {
+	window.anonymousView();
+
 	Button.GetInstance("PrevStep").setOnClick(() => {
 		Form.GetInstance(pageId).submit(true, "-");
 	});

@@ -3,7 +3,7 @@
 namespace Database\Object\Setting;
 
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Setting extends CustomObject
 {
@@ -40,9 +40,11 @@ class Setting extends CustomObject
         $this->formatted->settingHtml = self::SETTING_TEMPLATES[$this->type];
 
         $options = "";
-        foreach ($this->options as $option) {
-            [$key, $value] = Strings::contains($option, ":") ? explode(":", $option) : [$option, $option];
-            $options .= "<option value=\"{$key}\">{$value}</option>";
+        if ($this->options) {
+            foreach ($this->options as $option) {
+                [$key, $value] = Strings::contains($option, ":") ? explode(":", $option) : [$option, $option];
+                $options .= "<option value=\"{$key}\">{$value}</option>";
+            }
         }
 
         foreach ($this->toArray(true) as $k => $v) $this->formatted->settingHtml = str_replace("{{setting:{$k}}}", $v, $this->formatted->settingHtml);

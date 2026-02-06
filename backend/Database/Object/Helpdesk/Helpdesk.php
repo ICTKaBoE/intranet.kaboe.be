@@ -10,7 +10,7 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Helpdesk\Category;
 use Database\Repository\Helpdesk\Priority;
 use Database\Repository\Helpdesk\Status;
@@ -24,11 +24,11 @@ class Helpdesk extends CustomObject
         "guid" => self::TYPE_GUID,
         "creatorUserId" => self::TYPE_INTEGER,
         "assignedToUserId" => self::TYPE_INTEGER,
-        "status" => self::TYPE_STRING,
-        "priority" => self::TYPE_STRING,
+        "status" => self::TYPE_INTEGER,
+        "priority" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
         "roomId" => self::TYPE_INTEGER,
-        "category" => self::TYPE_STRING,
+        "category" => self::TYPE_INTEGER,
         "subject" => self::TYPE_STRING,
         "assetId" => self::TYPE_INTEGER,
         "creationDateTime" => self::TYPE_DATETIME,
@@ -39,8 +39,11 @@ class Helpdesk extends CustomObject
     protected $linkedAttributes = [
         "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
         "assignedToUser" => ["assignedToUserId" => \Database\Repository\User\User::class],
+        "status" => ["status" => \Database\Repository\Helpdesk\Status::class],
+        "priority" => ["priority" => \Database\Repository\Helpdesk\Priority::class],
         "school" => ["schoolId" => \Database\Repository\School\School::class],
         "computer" => ['assetId' => \Database\Repository\Management\Computer::class],
+        "category" => ['category' => \Database\Repository\Helpdesk\Category::class],
         "ipad" => ['assetId' => \Database\Repository\Management\IPad::class],
         "beamer" => ['assetId' => \Database\Repository\Management\Beamer::class],
         "printer" => ['assetId' => \Database\Repository\Management\Printer::class],
@@ -52,25 +55,24 @@ class Helpdesk extends CustomObject
     public function init()
     {
         $catRepo = new Category;
-        $priority = (new Priority)->getById($this->priority);
-        $status = (new Status)->getById($this->status);
 
-        $this->formatted->badge->status = $status->formatted->badge->name;
-        $this->formatted->badge->priority = $priority->formatted->badge->name;
+        $this->formatted->badge->status = $this->linked->status->formatted->badge->name;
+        $this->formatted->badge->priority = $this->linked->priority->formatted->badge->name;
+        $this->formatted->subject = Strings::equal($this->category, SELECT_OTHER_ID) ? ($this->subject ? $this->subject : SELECT_OTHER_VALUE) : $this->linked->category->formatted->name;
 
-        $_category = explode("-", $this->category);
-        $category = $catRepo->getByIdAndCategoryId($_category[0], null);
-        $this->formatted->subject = $category->name;
-        if (!is_null($_category[1])) $this->formatted->subject .= " - " . $catRepo->getByIdAndCategoryId($_category[1], $category->id)->name;
-        else if (Strings::equal($_category[0], "O")) $this->formatted->subject = $this->subject ?: $this->formatted->subject;
+        // $_category = explode("-", $this->category);
+        // $category = $catRepo->getByIdAndCategoryId($_category[0], null);
+        // $this->formatted->subject = $category->name;
+        // if (!is_null($_category[1])) $this->formatted->subject .= " - " . $catRepo->getByIdAndCategoryId($_category[1], $category->id)->name;
+        // else if (Strings::equal($_category[0], "O")) $this->formatted->subject = $this->subject ?: $this->formatted->subject;
 
-        if (Strings::equal($_category[0], "L") || Strings::equal($_category[0], "D")) $this->formatted->subject = $this->linked->computer->name . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "I")) $this->formatted->subject = $this->linked->ipad->name . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "B")) $this->formatted->subject = $this->linked->beamer->serialnumber . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "P")) $this->formatted->subject = $this->linked->printer->name . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "F")) $this->formatted->subject = $this->linked->firewall->hostname . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
-        else if (Strings::equal($_category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
+        // if (Strings::equal($_category[0], "L") || Strings::equal($_category[0], "D")) $this->formatted->subject = $this->linked->computer->name . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "I")) $this->formatted->subject = $this->linked->ipad->name . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "B")) $this->formatted->subject = $this->linked->beamer->serialnumber . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "P")) $this->formatted->subject = $this->linked->printer->name . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "F")) $this->formatted->subject = $this->linked->firewall->hostname . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
+        // else if (Strings::equal($_category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
 
         $this->formatted->link = "https://intranet.kaboe.be/helpdesk/mine/{$this->guid}";
         $this->formatted->assignedLink = "https://intranet.kaboe.be/helpdesk/assigned/{$this->guid}";

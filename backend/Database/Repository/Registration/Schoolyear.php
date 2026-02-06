@@ -15,6 +15,6 @@ class Schoolyear extends Repository
     public function getByName($name)
     {
         $statement = $this->prepareSelect(filters: ["name" => $name]);
-        return $this->executeSelect($statement);
+        return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

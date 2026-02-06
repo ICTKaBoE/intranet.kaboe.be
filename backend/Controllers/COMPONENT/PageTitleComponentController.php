@@ -20,7 +20,7 @@ class PageTitleComponentController extends ComponentController
 		$page = Helpers::getPage();
 
 		$navigationRepo = new Navigation;
-		$moduleNavigation = $navigationRepo->getByLink($module);
+		$moduleNavigation = $navigationRepo->getByLinkAndType($module, "M");
 		$pageNavigation = is_null($page) ? null : $navigationRepo->getByParentIdAndLink($moduleNavigation->id, $page);
 
 		$pagetitle = $moduleNavigation->name . (is_null($pageNavigation) ? '' : ' - ' . $pageNavigation->name);

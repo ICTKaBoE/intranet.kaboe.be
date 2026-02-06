@@ -12,6 +12,7 @@ export default class List {
 		this.template = this.element.dataset.template || false;
 		this.limit = this.element.dataset.limit || 200;
 		this.stopCheckNext = false;
+		this.noItemsText = this.element.dataset.noItemsText || false;
 
 		this.element.removeAttribute("data-template");
 
@@ -49,6 +50,12 @@ export default class List {
 				String(id).charAt(0).toUpperCase() + String(id).slice(1)
 			}`;
 		return List.INSTANCES[id] || false;
+	};
+
+	static ReloadAll = () => {
+		for (const lst in List.INSTANCES) {
+			List.INSTANCES[lst].reload();
+		}
 	};
 
 	static SearchAll = (value) => {

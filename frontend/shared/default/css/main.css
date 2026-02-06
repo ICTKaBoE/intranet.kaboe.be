@@ -70,7 +70,7 @@ td:first-child {
 	.ts-dropdown-content
 	.optgroup
 	.dropdown-item::before {
-	content: " ";
+	content: " - ";
 }
 
 .steps {

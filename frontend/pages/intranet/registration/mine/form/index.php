@@ -24,7 +24,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label class="form-label" for="sex" required>Geslacht</label>
-                    <select name="sex" id="sex" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=sex" data-load-value="id" data-load-label="name" data-default-value="{{url:param.sex}}"></select>
+                    <select name="sex" id="sex" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=sex" data-default-value="{{url:param.sex}}"></select>
                 </div>
             </div>
 
@@ -41,7 +41,7 @@
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="birthCountryId">Geboorteland</label>
-                    <select name="birthCountryId" id="birthCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-value="237" data-search data-default-value="{{url:param.birthCountryId}}"></select>
+                    <select name="birthCountryId" id="birthCountryId" data-load-source="{{select:url:short}}/general/country" data-default-value="237" data-search data-default-value="{{url:param.birthCountryId}}"></select>
                 </div>
             </div>
 
@@ -55,7 +55,7 @@
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="nationalityId">Nationaliteit</label>
-                    <select name="nationalityId" id="nationalityId" data-load-source="{{select:url:short}}/general/nationality" data-load-value="id" data-load-label="name" data-default-no-value data-search data-default-value="{{url:param.nationalityId}}"></select>
+                    <select name="nationalityId" id="nationalityId" data-load-source="{{select:url:short}}/general/nationality" data-default-no-value data-search data-default-value="{{url:param.nationalityId}}"></select>
                 </div>
             </div>
 
@@ -105,7 +105,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label class="form-label" for="addressCountryId">Land</label>
-                    <select name="addressCountryId" id="addressCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-value="237" data-search data-default-value="{{url:param.addressCountryId}}" required></select>
+                    <select name="addressCountryId" id="addressCountryId" data-load-source="{{select:url:short}}/general/country" data-default-value="237" data-search data-default-value="{{url:param.addressCountryId}}" required></select>
                 </div>
             </div>
         </fieldset>
@@ -115,7 +115,7 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label for="subscriberRelation" class="form-label">Hoedanigheid van de persoon die de leerling komt registreren</label>
-                    <select name="subscriberRelation" id="subscriberRelation" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" required data-default-no-value></select>
+                    <select name="subscriberRelation" id="subscriberRelation" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" required data-default-no-value></select>
                 </div>
             </div>
 
@@ -134,12 +134,12 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="meansOfTransport" class="form-label">Voornaamste vervoersmiddel van de leerling</label>
-                    <select name="meansOfTransport" id="meansOfTransport" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=transport" data-load-value="id" data-load-label="name" data-default-no-value required></select>
+                    <select name="meansOfTransport" id="meansOfTransport" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=transport" data-default-no-value required></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="personalReligion" class="form-label">Persoonlijke Levensbeschouwing</label>
-                    <select name="personalReligion" id="personalReligion" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=religion" data-load-value="id" data-load-label="name" data-default-value="140" required></select>
+                    <select name="personalReligion" id="personalReligion" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=religion" data-default-value="140" required></select>
                 </div>
             </div>
         </fieldset>
@@ -152,7 +152,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="livingWith" class="form-label">Leerling woont bij</label>
-                    <select name="livingWith" id="livingWith" data-on-change="checkLivingWith" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=livingWith" data-load-value="id" data-load-label="name" required data-default-no-value></select>
+                    <select name="livingWith" id="livingWith" data-on-change="checkLivingWith" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=livingWith" required data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3 d-none" id="divLivingWithO">
@@ -169,7 +169,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="diedParent" class="form-label">Is er een ouder overleden?</label>
-                    <select name="diedParent" id="diedParent" multiple data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=diedParent" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="diedParent" id="diedParent" multiple data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=diedParent" data-default-no-value></select>
                 </div>
             </div>
         </fieldset>
@@ -217,7 +217,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation1" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation1" id="relation1" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" required data-default-no-value></select>
+                    <select name="relation1" id="relation1" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" required data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -267,7 +267,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation2" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation2" id="relation2" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="relation2" id="relation2" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -315,7 +315,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation3" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation3" id="relation3" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="relation3" id="relation3" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -363,7 +363,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation4" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation4" id="relation4" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="relation4" id="relation4" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -411,7 +411,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation5" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation5" id="relation5" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="relation5" id="relation5" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -459,7 +459,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="relation6" class="form-label">Hoedanigheid (relatie tot de leerling)</label>
-                    <select name="relation6" id="relation6" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-load-value="id" data-load-label="name" data-default-no-value></select>
+                    <select name="relation6" id="relation6" required data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=relation" data-default-no-value></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -553,7 +553,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country1" class="form-label">Land</label>
-                    <select name="country1" id="country1" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country1" id="country1" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -605,7 +605,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country2" class="form-label">Land</label>
-                    <select name="country2" id="country2" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country2" id="country2" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -657,7 +657,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country3" class="form-label">Land</label>
-                    <select name="country3" id="country3" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country3" id="country3" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -709,7 +709,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country4" class="form-label">Land</label>
-                    <select name="country4" id="country4" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country4" id="country4" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -761,7 +761,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country5" class="form-label">Land</label>
-                    <select name="country5" id="country5" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country5" id="country5" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -813,7 +813,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="country6" class="form-label">Land</label>
-                    <select name="country6" id="country6" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search required></select>
+                    <select name="country6" id="country6" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -826,39 +826,39 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="schoolyearId" class="form-label">Schooljaar</label>
-                    <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/schoolyear" data-load-value="id" data-load-label="formatted.nameWithCurrent" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-on-change="setSchoolyear" required></select>
+                    <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/general/schoolyear" data-label="formatted.nameWithCurrent" data-on-change="setSchoolyear" required></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="schoolId" class="form-label">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" required></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="studyyearId" class="form-label">Leerjaar</label>
-                    <select name="studyyearId" id="studyyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/studyyear" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-parent-select="schoolId" data-default-no-load required></select>
+                    <select name="studyyearId" id="studyyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/studyyear" data-parent-select="schoolId" data-default-no-load required></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="fieldId" class="form-label">Studierichting</label>
-                    <select name="fieldId" id="fieldId" data-load-source="{{select:url:short}}/{{url:part.module}}/field" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-parent-select="studyyearId" data-on-change="setField" data-default-no-load data-search required></select>
+                    <select name="fieldId" id="fieldId" data-load-source="{{select:url:short}}/{{url:part.module}}/field" data-parent-select="studyyearId" data-on-change="setField" data-default-no-load data-search required></select>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="optionId" class="form-label">Keuzevak</label>
-                    <select name="optionId" id="optionId" data-load-source="{{select:url:short}}/{{url:part.module}}/option" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-no-load data-hide-if-no-options data-search></select>
+                    <select name="optionId" id="optionId" data-load-source="{{select:url:short}}/{{url:part.module}}/option" data-default-no-load data-hide-if-no-options data-search></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="talentId" class="form-label">Talentmodule</label>
-                    <select name="talentId" id="talentId" data-load-source="{{select:url:short}}/{{url:part.module}}/talent" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-no-load data-hide-if-no-options data-search></select>
+                    <select name="talentId" id="talentId" data-load-source="{{select:url:short}}/{{url:part.module}}/talent" data-default-no-load data-hide-if-no-options data-search></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="clilId" class="form-label">CLIL (Content and Learning Integrated Language)</label>
-                    <select name="clilId" id="clilId" data-load-source="{{select:url:short}}/{{url:part.module}}/clil" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-no-load data-hide-if-no-options data-search></select>
+                    <select name="clilId" id="clilId" data-load-source="{{select:url:short}}/{{url:part.module}}/clil" data-default-no-load data-hide-if-no-options data-search></select>
                 </div>
             </div>
 
@@ -877,7 +877,7 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label for="lastSchool" class="form-label">Laatste school waar de leerling les volgde was een</label>
-                    <select name="lastSchool" id="lastSchool" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchool" data-load-value="id" data-load-label="name" data-default-value="N" data-on-change="checkLastSchool"></select>
+                    <select name="lastSchool" id="lastSchool" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchool" data-default-value="N" data-on-change="checkLastSchool"></select>
                 </div>
 
                 <div class="col-12 mb-3">
@@ -893,7 +893,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="currentSchoolStudyyear" class="form-label">Gevolgd leerjaar</label>
-                    <select name="currentSchoolStudyyear" id="currentSchoolStudyyear" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=currentSchoolStudyyear" data-load-value="id" data-load-label="name"></select>
+                    <select name="currentSchoolStudyyear" id="currentSchoolStudyyear" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=currentSchoolStudyyear"></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
@@ -939,7 +939,7 @@
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="currentSchoolCountryId" class="form-label">Land</label>
-                    <select name="currentSchoolCountryId" id="currentSchoolCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-value="237" data-search required></select>
+                    <select name="currentSchoolCountryId" id="currentSchoolCountryId" data-load-source="{{select:url:short}}/general/country" data-default-value="237" data-search required></select>
                 </div>
             </div>
         </fieldset>
@@ -950,22 +950,22 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="mealMonday" class="form-label">Maaltijd op maandagmiddag</label>
-                    <select name="mealMonday" id="mealMonday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal" data-load-value="id" data-load-label="name"></select>
+                    <select name="mealMonday" id="mealMonday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal"></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="mealTuesday" class="form-label">Maaltijd op dinsdagmiddag</label>
-                    <select name="mealTuesday" id="mealTuesday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal" data-load-value="id" data-load-label="name"></select>
+                    <select name="mealTuesday" id="mealTuesday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal"></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="mealThursday" class="form-label">Maaltijd op donderdagmiddag</label>
-                    <select name="mealThursday" id="mealThursday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal" data-load-value="id" data-load-label="name"></select>
+                    <select name="mealThursday" id="mealThursday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal"></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="mealFriday" class="form-label">Maaltijd op vrijdagmiddag</label>
-                    <select name="mealFriday" id="mealFriday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal" data-load-value="id" data-load-label="name"></select>
+                    <select name="mealFriday" id="mealFriday" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=meal"></select>
                 </div>
             </div>
         </fieldset>
@@ -976,7 +976,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="lastSchoolStudyyearB" class="form-label">Gevolgd leerjaar</label>
-                    <select name="lastSchoolStudyyearB" id="lastSchoolStudyyearB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearB" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastSchoolStudyyearB" id="lastSchoolStudyyearB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearB"></select>
                 </div>
 
                 <div class="col-lg-9 col-12 mb-3">
@@ -988,7 +988,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label class="form-label" for="lastSchoolCountryB">Land</label>
-                    <select name="lastSchoolCountryB" id="lastSchoolCountryB" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search></select>
+                    <select name="lastSchoolCountryB" id="lastSchoolCountryB" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -1014,12 +1014,12 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label for="lastSchoolCertificateReceivedB" class="form-label">Getuigschrift afgegeven</label>
-                    <select name="lastSchoolCertificateReceivedB" id="lastSchoolCertificateReceivedB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolCertificateReceivedB" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastSchoolCertificateReceivedB" id="lastSchoolCertificateReceivedB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolCertificateReceivedB"></select>
                 </div>
 
                 <div class="col-12 mb-3">
                     <label for="lastSchoolBaSoCertificateReceivedB" class="form-label">BaSo-fiche afgegeven</label>
-                    <select name="lastSchoolBaSoCertificateReceivedB" id="lastSchoolBaSoCertificateReceivedB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolBaSoCertificateReceivedB" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastSchoolBaSoCertificateReceivedB" id="lastSchoolBaSoCertificateReceivedB" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolBaSoCertificateReceivedB"></select>
                 </div>
             </div>
         </fieldset>
@@ -1030,7 +1030,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="lastStudyyearS" class="form-label">Gevolgd leerjaar</label>
-                    <select name="lastStudyyearS" id="lastStudyyearS" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearS" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastStudyyearS" id="lastStudyyearS" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearS"></select>
                 </div>
 
                 <div class="col-lg-9 col-12 mb-3">
@@ -1049,7 +1049,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label class="form-label" for="lastSchoolCountryS">Land</label>
-                    <select name="lastSchoolCountryS" id="lastSchoolCountryS" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search></select>
+                    <select name="lastSchoolCountryS" id="lastSchoolCountryS" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -1066,7 +1066,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="lastSchoolCertificateS" class="form-label">Behaald attest</label>
-                    <select name="lastSchoolCertificateS" id="lastSchoolCertificateS" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolCertificateS" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastSchoolCertificateS" id="lastSchoolCertificateS" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolCertificateS"></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
@@ -1082,7 +1082,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label for="lastStudyyearH" class="form-label">Gevolgd jaar</label>
-                    <select name="lastStudyyearH" id="lastStudyyearH" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearH" data-load-value="id" data-load-label="name"></select>
+                    <select name="lastStudyyearH" id="lastStudyyearH" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=lastSchoolStudyyearH"></select>
                 </div>
 
                 <div class="col-lg-9 col-12 mb-3">
@@ -1101,7 +1101,7 @@
             <div class="row">
                 <div class="col-lg-3 col-12 mb-3">
                     <label class="form-label" for="lastSchoolCountryH">Land</label>
-                    <select name="lastSchoolCountryH" id="lastSchoolCountryH" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="name" data-default-no-value data-search></select>
+                    <select name="lastSchoolCountryH" id="lastSchoolCountryH" data-load-source="{{select:url:short}}/general/country" data-default-no-value data-search></select>
                 </div>
 
                 <div class="col-lg-3 col-12 mb-3">
@@ -1146,17 +1146,17 @@
             <div class="row">
                 <div class="col-lg-4 col-12 mb-3">
                     <label for="homeLanguage" class="form-label">Wat is de hoofd thuistaal van de leerling?</label>
-                    <select name="homeLanguage" id="homeLanguage" data-load-source="{{select:url:short}}/general/language" data-load-value="id" data-load-label="name" data-default-no-value data-search></select>
+                    <select name="homeLanguage" id="homeLanguage" data-load-source="{{select:url:short}}/general/language" data-default-no-value data-search></select>
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label for="homeLanguageMore" class="form-label">Welke talen worden door de leerling nog thuis gebruikt?</label>
-                    <select name="homeLanguageMore" id="homeLanguageMore" data-load-source="{{select:url:short}}/general/language" multiple data-load-value="id" data-load-label="name" data-default-no-value data-search></select>
+                    <select name="homeLanguageMore" id="homeLanguageMore" data-load-source="{{select:url:short}}/general/language" multiple data-default-no-value data-search></select>
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label for="howLongDutch" class="form-label">Hoe lang spreekt de leerling al Nederlands?</label>
-                    <select name="howLongDutch" id="howLongDutch" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=howLongDutch" data-load-value="id" data-load-label="name"></select>
+                    <select name="howLongDutch" id="howLongDutch" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=howLongDutch"></select>
                 </div>
             </div>
 
@@ -1173,7 +1173,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label for="problemLearnProblem" class="form-label">Welke leerproblemen heeft de leerling?</label>
-                    <select name="problemLearnProblem" id="problemLearnProblem" multiple data-on-change="checkProblemLearnProblem" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemLearnProblem" data-load-value="id" data-load-label="name"></select>
+                    <select name="problemLearnProblem" id="problemLearnProblem" multiple data-on-change="checkProblemLearnProblem" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemLearnProblem"></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
@@ -1187,7 +1187,7 @@
 
                 <div class="col-12 mb-3 d-none" id="problemLearnCertificateReceivedContainer">
                     <label for="problemLearnCertificateReceived" class="form-label">Hoe krijgt de school inzage in dit attest?</label>
-                    <select name="problemLearnCertificateReceived" id="problemLearnCertificateReceived" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemLearnCertificateReceived" data-load-value="id" data-load-label="name"></select>
+                    <select name="problemLearnCertificateReceived" id="problemLearnCertificateReceived" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemLearnCertificateReceived"></select>
                 </div>
             </div>
 
@@ -1256,7 +1256,7 @@
 
             <div class="row">
                 <label for="problemHealthInternConsultConsult" class="form-label">Wenst u bepaalde gegevens verder te bespreken met de klassenleraar, de leerlingbegeleiding of de directie?</label>
-                <select name="problemHealthInternalConsult" id="problemHealthInternalConsult" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemHealthInternalConsult" data-load-value="id" data-load-label="name"></select>
+                <select name="problemHealthInternalConsult" id="problemHealthInternalConsult" data-load-source="{{select:url:short}}/{{url:part.module}}/options?o=problemHealthInternalConsult"></select>
             </div>
         </fieldset>
     </div>

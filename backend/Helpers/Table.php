@@ -15,7 +15,7 @@ abstract class Table
         $url = explode("/", $url);
 
         $navRepo = new Navigation;
-        $navItem = $navRepo->getByParentIdAndLink($navRepo->getByLink($url[1])->id, $url[2]);
+        $navItem = $navRepo->getByParentIdAndLink($navRepo->getByLinkAndType($url[1], "M")->id, $url[2]);
 
         return (new TableDef)->getByNavigationId($navItem->id);
     }

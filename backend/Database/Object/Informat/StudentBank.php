@@ -2,7 +2,7 @@
 
 namespace Database\Object\Informat;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\CString;
 
 class StudentBank extends CustomObject

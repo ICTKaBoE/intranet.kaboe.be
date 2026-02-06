@@ -2,46 +2,40 @@
 
 namespace Controllers\API\Cron;
 
+use Helpers\Log;
 use Security\User;
 use Security\Input;
 use Helpers\General;
+use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\School\School;
 use Database\Repository\Mail\Mail;
-use Database\Repository\Navigation\Navigation;
 use Database\Repository\Mail\Receiver;
-use Database\Object\Sync\Sync as ObjectSync;
-use Database\Repository\School\Institute;
+use Database\Repository\School\School;
 use Database\Repository\Informat\Student;
+use Database\Repository\School\Institute;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Repository\Informat\Employee;
+use Database\Repository\General\Schoolyear;
+use Database\Repository\Navigation\Setting;
 use M365\Repository\User as RepositoryUser;
+use Database\Object\Sync\Sync as ObjectSync;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Informat\Registration;
+use Database\Repository\Navigation\Navigation;
 use Database\Repository\Informat\EmployeeEmail;
-use Database\Repository\Sync\Sync as RepositorySync;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Repository\Informat\RegistrationClass;
-use Database\Repository\Navigation\Setting;
-use Helpers\Log;
-use Security\FileSystem;
+use Database\Repository\Sync\Sync as RepositorySync;
 
 abstract class Sync
 {
     static public function Prepare()
     {
-        define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
-        define("_LOGLOCATION_", "cron/sync");
-        Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Schoolyear: " . General::getSchoolyear());
-
         $prepareEmployee = self::PrepareEmployee();
         $prepareStudent = self::PrepareStudent();
-
-        Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
 
         return ($prepareEmployee && $prepareStudent);
     }
@@ -56,7 +50,7 @@ abstract class Sync
         $m365UserRepo = new RepositoryUser;
         $informatEmployeeRepo = new Employee;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
         $_firstName = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
         $_photo = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.employee")->value, 'bool');
@@ -74,6 +68,10 @@ abstract class Sync
         // Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
 
         foreach ($informatEmployees as $informatEmployee) {
+            if (!$informatEmployee->linked->institute->linked->school->sync && !$informatEmployee->linked->institute->linked->school->linked->parentSchool->sync) continue;
+
+            $employeeOU = $informatEmployee->linked->institute->linked->school->syncEmployeeOU ?? $informatEmployee->linked->institute->linked->school->linked->parentSchool->syncEmployeeOU;
+
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$informatEmployee->informatId} - {$informatEmployee->name} {$informatEmployee->firstName}");
             $sync = $syncRepo->getByEmployeeId($informatEmployee->informatId) ?? new ObjectSync;
@@ -176,7 +174,7 @@ abstract class Sync
                     $sync->thumbnailPhoto = FileSystem::GetDownloadLink(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg");
             }
 
-            $CompanyName = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.companyName.employee")->value;
+            $CompanyName = $informatEmployee->linked->institute->linked->school->syncEmployeeCompanyName ?? $informatEmployee->linked->institute->linked->school->linked->parentSchool->syncEmployeeCompanyName;
             if (Strings::contains($m365User?->getCompanyName(), "COLTD")) $CompanyName = "COLTD, {$CompanyName}";
 
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365User ? "" : "not") . " found; M365 Enabled: " . ($m365User ? ($m365User->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; Informat Active: " . ($informatEmployee->active ? "YES" : "NO") . "; In Service: " . ($inService ? "YES" : "NO"));
@@ -210,7 +208,7 @@ abstract class Sync
                 $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
                 $sync->otherAttributes = (is_null($OtherAttributes) || empty($OtherAttributes)) ? null : $OtherAttributes;
                 $sync->password = User::generatePassword();
-                $sync->ou = $settingRepo->getByNavigationIdAndKey($navigation->id, "default.ou.employee")->value;
+                $sync->ou = $employeeOU;
 
                 // foreach ($sync as $k => $v) if (!is_null($v)) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$k}: {$v}");
             }
@@ -320,7 +318,7 @@ abstract class Sync
         $informatRegistrationClassRepo = new RegistrationClass;
         $informatClassgroupRepo = new ClassGroup;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
         $_minDepartmentCodes = Arrays::map($_minDepartmentCodes, fn($m) => Strings::trimToNull($m));
         $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
@@ -339,6 +337,8 @@ abstract class Sync
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($informatStudents) . " students");
 
         foreach ($informatStudents as $informatStudent) {
+            if (!$informatStudent->linked->institute->linked->school->sync && !$informatStudent->linked->institute->linked->school->linked->parentSchool->sync) continue;
+
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$informatStudent->informatId} - {$informatStudent->name} {$informatStudent->firstName}");
 
@@ -381,8 +381,9 @@ abstract class Sync
             $DisplayName = Input::createDisplayName($settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value, $informatStudent->firstName, $informatStudent->name);
             $EmailAddress = Input::createEmail($settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value, $informatStudent->firstName, $informatStudent->name, EMAIL_SUFFIX_STUDENT);
 
-            $CompanyName = str_replace("{{school:name}}", $school->name, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.companyName.student")->value);
-            $OU = str_replace("{{school:adOuPart}}", $school->adOuPart, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.ou.student")->value);
+            $CompanyName = $informatStudent->linked->institute->linked->school->syncEmployeeCompanyName ?? $informatStudent->linked->institute->linked->school->linked->parentSchool->syncEmployeeCompanyName;;
+            $OU = $informatStudent->linked->institute->linked->school->syncEmployeeOU ?? $informatStudent->linked->institute->linked->school->linked->parentSchool->syncEmployeeOU;
+            $OU = str_replace("{{school:adOuPart}}", $school->adOuPart, $OU);
 
             $MemberOf = [];
 
@@ -534,7 +535,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $_mainSchool = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.mainSchool")->value;
         $_mailType = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.mailType")->value;
 
@@ -577,7 +578,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $_mailType = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.mailType")->value;
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
@@ -614,7 +615,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
 
@@ -672,7 +673,7 @@ abstract class Sync
         $mailReceiverRepo = new Receiver;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
 
         $employee = $informatEmployeeRepo->getByInformatId($sync->employeeId);
 
@@ -715,7 +716,7 @@ abstract class Sync
         $informatClassgroupRepo = new ClassGroup;
         $settingRepo = new Setting;
 
-        $navigation = (new Navigation)->getByLink('sync');
+        $navigation = (new Navigation)->getByLinkAndType('sync', "M");
 
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;

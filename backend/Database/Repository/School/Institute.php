@@ -3,6 +3,7 @@
 namespace Database\Repository\School;
 
 use Database\Interface\Repository;
+use Ouzo\Utilities\Arrays;
 
 class Institute extends Repository
 {

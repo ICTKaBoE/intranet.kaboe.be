@@ -15,18 +15,21 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
+use Database\Object\Export\Export as ExportExport;
 use Database\Repository\Holliday;
 use Database\Repository\User\Address;
+use Database\Repository\Export\Export;
 use Database\Repository\School\School;
 use Database\Repository\SupervisionEvent;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\Navigation;
 use Database\Repository\User\User as RepositoryUser;
 use Database\Object\SupervisionEvent as ObjectSupervisionEvent;
 
 class SupervisionController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "supervision";
+
     // Get functions
     protected function getFill($view, $id = null)
     {
@@ -56,14 +59,13 @@ class SupervisionController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        return $this->getNavigationSettings("supervision");
+        return $this->getNavigationSettings();
     }
 
     // Post functions
     protected function postFill($view, $id = null)
     {
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("supervision");
 
         $_fields = [
             "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
@@ -79,19 +81,19 @@ class SupervisionController extends ApiController
             $fields['start'] = $fields['date'] . " " . $fields['start'];
             $fields['end'] = $fields['date'] . " " . $fields['end'];
 
-            if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.enabled")->value, "bool")) {
+            if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.enabled")->value, "bool")) {
                 $pastDate = Clock::now()->toDateTime();
-                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value);
+                if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.amount")->value);
                 $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value);
+                if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value);
 
                 if (Clock::at($fields['date'])->isBefore($pastDate)) $this->setToast("U kan geen middagtoezicht inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
             }
 
-            if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.enabled")->value, "bool")) {
+            if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.enabled")->value, "bool")) {
                 $futureDate = Clock::now()->toDateTime();
-                if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value);
+                if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.amount")->value !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.amount")->value);
                 $futureDate = Clock::at($futureDate->format('Y-m-d'));
 
                 if (Clock::at($fields['date'])->isAfter($futureDate)) $this->setToast("U kan geen middagtoezicht inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
@@ -135,10 +137,10 @@ class SupervisionController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("supervision");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
             "per",
@@ -165,10 +167,8 @@ class SupervisionController extends ApiController
             $fields['start'] .= " 00:00:00";
             $fields['end'] .= " 23:59:59";
 
-            if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'xlsx')) $this->exportPerSchoolAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'pdf')) $this->exportPerSchoolAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "xlsx")) $this->exportPerTeacherAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "pdf")) $this->exportPerTeacherAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            if (Strings::equal($fields['per'], "school")) $this->exportPerSchool($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher")) $this->exportPerTeacher($fields['school'], $fields['start'], $fields['end'], $fields['type']);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
 
         $this->handle();
@@ -193,12 +193,12 @@ class SupervisionController extends ApiController
     }
 
     // Export functions
-    protected function exportPerSchoolAsXlsx($schoolIds, $start, $end)
+    private function exportPerSchool($schoolIds, $start, $end)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("supervision")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value;
 
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/supervision/" . date("YmdHis"));
         $filename = "Middagtoezichten - Export Per School.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
@@ -293,108 +293,11 @@ class SupervisionController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    protected function exportPerSchoolAsPdf($schoolIds, $start, $end)
+    private function exportPerTeacher($schoolIds, $start, $end)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("supervision")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value;
 
-        $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $zipFileName = "Middagtoezichten - Export Per School.zip";
-        $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
-
-        foreach ($schoolIds as $index => $schoolId) {
-            $schoolTotalMinutes = 0;
-            $groupedEvents = $this->getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end);
-
-            $school = $schoolRepo->get($schoolId)[0];
-            $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Middagtoezichten - Overzicht: {$school->name}");
-
-            $pdf->AddPage();
-            $pdf->Cell(60, 10, 'Startdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($start)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Einddatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($end)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Laatste uitbetalingsdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-
-            $table = [];
-            $table['header'][] = [
-                "title" => "Leerkracht",
-                "border" => "B",
-                "width" => 60
-            ];
-
-            foreach ($monthsBetweenDates as $month) {
-                $table['header'][] = [
-                    'title' => $month,
-                    "border" => "B"
-                ];
-            }
-
-            $table['header'][] = [
-                "title" => "Totaal",
-                "border" => "LB",
-                "width" => 30
-            ];
-
-            $table['header'][] = [
-                "title" => "in decimalen",
-                "border" => "B",
-                "width" => 30
-            ];
-
-            foreach ($groupedEvents as $user => $events) {
-                $userTotalMinutes = 0;
-
-                $table['data'][$user][] = $user;
-
-                foreach ($monthsBetweenDates as $month) {
-                    $table['data'][$user][] = intdiv($events[$month]['time'], 60) . "u " . str_pad(($events[$month]['time'] % 60), 2, "0", STR_PAD_LEFT) . "m";
-                    $userTotalMinutes += $events[$month]['time'] ?? 0;
-                }
-
-                $table['data'][$user][] = [
-                    "text" => intdiv($userTotalMinutes, 60) . "u " . str_pad(($userTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m",
-                    "border" => "L"
-                ];
-
-                $table['data'][$user][] = number_format($userTotalMinutes / 60, 2, ",", ".");
-
-                $schoolTotalMinutes += $userTotalMinutes;
-            }
-
-            $table['data']['total'][] = [];
-            foreach ($monthsBetweenDates as $m) {
-                $table['data']['total'][] = [];
-            }
-
-            $table['data']['total'][] = [
-                "text" => intdiv($schoolTotalMinutes, 60) . "u " . str_pad(($schoolTotalMinutes % 60), 2, "0", STR_PAD_LEFT) . "m",
-                "border" => "T"
-            ];
-
-            $table['data']['total'][] = [
-                "text" => number_format($schoolTotalMinutes / 60, 2, ",", "."),
-                "border" => "T"
-            ];
-
-            $pdf->Ln(10);
-            $pdf->table($table);
-
-            $pdf->save();
-        }
-
-        $zipFile = new ZIP("{$folder}/{$zipFileName}");
-        $zipFile->addDir($folder);
-        $zipFile->save();
-        if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
-    }
-
-    protected function exportPerTeacherAsXlsx($schoolIds, $start, $end)
-    {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("supervision")->id, "lastPayDate")->value;
-
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/supervision/" . date("YmdHis"));
         $filename = "Middagtoezichten - Export Per Leerkracht.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
         $excel = new Excel("{$folder}/{$filename}");
@@ -517,129 +420,6 @@ class SupervisionController extends ApiController
 
         $excel->save();
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
-    }
-
-    protected function exportPerTeacherAsPdf($schoolIds, $start, $end)
-    {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("supervision")->id, "lastPayDate")->value;
-
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $zipFileName = "Middagtoezichten - Export Per Leerkracht.zip";
-        $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
-        $groupedEvents = $this->getEventsGroupedByMonthByTeacherBySchool($start, $end, $schoolIds);
-
-        foreach ($groupedEvents as $username => $userEvent) {
-            $index = array_search($username, array_keys($groupedEvents));
-            $user = $userEvent['user'];
-            $address = $userEvent['address'];
-            $events = $userEvent['events'];
-
-            $userTotal = 0;
-            $pdf = new PDF($user->formatted->fullNameReversed, "{$folder}/{$user->formatted->fullNameReversed}.pdf", "P", "Middagtoezichten - Overzicht: {$user->formatted->fullNameReversed}");
-
-            $pdf->AddPage();
-            $pdf->Cell(60, 10, 'Hoofdschool', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $user->linked->mainSchool->name, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Adres', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $address->formatted->address, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Rekeningnummer', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $user->bankAccount, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Startdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($start)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Einddatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($end)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Laatste uitbetalingsdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-
-            $table = [];
-            $table['header'][] = ["title" => "School", "width" => 50];
-            $table['header'][] = ["title" => "Datum", "width" => 30];
-            $table['header'][] = ["title" => "Start", "width" => 20];
-            $table['header'][] = ["title" => "Einde"];
-            $table['header'][] = ["title" => "Minuten", "width" => 20];
-            $table['header'][] = ["title" => "in decimalen", "width" => 30];
-
-            foreach ($monthsBetweenDates as $month) {
-                $monthTotal = 0;
-
-                $table['data'][][] = [
-                    "text" => $month,
-                    "width" => 0
-                ];
-
-                foreach ($events[$month] as $index => $event) {
-                    $table['data'][$event->start][] = $event->linked->school->name;
-                    $table['data'][$event->start][] = Clock::at($event->start)->format("d/m/Y");
-                    $table['data'][$event->start][] = Clock::at($event->start)->format("H:i");
-                    $table['data'][$event->start][] = Clock::at($event->end)->format("H:i");
-                    $table['data'][$event->start][] = intdiv($event->diffInMinutes, 60) . "u " . str_pad(($event->diffInMinutes % 60), 2, "0", STR_PAD_LEFT) . "m";
-                    $table['data'][$event->start][] = number_format(($event->diffInMinutes / 60), 2, ",", ".");
-
-                    $monthTotal += $event->diffInMinutes;
-                }
-
-                $table['data'][$month][] =
-                    [
-                        "text" => count($events[$month] ?? []) . " toezicht(ten)",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => "",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => "",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => "",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => intdiv($monthTotal, 60) . "u " . str_pad(($monthTotal % 60), 2, "0", STR_PAD_LEFT) . "m",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => number_format(($monthTotal / 60), 2, ",", "."),
-                        "border" => 'T'
-                    ];
-
-                $table['data'][][] = "";
-
-                $userTotal += $monthTotal;
-            }
-
-            $table2 = [];
-            $table2['header'][] = ["title" => "Totaal"];
-            $table2['header'][] = ["title" => ""];
-            $table2['header'][] = ["title" => ""];
-            $table2['header'][] = ["title" => ""];
-            $table2['header'][] = ["title" => intdiv($userTotal, 60) . "u " . str_pad(($userTotal % 60), 2, "0", STR_PAD_LEFT) . "m"];
-            $table2['header'][] = ["title" => number_format(($userTotal / 60), 2, ",", ".")];
-
-            $pdf->Ln(10);
-            $pdf->table($table);
-
-            $pdf->Ln(10);
-            $pdf->table($table2);
-
-            $pdf->save();
-        }
-
-        $zipFile = new ZIP("{$folder}/{$zipFileName}");
-        $zipFile->addDir($folder);
-        $zipFile->save();
-        if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
     }
 
     protected function getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end)

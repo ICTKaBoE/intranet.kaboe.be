@@ -4,8 +4,7 @@ namespace Database\Object;
 
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use stdClass;
 
 class Holliday extends CustomObject
@@ -14,8 +13,8 @@ class Holliday extends CustomObject
         "id" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
-        "start" => self::TYPE_DATETIME,
-        "end" => self::TYPE_DATETIME,
+        "start" => self::TYPE_DATE,
+        "end" => self::TYPE_DATE,
         "fullDay" => self::TYPE_BOOLEAN,
         "deleted" => self::TYPE_BOOLEAN
     ];
@@ -38,8 +37,6 @@ class Holliday extends CustomObject
         if ($this->fullDay) {
             $this->start = Arrays::first(explode(" ", $this->start));
             $this->end = Arrays::first(explode(" ", $this->end));
-
-            if (!Strings::equal($this->start, $this->end)) $this->end = Clock::at($this->end)->plusDays(1)->format("Y-m-d");
         }
     }
 }

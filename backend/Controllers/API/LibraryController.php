@@ -22,6 +22,8 @@ use Database\Object\Library\BookHistory as LibraryBookHistory;
 
 class LibraryController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "library";
+
     // Get Functions
     protected function getAuthor($view, $id = null)
     {

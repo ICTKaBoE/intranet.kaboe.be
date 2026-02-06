@@ -35,8 +35,7 @@ class GeneralMessageComponentController extends ComponentController
     {
         $repo = new Navigation;
         $domain = Helpers::url()->getHost();
-        $routeGroup = (new Group)->getByDomain($domain);
-        $module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
+        $module = $repo->getByLinkAndType(Helpers::getModule(), "M");
 
         $messages = (new Message)->getByNavigationId($module->id ?: 0);
         $messages = Arrays::filter($messages, fn($m) => $m->show);

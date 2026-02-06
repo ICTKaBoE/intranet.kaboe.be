@@ -6,7 +6,7 @@ use Helpers\HTML;
 use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Informat\Student;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Sync\Action;

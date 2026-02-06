@@ -13,6 +13,8 @@ use Ouzo\Utilities\Strings;
 
 class IndexController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "index";
+
     // Get functions
     protected function getList($view, $id = null)
     {

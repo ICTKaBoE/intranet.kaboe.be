@@ -17,7 +17,7 @@ abstract class HTML
 	static public function Icon($icon, $title = null, $color = null, $class = [], $style = [])
 	{
 		if (!$icon) return "";
-		$classes = ["ti", "icon", ...$class];
+		$classes = ["ti", "icon", "icon-1", ...$class];
 		$styles = [];
 
 		if ($icon) $classes[] = "ti-{$icon}";

@@ -14,7 +14,7 @@ use Ouzo\Utilities\Clock;
 
 abstract class JAMF
 {
-    public static function ImportIPads()
+    public static function Import()
     {
         $start = Clock::now();
         $schools = (new School)->get();
@@ -41,7 +41,7 @@ abstract class JAMF
         $end = Clock::now();
 
         $repo = new Setting;
-        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByLink('management')->id, "ipad.lastSyncTime");
+        $item = $repo->getByNavigationIdAndKey((new Navigation)->getByLinkAndType('management', "M")->id, "ipad.lastSyncTime");
         $item->value = $start->format("d/m/Y H:i:s") . ' - ' . $end->format('d/m/Y H:i:s') . ' (' . (strtotime($end->format("Y-m-d H:i:s")) - strtotime($start->format("Y-m-d H:i:s"))) . ' seconden)';
         $repo->set($item);
 

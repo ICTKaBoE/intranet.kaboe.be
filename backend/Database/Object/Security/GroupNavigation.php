@@ -2,7 +2,7 @@
 
 namespace Database\Object\Security;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class GroupNavigation extends CustomObject
 {

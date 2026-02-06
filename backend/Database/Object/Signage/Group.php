@@ -2,7 +2,7 @@
 
 namespace Database\Object\Signage;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Group extends CustomObject
 {

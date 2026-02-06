@@ -24,12 +24,20 @@ use Database\Repository\Navigation\Navigation;
 use Database\Object\Route\Group as ObjectSchool;
 use Database\Repository\Security\GroupNavigation;
 use Database\Object\General\Message as GeneralMessage;
+use Database\Object\School\Course as SchoolCourse;
+use Database\Object\School\Department as SchoolDepartment;
+use Database\Object\School\Hour as SchoolHour;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
+use Database\Repository\School\Course;
+use Database\Repository\School\Department;
+use Database\Repository\School\Hour;
 
 class ConfigurationController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "configuration";
+
     // Get functions
     protected function getGeneral($view, $id = null)
     {
@@ -77,6 +85,57 @@ class ConfigurationController extends ApiController
     protected function getSchools($view, $id = null)
     {
         $repo = new School;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            [$defaultOrder, $columns] = Table::Format();
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get();
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+            $group = $repo->getById($id);
+            $this->appendToJson('fields', $group);
+        }
+    }
+
+    protected function getDepartment($view, $id = null)
+    {
+        $repo = new Department;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            [$defaultOrder, $columns] = Table::Format();
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get();
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+            $group = $repo->getById($id);
+            $this->appendToJson('fields', $group);
+        }
+    }
+
+    protected function getCourse($view, $id = null)
+    {
+        $repo = new Course;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            [$defaultOrder, $columns] = Table::Format();
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get();
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+            $group = $repo->getById($id);
+            $this->appendToJson('fields', $group);
+        }
+    }
+
+    protected function getHours($view, $id = null)
+    {
+        $repo = new Hour;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -194,7 +253,15 @@ class ConfigurationController extends ApiController
 
         $_fields = [
             "name" => ["mandatory" => true],
+            "virtual",
+            "parentSchoolId" => ['default' => 0, 'trimToNull' => true],
             "color",
+            "import",
+            "sync",
+            "syncEmployeeCompanyName",
+            "syncStudentCompanyName",
+            "syncEmployeeOU",
+            "syncStudentOU",
             "intuneOrderIdPrefix",
             "jamfIpadPrefix",
             "adJobTitlePrefix",
@@ -211,6 +278,89 @@ class ConfigurationController extends ApiController
 
             if ($this->validationIsAllGood()) {
                 $item = $repo->getById($id) ?? new ObjectSchool;
+                $item->fillWithPostData();
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
+    protected function postDepartment($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $_fields = [
+            "name" => ["mandatory" => true],
+            "schoolId" => ["mandatory" => true]
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Department;
+
+            if ($this->validationIsAllGood()) {
+                $item = $repo->getById($id) ?? new SchoolDepartment;
+                $item->fillWithPostData();
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
+    protected function postCourse($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $_fields = [
+            "schoolId" => ["mandatory" => true],
+            "departmentId" => ["mandatory" => true],
+            "name" => ["mandatory" => true],
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Course;
+
+            if ($this->validationIsAllGood()) {
+                $item = $repo->getById($id) ?? new SchoolCourse;
+                $item->fillWithPostData();
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
+    protected function postHours($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $_fields = [
+            "schoolId" => ["mandatory" => true],
+            "start" => ["mandatory" => true],
+            "end" => ["mandatory" => true]
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Hour;
+
+            if ($this->validationIsAllGood()) {
+                $item = $repo->getById($id) ?? new SchoolHour;
                 $item->fillWithPostData();
 
                 $repo->set($item);
@@ -270,8 +420,8 @@ class ConfigurationController extends ApiController
                             "navigationId" => $navItem->id
                         ]));
 
-                        while ($navItem->parentId !== 0 || $navItem->folderId !== 0) {
-                            $navItem = $navRepo->getById($navItem->folderId !== 0 ? $navItem->folderId : $navItem->parentId);
+                        while ($navItem->parentId !== 0) {
+                            $navItem = $navRepo->getById($navItem->parentId);
                             $doesExists = $sgnRepo->get(filters: ['securityGroupId' => $item->id, "navigationId" => $navItem->id]);
 
                             if (!$doesExists) {
@@ -295,8 +445,8 @@ class ConfigurationController extends ApiController
                             "navigationId" => $navItem->id
                         ]));
 
-                        while ($navItem->parentId !== 0 || $navItem->folderId !== 0) {
-                            $navItem = $navRepo->getById($navItem->folderId !== 0 ? $navItem->folderId : $navItem->parentId);
+                        while ($navItem->parentId !== 0) {
+                            $navItem = $navRepo->getById($navItem->parentId);
                             $doesExists = $sgnRepo->get(filters: ['securityGroupId' => $item->id, "navigationId" => $navItem->id]);
 
                             if (!$doesExists) {

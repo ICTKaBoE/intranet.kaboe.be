@@ -17,6 +17,9 @@
 		let siteVersion = ("{{setting:site.version}}").replaceAll(".", "");
 	</script>
 
+	{{component:modal}}
+	{{component:toast}}
+
 	{{content:page:js}}
 	{{load:body}}
 </body>

@@ -6,38 +6,26 @@ import Component from "../../../../../shared/default/js/object/Component.js";
 import Checkbox from "../../../../../shared/default/js/object/Checkbox.js";
 
 window.renderOptgroupItem = (data, escape) => {
-	return (
-		"<div>" +
-		(data.optgroupName ? `${data.optgroupName} - ` : "") +
-		`${data.name}</div>`
-	);
+	return `<div>${data?.formatted?.name || data.name}</div>`;
 };
 
 window.locationView = (info) => {
-	let location = Select.GetInstance("location").getValue();
-	location = location.split("-")[0];
+	let location = Select.GetInstance("location").getItemDetails();
+	if (!location) return;
 
-	if (location === "O")
+	if (location?.linked?.category?.extendedOptions || location.extendedOptions)
 		document.getElementById("location-O").classList.remove("d-none");
 	else document.getElementById("location-O").classList.add("d-none");
 };
 
 window.partyView = (info) => {
-	let party = Select.GetInstance("party").getValue();
+	let party = Select.GetInstance("party").getItemDetails();
+	if (!party) return;
 
-	if (party === "E") {
-		document.getElementById("party-E").classList.remove("d-none");
-		document.getElementById("party-O").classList.add("d-none");
-		document.getElementById("party-I").classList.add("d-none");
-	} else if (party === "O") {
-		document.getElementById("party-E").classList.add("d-none");
-		document.getElementById("party-O").classList.remove("d-none");
-		document.getElementById("party-I").classList.add("d-none");
-	} else if (party === "I") {
-		document.getElementById("party-E").classList.add("d-none");
-		document.getElementById("party-O").classList.add("d-none");
-		document.getElementById("party-I").classList.remove("d-none");
-	}
+	$(`[id='party-E']`).addClass("d-none");
+	$(`[id='party-O']`).addClass("d-none");
+	$(`[id='party-I']`).addClass("d-none");
+	$(`[id='party-${party.extendedOptions}']`).removeClass("d-none");
 };
 
 window.policeView = () => {
@@ -53,6 +41,30 @@ window.supervisionView = () => {
 	if (supervision)
 		document.getElementById("supervision-Y").classList.remove("d-none");
 	else document.getElementById("supervision-Y").classList.add("d-none");
+};
+
+window.witnessView = () => {
+	let witness = Checkbox.GetInstance("chbWitness").getValue();
+
+	if (witness) {
+		document.getElementById("witness-Y").classList.remove("d-none");
+		document.getElementById("witness-N").classList.add("d-none");
+	} else {
+		document.getElementById("witness-Y").classList.add("d-none");
+		document.getElementById("witness-N").classList.remove("d-none");
+	}
+};
+
+window.witnessAfterView = () => {
+	let witnessAfter = Checkbox.GetInstance("chbWitnessAfter").getValue();
+
+	if (witnessAfter) {
+		document.getElementById("witnessAfter-Y").classList.remove("d-none");
+		document.getElementById("whenAndWho-N").classList.add("d-none");
+	} else {
+		document.getElementById("witnessAfter-Y").classList.add("d-none");
+		document.getElementById("whenAndWho-N").classList.remove("d-none");
+	}
 };
 
 let btnCancel = new Button({
@@ -81,45 +93,49 @@ let btnSave = new Button({
 	},
 });
 
-Component.addActionButton(btnCancel, btnSave);
+if (add == "") {
+	Component.addActionButton(btnCancel, btnSave);
 
-Helpers.CheckAllLoaded(() => {
-	setTimeout(() => {
-		window.locationView();
-		window.partyView();
-		window.policeView();
-		window.supervisionView();
-	}, 250);
+	Helpers.CheckAllLoaded(() => {
+		setTimeout(() => {
+			window.locationView();
+			window.partyView();
+			window.policeView();
+			window.supervisionView();
+			window.witnessView();
+			window.witnessAfterView();
+		}, 250);
 
-	setTimeout(() => {
-		Select.GetInstance("informatStudentRelationId").setExtraLoadParam(
-			"informatStudentId",
-			document.getElementById("informatStudentId").value
-		);
-		Select.GetInstance("informatStudentRelationId").reload();
+		setTimeout(() => {
+			Select.GetInstance("informatStudentRelationId").setExtraLoadParam(
+				"informatStudentId",
+				document.getElementById("informatStudentId").value
+			);
+			Select.GetInstance("informatStudentRelationId").reload();
 
-		Select.GetInstance("informatStudentEmailId").setExtraLoadParam(
-			"informatStudentId",
-			document.getElementById("informatStudentId").value
-		);
-		Select.GetInstance("informatStudentEmailId").reload();
+			Select.GetInstance("informatStudentEmailId").setExtraLoadParam(
+				"informatStudentId",
+				document.getElementById("informatStudentId").value
+			);
+			Select.GetInstance("informatStudentEmailId").reload();
 
-		Select.GetInstance("informatStudentNumberId").setExtraLoadParam(
-			"informatStudentId",
-			document.getElementById("informatStudentId").value
-		);
-		Select.GetInstance("informatStudentNumberId").reload();
+			Select.GetInstance("informatStudentNumberId").setExtraLoadParam(
+				"informatStudentId",
+				document.getElementById("informatStudentId").value
+			);
+			Select.GetInstance("informatStudentNumberId").reload();
 
-		Select.GetInstance("informatStudentBankId").setExtraLoadParam(
-			"informatStudentId",
-			document.getElementById("informatStudentId").value
-		);
-		Select.GetInstance("informatStudentBankId").reload();
+			Select.GetInstance("informatStudentBankId").setExtraLoadParam(
+				"informatStudentId",
+				document.getElementById("informatStudentId").value
+			);
+			Select.GetInstance("informatStudentBankId").reload();
 
-		Select.GetInstance("informatStudentAddressId").setExtraLoadParam(
-			"informatStudentId",
-			document.getElementById("informatStudentId").value
-		);
-		Select.GetInstance("informatStudentAddressId").reload();
-	}, 500);
-});
+			Select.GetInstance("informatStudentAddressId").setExtraLoadParam(
+				"informatStudentId",
+				document.getElementById("informatStudentId").value
+			);
+			Select.GetInstance("informatStudentAddressId").reload();
+		}, 500);
+	});
+}

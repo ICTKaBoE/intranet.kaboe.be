@@ -24,13 +24,14 @@ use Database\Repository\Helpdesk\Category;
 use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\Helpdesk\Priority;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Object\Helpdesk\Thread as HelpdeskThread;
 use Database\Object\Helpdesk\Helpdesk as HelpdeskHelpdesk;
 
 class HelpdeskController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "helpdesk";
+
     // Get functions
     protected function getMine($view, $id = null)
     {
@@ -113,31 +114,38 @@ class HelpdeskController extends ApiController
 
     protected function getCategory($view, $id = null)
     {
-        $catRepo = new Category;
+        $repo = new Category;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $mainCategories = $catRepo->getMainCategoryOnly();
-            $optgroups = $items = [];
+            $_items = $repo->get();
 
-            foreach ($mainCategories as $mainCategory) {
-                $subCategories = $catRepo->getByCategoryId($mainCategory->id);
+            $optgroups = array_values(Arrays::filter($_items, fn($i) => is_null($i->categoryId) && count($repo->getByCategoryId($i->id))));
+            $items = array_values(Arrays::filter($_items, fn($i) => !is_null($i->categoryId) || !count($repo->getByCategoryId($i->id))));
+            Arrays::each($items, fn($i) => $i->optgroup = $i->categoryId);
+            $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
 
-                if ($subCategories) {
-                    $optgroups[] = $mainCategory;
-                    foreach ($subCategories as $subCategory) {
-                        $subCategory->optgroup = $mainCategory->id;
-                        $subCategory->optgroupName = $mainCategory->name;
-                        $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
+            // $mainCategories = $catRepo->getMainCategoryOnly();
+            // $optgroups = $items = [];
 
-                        $items[] = $subCategory;
-                    }
-                } else {
-                    $mainCategory->optgroup = SELECT_OTHER_ID;
-                    $items[] = $mainCategory;
-                }
-            }
+            // foreach ($mainCategories as $mainCategory) {
+            //     $subCategories = $catRepo->getByCategoryId($mainCategory->id);
 
-            $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+            //     if ($subCategories) {
+            //         $optgroups[] = $mainCategory;
+            //         foreach ($subCategories as $subCategory) {
+            //             $subCategory->optgroup = $mainCategory->id;
+            //             $subCategory->optgroupName = $mainCategory->name;
+            //             $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
+
+            //             $items[] = $subCategory;
+            //         }
+            //     } else {
+            //         $mainCategory->optgroup = SELECT_OTHER_ID;
+            //         $items[] = $mainCategory;
+            //     }
+            // }
+
+            // $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
 
             $this->appendToJson('optgroups', $optgroups);
             $this->appendToJson('items', $items);
@@ -163,14 +171,13 @@ class HelpdeskController extends ApiController
 
         if (Strings::equal($view, self::VIEW_LIST)) {
             $ticket = $repo->getById($id);
-            $attachments = FileSystem::getFiles(LOCATION_UPLOAD . "/helpdesk/{$ticket->guid}");
+            $attachments = FileSystem::getFiles(LOCATION_FILES . "/helpdesk/{$ticket->guid}");
 
             if (!$attachments) $this->appendToJson('raw', 'Geen bestanden!');
             else {
-
                 $items = Arrays::map($attachments, function ($a) use ($ticket) {
                     $item = new stdClass;
-                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/helpdesk/{$ticket->guid}/{$a}"), $a, HTML::LINK_TARGET_BLANK);
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($a), $a, HTML::LINK_TARGET_BLANK);
 
                     return $item;
                 });
@@ -182,7 +189,7 @@ class HelpdeskController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $this->getNavigationSettings("helpdesk");
+        $this->getNavigationSettings();
     }
 
     // Post functions
@@ -251,7 +258,7 @@ class HelpdeskController extends ApiController
             $helpdesk = $repo->getById($helpdesk->id);
 
             if ($fields['attachments']) {
-                $location = LOCATION_UPLOAD . "/helpdesk/{$helpdesk->guid}";
+                $location = LOCATION_FILES . "/helpdesk/{$helpdesk->guid}";
                 FileSystem::CreateFolder($location);
 
                 foreach ($fields['attachments'] as $index => $attachment) {
@@ -288,7 +295,7 @@ class HelpdeskController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("helpdesk");
+        $this->postNavigationSettings();
     }
 
     // Delete functions
@@ -301,13 +308,12 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.new.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.new.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.new.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.new.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -316,9 +322,9 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.new.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.new.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -337,13 +343,12 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.update.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.update.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.update.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.update.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -352,9 +357,9 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.update.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.update.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -373,13 +378,12 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assigned.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assigned.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assigned.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assigned.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -388,9 +392,9 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assigned.reply")->value, "bool"))   $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assigned.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -409,13 +413,12 @@ class HelpdeskController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("helpdesk");
 
         $h = $repo->get($id)[0];
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assignedUpdate.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assignedUpdate.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assignedUpdate.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assignedUpdate.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -424,9 +427,9 @@ class HelpdeskController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.assignedUpdate.reply")->value, "bool")) $mail->replyTo =   $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.assignedUpdate.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);

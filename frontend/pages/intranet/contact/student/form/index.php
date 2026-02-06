@@ -1,40 +1,4 @@
 <?php
-const TEMPLATE_REPEAT_ADDRESS = '   <div class="datagrid">
-                                        <div class="datagrid-item">
-                                            <div class="datagrid-content">{{address:formatted.full}}</div>
-                                        </div>
-                                    </div>';
-
-const TEMPLATE_REPEAT_RELATION = '  <div class="datagrid">
-                                        <div class="datagrid-item">
-                                            <div class="datagrid-content">{{relation:formatted.typeWithFullNameReversed}}</div>
-                                        </div>
-                                    </div>';
-
-const TEMPLATE_REPEAT_NUMBER = '    <div class="datagrid">
-                                        <div class="datagrid-item">
-                                            <div class="datagrid-content">{{number:formatted.typeWithNumberLink}}</div>
-                                        </div>
-                                    </div>';
-
-const TEMPLATE_REPEAT_EMAIL = ' <div class="datagrid">
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-content">{{email:formatted.typeWithEmailLink}}</div>
-                                    </div>
-                                </div>';
-
-const TEMPLATE_REPEAT_BANK = '  <div class="datagrid">
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-content">{{bank:formatted.details}}</div>
-                                    </div>
-                                </div>';
-
-const TEMPLATE_REPEAT_HISTORY = '   <div class="datagrid">
-                                        <div class="datagrid-item">
-                                            <div class="datagrid-content">{{history:formatted.details}}</div>
-                                        </div>
-                                    </div>';
-
 const LIST_TEMPLATE = " <div class='datagrid-item'>
                             <div class='datagrid-item'>#title#</div>
                             <div class='datagrid-content'>#content#</div>

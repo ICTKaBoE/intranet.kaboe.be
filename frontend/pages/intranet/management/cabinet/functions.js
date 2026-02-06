@@ -1,40 +1,8 @@
 import Button from "../../../../shared/default/js/object/Button.js";
 import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Table from "../../../../shared/default/js/object/Table.js";
-import Select from "../../../../shared/default/js/object/Select.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
-
-window.emptyFilter = () => {
-	Select.GetInstance("schoolId").clear();
-	Select.GetInstance("buildingId").clear();
-	Select.GetInstance("roomId").clear();
-
-	filter();
-};
-
-window.filter = () => {
-	Table.GetInstance(pageId).addExtraData(
-		"schoolId",
-		Select.GetInstance("schoolId").getValue()
-	);
-	Table.GetInstance(pageId).addExtraData(
-		"buildingId",
-		Select.GetInstance("buildingId").getValue()
-	);
-	Table.GetInstance(pageId).addExtraData(
-		"roomId",
-		Select.GetInstance("roomId").getValue()
-	);
-
-	Helpers.closeAllModals();
-	Table.GetInstance(pageId).reload();
-};
-
-window.edit = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
-	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
-};
 
 let btnFilter = new Button({
 	options: {

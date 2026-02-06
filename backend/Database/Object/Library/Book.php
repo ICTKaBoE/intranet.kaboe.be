@@ -2,7 +2,7 @@
 
 namespace Database\Object\Library;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Book extends CustomObject
 {

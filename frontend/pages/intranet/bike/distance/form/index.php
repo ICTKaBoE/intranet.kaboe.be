@@ -9,17 +9,17 @@
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="type">Type</label>
-                    <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-load-value="id" data-load-label="name" data-on-change="changeLocationType" data-default-value="HW" required></select>
+                    <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-on-change="changeLocationType" data-default-value="HW" required></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="startId">Startlocatie</label>
-                    <select name="startId" id="startId" data-load-source="[HW@{{select:url:short}}/user/address;WW@{{select:url:short}}/school]" data-load-value="id" data-load-label="[HW@formatted.address;WW@name]" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-details="HW" required></select>
+                    <select name="startId" id="startId" data-load-source="[HW@{{select:url:short}}/user/address;WW@{{select:url:short}}/school]" data-label="[HW@formatted.address;WW@name]" data-default-details="HW" required></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="endSchoolId">Eindbestemming</label>
-                    <select name="endSchoolId" id="endSchoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                    <select name="endSchoolId" id="endSchoolId" data-load-source="{{select:url:short}}/school" required></select>
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">

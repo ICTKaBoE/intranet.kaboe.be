@@ -2,7 +2,7 @@
 
 namespace Informat\Object;
 
-use Informat\Interface\CustomObject;
+use Security\CustomObject;
 
 class Student extends CustomObject
 {
@@ -28,6 +28,7 @@ class Student extends CustomObject
         "leerlingenkaartNummer" => "string",
         "fietsNummer" => "string",
         "adressen" => "array",
+        "overigeAdressen" => "array",
         "relaties" => "array",
         "comnrs" => "array",
         "emails" => "array",

@@ -9,12 +9,11 @@ export default class Button {
 	constructor({ element = null, options = {} }) {
 		this.options = options;
 		if (element !== null) this.element = element;
-		else {
-			this.element = document.createElement("button");
-			this.create();
-		}
+		else this.element = document.createElement("button");
 
-		this.id = this.element.id;
+		this.create(element === null);
+
+		this.id = this.element.id || Helpers.generateId("btn");
 	}
 
 	static ScanAndCreate = () => {
@@ -34,16 +33,19 @@ export default class Button {
 		return Button.INSTANCES[id] || false;
 	};
 
-	create = () => {
-		this.element.type = "button";
-		this.element.classList.add("btn");
-		if (this.options.bgColor || false)
-			this.element.classList.add(`btn-${this.options.bgColor}`);
+	create = (full = false) => {
+		if (full) {
+			this.element.type = "button";
+			this.element.classList.add("btn");
 
-		if (this.options.title || false) {
-			this.element.title = this.options.title;
-			this.element.dataset.bsToggle = "tooltip";
-			this.element.dataset.bsPlacement = "top";
+			if (this.options.bgColor || false)
+				this.element.classList.add(`btn-${this.options.bgColor}`);
+
+			if (this.options.title || false) {
+				this.element.title = this.options.title;
+				this.element.dataset.bsToggle = "tooltip";
+				this.element.dataset.bsPlacement = "top";
+			}
 		}
 
 		if (this.options.onclick || false)
@@ -58,30 +60,40 @@ export default class Button {
 				Helpers.toggleModal(this.options.modal);
 			});
 
-		switch (this.options.type || Button.TYPE_TEXT) {
-			case Button.TYPE_ICON:
-				{
-					let icon = document.createElement("i");
-					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
+		if (full) {
+			switch (this.options.type || Button.TYPE_TEXT) {
+				case Button.TYPE_ICON:
+					{
+						let icon = document.createElement("i");
+						icon.classList.add(
+							"icon",
+							"ti",
+							`ti-${this.options.icon}`
+						);
 
-					this.element.classList.add("btn-icon");
-					this.element.appendChild(icon);
-				}
-				break;
+						this.element.classList.add("btn-icon");
+						this.element.appendChild(icon);
+					}
+					break;
 
-			case Button.TYPE_ICON_TEXT:
-				{
-					let icon = document.createElement("i");
-					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
+				case Button.TYPE_ICON_TEXT:
+					{
+						let icon = document.createElement("i");
+						icon.classList.add(
+							"icon",
+							"ti",
+							`ti-${this.options.icon}`
+						);
 
-					this.element.appendChild(icon);
-					this.element.innerHTML += this.options.text;
-				}
-				break;
+						this.element.appendChild(icon);
+						this.element.innerHTML += this.options.text;
+					}
+					break;
 
-			default:
-				this.element.innerHTML = this.options.text;
-				break;
+				default:
+					this.element.innerHTML = this.options.text;
+					break;
+			}
 		}
 	};
 

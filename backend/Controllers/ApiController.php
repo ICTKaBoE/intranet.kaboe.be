@@ -26,6 +26,8 @@ class ApiController extends stdClass
 	const VIEW_PS = "ps";
 	const VIEW_SIGNAGE = "signage";
 
+	const CURRENT_NAVIGATION_MODULE_NAME = false;
+
 	private $httpCode = 200;
 	private $validation = [];
 	private $reload = false;
@@ -34,6 +36,13 @@ class ApiController extends stdClass
 	private $notActiveButton = [];
 
 	private $json = [];
+
+	public function __construct()
+	{
+		if (static::CURRENT_NAVIGATION_MODULE_NAME) {
+			define("CURRENT_NAVIGATION_MODULE_ID", (new Navigation)->getByLinkAndType(static::CURRENT_NAVIGATION_MODULE_NAME, "M")->id ?: false);
+		}
+	}
 
 	public function any($view = null, $what = null, $id = null)
 	{
@@ -68,7 +77,9 @@ class ApiController extends stdClass
 		if ($this->closeModal) Arrays::setNestedValue($this->json, ['closeModal'], $this->closeModal);
 		if ($this->reloadTable) Arrays::setNestedValue($this->json, ['reloadTable'], $this->reloadTable);
 		if ($this->reloadCalendar) Arrays::setNestedValue($this->json, ['reloadCalendar'], $this->reloadCalendar);
+		if ($this->reloadList) Arrays::setNestedValue($this->json, ['reloadList'], $this->reloadList);
 		if ($this->resetForm) Arrays::setNestedValue($this->json, ['resetForm'], $this->resetForm);
+		if ($this->enableForm) Arrays::setNestedValue($this->json, ['enableForm'], $this->enableForm);
 		if ($this->activeStep) Arrays::setNestedValue($this->json, ['activeStep'], $this->activeStep);
 		if ($this->activeButton) Arrays::setNestedValue($this->json, ['activeButton'], $this->activeButton);
 		if ($this->notActiveButton) Arrays::setNestedValue($this->json, ['notActiveButton'], $this->notActiveButton);
@@ -137,9 +148,19 @@ class ApiController extends stdClass
 		$this->reloadCalendar = $id ?? true;
 	}
 
+	protected function setReloadList($id = null)
+	{
+		$this->reloadList = $id ?? true;
+	}
+
 	protected function setResetForm()
 	{
 		$this->resetForm = true;
+	}
+
+	protected function setEnableForm()
+	{
+		$this->enableForm = true;
 	}
 
 	protected function setActiveStep($activeStep)
@@ -179,25 +200,22 @@ class ApiController extends stdClass
 		return $this->validation;
 	}
 
-	protected function getNavigationSettings($navigationLink)
+	protected function getNavigationSettings()
 	{
 		$settings = [];
-		$navigation = (new Navigation)->getByParentIdAndLink(0, $navigationLink);
-		foreach ((new Setting)->getByNavigationId($navigation->id) as $setting) $settings[$setting->key] = $setting->value;
+		foreach ((new Setting)->getByNavigationId(CURRENT_NAVIGATION_MODULE_ID) as $setting) $settings[$setting->key] = $setting->value;
 		$this->appendToJson('fields', Arrays::flattenKeysRecursively($settings));
 	}
 
-	protected function postNavigationSettings($navigationLink)
+	protected function postNavigationSettings()
 	{
-		$navigation = (new Navigation)->getByParentIdAndLink(0, $navigationLink);
-
 		$_settings = Helpers::input()->all();
 		$_settings = Arrays::mapKeys($_settings, fn($s) => str_replace("_", ".", $s));
 
 		$repo = new Setting;
 		foreach ($_settings as $k => $v) {
-			$item = $repo->getByNavigationIdAndKey($navigation->id, $k) ?? new NavigationSetting;
-			$item->navigationId = $navigation->id;
+			$item = $repo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, $k) ?? new NavigationSetting;
+			$item->navigationId = CURRENT_NAVIGATION_MODULE_ID;
 			$item->key = $k;
 			$item->value = $v;
 
@@ -205,5 +223,6 @@ class ApiController extends stdClass
 		}
 
 		$this->setToast("De instellingen zijn opgeslagen!");
+		$this->setEnableForm();
 	}
 }

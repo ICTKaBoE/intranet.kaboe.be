@@ -1,14 +1,12 @@
 import Select from "../../../../../shared/default/js/object/Select.js";
 import Button from "../../../../../shared/default/js/object/Button.js";
-import Helpers from "../../../../../shared/default/js/object/Helpers.js";
 import Form from "../../../../../shared/default/js/object/Form.js";
 import Component from "../../../../../shared/default/js/object/Component.js";
 
 window.deviceView = (info) => {
-	let category = Select.GetInstance("category").getValue();
-	category = category.split("-")[0];
+	let category = Select.GetInstance("category").getItemDetails();
 
-	if (category == "O") {
+	if (category.id == window.SELECT_OTHER_ID) {
 		document
 			.getElementById("subject")
 			.parentElement.classList.remove("d-none");
@@ -28,7 +26,10 @@ window.deviceView = (info) => {
 			);
 		if (roomId)
 			Select.GetInstance("assetId").setExtraLoadParam("roomId", roomId);
-		Select.GetInstance("assetId").setDetails(category);
+		Select.GetInstance("assetId").setDetails(
+			category?.linked?.category?.managementType ||
+				category?.managementType
+		);
 
 		setTimeout(() => {
 			if (Form.GetInstance(pageId).locked) {
@@ -40,11 +41,7 @@ window.deviceView = (info) => {
 };
 
 window.renderOptgroupItem = (data, escape) => {
-	return (
-		"<div>" +
-		(data.optgroupName ? `${data.optgroupName} - ` : "") +
-		`${data.name}</div>`
-	);
+	return `<div>${data?.formatted?.name || data.name}</div>`;
 };
 
 let btnCancel = new Button({

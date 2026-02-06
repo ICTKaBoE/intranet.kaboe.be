@@ -55,6 +55,12 @@ class Navigation extends Repository
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
+    public function getByLinkAndType($link, $type)
+    {
+        $statement = $this->prepareSelect(filters: ['link' => $link, 'type' => $type]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
     public function getByParentIdAndLink($parentId, $link)
     {
         $statement = $this->prepareSelect(filters: [
@@ -76,5 +82,16 @@ class Navigation extends Repository
     {
         $statement = $this->prepareSelect(filters: ['default' => 1, 'parentId' => $parentId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
+    public function getByRouteGroupIdLinkAndType($routeGroupId, $link, $type)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'type' => $type,
+            'link' => $link
+        ]);
+
+        $items = $this->executeSelect($statement);
+        return Arrays::filter($items, fn($i) => Arrays::contains(explode(",", $i->routeGroupId), $routeGroupId));
     }
 }

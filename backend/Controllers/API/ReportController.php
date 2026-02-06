@@ -13,11 +13,14 @@ use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\Helpdesk\Status;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\ComputerUsageOnOff;
+use Database\Repository\Registration\Schoolyear;
 use Database\Repository\TempReg\TempReg;
 use Database\Repository\TempReg\Treshhold;
 
 class ReportController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "report";
+
     public function getComputerUsageAmount($view, $id = null)
     {
         $filters = [
@@ -29,15 +32,13 @@ class ReportController extends ApiController
         if ($filters['schoolId']) {
             $repo = new ComputerUsageOnOff;
             $computerRepo = new Computer;
-
-            $start = General::getSchoolyearStartBySchoolyear($filters['schoolyear']);
-            $end = General::getSchoolyearEndBySchoolyear($filters['schoolyear']);
+            $schoolyear = (new Schoolyear)->getByName($filters['schoolyear']);
 
             $computers = $computerRepo->getBySchoolIdAndLikeName($filters['schoolId'], $filters['type']);
             $items = [];
 
             foreach ($computers as $c) {
-                $_items = $repo->getByComputerIdBetween($c->id, $start, $end);
+                $_items = $repo->getByComputerIdBetween($c->id, $schoolyear->start, $schoolyear->end);
                 if (!$_items) continue;
 
                 $_items = Arrays::filter($_items, fn($i) => !is_null($i->shutdown) || Strings::isNotBlank($i->shutdown));
@@ -45,7 +46,7 @@ class ReportController extends ApiController
             }
 
             $_usagePerMonth = $usagePerDay = $usagePerWeek = [];
-            foreach (Date::monthsBetweenDates($start, $end, "Y-m") as $m) $_usagePerMonth[$m] = 0;
+            foreach (Date::monthsBetweenDates($schoolyear->start, $schoolyear->end, "Y-m") as $m) $_usagePerMonth[$m] = 0;
             foreach ($items as $i) $_usagePerMonth[Clock::at($i->startup)->format("Y-m")]++;
             foreach ($_usagePerMonth as $k => $v) {
                 $usagePerDay[] = ['x' => $k, 'y' => round($v / (Date::workingDays(Arrays::first(explode("-", $k)), Arrays::last(explode("-", $k))) * count($computers)), 2)];
@@ -77,15 +78,13 @@ class ReportController extends ApiController
         if ($filters['schoolId']) {
             $repo = new ComputerUsageOnOff;
             $computerRepo = new Computer;
-
-            $start = General::getSchoolyearStartBySchoolyear($filters['schoolyear']);
-            $end = General::getSchoolyearEndBySchoolyear($filters['schoolyear']);
+            $schoolyear = (new Schoolyear)->getByName($filters['schoolyear']);
 
             $computers = $computerRepo->getBySchoolIdAndLikeName($filters['schoolId'], $filters['type']);
             $items = [];
 
             foreach ($computers as $c) {
-                $_items = $repo->getByComputerIdBetween($c->id, $start, $end);
+                $_items = $repo->getByComputerIdBetween($c->id, $schoolyear->start, $schoolyear->end);
                 if (!$_items) continue;
 
                 $_items = Arrays::filter($_items, fn($i) => !is_null($i->shutdown) || Strings::isNotBlank($i->shutdown));
@@ -93,7 +92,7 @@ class ReportController extends ApiController
             }
 
             $_usagePerMonth = $usagePerDay = $usagePerWeek = [];
-            foreach (Date::monthsBetweenDates($start, $end, "Y-m") as $m) $_usagePerMonth[$m] = 0;
+            foreach (Date::monthsBetweenDates($schoolyear->start, $schoolyear->end, "Y-m") as $m) $_usagePerMonth[$m] = 0;
             foreach ($items as $i) $_usagePerMonth[Clock::at($i->startup)->format("Y-m")] += $i->seconds;
             foreach ($_usagePerMonth as $k => $v) {
                 $usagePerDay[] = ['x' => $k, 'y' => round($v / (Date::workingDays(Arrays::first(explode("-", $k)), Arrays::last(explode("-", $k))) * count($computers)), 2)];
@@ -123,10 +122,8 @@ class ReportController extends ApiController
 
         if ($filters['schoolId']) {
             $repo = new TempReg;
-
-            $start = General::getSchoolyearStartBySchoolyear($filters['schoolyear']);
-            $end = General::getSchoolyearEndBySchoolyear($filters['schoolyear']);
-            $items = $repo->getBySchoolIdBetween($filters['schoolId'], $start, $end);
+            $schoolyear = (new Schoolyear)->getByName($filters['schoolyear']);
+            $items = $repo->getBySchoolIdBetween($filters['schoolId'], $schoolyear->start, $schoolyear->end);
             $items = Arrays::orderBy($items, 'datetime');
 
             $soup = $pasta = $vegetables = $meat = [];

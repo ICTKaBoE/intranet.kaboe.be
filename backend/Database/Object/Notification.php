@@ -2,7 +2,7 @@
 
 namespace Database\Object;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Notification extends CustomObject
 {

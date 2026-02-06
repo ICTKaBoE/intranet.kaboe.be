@@ -2,7 +2,7 @@
 
 namespace Database\Object\Order;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Supplier extends CustomObject
 {

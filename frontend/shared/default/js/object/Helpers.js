@@ -3,10 +3,13 @@ import Toast from "./Toast.js";
 import Table from "./Table.js";
 import Calendar from "./Calendar.js";
 import Button from "./Button.js";
+import List from "./List.js";
 
 export default class Helpers {
-	static toggleWait = () => {
-		this.toggleModal("wait");
+	static toggleWait = (other = false) => {
+		let id = "wait";
+		if (other) id += `-${other}`;
+		this.toggleModal(id);
 	};
 
 	static toggleModal = (id) => {
@@ -189,6 +192,7 @@ export default class Helpers {
 		if (data.reload) location.reload();
 		if (data.reloadTable) Table.ReloadAll();
 		if (data.reloadCalendar) Calendar.ReloadAll();
+		if (data.reloadList) List.ReloadAll();
 		if (data.download) window.open(data.download, "_blank");
 		if (data.activeButton) {
 			data.activeButton.forEach((btn) => {

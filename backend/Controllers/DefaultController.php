@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Database\Repository\General\Schoolyear;
 use stdClass;
 use Security\User;
 use Router\Helpers;
@@ -36,7 +37,8 @@ class DefaultController extends stdClass
 		"searchField" => \Controllers\COMPONENT\SearchFieldComponentController::class,
 		"extraPageInfo" => \Controllers\COMPONENT\ExtraPageInfoComponentController::class,
 		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
-		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class
+		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class,
+		"manual" => \Controllers\COMPONENT\ManualComponentController::class
 	];
 
 	public function index()
@@ -209,9 +211,9 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{page:id}}", $this->pageId, $this->layout);
 		$this->layout = str_replace("{{page:action}}", $this->pageAction, $this->layout);
 		$this->layout = str_replace("{{site:url}}", $this->siteUrl, $this->layout);
-		$this->layout = str_replace("{{schoolyear}}", General::getSchoolyear(), $this->layout);
-		$this->layout = str_replace("{{schoolyear:start}}", General::getSchoolyearStart(), $this->layout);
-		$this->layout = str_replace("{{schoolyear:end}}", General::getSchoolyearEnd(), $this->layout);
+
+		$currentSchoolyear = (new Schoolyear)->getCurrent();
+		$this->layout = str_replace("{{schoolyear:default}}", $currentSchoolyear->id, $this->layout);
 	}
 
 	private function loadSettings()
@@ -353,7 +355,7 @@ class DefaultController extends stdClass
 		$repo = new Navigation;
 		$domain = Helpers::url()->getHost();
 		$routeGroup = (new Group)->getByDomain($domain);
-		$module = Arrays::firstOrNull($repo->getByRouteGroupIdParentIdAndLink($routeGroup->id, 0, Helpers::getModule()));
+		$module = Arrays::firstOrNull($repo->getByRouteGroupIdLinkAndType($routeGroup->id, Helpers::getModule(), "M"));
 		if (!$module) return [];
 
 		$settings = (new NavigationSetting)->getByNavigationId($module->id);

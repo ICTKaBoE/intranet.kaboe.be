@@ -2,6 +2,7 @@
 
 const TEMPLATE = "  <div class='col-12 col-md-6 col-lg-3 col-xl-2'>
                         <a href='@formatted.linkWithDefault@' target='@formatted.target@' class='card text-center bg-@color@ bg-gradient pb-0'>
+                            @formatted.badge@
                             <div class='card-body'> 
                                 @formatted.icon.dashboard@
                             </div>

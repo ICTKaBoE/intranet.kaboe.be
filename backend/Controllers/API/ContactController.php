@@ -26,6 +26,8 @@ use Database\Repository\Informat\StudentRelation;
 
 class ContactController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "contact";
+
     // Get functions
     protected function getStaff($view, $id = null)
     {

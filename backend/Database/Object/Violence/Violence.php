@@ -4,7 +4,7 @@ namespace Database\Object\Violence;
 
 use stdClass;
 use Ouzo\Utilities\Clock;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 
@@ -17,7 +17,7 @@ class Violence extends CustomObject
         "creatorUserId" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
         "anonymous" => self::TYPE_BOOLEAN,
-        "factsDateTime" => self::TYPE_DATETIME,
+        "factsDate" => self::TYPE_DATE,
         "identityParty" => self::TYPE_STRING,
         "ageParty" => self::TYPE_INTEGER,
         "workingHours" => self::TYPE_BOOLEAN,
@@ -59,9 +59,9 @@ class Violence extends CustomObject
         $this->formatted->creationDateTime->display = Clock::at($this->creationDateTime)->format("d/m/Y H:i:s");
         $this->formatted->creationDateTime->sort = Clock::at($this->creationDateTime)->format("U");
 
-        $this->formatted->factsDateTime = new stdClass;
-        $this->formatted->factsDateTime->display = Clock::at($this->factsDateTime)->format("d/m/Y H:i:s");
-        $this->formatted->factsDateTime->sort = Clock::at($this->factsDateTime)->format("U");
+        $this->formatted->factsDate = new stdClass;
+        $this->formatted->factsDate->display = Clock::at($this->factsDate)->format("d/m/Y");
+        $this->formatted->factsDate->sort = Clock::at($this->factsDate)->format("U");
 
         if (!is_array($this->linked->form)) $this->linked->form = [$this->linked->form];
         if (!is_array($this->linked->out)) $this->linked->out = [$this->linked->out];

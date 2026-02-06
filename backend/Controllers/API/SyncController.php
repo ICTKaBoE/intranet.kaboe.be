@@ -5,18 +5,15 @@ namespace Controllers\API;
 use Helpers\Form;
 use Helpers\Table;
 use Security\User;
-use Router\Helpers;
-use Security\Input;
-use Helpers\General;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Sync\Sync;
-use Database\Repository\Navigation\TableDef;
-use Database\Repository\Navigation\Navigation;
 
 class SyncController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "sync";
+
 
     protected function getEmployee($view, $id = null)
     {
@@ -67,7 +64,7 @@ class SyncController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $this->getNavigationSettings("sync");
+        $this->getNavigationSettings();
     }
 
     protected function postEmployeeChangePassword($view, $id = null)
@@ -120,7 +117,7 @@ class SyncController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("sync");
+        $this->postNavigationSettings();
     }
 
     protected function postUpdate($view, $id = null)

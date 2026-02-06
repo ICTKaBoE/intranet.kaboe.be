@@ -12,6 +12,12 @@ class School extends Repository
         parent::__construct("tbl_school", \Database\Object\School\School::class, orderField: 'name', guidField: false);
     }
 
+    public function getImport()
+    {
+        $statement = $this->prepareSelect(filters: ['import' => true]);
+        return $this->executeSelect($statement);
+    }
+
     public function getByName($name)
     {
         $statement = $this->prepareSelect(filters: ['name' => $name]);

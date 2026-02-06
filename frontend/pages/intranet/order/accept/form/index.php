@@ -32,31 +32,31 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label" for="status">Status</label>
-                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N" disabled></select>
+                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N" disabled></select>
 
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" disabled></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" disabled></select>
 
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="creatorUserId">Aangemaakt door</label>
-                    <select name="creatorUserId" id="creatorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" disabled></select>
+                    <select name="creatorUserId" id="creatorUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" disabled></select>
 
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="acceptorUserId">Goed te keuren door</label>
-                    <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" disabled></select>
+                    <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" disabled></select>
 
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="supplierId">Leverancier</label>
-                    <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-load-value="id" data-load-label="name" disabled></select>
+                    <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" disabled></select>
 
                 </div>
             </div>

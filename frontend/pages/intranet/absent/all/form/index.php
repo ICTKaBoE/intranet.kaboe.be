@@ -7,12 +7,12 @@
         <div class="row">
             <div class="col-lg-4 col-12 mb-3">
                 <label class="form-label" for="schoolId">School</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" data-search required></select>
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-default-value="{{user:mainSchoolId}}" data-search required></select>
             </div>
 
             <div class="col-lg-6 col-12 mb-3">
                 <label for="absentUserId" class="form-label">Afwezige Leerkracht</label>
-                <select name="absentUserId" id="absentUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-search required></select>
+                <select name="absentUserId" id="absentUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" data-search required></select>
             </div>
 
             <div class="col-lg-2 col-12 mb-3">
@@ -42,7 +42,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label class="form-label" for="substituteBy">Leerkracht wordt vervangen door</label>
-                <select name="substituteBy" id="substituteBy" data-load-source="{{select:url:short}}/{{url:part.module}}/substitute" data-load-value="id" data-load-label="name" required data-on-change="substituteByView"></select>
+                <select name="substituteBy" id="substituteBy" data-load-source="{{select:url:short}}/{{url:part.module}}/substitute" required data-on-change="substituteByView"></select>
             </div>
         </div>
 
@@ -55,7 +55,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label class="form-label" for="paymentOfSubstitute">Vervanger wordt betaald via</label>
-                <select name="paymentOfSubstitute" id="paymentOfSubstitute" data-load-source="{{select:url:short}}/{{url:part.module}}/payment" data-load-value="id" data-load-label="name" required data-on-change="paymentOfSubstituteView"></select>
+                <select name="paymentOfSubstitute" id="paymentOfSubstitute" data-load-source="{{select:url:short}}/{{url:part.module}}/payment" required data-on-change="paymentOfSubstituteView"></select>
             </div>
         </div>
 
@@ -74,7 +74,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label class="form-label" for="absentNoteReceived">Ziektebriefje</label>
-                <select name="absentNoteReceived" id="absentNoteReceived" data-load-source="{{select:url:short}}/{{url:part.module}}/note" data-load-value="id" data-load-label="name" required data-on-change="substituteView"></select>
+                <select name="absentNoteReceived" id="absentNoteReceived" data-load-source="{{select:url:short}}/{{url:part.module}}/note" required data-on-change="substituteView"></select>
             </div>
         </div>
 

@@ -23,7 +23,7 @@
 
                 <div class="col-12 mb-3">
                     <label class="form-label" for="acceptableUsers">Kan goedgekeurd worden door</label>
-                    <select name="acceptableUsers" id="acceptableUsers" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" multiple data-search></select>
+                    <select name="acceptableUsers" id="acceptableUsers" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" multiple data-search></select>
 
                 </div>
             </div>

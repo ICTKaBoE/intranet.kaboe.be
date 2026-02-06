@@ -2,12 +2,14 @@
 
 namespace Database\Object\Mail;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Mail extends CustomObject
 {
     protected $objectAttributes = [
         "id" => self::TYPE_INTEGER,
+        "fromEmail" => self::TYPE_STRING,
+        "fromName" => self::TYPE_STRING,
         "subject" => self::TYPE_STRING,
         "body" => self::TYPE_STRING,
         "html" => self::TYPE_BOOLEAN,

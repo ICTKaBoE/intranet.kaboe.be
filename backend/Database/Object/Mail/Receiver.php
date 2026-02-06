@@ -2,7 +2,7 @@
 
 namespace Database\Object\Mail;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Receiver extends CustomObject
 {

@@ -9,13 +9,15 @@
 
 <body data-bs-theme="{{layout:theme}}">
 	{{content:page}}
-
 	{{component:toast}};
 
 	<script>
 		let pageId = "{{page:id}}";
 		let siteVersion = ("{{setting:site.version}}").replaceAll(".", "");
 	</script>
+
+	{{component:modal}}
+	{{component:toast}}
 
 	{{content:page:js}}
 	{{load:body}}

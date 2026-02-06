@@ -11,9 +11,12 @@ use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Holliday;
 use Database\Object\Holliday as ObjectHolliday;
+use Ouzo\Utilities\Clock;
 
 class HollidayController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "holliday";
+
     // Get functions
     protected function getGeneral($view, $id = null)
     {
@@ -57,7 +60,7 @@ class HollidayController extends ApiController
                 $this->appendToJson(data: [
                     "id" => $item->id,
                     "start" => $item->start,
-                    "end" => $item->end,
+                    "end" => ($item->fullDay ? Clock::at($item->end)->plusDays(1)->format("Y-m-d") : $item->end),
                     "title" => ($item->linked->school ? $item->linked->school->name . ": " : "") . $item->name,
                     "allDay" => $item->fullDay
                 ]);

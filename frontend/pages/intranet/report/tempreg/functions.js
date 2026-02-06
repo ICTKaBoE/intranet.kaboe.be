@@ -4,13 +4,6 @@ import Select from "../../../../shared/default/js/object/Select.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 import Chart from "../../../../shared/default/js/object/Chart.js";
 
-window.emptyFilter = () => {
-	Select.GetInstance("schoolId").clear();
-	document.getElementById("schoolyear").value = "";
-
-	filter();
-};
-
 window.filter = () => {
 	Chart.GetInstance(pageId).addExtraData(
 		"schoolId",

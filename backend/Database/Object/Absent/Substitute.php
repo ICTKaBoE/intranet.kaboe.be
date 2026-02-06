@@ -2,7 +2,7 @@
 
 namespace Database\Object\Absent;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Substitute extends CustomObject
 {

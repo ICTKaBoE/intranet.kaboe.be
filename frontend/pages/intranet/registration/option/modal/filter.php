@@ -10,28 +10,28 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="schoolyearId">Schooljaar</label>
-                        <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/schoolyear" data-load-value="id" data-load-label="name"></select>
+                        <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/general/schoolyear"></select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name"></select>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school"></select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="studyyearId">Leerjaar</label>
-                        <select name="studyyearId" id="studyyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/studyyear" data-load-value="id" data-load-label="name" data-parent-select="schoolId"></select>
+                        <select name="studyyearId" id="studyyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/studyyear" data-parent-select="schoolId"></select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="fieldId">Studierichting</label>
-                        <select name="fieldId" id="fieldId" data-load-source="{{select:url:short}}/{{url:part.module}}/field" data-load-value="id" data-load-label="name" data-parent-select="studyyearId"></select>
+                        <select name="fieldId" id="fieldId" data-load-source="{{select:url:short}}/{{url:part.module}}/field" data-parent-select="studyyearId"></select>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.2](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-multipart-v1.5.1...microsoft-kiota-serialization-multipart-v1.5.2) (2025-12-18)
+
+
+### Miscellaneous Chores
+
+* **microsoft-kiota-serialization-multipart:** Synchronize microsoft-kiota-php versions
+
+## [1.5.1](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-multipart-v1.5.0...microsoft-kiota-serialization-multipart-v1.5.1) (2025-10-08)
+
+
+### Miscellaneous Chores
+
+* **microsoft-kiota-serialization-multipart:** Synchronize microsoft-kiota-php versions
+
 ## [1.5.0](https://github.com/microsoft/kiota-php/compare/microsoft-kiota-serialization-multipart-v1.4.0...microsoft-kiota-serialization-multipart-v1.5.0) (2025-02-10)
 
 

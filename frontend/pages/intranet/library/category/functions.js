@@ -4,11 +4,6 @@ import Table from "../../../../shared/default/js/object/Table.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
-window.edit = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
-	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
-};
-
 let btnAdd = new Button({
 	options: {
 		type: Button.TYPE_ICON,

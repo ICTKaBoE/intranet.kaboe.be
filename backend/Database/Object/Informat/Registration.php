@@ -3,7 +3,7 @@
 namespace Database\Object\Informat;
 
 use Ouzo\Utilities\Clock;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Registration extends CustomObject
 {

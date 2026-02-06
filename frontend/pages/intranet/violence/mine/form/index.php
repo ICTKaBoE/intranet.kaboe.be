@@ -1,3 +1,15 @@
+<div class="mb-3 alert alert-important alert-warning col-12 col-lg-6 mx-auto" role="alert">
+    <div class="d-flex">
+        <div class="me-3">
+            <i class="icon ti ti-alert-triangle"></i>
+        </div>
+
+        <div>
+            {{module:description}}
+        </div>
+    </div>
+</div>
+
 <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto">
     <div class="card-header">
         <h1 class="card-title fs-1" role="step-title"></h1>
@@ -7,16 +19,16 @@
         <div class="row">
             <div class="col-lg-4 col-12 mb-3">
                 <label class="form-label" for="schoolId">School</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" data-search required></select>
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-default-value="{{user:mainSchoolId}}" data-search required></select>
             </div>
 
-            <div class="col-lg-8 col-12 mt-5" id="chbAnonymous" role="checkbox" data-default-value="false" data-on-change="anonymousView" data-type="checkbox" data-name="anonymous" data-text="Slachtoffer wenst anoniem te blijven"></div>
+            <div class="col-lg-8 col-12 mt-5" id="chbAnonymous" role="checkbox" data-default-value="true" data-on-change="anonymousView" data-type="checkbox" data-name="anonymous" data-text="Slachtoffer wenst anoniem te blijven"></div>
         </div>
 
         <div class="row">
             <div class="col-12 mb-3">
                 <label for="victimId" class="form-label">Slachtoffer</label>
-                <select name="victimId" id="victimId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-search></select>
+                <select name="victimId" id="victimId" data-load-source="{{select:url:short}}/informat/employee" data-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-search></select>
             </div>
         </div>
     </div>
@@ -24,8 +36,8 @@
     <div class="card-body" data-step="2" data-title="Basisgegevens">
         <div class="row">
             <div class="col-12 mb-3">
-                <label for="factsDateTime" class="form-label">Datum/Uur van de feiten (mag naar schatting)</label>
-                <input type="datetime-local" name="factsDateTime" id="factsDateTime" class="form-control" required />
+                <label for="factsDate" class="form-label">Datum van de feiten</label>
+                <input type="date" name="factsDate" id="factsDate" class="form-control" required />
             </div>
         </div>
 
@@ -50,7 +62,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label for="form" class="form-label">Vorm van het ongewenst gedrag</label>
-                <select name="form" id="form" data-load-source="{{select:url:short}}/{{url:part.module}}/form" data-load-value="id" data-load-label="name" data-on-change="formView" multiple required></select>
+                <select name="form" id="form" data-load-source="{{select:url:short}}/{{url:part.module}}/form" data-on-change="formView" multiple required></select>
             </div>
 
             <div class="col-12 mb-3 d-none" id="form-O">
@@ -59,7 +71,7 @@
 
             <div class="col-12 mb-3">
                 <label for="out" class="form-label">Hoe kwam het ongewenst gedrag tot uiting</label>
-                <select name="out" id="out" data-load-source="{{select:url:short}}/{{url:part.module}}/out" data-load-value="id" data-load-label="name" data-on-change="outView" multiple required></select>
+                <select name="out" id="out" data-load-source="{{select:url:short}}/{{url:part.module}}/out" data-on-change="outView" multiple required></select>
             </div>
 
             <div class="col-12 mb-3 d-none" id="out-O">
@@ -68,7 +80,7 @@
 
             <div class="col-12 mb-3">
                 <label for="intention" class="form-label">De intentie van de derde, zoals beleefd door het slachtoffer</label>
-                <select name="intention" id="intention" data-load-source="{{select:url:short}}/{{url:part.module}}/intention" data-load-value="id" data-load-label="name" data-on-change="intentionView" multiple required></select>
+                <select name="intention" id="intention" data-load-source="{{select:url:short}}/{{url:part.module}}/intention" data-on-change="intentionView" multiple required></select>
             </div>
 
             <div class="col-12 mb-3 d-none" id="intention-O">
@@ -77,7 +89,7 @@
 
             <div class="col-12 mb-3">
                 <label for="consequence" class="form-label">Wat zijn de gevolgen van het ongewenst gedrag</label>
-                <select name="consequence" id="consequence" data-load-source="{{select:url:short}}/{{url:part.module}}/consequence" data-load-value="id" data-load-label="name" multiple></select>
+                <select name="consequence" id="consequence" data-load-source="{{select:url:short}}/{{url:part.module}}/consequence" multiple></select>
             </div>
         </div>
     </div>
@@ -86,7 +98,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label for="cause" class="form-label">Aanleiding van het ongewenst gedrag</label>
-                <select name="cause" id="cause" data-load-source="{{select:url:short}}/{{url:part.module}}/cause" data-load-value="id" data-load-label="name" data-on-change="causeView" multiple></select>
+                <select name="cause" id="cause" data-load-source="{{select:url:short}}/{{url:part.module}}/cause" data-on-change="causeView" multiple></select>
             </div>
         </div>
 
@@ -99,12 +111,12 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label for="damage" class="form-label">Schade of gevolg van het ongewenst gedrag aan personen</label>
-                <select name="damage" id="damage" data-load-source="{{select:url:short}}/{{url:part.module}}/damage" data-load-value="id" data-load-label="name" multiple></select>
+                <select name="damage" id="damage" data-load-source="{{select:url:short}}/{{url:part.module}}/damage" multiple></select>
             </div>
 
             <div class="col-12 mb-3">
                 <label for="damageKind" class="form-label">Soort schade of gevolg van het ongewenst gedrag</label>
-                <select name="damageKind" id="damageKind" data-load-source="{{select:url:short}}/{{url:part.module}}/damageKind" data-load-value="id" data-load-label="name" multiple></select>
+                <select name="damageKind" id="damageKind" data-load-source="{{select:url:short}}/{{url:part.module}}/damageKind" multiple></select>
             </div>
 
             <div class="col-12 mb-3" id="chbPolice" role="checkbox" data-default-value="false" data-type="checkbox" data-name="police" data-text="Aangifte gedaan bij de politie"></div>

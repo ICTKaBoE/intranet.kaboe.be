@@ -2,12 +2,9 @@
 
 namespace Controllers\API;
 
-use Helpers\Table;
 use Router\Helpers;
 use Security\Input;
-use Helpers\General;
 use Security\Session;
-use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
@@ -16,12 +13,12 @@ use Security\User as SecurityUser;
 use Database\Repository\User\Address;
 use Database\Repository\Setting\Setting;
 use Database\Repository\User\LoginHistory;
-use Database\Repository\Navigation\TableDef;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 
 class UserController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "user";
+
     public function login()
     {
         $username = Helpers::input()->post("username")->getValue();

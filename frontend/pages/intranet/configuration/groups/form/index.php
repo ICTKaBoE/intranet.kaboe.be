@@ -16,19 +16,19 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label class="form-label" for="members">Leden</label>
-                    <select name="members" id="members" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" multiple data-search></select>
+                    <select name="members" id="members" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" multiple data-search></select>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12 mb-3">
                     <label class="form-label" for="applications">Applicaties</label>
-                    <select name="applications" id="applications" data-load-source="{{select:url:short}}/navigation/extended" data-load-value="id" data-load-label="name" data-optgroup-attribute="parentId" data-optgroup-value="id" data-optgroup-label="name" data-render-item="renderOptgroupItem" multiple data-search></select>
+                    <select name="applications" id="applications" data-load-source="{{select:url:short}}/navigation/extended" data-optgroup-attribute="parentId" data-render-item="renderOptgroupItem" multiple data-search></select>
                 </div>
 
                 <div class="col-12 mb-3">
                     <label class="form-label" for="links">Links</label>
-                    <select name="links" id="links" data-load-source="{{select:url:short}}/navigation/links" data-load-value="id" data-load-label="name" multiple data-search></select>
+                    <select name="links" id="links" data-load-source="{{select:url:short}}/navigation/links" multiple data-search></select>
                 </div>
             </div>
         </div>

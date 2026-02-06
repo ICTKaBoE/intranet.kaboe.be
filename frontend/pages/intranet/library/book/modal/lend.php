@@ -10,14 +10,14 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="lenderType">Type persoon</label>
-                        <select name="lenderType" id="lenderType" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-load-value="id" data-load-label="name" data-on-change="setLender" required></select>
+                        <select name="lenderType" id="lenderType" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-on-change="setLender" required></select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label" for="lenderInformatId">Persoon</label>
-                        <select name="lenderInformatId" id="lenderInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-default-no-load data-search required></select>
+                        <select name="lenderInformatId" id="lenderInformatId" data-load-source="[S@{{select:url:short}}/informat/student;T@{{select:url:short}}/informat/employee]" data-label="formatted.fullNameReversed" data-extra="[schoolId={{user:mainSchoolId}}]" data-default-no-load data-search required></select>
 
                     </div>
                 </div>

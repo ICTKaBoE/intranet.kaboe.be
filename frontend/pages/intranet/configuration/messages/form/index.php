@@ -14,12 +14,12 @@
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="type">Type</label>
-                    <select name="type" id="type" data-load-source="{{select:url:full}}Type" data-load-value="id" data-load-label="name" required></select>
+                    <select name="type" id="type" data-load-source="{{select:url:full}}Type" required></select>
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="navigationId">Tonen op</label>
-                    <select name="navigationId" id="navigationId" data-load-source="{{select:url:short}}/navigation" data-load-value="id" data-load-label="name" required></select>
+                    <select name="navigationId" id="navigationId" data-load-source="{{select:url:short}}/navigation" required></select>
                 </div>
 
                 <div class="col-12">

@@ -6,7 +6,7 @@ use Helpers\CString;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Mapping;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Bike\DistanceType;
 
 class Event extends CustomObject
@@ -30,7 +30,7 @@ class Event extends CustomObject
     protected $linkedAttributes = [
         "user" => ['userId' => \Database\Repository\User\User::class],
         "userAddress" => ['startId' => \Database\Repository\User\Address::class],
-        "startSchool" => ['startId' => \Database\Repository\School\Address::class],
+        "startSchool" => ['startId' => \Database\Repository\School\School::class],
         "endSchool" => ["endSchoolId" => \Database\Repository\School\School::class],
         "userMainSchool" => ["userMainSchoolId" => \Database\Repository\School\School::class]
     ];

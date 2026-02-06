@@ -40,7 +40,7 @@ const LIST_TEMPLATE = "  <div class='row mb-1 bg-@color@'>
             </div>
         </div>
 
-        <div class="card">
+        <!-- <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Handleiding</h3>
             </div>
@@ -52,7 +52,7 @@ const LIST_TEMPLATE = "  <div class='row mb-1 bg-@color@'>
                 </p>
                 <p>Om te veranderen van maand of jaar: klik op de pijltjes in de hoeken.</p>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 

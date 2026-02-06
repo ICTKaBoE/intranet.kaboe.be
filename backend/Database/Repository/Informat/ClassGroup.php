@@ -12,6 +12,13 @@ class ClassGroup extends Repository
         parent::__construct("tbl_informat_classgroup", \Database\Object\Informat\ClassGroup::class, orderField: 'name', deletedField: false, guidField: 'informatGuid');
     }
 
+    public function getBySchoolyearAndCode($schoolyear, $code)
+    {
+        $statement = $this->prepareSelect(filters: ['schoolyear' => $schoolyear, 'code' => $code]);
+
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
     public function getByInformatId($informatId)
     {
         $statement = $this->prepareSelect(filters: [

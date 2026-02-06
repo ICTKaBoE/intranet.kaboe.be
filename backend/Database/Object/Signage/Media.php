@@ -2,7 +2,7 @@
 
 namespace Database\Object\Signage;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Security\FileSystem;
 
 class Media extends CustomObject

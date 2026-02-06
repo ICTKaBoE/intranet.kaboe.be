@@ -2,7 +2,7 @@
 
 namespace Database\Object\User;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\CString;
 use Security\Input;
 

@@ -2,7 +2,7 @@
 
 namespace Informat\Object;
 
-use Informat\Interface\CustomObject;
+use Security\CustomObject;
 
 class EmployeePhoto extends CustomObject
 {

@@ -22,6 +22,8 @@ use Database\Object\Absent\Absent as AbsentAbsent;
 
 class AbsentController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "absent";
+
     // Get functions
     protected function getMine($view, $id = null)
     {
@@ -65,14 +67,18 @@ class AbsentController extends ApiController
     protected function getSubstitute($view, $id = null)
     {
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $this->appendToJson('items', (new Substitute)->get());
+            $items = (new Substitute)->get();
+            $items[] = SELECT_OTHER;
+            $this->appendToJson('items', $items);
         }
     }
 
     protected function getPayment($view, $id = null)
     {
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $this->appendToJson('items', (new Payment)->get());
+            $items = (new Payment)->get();
+            $items[] = SELECT_OTHER;
+            $this->appendToJson('items', $items);
         }
     }
 
@@ -85,7 +91,7 @@ class AbsentController extends ApiController
 
     protected function getSettings($view)
     {
-        $this->getNavigationSettings("accident");
+        $this->getNavigationSettings();
     }
 
     // Post functions
@@ -108,12 +114,12 @@ class AbsentController extends ApiController
             "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "absentUserId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "substituteBy" => ["mandatory" => true],
-            "substituteByOther" => ["mandatory" => true, "preconditions" => ["substituteBy" => "O"]],
+            "substituteByOther" => ["mandatory" => true, "preconditions" => ["substituteBy" => SELECT_OTHER_ID]],
             "volume" => ["mandatory" => true, "placeholder" => "__/__"],
             "start" => ["mandatory" => true],
             "end",
             "paymentOfSubstitute" => ["mandatory" => true],
-            "paymentOfSubstituteOther" => ["mandatory" => true, "preconditions" => ["paymentOfSubstitute" => "O"]],
+            "paymentOfSubstituteOther" => ["mandatory" => true, "preconditions" => ["paymentOfSubstitute" => SELECT_OTHER_ID]],
             "absentNoteReceived" => ["mandatory" => true],
             "notes",
             "finished" => ["convert" => "bool", "default" => 0]
@@ -137,16 +143,15 @@ class AbsentController extends ApiController
 
     protected function postSettings()
     {
-        $this->postNavigationSettings("accident");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
             "school" => ["mandatory" => true],
             "start" => ["default" => null],
-            "end" => ["default" => null],
-            "exportAs"
+            "end" => ["default" => null]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -166,15 +171,15 @@ class AbsentController extends ApiController
             if ($fields['start']) $fields['start'] .= " 00:00:00";
             if ($fields['end']) $fields['end'] .= " 23:59:59";
 
-            if (Strings::equal($fields['exportAs'], 'xlsx')) $this->exportAsXlsx($fields['school'], $fields['start'], $fields['end']);
+            $this->export($fields['school'], $fields['start'], $fields['end']);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Export functions
-    protected function exportAsXlsx($schoolIds, $start, $end)
+    private function export($schoolIds, $start, $end)
     {
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/absent/" . date("YmdHis"));
         $filename = "Afwezigheid Personeel.xlsx";
 
         $items = $this->getAllGroupedBySchool($schoolIds, $start, $end);

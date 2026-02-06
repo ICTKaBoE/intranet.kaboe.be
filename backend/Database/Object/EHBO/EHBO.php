@@ -5,7 +5,7 @@ namespace Database\Object\EHBO;
 use stdClass;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class EHBO extends CustomObject
 {
@@ -16,13 +16,14 @@ class EHBO extends CustomObject
         "creationDateTime" => self::TYPE_DATETIME,
         "schoolId" => self::TYPE_INTEGER,
         "place" => self::TYPE_STRING,
-        "description" => self::TYPE_STRING,
+        "description" => self::TYPE_INTEGER,
         "descriptionOther" => self::TYPE_STRING,
         "firstHelpDateTime" => self::TYPE_DATETIME,
-        "firstHelp" => self::TYPE_STRING,
+        "firstHelp" => self::TYPE_INTEGER,
         "firstHelpOther" => self::TYPE_STRING,
-        "victimType" => self::TYPE_STRING,
+        "victimType" => self::TYPE_INTEGER,
         "victimId" => self::TYPE_INTEGER,
+        "firstHelper" => self::TYPE_STRING,
         "witness" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
@@ -32,15 +33,16 @@ class EHBO extends CustomObject
         "firstHelp" => ["firstHelp" => \Database\Repository\EHBO\FirstHelp::class],
         "school" => ["schoolId" => \Database\Repository\School\School::class],
         "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
+        "victimType" => ["victimType" => \Database\Repository\EHBO\VictimType::class],
         "victimEmployee" => ["victimId" => \Database\Repository\Informat\Employee::class],
         "victimStudent" => ["victimId" => \Database\Repository\Informat\Student::class],
     ];
 
     public function init()
     {
-        $this->linked->victim = Strings::equal($this->victimType, "S") ? $this->linked->victimStudent : $this->linked->victimEmployee;
-        $this->formatted->description = Strings::equal($this->description, "O") ? $this->descriptionOther : $this->linked->description->name;
-        $this->formatted->firstHelp = Strings::equal($this->firstHelp, "O") ? $this->firstHelpOther : $this->linked->firstHelp->name;
+        $this->formatted->victim = (Strings::equal($this->victimType, SELECT_OTHER_ID) ? "Andere" : (Strings::equal($this->linked->victimType->type, "S") ? $this->linked->victimStudent->formatted->fullNameReversed : $this->linked->victimEmployee->formatted->fullNameReversed)) . " ({$this->linked->victimType->name})";
+        $this->formatted->description = Strings::equal($this->description, SELECT_OTHER_ID) ? $this->descriptionOther : $this->linked->description->name;
+        $this->formatted->firstHelp = Strings::equal($this->firstHelp, SELECT_OTHER_ID) ? $this->firstHelpOther : $this->linked->firstHelp->name;
         $this->formatted->firstHelpWithDateTime = $this->formatted->firstHelp . " - " . Clock::at($this->firstHelpDateTime)->format("d/m/Y H:i");
 
         $this->formatted->creationDateTime = new stdClass;

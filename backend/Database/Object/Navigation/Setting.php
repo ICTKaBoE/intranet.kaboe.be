@@ -2,7 +2,7 @@
 
 namespace Database\Object\Navigation;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Setting  extends CustomObject
 {

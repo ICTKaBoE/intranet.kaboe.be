@@ -8,7 +8,7 @@ use Security\Session;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Order\Status;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Navigation\Setting;
@@ -24,6 +24,7 @@ class Order extends CustomObject
         "supplierId" => self::TYPE_INTEGER,
         "quoteLink" => self::TYPE_STRING,
         "quoteFile" => self::TYPE_STRING,
+        "orderNumber" => self::TYPE_STRING,
         "status" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];

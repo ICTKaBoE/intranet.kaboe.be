@@ -3,7 +3,7 @@
 namespace Database\Object\Management;
 
 use Ouzo\Utilities\Clock;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Ouzo\Utilities\Strings;
 use stdClass;
 

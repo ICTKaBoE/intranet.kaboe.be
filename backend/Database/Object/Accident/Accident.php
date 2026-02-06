@@ -6,7 +6,7 @@ use stdClass;
 use Helpers\HTML;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Accident\Party;
 use Database\Repository\Accident\Status;
 use Database\Repository\Accident\Location;
@@ -18,7 +18,7 @@ class Accident extends CustomObject
     protected $objectAttributes = [
         "id" => self::TYPE_INTEGER,
         "guid" => self::TYPE_GUID,
-        "status" => self::TYPE_STRING,
+        "status" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
         "creatorUserId" => self::TYPE_INTEGER,
         "informatSubgroupId" => self::TYPE_INTEGER,
@@ -30,12 +30,13 @@ class Accident extends CustomObject
         "informatStudentAddressId" => self::TYPE_INTEGER,
         "datetime" => self::TYPE_DATETIME,
         "description" => self::TYPE_STRING,
-        "location" => self::TYPE_STRING,
+        "visibleDescription" => self::TYPE_STRING,
+        "location" => self::TYPE_INTEGER,
         "exactLocation" => self::TYPE_STRING,
         "transport" => self::TYPE_STRING,
         "supervision" => self::TYPE_BOOLEAN,
         "informatSupervisorId" => self::TYPE_INTEGER,
-        "party" => self::TYPE_STRING,
+        "party" => self::TYPE_INTEGER,
         "partyExternalName" => self::TYPE_STRING,
         "partyExternalFirstName" => self::TYPE_STRING,
         "partyExternalSex" => self::TYPE_STRING,
@@ -54,12 +55,17 @@ class Accident extends CustomObject
         "police" => self::TYPE_BOOLEAN,
         "policeName" => self::TYPE_STRING,
         "policePVNumber" => self::TYPE_STRING,
-        "witnessId" => self::TYPE_INTEGER,
+        "witness" => self::TYPE_BOOLEAN,
+        "witnessInfo" => self::TYPE_STRING,
+        "witnessAfter" => self::TYPE_BOOLEAN,
+        "witnessAfterInfo" => self::TYPE_STRING,
+        "whenAndWho" => self::TYPE_STRING,
         "creationDateTime" => self::TYPE_DATETIME,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
     protected $linkedAttributes = [
+        "status" => ["status" => \Database\Repository\Accident\Status::class],
         "school" => [
             "schoolId" => \Database\Repository\School\School::class
         ],
@@ -90,11 +96,17 @@ class Accident extends CustomObject
         "supervisor" => [
             "informatSupervisorId" => \Database\Repository\Informat\Employee::class
         ],
+        "party" => [
+            "party" => \Database\Repository\Accident\Party::class
+        ],
         "partyExternalCountry" => [
             "partyExternalCountryId" => \Database\Repository\General\Country::class
         ],
         "witness" => [
             "witnessId" => \Database\Repository\Informat\Employee::class
+        ],
+        "location" => [
+            "location" => \Database\Repository\Accident\Location::class
         ]
     ];
 
@@ -107,12 +119,17 @@ class Accident extends CustomObject
         $this->formatted->date = Clock::at($this->datetime)->format("d/m/Y");
         $this->formatted->day = Clock::at($this->datetime)->format("l");
         $this->formatted->time = Clock::at($this->datetime)->format("H:i");
+        $this->formatted->dateDay = Clock::at($this->datetime)->format("d");
+        $this->formatted->dateMonth = Clock::at($this->datetime)->format("m");
+        $this->formatted->dateYear = Clock::at($this->datetime)->format("Y");
 
-        $this->formatted->party = (new Party)->getById($this->party)->name;
-        $this->formatted->badge->status = (new Status)->getById($this->status)->formatted->badge->name;
+        $this->formatted->party = $this->linked->party->name;
+        $this->formatted->location = $this->linked->location->formatted->name;
+        $this->formatted->link = "https://intranet.kaboe.be/accident/mine/{$this->guid}";
+        $this->formatted->publicLink = "https://extranet.kaboe.be/ongeval/details/{$this->guid}";
+        $this->_lockedForm = $this->status == "C";
 
         $this->createNumber();
-        $this->createLocation();
     }
 
     private function createNumber()
@@ -133,16 +150,5 @@ class Accident extends CustomObject
             for ($i = 0; $i < $count; $i++) $hashes .= "Y";
             $this->formatted->number = str_replace($hashes, Clock::at($this->creationDateTime)->format($hashes), $this->formatted->number);
         }
-    }
-
-    private function createLocation()
-    {
-        $locationRepo = new Location;
-
-        [$main, $sub] = explode("-", $this->location);
-        $mainLocation = $locationRepo->getById($main)->name;
-        $subLocation = $locationRepo->getByIdAndCategoryId($sub, $main)->name;
-
-        $this->formatted->location = "{$mainLocation} - {$subLocation}";
     }
 }

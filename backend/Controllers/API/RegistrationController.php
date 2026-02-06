@@ -18,7 +18,6 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Navigation\Navigation;
-use Database\Repository\School\Address;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Database\Repository\Registration\CLIL;
 use Database\Repository\Registration\Field;
@@ -43,12 +42,15 @@ use Database\Object\Registration\Registration as RegistrationRegistration;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Informat\Registration as InformatRegistration;
 use Database\Repository\Informat\RegistrationClass;
+use Database\Repository\Registration\Address;
 use Database\Repository\School\Institute;
 use Helpers\General;
 use Karriere\PdfMerge\PdfMerge;
 
 class RegistrationController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "registration";
+
     const REGISTRATION_FIELDS = [
         1 => [
             "name" => ["mandatory" => true],
@@ -1199,8 +1201,8 @@ class RegistrationController extends ApiController
             if ($file && $file[0]->getSize() > 0) {
                 $item->name = $file[0]->getFilename();
                 $item->ext = $file[0]->getExtension();
-                FileSystem::CreateFolder(LOCATION_UPLOAD . "/registration");
-                $file[0]->move(LOCATION_UPLOAD . "/registration/{$item->guid}.{$item->ext}");
+                FileSystem::CreateFolder(LOCATION_FILES . "/registration");
+                $file[0]->move(LOCATION_FILES . "/registration/{$item->guid}.{$item->ext}");
             } else {
                 $item->name = $origName;
             }
@@ -1223,7 +1225,7 @@ class RegistrationController extends ApiController
             $documents = Arrays::orderBy((new Document)->getByType("R"), "order");
 
             $settings = (new Navigation)->getByParentIdAndLink(0, "registration")->settings;
-            $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+            $folder = FileSystem::CreateFolder(LOCATION_FILES . "/registration/" . date("YmdHis"));
             $filename = "Inschrijvingen " . Clock::nowAsString("d-m-Y H-i-s") . ".zip";
 
             $printVariables = $printChecks = [];
@@ -1235,18 +1237,16 @@ class RegistrationController extends ApiController
                 FileSystem::CreateFolder($_folder);
 
                 // Fill printVariables
-                $schoolAddress = (new Address)->getBySchoolId($item->schoolId);
-                if (!$schoolAddress) $schoolAddress = (new Address)->getBySchoolId($item->linked->school->parentSchoolId);
                 Arrays::setNestedValue($printVariables, ['registratie:type'], $item->mapped->type);
                 Arrays::setNestedValue($printVariables, ['registratie:voltooid.op'], Clock::at($item->registrationAt)->format("d/m/Y H:i:s"));
                 Arrays::setNestedValue($printVariables, ['registratie:voltooid.door'], $item->linked->registrationByUser->formatted->fullNameReversed);
                 Arrays::setNestedValue($printVariables, ['school:naam'], $item->linked->school->name);
                 Arrays::setNestedValue($printVariables, ['school:naam.metHoofdschool'], $item->linked->school->formatted->nameWithParent);
-                Arrays::setNestedValue($printVariables, ['school:adres.straat'], $schoolAddress->street);
-                Arrays::setNestedValue($printVariables, ['school:adres.nummer'], $schoolAddress->number);
-                Arrays::setNestedValue($printVariables, ['school:adres.bus'], $schoolAddress->bus);
-                Arrays::setNestedValue($printVariables, ['school:adres.postcode'], $schoolAddress->zipcode);
-                Arrays::setNestedValue($printVariables, ['school:adres.gemeente'], $schoolAddress->city);
+                Arrays::setNestedValue($printVariables, ['school:adres.straat'], $item->linked->school->street);
+                Arrays::setNestedValue($printVariables, ['school:adres.nummer'], $item->linked->school->number);
+                Arrays::setNestedValue($printVariables, ['school:adres.bus'], $item->linked->school->bus);
+                Arrays::setNestedValue($printVariables, ['school:adres.postcode'], $item->linked->school->zipcode);
+                Arrays::setNestedValue($printVariables, ['school:adres.gemeente'], $item->linked->school->city);
                 Arrays::setNestedValue($printVariables, ['student:naam'], $item->name);
                 Arrays::setNestedValue($printVariables, ['student:voornaam'], $item->firstName);
                 Arrays::setNestedValue($printVariables, ['student:adres.straat'], $item->addressStreet);
@@ -1268,13 +1268,13 @@ class RegistrationController extends ApiController
                 Arrays::setNestedValue($printChecks, ['status:3'], false);
 
                 foreach ($documents as $document) {
-                    if (FileSystem::PathExists(LOCATION_UPLOAD . "/registration/{$document->guid}.{$document->ext}")) {
+                    if (FileSystem::PathExists(LOCATION_FILES . "/registration/{$document->guid}.{$document->ext}")) {
                         // if ($document->fieldId == )
                         if ($document->dependOn) {
                         }
                         $saveAs = $_folder . "/{$document->guid}.{$document->ext}";
                         $saveAsPdf = $_folder . "/{$document->order}_1.pdf";
-                        $template = new TemplateProcessor(LOCATION_UPLOAD . "/registration/{$document->guid}.{$document->ext}");
+                        $template = new TemplateProcessor(LOCATION_FILES . "/registration/{$document->guid}.{$document->ext}");
 
                         foreach ($printVariables as $k => $v) $template->setValue($k, $v);
                         foreach ($printChecks as $k => $v) $template->setCheckbox($k, $v);

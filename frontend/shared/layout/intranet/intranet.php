@@ -27,6 +27,7 @@
 
     {{component:modal}}
     {{component:toast}}
+    {{component:manual}}
 
 
     <script>

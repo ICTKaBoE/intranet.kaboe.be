@@ -9,6 +9,7 @@ use PHPMailer\PHPMailer\SMTP;
 class Mail
 {
 	private $receivers = [];
+	private $attachments = [];
 	private $subject = "";
 	private $body = "";
 	private $html = true;
@@ -31,11 +32,25 @@ class Mail
 		$this->mail = new PHPMailer(true);
 	}
 
+	public function setSender($email, $name = null)
+	{
+		$this->fromEmail = $email;
+		$this->fromName = $name ?? $email;
+	}
+
 	public function setReceiver($mail, $name = null)
 	{
 		$this->receivers[] = [
 			'mail' => $mail,
 			'name' => $name
+		];
+	}
+
+	public function setAttachment($path, $name = null)
+	{
+		$this->attachments[] = [
+			"path" => $path,
+			"name" => $name
 		];
 	}
 
@@ -72,6 +87,10 @@ class Mail
 
 		foreach ($this->receivers as $receiver) {
 			$this->mail->addAddress($receiver['mail'], $receiver['name']);
+		}
+
+		foreach ($this->attachments as $attachment) {
+			$this->mail->addAttachment($attachment["path"], $attachment["name"]);
 		}
 
 		$this->mail->isHTML($this->html);

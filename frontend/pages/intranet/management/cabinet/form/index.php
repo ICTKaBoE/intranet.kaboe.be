@@ -4,13 +4,13 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" required></select>
 
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="buildingId">Gebouw</label>
-                    <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/{{url:part.module}}/building/" data-load-value="id" data-load-label="name" required data-parent-select="schoolId"></select>
+                    <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/{{url:part.module}}/building/" required data-parent-select="schoolId"></select>
 
                 </div>
             </div>
@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="roomId">Lokaal</label>
-                    <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/{{url:part.module}}/room/" data-load-value="id" data-load-label="formatted.name" required data-parent-select="buildingId"></select>
+                    <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/{{url:part.module}}/room/" data-label="formatted.name" required data-parent-select="buildingId"></select>
 
                 </div>
 

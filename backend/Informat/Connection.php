@@ -2,31 +2,30 @@
 
 namespace Informat;
 
-use Database\Repository\Setting\Setting;
 use Database\Repository\Source;
 use GuzzleHttp\Client;
 use Helpers\CString;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 
 abstract class Connection
 {
     const RESPONSE_CODE_OK = 200;
+    const SOURCE_ID = "informat";
 
-    static public function init($sourceId = null)
+    static public function init()
     {
         $sourceRepo = new Source;
 
-        $tokenValue = self::GetTokenValue($sourceId);
-        $tokenType = self::GetTokenType($sourceId);
-        $tokenUntil = self::GetTokenUntil($sourceId);
+        $tokenValue = self::GetTokenValue();
+        $tokenType = self::GetTokenType();
+        $tokenUntil = self::GetTokenUntil();
 
-        $identityEndpoint = Strings::trimToNull(self::GetIdentityEndpoint($sourceId));
-        $identityGrantType = Strings::trimToNull(self::GetIdentityGrantType($sourceId));
-        $identityClientId = Strings::trimToNull(self::GetIdentityClientId($sourceId));
-        $identityClientSecret = Strings::trimToNull(self::GetIdentityClientSecret($sourceId));
-        $identityScopes = Strings::trimToNull(self::GetIdentityScope($sourceId));
+        $identityEndpoint = Strings::trimToNull(self::GetIdentityEndpoint());
+        $identityGrantType = Strings::trimToNull(self::GetIdentityGrantType());
+        $identityClientId = Strings::trimToNull(self::GetIdentityClientId());
+        $identityClientSecret = Strings::trimToNull(self::GetIdentityClientSecret());
+        $identityScopes = Strings::trimToNull(self::GetIdentityScope());
         $identityScopes = CString::noLines($identityScopes, " ");
 
         if (Strings::isBlank($tokenValue) || Strings::isBlank($tokenUntil) || Clock::now()->isAfter(Clock::at($tokenUntil))) {
@@ -45,7 +44,7 @@ abstract class Connection
                 $body = $response->getBody()->getContents();
                 $body = json_decode($body, true);
 
-                $source = $sourceRepo->getById($sourceId);
+                $source = $sourceRepo->getById(self::SOURCE_ID);
                 $source->tokenValue = $body['access_token'];
                 $source->tokenType = $body['token_type'];
                 $source->tokenUntil = Clock::now()->plusSeconds($body['expires_in'])->format("Y-m-d H:i:s");
@@ -58,43 +57,43 @@ abstract class Connection
         return true;
     }
 
-    static public function GetIdentityEndpoint($sourceId)
+    static public function GetIdentityEndpoint()
     {
-        return (new Source)->getById($sourceId)->identityEndpoint;
+        return (new Source)->getById(self::SOURCE_ID)->host;
     }
 
-    static public function GetIdentityGrantType($sourceId)
+    static public function GetIdentityGrantType()
     {
-        return (new Source)->getById($sourceId)->identityGrantType;
+        return (new Source)->getById(self::SOURCE_ID)->identityGrantType;
     }
 
-    static public function GetIdentityClientId($sourceId)
+    static public function GetIdentityClientId()
     {
-        return (new Source)->getById($sourceId)->identityClientId;
+        return (new Source)->getById(self::SOURCE_ID)->identityClientId;
     }
 
-    static public function GetIdentityClientSecret($sourceId)
+    static public function GetIdentityClientSecret()
     {
-        return (new Source)->getById($sourceId)->identityClientSecret;
+        return (new Source)->getById(self::SOURCE_ID)->identityClientSecret;
     }
 
-    static public function GetIdentityScope($sourceId)
+    static public function GetIdentityScope()
     {
-        return (new Source)->getById($sourceId)->identityScope;
+        return (new Source)->getById(self::SOURCE_ID)->identityScope;
     }
 
-    static public function GetTokenValue($sourceId)
+    static public function GetTokenValue()
     {
-        return (new Source)->getById($sourceId)->tokenValue;
+        return (new Source)->getById(self::SOURCE_ID)->tokenValue;
     }
 
-    static public function GetTokenType($sourceId)
+    static public function GetTokenType()
     {
-        return (new Source)->getById($sourceId)->tokenType;
+        return (new Source)->getById(self::SOURCE_ID)->tokenType;
     }
 
-    static public function GetTokenUntil($sourceId)
+    static public function GetTokenUntil()
     {
-        return (new Source)->getById($sourceId)->tokenUntil;
+        return (new Source)->getById(self::SOURCE_ID)->tokenUntil;
     }
 }

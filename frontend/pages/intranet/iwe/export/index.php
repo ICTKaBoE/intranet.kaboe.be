@@ -1,15 +1,11 @@
 <div class="card col-12 col-lg-6 mx-auto">
     <form class="card" action="{{form:url:full}}" method="POST" id="frm{{page:id}}">
+        <input type="hidden" name="_method" value="PRINT" />
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-lg-6 mb-3">
+                <div class="col-12 mb-3">
                     <label class="form-label" for="school">Scholen</label>
-                    <select name="school" id="school" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" multiple required></select>
-                </div>
-
-                <div class="col-12 col-lg-6 mb-3">
-                    <label class="form-label" for="exportAs">Exporteren als</label>
-                    <div id="chbExportAs" role="checkbox" data-type="radio" data-name="exportAs" data-value="xlsx" data-text="Excel" data-default-value="xlsx"></div>
+                    <select name="school" id="school" data-load-source="{{select:url:short}}/school/all" multiple required></select>
                 </div>
             </div>
         </div>

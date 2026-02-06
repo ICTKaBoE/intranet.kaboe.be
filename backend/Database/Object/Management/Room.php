@@ -2,7 +2,7 @@
 
 namespace Database\Object\Management;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\CString;
 
 class Room extends CustomObject
@@ -26,6 +26,7 @@ class Room extends CustomObject
     {
         $this->formatted->number = CString::leadingZeros($this->number, 2);
         $this->formatted->name = "{$this->floor}.{$this->formatted->number}";
+        $this->formatted->buildingRoom = "{$this->linked->building->name} {$this->formatted->name}";
         $this->formatted->full = "{$this->linked->building->formatted->full} - {$this->formatted->name}";
     }
 }

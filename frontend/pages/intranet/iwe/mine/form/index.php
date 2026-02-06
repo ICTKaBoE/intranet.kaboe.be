@@ -3,17 +3,17 @@
         <div class="row">
             <div class="col-lg-4 col-12 mb-3">
                 <label class="form-label" for="schoolId">School</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" data-search required></select>
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-default-value="{{user:mainSchoolId}}" data-search required></select>
             </div>
 
             <div class="col-lg-4 col-12 mb-3">
                 <label class="form-label" for="buildingId">Gebouw</label>
-                <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/management/building/" data-load-value="id" data-load-label="name" data-extra="[schoolId={{user:mainSchoolId}}]" required data-parent-select="schoolId"></select>
+                <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/management/building/" data-extra="[schoolId={{user:mainSchoolId}}]" required data-parent-select="schoolId"></select>
             </div>
 
             <div class="col-12 col-lg-4 mb-3">
                 <label class="form-label" for="roomId">Lokaal</label>
-                <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room/" data-load-value="id" data-load-label="formatted.name" data-default-no-load required data-parent-select="buildingId"></select>
+                <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room/" data-label="formatted.name" data-default-no-load required data-parent-select="buildingId"></select>
             </div>
         </div>
 
@@ -42,8 +42,20 @@
         </div>
 
         <div class="row">
-            <div class="col-12" id="chbOwnedBySchool" role="checkbox" data-default-value="true" data-type="checkbox" data-on-change="ownedBySchoolView" data-name="ownedBySchool" data-text="Eigendom van de school?"></div>
-            <div class="col-12 mb-3" id="chbSchoolTakesOwnership" role="checkbox" data-type="checkbox" data-on-change="schoolTakesOwnershipView" data-name="schoolTakesOwnership" data-text="Mag het in dienst gesteld worden en eigendom van de school worden?"></div>
+            <div class="col-12" id="chbOwnedBySchool" role="checkbox" data-default-value="true" data-type="checkbox" data-on-change="checkedView" data-name="ownedBySchool" data-text="Eigendom van de school?"></div>
+            <div class="col-12 mb-3" id="chbSchoolTakesOwnership" role="checkbox" data-type="checkbox" data-on-change="checkedView" data-name="schoolTakesOwnership" data-text="Mag het in dienst gesteld worden en eigendom van de school worden?"></div>
+
+            <div class="mb-3 alert alert-important alert-danger d-none" role="alert" id="remove-danger">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="icon ti ti-alert-triangle"></i>
+                    </div>
+
+                    <div>
+                        {{module:removeNotification}}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row">

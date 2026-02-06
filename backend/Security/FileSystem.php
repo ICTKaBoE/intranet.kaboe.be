@@ -3,6 +3,7 @@
 namespace Security;
 
 use DirectoryIterator;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Path;
 use Ouzo\Utilities\Strings;
@@ -53,6 +54,22 @@ abstract class FileSystem
 	static public function RemoveDirectory($path)
 	{
 		return rmdir($path);
+	}
+
+	static public function Rename($path, $newNameWithoutExtension)
+	{
+		$filename = Arrays::last(explode(DIRECTORY_SEPARATOR, $path));
+		$ext = Arrays::last(explode(".", $filename));
+		$newPath = str_replace($filename, "{$newNameWithoutExtension}.{$ext}", $path);
+		if (rename($path, $newPath)) return $newPath;
+		return false;
+	}
+
+	static public function Move($source, $destinationWithoutFilename)
+	{
+		$filename = Arrays::last(explode(DIRECTORY_SEPARATOR, $source));
+		if (copy($source, "{$destinationWithoutFilename}\\{$filename}")) return "{$destinationWithoutFilename}\\{$filename}";
+		return false;
 	}
 
 	static public function unifyPath($path)

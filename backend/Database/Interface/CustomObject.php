@@ -23,6 +23,7 @@ class CustomObject extends stdClass
     const TYPE_LIST = "list";
     const TYPE_GUID = "guid";
     const TYPE_ALL = "*";
+    const TYPE_ARRAY = "array";
 
     protected $objectAttributes = [];
     protected $encodeAttributes = [];

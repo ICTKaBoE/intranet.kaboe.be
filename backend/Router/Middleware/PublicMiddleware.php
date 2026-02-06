@@ -4,12 +4,9 @@ namespace Router\Middleware;
 
 use Router\Helpers;
 use Pecee\Http\Request;
-use Ouzo\Utilities\Strings;
 use Database\Repository\Setting\Setting;
-use Ouzo\Utilities\Arrays;
 use Pecee\Http\Middleware\IMiddleware;
 use Security\Code;
-use Security\User;
 
 class PublicMiddleware implements IMiddleware
 {

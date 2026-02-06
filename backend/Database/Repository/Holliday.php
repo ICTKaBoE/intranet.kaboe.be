@@ -26,7 +26,6 @@ class Holliday extends Repository
         $date = Clock::at($date);
 
         $items = $this->get();
-
         $items = Arrays::filter($items, fn($i) => ($date->isAfterOrEqualTo(Clock::at($i->start)) && $date->isBeforeOrEqualTo(Clock::at($i->end))));
         return !empty($items);
     }

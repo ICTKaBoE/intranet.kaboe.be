@@ -11,13 +11,17 @@ use Database\Repository\Route\Group;
 
 class NavigationController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "navigation";
+
     // Get functions
     protected function getList($view, $id = null)
     {
         $repo = new Navigation;
+        $domain = str_replace(["https", "http", "://", "/"], "", Strings::equalsIgnoreCase(Helpers::request()->getHost(), Helpers::request()->getReferer()) ? Helpers::request()->getHost() : Helpers::request()->getReferer());
+
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->getByParentId(0);
-            $items = Arrays::map($items, fn($i) => $i->toArray(true));
+            $items = $repo->getByRouteGroupId((new Group)->getByDomain($domain)->id);
+            $items = Arrays::filter($items, fn($i) => Strings::equal($i->type, "P"));
             $items = array_merge([["id" => SELECT_ALL_ID, "name" => SELECT_ALL_VALUE]], $items);
             $this->appendToJson('items', $items);
         }
@@ -29,7 +33,7 @@ class NavigationController extends ApiController
         $domain = str_replace(["https", "http", "://", "/"], "", Strings::equalsIgnoreCase(Helpers::request()->getHost(), Helpers::request()->getReferer()) ? Helpers::request()->getHost() : Helpers::request()->getReferer());
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $optgroups = $repo->getByRouteGroupIdAndParentId((new Group)->getByDomain($domain)->id, 0);
+            $optgroups = $repo->getByRouteGroupId((new Group)->getByDomain($domain)->id);
             $optgroups = Arrays::filter($optgroups, fn($o) => Strings::equal($o->type, "M"));
             $optgroups = Arrays::map($optgroups, fn($o) => ["id" => $o->id, "name" => $o->name]);
             // $optgroups[] = ["id" => "LINKS", "name" => "Links"];
@@ -48,7 +52,7 @@ class NavigationController extends ApiController
         $domain = str_replace(["https", "http", "://", "/"], "", Strings::equalsIgnoreCase(Helpers::request()->getHost(), Helpers::request()->getReferer()) ? Helpers::request()->getHost() : Helpers::request()->getReferer());
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = $repo->getByRouteGroupIdAndParentId((new Group)->getByDomain($domain)->id, 0);
+            $items = $repo->getByRouteGroupId((new Group)->getByDomain($domain)->id);
             $items = Arrays::filter($items, fn($i) => Strings::equal($i->type, "L"));
 
             $this->appendToJson('items', array_values($items));

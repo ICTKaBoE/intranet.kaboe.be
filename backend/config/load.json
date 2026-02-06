@@ -59,28 +59,28 @@
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler.min.css",
+				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler-socials.min.css",
+				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-socials.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler-vendors.min.css",
+				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-vendors.min.css",
 				"rel": "stylesheet"
 			}
 		},
 		{
 			"tag": "link",
 			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler-themes.min.css",
+				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-themes.min.css",
 				"rel": "stylesheet"
 			}
 		},
@@ -167,7 +167,7 @@
 		{
 			"tag": "script",
 			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/@tabler/core/dist/js/tabler.min.js"
+				"src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"
 			}
 		},
 		{
@@ -175,6 +175,13 @@
 			"attributes": {
 				"type": "module",
 				"src": "{{site:url}}/frontend/shared/default/js/main.js"
+			}
+		},
+		{
+			"tag": "script",
+			"attributes": {
+				"type": "module",
+				"src": "{{site:url}}/frontend/shared/default/js/functions.js"
 			}
 		}
 	]

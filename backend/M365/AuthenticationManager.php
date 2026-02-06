@@ -127,7 +127,7 @@ class AuthenticationManager
         // The id token is a JWT token that contains information about the user
         // It's a base64 coded string that has a header and payload
         $decodedAccessTokenPayload = base64_decode(
-            explode('.', Session::get('id_token'))[1]
+            str_replace("_", "/", explode('.', Session::get('id_token'))[1])
         );
 
         $jsonAccessTokenPayload = json_decode($decodedAccessTokenPayload, true);

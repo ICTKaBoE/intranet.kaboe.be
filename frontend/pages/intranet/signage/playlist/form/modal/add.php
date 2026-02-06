@@ -12,7 +12,7 @@
                 <div class="row">
                     <div class="col-12 mb-3">
                         <label class="form-label" for="mediaId">Media</label>
-                        <select name="mediaId" id="mediaId" data-load-source="{{select:url:short}}/{{url:part.module}}/media" data-load-value="id" data-load-label="alias" required></select>
+                        <select name="mediaId" id="mediaId" data-load-source="{{select:url:short}}/{{url:part.module}}/media" data-label="alias" required></select>
                     </div>
 
                     <div class="col-12 mb-3">

@@ -2,7 +2,7 @@
 
 namespace JAMF\Object;
 
-use JAMF\Interface\CustomObject;
+use Security\CustomObject;
 
 class Device extends CustomObject
 {

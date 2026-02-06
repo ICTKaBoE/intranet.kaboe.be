@@ -3,14 +3,16 @@
 namespace Database\Object\Accident;
 
 use Helpers\HTML;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Status extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
+        "id" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
-        "color" => self::TYPE_STRING
+        "color" => self::TYPE_STRING,
+        "order" => self::TYPE_INTEGER,
+        "default" => self::TYPE_BOOLEAN
     ];
 
     public function init()

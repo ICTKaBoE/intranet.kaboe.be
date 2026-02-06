@@ -2,7 +2,7 @@
 
 namespace Database\Object\Route;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Group extends CustomObject
 {

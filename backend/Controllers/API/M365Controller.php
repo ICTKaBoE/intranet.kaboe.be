@@ -13,6 +13,8 @@ use Database\Object\User\LoginHistory as ObjectUserLoginHistory;
 
 class M365Controller extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "m365";
+
     public function callback()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && Helpers::input()->exists('code')) {
@@ -40,7 +42,10 @@ class M365Controller extends ApiController
 
                     (new LoginHistory)->set($userLoginHistory);
 
-                    header('Location: ' . (new Setting)->get(id: "page.default.afterLogin")[0]->value);
+                    header('Location: ' . (new Setting)->getById("page.default.afterLogin")->value);
+                    exit();
+                } else {
+                    header('Location: ' . (new Setting)->getById("page.default.login")->value);
                     exit();
                 }
             } catch (\RuntimeException $e) {

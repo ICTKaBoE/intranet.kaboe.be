@@ -12,26 +12,39 @@ abstract class General
 {
     static public function convert($value, $type)
     {
-        if (is_null($value) && $type !== "json") return $value;
-        else if ($type == "int") $value = intval($value);
-        else if ($type == "string") $value = (string)$value;
-        else if ($type == "bool" || $type == "boolean") $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        else if ($type == "list") $value = explode(PHP_EOL, $value);
-        else if ($type == "binary") $value = Arrays::map(str_split($value), fn($v) => intval($v));
-        else if ($type == "object") $value = self::convertToObject($value);
-        else if ($type == "array") $value = self::arrayToObjects($value);
-        else if ($type == "date") $value = Clock::at($value)->format("Y-m-d");
-        else if ($type == "datetime") $value = Clock::at($value)->format("Y-m-d H:i:s");
-        else if ($type == "json") $value = json_decode($value ?: "{}", true);
-        else if ($type == "base64") $value = base64_decode($value);
-        else if ($type == "*") $value = $value;
+        try {
+            if (is_null($value) && $type !== "json") return $value;
+            else if ($type == "int") $value = intval($value);
+            else if ($type == "string") $value = (string)$value;
+            else if ($type == "bool" || $type == "boolean") $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            else if ($type == "list") $value = explode(PHP_EOL, $value);
+            else if ($type == "binary") $value = Arrays::map(str_split($value), fn($v) => intval($v));
+            else if ($type == "arrayOrObject") $value = isset($value[0]) ? self::arrayToObjects($value) : self::convertToObject($value);
+            else if ($type == "object") $value = self::convertToObject($value);
+            else if ($type == "array") $value = self::arrayToObjects($value);
+            else if ($type == "date") $value = Clock::at($value)->format("Y-m-d");
+            else if ($type == "datetime") $value = Clock::at($value)->format("Y-m-d H:i:s");
+            else if ($type == "json") $value = json_decode($value ?: "{}", true);
+            else if ($type == "base64") $value = base64_decode($value);
+            else if ($type == "*") $value = $value;
+            else if (is_array($type)) {
+                if (Arrays::getValue($type, 'type')) $value = self::convert($value, Arrays::getValue($type, 'type'));
+                if (Arrays::getValue($type, 'sub')) {
+                    foreach (Arrays::getValue($type, 'sub') as $sValue => $sType) {
+                        $value[$sValue] = self::convert($value[$sValue], $sType);
+                    }
+                }
+            }
 
-        return $value;
+            return $value;
+        } catch (\Exception $e) {
+            die(var_dump($value, $type));
+        }
     }
 
     static public function deconvert($value, $origType)
     {
-        if (is_null($value)) return $value;
+        if (is_null($value)) return NULL;
         else if ($origType == "list" && is_array($value)) $value = implode(PHP_EOL, $value);
         else if ($origType == "binary") $value = implode("", $value);
         else if ($origType == "json") $value = json_encode($value);
@@ -53,6 +66,11 @@ abstract class General
         foreach ($array as $a) $objects[] = self::convertToObject($a);
 
         return $objects;
+    }
+
+    static public function xmlToArray($xml)
+    {
+        return json_decode(json_encode(simplexml_load_string($xml, options: LIBXML_NOCDATA)), TRUE);
     }
 
     static public function normalizeArray(array $items, $delimiter = '.')
@@ -180,14 +198,6 @@ abstract class General
         return ($date->format("n") < 8 ? ($date->format("Y") - 1) : $date->format("Y")) . "-09-01";
     }
 
-    static public function getSchoolyearEnd($date = null)
-    {
-        if (is_null($date)) $date = Clock::now();
-        else $date = Clock::at($date);
-
-        return ($date->format("n") < 8 ? $date->format("Y") : ($date->format("Y") + 1)) . "-08-31";
-    }
-
     static public function getSchoolyearStartBySchoolyear($schoolyear = null)
     {
         if (is_null($schoolyear)) $schoolyear = self::getSchoolyear();
@@ -195,14 +205,5 @@ abstract class General
         if (strlen($part) == 2) $part = "20{$part}";
 
         return self::getSchoolyearStart("{$part}-09-01");
-    }
-
-    static public function getSchoolyearEndBySchoolyear($schoolyear = null)
-    {
-        if (is_null($schoolyear)) $schoolyear = self::getSchoolyear();
-        $part = Arrays::last(explode("-", $schoolyear));
-        if (strlen($part) == 2) $part = "20{$part}";
-
-        return self::getSchoolyearEnd("{$part}-08-31");
     }
 }

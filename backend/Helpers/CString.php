@@ -46,14 +46,19 @@ abstract class CString
 		return $ret;
 	}
 
-	public static function formatAddress($street = null, $number = null, $bus = null, $zipcode = null, $city = null, $country = null)
+	public static function formatAddress($street = null, $number = null, $bus = null, $zipcode = null, $city = null, $country = null, $doubleLine = false)
 	{
-		return "{$street} {$number}" . ($bus ? "/{$bus}" : "") . ", {$zipcode} {$city}, {$country}";
+		return "{$street} {$number}" . ($bus ? "/{$bus}" : "") . ($doubleLine ? "\n" : ", ") . "{$zipcode} {$city}, {$country}";
 	}
 
 	public static function leadingZeros($value, $fullLength)
 	{
 		return sprintf("%0{$fullLength}d", $value);
+	}
+
+	public static function removeLeadingZeros($value)
+	{
+		return ltrim($value, "0");
 	}
 
 	public static function noHtml($value)
@@ -108,5 +113,11 @@ abstract class CString
 		}
 
 		return $number ?? false;
+	}
+
+	public static function getDigitsOnly($input)
+	{
+		preg_match_all('/\d+/', $input, $matches);
+		return $matches[0][0];
 	}
 }

@@ -3,12 +3,12 @@
 namespace Database\Object\Helpdesk;
 
 use Helpers\HTML;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Priority extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
+        "id" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
         "color" => self::TYPE_STRING
     ];

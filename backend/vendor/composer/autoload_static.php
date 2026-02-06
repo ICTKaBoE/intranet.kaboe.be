@@ -27,15 +27,15 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
     );
 
     public static $prefixLengthsPsr4 = array (
-        'p' => 
+        'p' =>
         array (
             'phpseclib3\\' => 11,
         ),
-        'Z' => 
+        'Z' =>
         array (
             'ZipStream\\' => 10,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php82\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -43,12 +43,12 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
             'Swagger\\Client\\' => 15,
             'StdUriTemplate\\' => 15,
         ),
-        'R' => 
+        'R' =>
         array (
             'Ramsey\\Uuid\\' => 12,
             'Ramsey\\Collection\\' => 18,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
@@ -63,7 +63,7 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
             'ParagonIE\\ConstantTime\\' => 23,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'O' => 
+        'O' =>
         array (
             'Ouzo\\' => 5,
             'OpenTelemetry\\SemConv\\' => 22,
@@ -71,12 +71,12 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
             'OpenTelemetry\\Context\\' => 22,
             'OpenTelemetry\\API\\' => 18,
         ),
-        'N' => 
+        'N' =>
         array (
             'Nyholm\\Psr7Server\\' => 18,
             'Nevay\\SPI\\' => 10,
         ),
-        'M' => 
+        'M' =>
         array (
             'Microsoft\\Kiota\\Serialization\\Text\\' => 35,
             'Microsoft\\Kiota\\Serialization\\Multipart\\' => 40,
@@ -89,267 +89,267 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
             'Microsoft\\Graph\\' => 16,
             'Matrix\\' => 7,
         ),
-        'L' => 
+        'L' =>
         array (
             'League\\OAuth2\\Client\\' => 21,
         ),
-        'K' => 
+        'K' =>
         array (
             'Karriere\\PdfMerge\\' => 18,
         ),
-        'H' => 
+        'H' =>
         array (
             'Http\\Promise\\' => 13,
             'Http\\Discovery\\' => 15,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
-        'F' => 
+        'F' =>
         array (
             'Firebase\\JWT\\' => 13,
         ),
-        'D' => 
+        'D' =>
         array (
             'Doctrine\\Common\\Lexer\\' => 22,
             'Doctrine\\Common\\Annotations\\' => 28,
         ),
-        'C' => 
+        'C' =>
         array (
             'Composer\\Semver\\' => 16,
             'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
             'ClanCats\\Hydrahon\\' => 18,
         ),
-        'B' => 
+        'B' =>
         array (
             'Brick\\Math\\' => 11,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib3\\' => 
+        'phpseclib3\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
         ),
-        'ZipStream\\' => 
+        'ZipStream\\' =>
         array (
             0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
         ),
-        'Symfony\\Polyfill\\Php82\\' => 
+        'Symfony\\Polyfill\\Php82\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php82',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Component\\Finder\\' => 
+        'Symfony\\Component\\Finder\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
-        'Swagger\\Client\\' => 
+        'Swagger\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/cloudmersive/cloudmersive_document_convert_api_client/lib',
         ),
-        'StdUriTemplate\\' => 
+        'StdUriTemplate\\' =>
         array (
             0 => __DIR__ . '/..' . '/stduritemplate/stduritemplate/src',
         ),
-        'Ramsey\\Uuid\\' => 
+        'Ramsey\\Uuid\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/uuid/src',
         ),
-        'Ramsey\\Collection\\' => 
+        'Ramsey\\Collection\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
-        'Psr\\SimpleCache\\' => 
+        'Psr\\SimpleCache\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'Psr\\Cache\\' => 
+        'Psr\\Cache\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
-        'PhpZip\\' => 
+        'PhpZip\\' =>
         array (
             0 => __DIR__ . '/..' . '/nelexa/zip/src',
         ),
-        'PhpOffice\\PhpWord\\' => 
+        'PhpOffice\\PhpWord\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpword/src/PhpWord',
         ),
-        'PhpOffice\\PhpSpreadsheet\\' => 
+        'PhpOffice\\PhpSpreadsheet\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
-        'PhpOffice\\Math\\' => 
+        'PhpOffice\\Math\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoffice/math/src/Math',
         ),
-        'Pecee\\' => 
+        'Pecee\\' =>
         array (
             0 => __DIR__ . '/..' . '/pecee/simple-router/src/Pecee',
         ),
-        'ParagonIE\\ConstantTime\\' => 
+        'ParagonIE\\ConstantTime\\' =>
         array (
             0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
-        'PHPMailer\\PHPMailer\\' => 
+        'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'Ouzo\\' => 
+        'Ouzo\\' =>
         array (
             0 => __DIR__ . '/..' . '/letsdrink/ouzo-goodies',
         ),
-        'OpenTelemetry\\SemConv\\' => 
+        'OpenTelemetry\\SemConv\\' =>
         array (
             0 => __DIR__ . '/..' . '/open-telemetry/sem-conv',
         ),
-        'OpenTelemetry\\SDK\\' => 
+        'OpenTelemetry\\SDK\\' =>
         array (
             0 => __DIR__ . '/..' . '/open-telemetry/sdk',
         ),
-        'OpenTelemetry\\Context\\' => 
+        'OpenTelemetry\\Context\\' =>
         array (
             0 => __DIR__ . '/..' . '/open-telemetry/context',
         ),
-        'OpenTelemetry\\API\\' => 
+        'OpenTelemetry\\API\\' =>
         array (
             0 => __DIR__ . '/..' . '/open-telemetry/api',
         ),
-        'Nyholm\\Psr7Server\\' => 
+        'Nyholm\\Psr7Server\\' =>
         array (
             0 => __DIR__ . '/..' . '/nyholm/psr7-server/src',
         ),
-        'Nevay\\SPI\\' => 
+        'Nevay\\SPI\\' =>
         array (
             0 => __DIR__ . '/..' . '/tbachert/spi/src',
         ),
-        'Microsoft\\Kiota\\Serialization\\Text\\' => 
+        'Microsoft\\Kiota\\Serialization\\Text\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-serialization-text/src',
         ),
-        'Microsoft\\Kiota\\Serialization\\Multipart\\' => 
+        'Microsoft\\Kiota\\Serialization\\Multipart\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-serialization-multipart/src',
         ),
-        'Microsoft\\Kiota\\Serialization\\Json\\' => 
+        'Microsoft\\Kiota\\Serialization\\Json\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-serialization-json/src',
         ),
-        'Microsoft\\Kiota\\Serialization\\Form\\' => 
+        'Microsoft\\Kiota\\Serialization\\Form\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-serialization-form/src',
         ),
-        'Microsoft\\Kiota\\Http\\' => 
+        'Microsoft\\Kiota\\Http\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-http-guzzle/src',
         ),
-        'Microsoft\\Kiota\\Authentication\\' => 
+        'Microsoft\\Kiota\\Authentication\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-authentication-phpleague/src',
         ),
-        'Microsoft\\Kiota\\Abstractions\\' => 
+        'Microsoft\\Kiota\\Abstractions\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/kiota-abstractions/src',
         ),
-        'Microsoft\\Graph\\Core\\' => 
+        'Microsoft\\Graph\\Core\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/microsoft-graph-core/src',
         ),
-        'Microsoft\\Graph\\' => 
+        'Microsoft\\Graph\\' =>
         array (
             0 => __DIR__ . '/..' . '/microsoft/microsoft-graph/src',
         ),
-        'Matrix\\' => 
+        'Matrix\\' =>
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
         ),
-        'League\\OAuth2\\Client\\' => 
+        'League\\OAuth2\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/league/oauth2-client/src',
         ),
-        'Karriere\\PdfMerge\\' => 
+        'Karriere\\PdfMerge\\' =>
         array (
             0 => __DIR__ . '/..' . '/karriere/pdf-merge/src',
         ),
-        'Http\\Promise\\' => 
+        'Http\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/php-http/promise/src',
         ),
-        'Http\\Discovery\\' => 
+        'Http\\Discovery\\' =>
         array (
             0 => __DIR__ . '/..' . '/php-http/discovery/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'Firebase\\JWT\\' => 
+        'Firebase\\JWT\\' =>
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
-        'Doctrine\\Common\\Lexer\\' => 
+        'Doctrine\\Common\\Lexer\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/lexer/src',
         ),
-        'Doctrine\\Common\\Annotations\\' => 
+        'Doctrine\\Common\\Annotations\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
         ),
-        'Composer\\Semver\\' => 
+        'Composer\\Semver\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
         ),
-        'Composer\\Pcre\\' => 
+        'Composer\\Pcre\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/pcre/src',
         ),
-        'Complex\\' => 
+        'Complex\\' =>
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
         ),
-        'ClanCats\\Hydrahon\\' => 
+        'ClanCats\\Hydrahon\\' =>
         array (
             0 => __DIR__ . '/..' . '/clancats/hydrahon/src',
         ),
-        'Brick\\Math\\' => 
+        'Brick\\Math\\' =>
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'H' => 
+        'H' =>
         array (
-            'HTMLPurifier' => 
+            'HTMLPurifier' =>
             array (
                 0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
@@ -417,6 +417,7 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         'getid3_flac' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio.flac.php',
         'getid3_flv' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio-video.flv.php',
         'getid3_gif' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.graphic.gif.php',
+        'getid3_gpx' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.misc.gpx.php',
         'getid3_gzip' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.archive.gzip.php',
         'getid3_handler' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/getid3.php',
         'getid3_hpk' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.archive.hpk.php',

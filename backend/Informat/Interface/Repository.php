@@ -31,7 +31,7 @@ class Repository extends stdClass
         $this->structure = $structure;
     }
 
-    public function get($sourceId, $schoolyear, $instituteNumber, $id = null, $raw = false)
+    public function get($schoolyear, $instituteNumber, $id = null, $raw = false)
     {
         $endpoint = Path::normalize(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint));
         $endpoint = Path::normalize(str_replace("<extend>", $this->extend ?: "", $endpoint));
@@ -44,7 +44,7 @@ class Repository extends stdClass
         $requestQuery['schoolYear'] = $schoolyear;
         if ($this->structure) $requestQuery['structure'] = Arrays::first((new Setting)->get("informat.structure"))->value;
 
-        $result = $this->execute($sourceId, $endpoint, $requestHeaders, $requestQuery);
+        $result = $this->execute($endpoint, $requestHeaders, $requestQuery);
         if ($this->shift) $result = $result[$this->shift];
 
         $objects = [];
@@ -55,11 +55,11 @@ class Repository extends stdClass
         return $raw ? $result : $objects;
     }
 
-    private function execute($sourceId, $endpoint, $requestHeaders = [], $requestQueryBody = [], $method = self::METHOD_GET)
+    private function execute($endpoint, $requestHeaders = [], $requestQueryBody = [], $method = self::METHOD_GET)
     {
-        if (Connection::init($sourceId)) {
+        if (Connection::init()) {
             $requestHeaders['Api-Version'] = $this->apiVersion;
-            $requestHeaders["Authorization"] = Connection::GetTokenType($sourceId) . " " . Connection::GetTokenValue($sourceId);
+            $requestHeaders["Authorization"] = Connection::GetTokenType() . " " . Connection::GetTokenValue();
 
             $options = ['headers' => $requestHeaders];
             if ($method == self::METHOD_GET) $options['query'] = $requestQueryBody;

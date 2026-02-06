@@ -16,6 +16,10 @@ export default class TinyMCE {
 		});
 	};
 
+	static GetInstance = (id) => {
+		return TinyMCE.INSTANCES[id] || false;
+	};
+
 	init = () => {
 		let options = {
 			selector: `#${this.id}`,

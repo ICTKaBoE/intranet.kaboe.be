@@ -29,6 +29,7 @@ use Database\Object\Informat\RegistrationClass;
 use Database\Object\Informat\Student as InformatStudent;
 use Database\Object\Informat\Employee as InformatEmployee;
 use Database\Object\Informat\Registration as InformatRegistration;
+use Database\Repository\General\Schoolyear;
 use Database\Repository\Informat\ClassGroup as InformatClassGroup;
 use Database\Repository\Informat\StudentBank as InformatStudentBank;
 use Database\Repository\Informat\Student as RepositoryInformatStudent;
@@ -44,34 +45,35 @@ use Database\Repository\Informat\StudentRelation as InformatStudentRelation;
 use Database\Repository\Informat\EmployeeOwnfield as InformatEmployeeOwnfield;
 use Database\Repository\Informat\Registration as RepositoryInformatRegistration;
 use Database\Repository\Informat\RegistrationClass as InformatRegistrationClass;
-use Ouzo\Utilities\Arrays;
+use Database\Repository\School\School;
 
 abstract class Informat
 {
     static public function Import()
     {
-        define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
-        define("_LOGLOCATION_", "cron/informat");
-        Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Schoolyear: " . General::getSchoolyear());
+
+        $institutes = [];
+        foreach ((new School)->getImport() as $school) {
+            foreach ((new Institute)->getBySchoolId($school->id) as $inst) $institutes[] = $inst;
+        }
+        define("_INSTITUTES_", $institutes);
 
         if (Helpers::url()->hasParam("image")) {
             $studentPhoto = self::StudentPhotos();
             $employeePhoto = self::EmployeePhotos();
 
-            Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
-
             return ($studentPhoto && $employeePhoto);
         } else {
-            $schoolyear = General::getSchoolyear();
-            if (Helpers::url()->hasParam("nextSchoolyear")) $schoolyear = General::getSchoolyear(Clock::now()->plusYears(1)->format("Y-m-d"));
+            $schoolyear = _CURRENT_SCHOOLYEAR_;
+            if (Helpers::url()->hasParam("nextSchoolyear")) {
+                $schoolyear = (new Schoolyear)->getByName(General::getSchoolyear(Clock::now()->plusYears(1)->format("Y-m-d")))->name;
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Switching to schoolyear {$schoolyear}");
+            }
 
             $student = self::Students($schoolyear);
             $registration = self::Registrations($schoolyear);
             $employee = self::Employees($schoolyear);
             $employeeOwnfield = self::EmployeeOwnfields($schoolyear);
-
-            Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
 
             return ($student && $registration && $employee && $employeeOwnfield);
         }
@@ -84,12 +86,11 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new Student;
-        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
-        foreach ($schoolInstitutes as $institute) {
+        foreach (_INSTITUTES_ as $institute) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             $repo = new RepositoryInformatStudent;
 
@@ -105,12 +106,14 @@ abstract class Informat
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
                     $item->birthPlace = $iItem->geboorteplaats;
-                    $item->isdn = $iItem->rijksregisternr ?: $iItem->bisnr ?: null;
+                    $item->insz = $iItem->rijksregisternr ?: $iItem->bisnr ?: null;
+                    $item->instituteId = $institute->id;
 
                     $nId = $repo->set($item);
                     if (!$item->id) $item->id = $nId;
 
-                    foreach ($iItem->adressen as $adres) self::CreateStudentAddress($item->id, $adres);
+                    foreach ($iItem->adressen as $adres) self::CreateStudentAddress($item->id, $adres, true);
+                    foreach ($iItem->overigeadressen as $adres) self::CreateStudentAddress($item->id, $adres, false);
                     foreach ($iItem->comnrs as $comnr) self::CreateStudentNumber($item->id, $comnr);
                     foreach ($iItem->emails as $email) self::CreateStudentEmail($item->id, $email);
                     foreach ($iItem->bankrek as $bankr) self::CreateStudentBank($item->id, $bankr);
@@ -135,12 +138,11 @@ abstract class Informat
         $_error = false;
         $informatRepo = new Student;
         $informatPhotoRepo = new StudentPhoto;
-        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
-        foreach ($schoolInstitutes as $institute) {
+        foreach (_INSTITUTES_ as $institute) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
                 $photo = $informatPhotoRepo->get($institute->numberNewFormat, $iItem->persoonId, true);
@@ -177,11 +179,10 @@ abstract class Informat
 
         $informatRepo = new Registration;
         $studentRepo = new RepositoryInformatStudent;
-        $schoolInstitutes = (new Institute)->get();
 
-        foreach ($schoolInstitutes as $institute) {
+        foreach (_INSTITUTES_ as $institute) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
             $repo = new RepositoryInformatRegistration;
 
             foreach ($iItems as $iItem) {
@@ -227,13 +228,12 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new Employee;
-        $schoolInstitutes = (new Institute)->get();
         $cRepo = new Country;
 
-        foreach ($schoolInstitutes as $institute) {
+        foreach (_INSTITUTES_ as $institute) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
 
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
             $repo = new RepositoryInformatEmployee;
 
             foreach ($iItems as $iItem) {
@@ -257,6 +257,7 @@ abstract class Informat
                     $item->iban = $iItem->bank->iban;
                     $item->bic = $iItem->bank->bic;
                     $item->active = $iItem->isActive;
+                    $item->instituteId = $institute->id;
 
                     $nId = $repo->set($item);
                     if (!$item->id) $item->id = $nId;
@@ -286,11 +287,10 @@ abstract class Informat
         $employeeRepo = new RepositoryInformatEmployee;
         $repo = new InformatEmployeeOwnfield;
         $repo->delete();
-        $schoolInstitutes = (new Institute)->get();
 
-        foreach ($schoolInstitutes as $institute) {
+        foreach (_INSTITUTES_ as $institute) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->personId}; Item: {$iItem->naam} - {$iItem->waarde}");
@@ -326,11 +326,10 @@ abstract class Informat
         $_error_ = false;
 
         $informatRepo = new EmployeePhoto;
-        $schoolInstitutes = (new Institute)->get();
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/employee");
 
-        foreach ($schoolInstitutes as $institute) {
-            $iItems = $informatRepo->get($institute->sourceId, $schoolyear, $institute->numberNewFormat);
+        foreach (_INSTITUTES_ as $institute) {
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
                 if (Strings::isBlank($iItem->photo)) continue;
@@ -354,7 +353,7 @@ abstract class Informat
     }
 
     // Sub functions
-    private static function CreateStudentAddress($studentId, $adres)
+    private static function CreateStudentAddress($studentId, $adres, $domicile = false)
     {
         $addressRepo = new InformatStudentAddress;
 
@@ -368,6 +367,7 @@ abstract class Informat
         $address->zipcode = $adres->postcode;
         $address->city = $adres->gemeente;
         $address->countryId = (new Country)->getByNisCode(General::removeLeadingZero($adres->landCode))->id;
+        $address->domicile = is_null($domicile) ? $address->domicile : $domicile;
 
         $addressRepo->set($address);
     }
@@ -428,7 +428,7 @@ abstract class Informat
         $relation->rank = $relatie->lpv;
         $relationRepo->set($relation);
 
-        foreach ($relatie->adressen as $adres) self::CreateStudentAddress($studentId, General::convertToObject($adres));
+        foreach ($relatie->adressen as $adres) self::CreateStudentAddress($studentId, General::convertToObject($adres), null);
         foreach ($relatie->comnrs as $comnr) self::CreateStudentNumber($studentId, General::convertToObject($comnr));
         foreach ($relatie->emails as $email) self::CreateStudentEmail($studentId, General::convertToObject($email));
     }
@@ -440,7 +440,7 @@ abstract class Informat
         $classgroup->informatId = $inschr->pKlas;
         $classgroup->informatGuid = $inschr->klasId;
         $classgroup->schoolInstituteId = $instituteId;
-        $classgroup->schoolyear = General::getSchoolyear($inschr->begindatum);
+        $classgroup->schoolyear = (new Schoolyear)->getByDate($inschr->begindatum)->name;
         $classgroup->administrativeGroupCode = $administrativeGroupCode;
         $classgroup->departmentCode = $departmentCode;
         $classgroup->grade = $grade;

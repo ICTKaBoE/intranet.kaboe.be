@@ -5,37 +5,6 @@ import Select from "../../../../shared/default/js/object/Select.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
-window.emptyFilter = () => {
-	Select.GetInstance("schoolId").clear();
-	Select.GetInstance("authorId").clear();
-	Select.GetInstance("categoryId").clear();
-
-	filter();
-};
-
-window.filter = () => {
-	Table.GetInstance(pageId).addExtraData(
-		"schoolId",
-		Select.GetInstance("schoolId").getValue()
-	);
-	Table.GetInstance(pageId).addExtraData(
-		"authorId",
-		Select.GetInstance("authorId").getValue()
-	);
-	Table.GetInstance(pageId).addExtraData(
-		"categoryId",
-		Select.GetInstance("categoryId").getValue()
-	);
-
-	Helpers.closeAllModals();
-	Table.GetInstance(pageId).reload();
-};
-
-window.edit = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
-	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
-};
-
 window.setLender = () => {
 	let selected = Select.GetInstance("lenderType").getValue();
 	Select.GetInstance("lenderInformatId").setDetails(selected);

@@ -13,6 +13,10 @@ export default class Calendar {
 		this.extraData = {};
 
 		this.editable = this.element.hasAttribute("data-editable");
+		this.droppable = this.element.hasAttribute("data-droppable");
+		this.onDrop = this.element.dataset.onDrop || false;
+		this.eventDataFormat = this.element.dataset.eventDataFormat || false;
+		this.eventRemove = this.element.dataset.eventRemove || false;
 		this.weekends = this.element.hasAttribute("data-weekends");
 		this.allDaySlot = this.element.hasAttribute("data-all-day-slot");
 		this.slotDuration = this.element.dataset.slotDuration || "00:30:00";
@@ -63,6 +67,13 @@ export default class Calendar {
 				center: "title",
 				end: "today next,nextYear",
 			},
+			editable: this.editable,
+			droppable: this.droppable,
+			eventContent: function (info) {
+				return {
+					html: `<div class="fc-event-title">${info.event.title}</div>`,
+				};
+			},
 		};
 
 		if (this.view === "timeGridWeek") {
@@ -70,13 +81,37 @@ export default class Calendar {
 			options.slotDuration = this.slotDuration;
 			options.nowIndicator = true;
 			options.scrollTime = new Date().getHours() - 1 + ":00:00";
-			options.editable = this.editable;
 			options.selectable = true;
 			options.expandRows = true;
 		}
 
 		if (this.slotMinTime) options.slotMinTime = this.slotMinTime;
 		if (this.slotMaxTime) options.slotMaxTime = this.slotMaxTime;
+
+		if (this.droppable) {
+			options.drop = (info) => {
+				window[this.onDrop](info);
+			};
+
+			options.eventDrop = (info) => {
+				window[this.onDrop](info);
+			};
+
+			if (this.eventRemove) {
+				options.eventDragStop = (e) => window[this.eventRemove](e);
+			}
+
+			let dragOptions = { itemSelector: ".drop-event" };
+			if (this.eventDataFormat) {
+				dragOptions.eventData = (eventEl) =>
+					window[this.eventDataFormat](eventEl);
+			}
+
+			new FullCalendar.Draggable(
+				document.getElementById(this.element.dataset.eventContainer),
+				dragOptions
+			);
+		}
 
 		if (this.dateClick || this.dateSelect) {
 			if (this.view === "timeGridWeek") {
@@ -141,6 +176,10 @@ export default class Calendar {
 
 		this.elementObject = new FullCalendar.Calendar(this.element, options);
 		this.elementObject.render();
+	};
+
+	revert = () => {
+		this.elementObject.revert();
 	};
 
 	reload = () => {

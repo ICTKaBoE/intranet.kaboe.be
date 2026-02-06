@@ -13,14 +13,18 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\EHBO\EHBO;
+use Database\Repository\Export\Export;
 use Database\Repository\School\School;
 use Database\Repository\EHBO\FirstHelp;
 use Database\Repository\EHBO\VictimType;
 use Database\Repository\EHBO\Description;
 use Database\Object\EHBO\EHBO as EHBOEHBO;
+use Database\Object\Export\Export as ExportExport;
 
 class EHBOController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "ehbo";
+
     // Get functions
     protected function getMine($view, $id = null)
     {
@@ -64,29 +68,33 @@ class EHBOController extends ApiController
     protected function getDescription($view, $id = null)
     {
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $this->appendToJson('items', (new Description)->get());
+            $items = (new Description)->get();
+            $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+            $this->appendToJson('items', $items);
         }
     }
 
     protected function getFirstHelp($view, $id = null)
     {
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $this->appendToJson('items', (new FirstHelp)->get());
+            $items = (new FirstHelp)->get();
+            $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+            $this->appendToJson('items', $items);
         }
     }
 
     protected function getVictimType($view, $id = null)
     {
-        $repo = new VictimType;
-
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $this->appendToJson('items', $repo->get());
+            $items = (new VictimType)->get();
+            $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+            $this->appendToJson('items', $items);
         }
     }
 
     protected function getSettings($view)
     {
-        $this->getNavigationSettings("accident");
+        $this->getNavigationSettings();
     }
 
     // Post functions
@@ -109,12 +117,13 @@ class EHBOController extends ApiController
             "schoolId" => ["mandatory" => true],
             "place" => ["mandatory" => true],
             "description" => ["mandatory" => true],
-            "descriptionOther" => ["mandatory" => true, "preconditions" => ["description" => "O"]],
+            "descriptionOther" => ["mandatory" => true, "preconditions" => ["description" => SELECT_OTHER_ID]],
             "firstHelpDateTime" => ["mandatory" => true],
             "firstHelp" => ["mandatory" => true],
-            "firstHelpOther" => ["mandatory" => true, "preconditions" => ["firstHelp" => "O"]],
+            "firstHelpOther" => ["mandatory" => true, "preconditions" => ["firstHelp" => SELECT_OTHER_ID]],
             "victimType" => ["mandatory" => true],
-            "victimId" => ["mandatory" => true],
+            "victimId",
+            "firstHelper" => ["mandatory" => true],
             "witness" => ["mandatory" => true]
         ];
 
@@ -134,16 +143,15 @@ class EHBOController extends ApiController
 
     protected function postSettings()
     {
-        $this->postNavigationSettings("accident");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
             "school" => ["mandatory" => true],
             "start" => ["default" => null],
-            "end" => ["default" => null],
-            "exportAs"
+            "end" => ["default" => null]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -171,7 +179,7 @@ class EHBOController extends ApiController
     protected function exportAsXlsx($schoolIds, $start, $end)
     {
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/ehbo/" . date("YmdHis"));
         $filename = "EHBO Register.xlsx";
 
         $items = $this->getAllGroupedBySchool($schoolIds, $start, $end);
@@ -211,7 +219,7 @@ class EHBOController extends ApiController
                     $item->place,
                     $item->formatted->description,
                     $item->formatted->firstHelpWithDateTime,
-                    $item->linked->victim->formatted->fullNameReversed,
+                    $item->formatted->victim,
                     $item->witness
                 ];
             }

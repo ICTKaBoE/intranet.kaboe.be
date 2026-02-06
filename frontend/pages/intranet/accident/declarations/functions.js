@@ -1,36 +1,8 @@
 import Button from "../../../../shared/default/js/object/Button.js";
 import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Table from "../../../../shared/default/js/object/Table.js";
-import Select from "../../../../shared/default/js/object/Select.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 import Form from "../../../../shared/default/js/object/Form.js";
-
-window.emptyFilter = () => {
-	// Select.GetInstance("status").clear();
-	Select.GetInstance("schoolId").clear();
-
-	filter();
-};
-
-window.filter = () => {
-	// Table.GetInstance(pageId).addExtraData(
-	// 	"status",
-	// 	Select.GetInstance("status").getValue()
-	// );
-
-	Table.GetInstance(pageId).addExtraData(
-		"schoolId",
-		Select.GetInstance("schoolId").getValue()
-	);
-
-	Helpers.closeAllModals();
-	Table.GetInstance(pageId).reload();
-};
-
-window.edit = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
-	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
-};
 
 let btnFilter = new Button({
 	options: {
@@ -39,6 +11,18 @@ let btnFilter = new Button({
 		title: "Filteren",
 		bgColor: "blue",
 		modal: "filter",
+	},
+});
+
+let btnAdd = new Button({
+	options: {
+		type: Button.TYPE_ICON,
+		icon: "plus",
+		title: "Toevoegen",
+		bgColor: "green",
+		onclick: () => {
+			Helpers.redirect("/add");
+		},
 	},
 });
 
@@ -52,15 +36,15 @@ let btnEdit = new Button({
 	},
 });
 
-let btnPrint = new Button({
+let btnMail = new Button({
 	options: {
 		type: Button.TYPE_ICON,
-		icon: "printer",
-		title: "Print Aangifteformulier",
+		icon: "send",
+		title: "Verzend Aangifteformulier",
 		bgColor: "primary",
-		modal: "print",
+		modal: "mail",
 		onclick: () => {
-			Form.GetInstance(`${pageId}Print`).setLastLoadedId(
+			Form.GetInstance(`${pageId}Mail`).setLastLoadedId(
 				Table.GetInstance(pageId)
 					.getSelectedRowData()
 					.map((r) => r.guid || r.id)
@@ -70,9 +54,9 @@ let btnPrint = new Button({
 	},
 });
 
-Component.addActionButton(btnFilter, btnEdit, btnPrint);
+Component.addActionButton(btnFilter, btnAdd, btnEdit, btnMail);
 
 $(document).ready(() => {
 	Table.GetInstance(pageId).attachButton(btnEdit, "==1");
-	Table.GetInstance(pageId).attachButton(btnPrint, ">0");
+	Table.GetInstance(pageId).attachButton(btnMail, ">0");
 });

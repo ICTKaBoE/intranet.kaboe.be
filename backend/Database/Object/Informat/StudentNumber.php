@@ -3,7 +3,7 @@
 namespace Database\Object\Informat;
 
 use Helpers\HTML;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class StudentNumber extends CustomObject
 {

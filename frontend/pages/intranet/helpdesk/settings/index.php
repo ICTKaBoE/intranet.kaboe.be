@@ -21,7 +21,7 @@
 
                 <div class="col-12 mb-3">
                     <label class="form-label" for="assignableUsers">Kan toegewezen worden aan</label>
-                    <select name="assignableUsers" id="assignableUsers" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" multiple data-search></select>
+                    <select name="assignableUsers" id="assignableUsers" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" multiple data-search></select>
 
                 </div>
             </div>

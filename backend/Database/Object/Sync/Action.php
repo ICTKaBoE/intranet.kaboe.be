@@ -2,7 +2,7 @@
 
 namespace Database\Object\Sync;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Action extends CustomObject
 {

@@ -48,6 +48,7 @@ export default class Toast {
 		toast.ariaAtomic = true;
 		if (delay) toast.dataset.bsDelay = delay;
 		if (link) {
+			toast.role = "button";
 			toast.onclick = () => {
 				window.location.href = link;
 			};

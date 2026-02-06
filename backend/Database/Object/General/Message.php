@@ -7,7 +7,7 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\General\MessageType;
 
 class Message extends CustomObject

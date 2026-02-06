@@ -16,6 +16,7 @@
 						</div>
 
 						<span class="avatar avatar-sm me-2">{{user:initials}}</span>
+						<a href="#pageManual" class="avatar avatar-sm me-2" data-bs-toggle="offcanvas" role="button" aria-controls="pageManual"><?= \Helpers\HTML::Icon("zoom-question", "Handleiding"); ?></a>
 						<a href="/user/logout" class="avatar avatar-sm"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
 					</div>
 				</div>
@@ -42,6 +43,7 @@
 					</div>
 
 					<span class="avatar avatar-sm me-2">{{user:initials}}</span>
+					<a href="#pageManual" class="avatar avatar-sm me-2" data-bs-toggle="offcanvas" role="button" aria-controls="pageManual"><?= \Helpers\HTML::Icon("zoom-question", "Handleiding"); ?></a>
 					<a href="/user/logout" class="avatar avatar-sm"><?= \Helpers\HTML::Icon("logout", "Afmelden..."); ?></a>
 				</div>
 			</div>

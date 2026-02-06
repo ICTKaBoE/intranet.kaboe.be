@@ -11,9 +11,9 @@ export default class Select {
 		this.render.item = this.element.dataset.renderItem || false;
 		this.render.option = this.element.dataset.renderOption || false;
 		this.onChange = this.element.dataset.onChange || false;
-		this.loadSource = this.element.dataset.loadSource || false;
-		this.loadValue = this.element.dataset.loadValue || "id";
-		this.loadLabel = this.element.dataset.loadLabel || false;
+		this.source = this.element.dataset.loadSource || false;
+		this.value = this.element.dataset.value || "id";
+		this.label = this.element.dataset.label || "name";
 		this.defaultDetails = this.element.dataset.defaultDetails || false;
 		this.defaultValue = this.element.dataset.defaultValue || false;
 		this.defaultExtraData = this.element.dataset.extra || false;
@@ -21,10 +21,9 @@ export default class Select {
 		this.search = this.element.hasAttribute("data-search");
 		this.parent = this.element.dataset.parentSelect || false;
 		this.defaultDisabled = this.element.hasAttribute("disabled") || false;
-		this.optgroupAttribute =
-			this.element.dataset.optgroupAttribute || false;
-		this.optgroupValue = this.element.dataset.optgroupValue || false;
-		this.optgroupLabel = this.element.dataset.optgroupLabel || false;
+		this.optgroup = this.element.dataset.optgroup || "optgroup";
+		this.optgroupValue = this.element.dataset.optgroupValue || "id";
+		this.optgroupLabel = this.element.dataset.optgroupLabel || "name";
 		this.limit = this.element.dataset.limit || 200;
 		this.defaultNoLoad = this.element.hasAttribute("data-default-no-load");
 		this.defaultNoValue = this.element.hasAttribute(
@@ -48,45 +47,45 @@ export default class Select {
 
 		this.stopCheckNext = false;
 
-		if (this.loadSource && this.loadSource.startsWith("[")) {
-			let loadSource = this.loadSource
+		if (this.source && this.source.startsWith("[")) {
+			let loadSource = this.source
 				.replace("[", "")
 				.replace("]", "")
 				.split(";");
 
-			this.loadSource = [];
+			this.source = [];
 			loadSource.forEach((source) => {
 				source = source.split("@");
-				this.loadSource[source[0]] = source[1];
+				this.source[source[0]] = source[1];
 			});
 
 			if (!this.defaultDetails)
-				this.defaultDetails = Object.keys(this.loadSource)[0];
+				this.defaultDetails = Object.keys(this.source)[0];
 		}
 
-		if (this.loadValue && this.loadValue.startsWith("[")) {
-			let loadValue = this.loadValue
+		if (this.value && this.value.startsWith("[")) {
+			let loadValue = this.value
 				.replace("[", "")
 				.replace("]", "")
 				.split(";");
 
-			this.loadValue = [];
+			this.value = [];
 			loadValue.forEach((source) => {
 				source = source.split("@");
-				this.loadValue[source[0]] = source[1];
+				this.value[source[0]] = source[1];
 			});
 		}
 
-		if (this.loadLabel && this.loadLabel.startsWith("[")) {
-			let loadLabel = this.loadLabel
+		if (this.label && this.label.startsWith("[")) {
+			let loadLabel = this.label
 				.replace("[", "")
 				.replace("]", "")
 				.split(";");
 
-			this.loadLabel = [];
+			this.label = [];
 			loadLabel.forEach((source) => {
 				source = source.split("@");
-				this.loadLabel[source[0]] = source[1];
+				this.label[source[0]] = source[1];
 			});
 		}
 
@@ -141,7 +140,7 @@ export default class Select {
 		if (!this.element.classList.contains("form-select"))
 			this.element.classList.add("form-select");
 
-		if (!this.defaultNoLoad && this.loadSource) {
+		if (!this.defaultNoLoad && this.source) {
 			this.loadParams.page = 0;
 			await this.getData();
 			if (!this.stopCheckNext) await this.checkNext();
@@ -164,7 +163,7 @@ export default class Select {
 		this.clear();
 		this.destroy();
 
-		if (this.loadSource) {
+		if (this.source) {
 			this.loadParams.page = 0;
 			await this.getData();
 			if (!this.stopCheckNext) await this.checkNext();
@@ -222,28 +221,27 @@ export default class Select {
 				});
 			};
 
-		if (this.optgroupAttribute) {
-			settings.optgroupField = this.optgroupAttribute;
+		if (this.optgroup) {
+			settings.optgroupField = this.optgroup;
 			settings.optgroupValueField = this.optgroupValue;
 			settings.optgroupLabelField = this.optgroupLabel;
 		}
 
-		if (this.loadSource && this.loadValue && this.loadLabel) {
+		if (this.source && this.value && this.label) {
 			settings.valueField =
-				this.loadValue[this.selectedDetails || this.defaultDetails] ||
-				this.loadValue;
+				this.value[this.selectedDetails || this.defaultDetails] ||
+				this.value;
 			settings.labelField =
-				this.loadLabel[this.selectedDetails || this.defaultDetails] ||
-				this.loadLabel;
+				this.label[this.selectedDetails || this.defaultDetails] ||
+				this.label;
 			settings.searchField = [
-				this.loadLabel[this.selectedDetails || this.defaultDetails] ||
-					this.loadLabel,
+				this.label[this.selectedDetails || this.defaultDetails] ||
+					this.label,
 			];
 		}
 
-		if (this.data?.optgroups && this.optgroupAttribute)
+		if (this.data?.optgroups && this.optgroup)
 			settings.optgroups = this.data.optgroups;
-
 		if (this.data?.items && this.data?.items.length)
 			settings.options = this.data.items;
 
@@ -251,11 +249,11 @@ export default class Select {
 	};
 
 	getData = () => {
-		if (!this.loadSource) return;
+		if (!this.source) return;
 
 		return $.get(
-			this.loadSource[this.selectedDetails || this.defaultDetails] ||
-				this.loadSource,
+			this.source[this.selectedDetails || this.defaultDetails] ||
+				this.source,
 			this.loadParams
 		).done((data) => {
 			let items = data.items;
@@ -311,8 +309,8 @@ export default class Select {
 		let details = this.getItemDetails();
 		if (!details) return "";
 		return details[
-			this.loadLabel[this.selectedDetails || this.defaultDetails] ||
-				this.loadLabel
+			this.label[this.selectedDetails || this.defaultDetails] ||
+				this.label
 		];
 	};
 
@@ -365,6 +363,10 @@ export default class Select {
 
 	setExtraLoadParam = (key, value) => {
 		this.loadParams[key] = value;
+	};
+
+	removeExtraLoadParam = (key) => {
+		delete this.loadParams[key];
 	};
 
 	detectParentAndSetFunctions = () => {

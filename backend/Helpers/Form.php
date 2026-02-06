@@ -24,6 +24,7 @@ abstract class Form
                 if (Arrays::getValue($value, 'placeholder')) $$key = str_replace(Arrays::getValue($value, 'placeholder'), "", $$key);
                 if (Arrays::getValue($value, 'convert') || Arrays::getValue($value, 'type')) $$key = General::convert($$key, Arrays::getValue($value, "convert", Arrays::getValue($value, 'type')));
                 if (Arrays::getValue($value, 'default')) $$key = $$key ?: Arrays::getValue($value, "default");
+                if (Arrays::getValue($value, 'trimToNull', false) == true) $$key = Strings::trimToNull($$key);
                 $fields[$key] = $$key;
 
                 if (Arrays::getValue($value, 'mandatory', false) == true) {

@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col-lg-6 col-12 mb-3">
                         <label class="form-label" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" data-on-change="assignedToView" required></select>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-default-value="{{user:mainSchoolId}}" data-on-change="assignedToView" required></select>
                     </div>
 
                     <div class="col-lg-6 col-12 mb-3">
@@ -25,7 +25,7 @@
 
                     <div class="col-lg-6 col-12 mb-3">
                         <label for="assignedToId" class="form-label">Toegewezen aan</label>
-                        <select name="assignedToId" id="assignedToId" data-load-source="[S@{{select:url:short}}/{{url:part.module}}/screen;G@{{select:url:short}}/{{url:part.module}}/group]" data-load-value="id" data-load-label="name" required></select>
+                        <select name="assignedToId" id="assignedToId" data-load-source="[S@{{select:url:short}}/{{url:part.module}}/screen;G@{{select:url:short}}/{{url:part.module}}/group]" required></select>
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-on-change="assignedToView" required></select>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-on-change="assignedToView" required></select>
                     </div>
 
                     <div class="mb-3">
@@ -75,7 +75,7 @@
 
                     <div class="mb-3">
                         <label for="assignedToId" class="form-label">Toegewezen aan</label>
-                        <select name="assignedToId" id="assignedToId" data-load-source="[S@{{select:url:short}}/{{url:part.module}}/screen;G@{{select:url:short}}/{{url:part.module}}/group]" data-load-value="id" data-load-label="name" required></select>
+                        <select name="assignedToId" id="assignedToId" data-load-source="[S@{{select:url:short}}/{{url:part.module}}/screen;G@{{select:url:short}}/{{url:part.module}}/group]" required></select>
                     </div>
                 </div>
             </div>

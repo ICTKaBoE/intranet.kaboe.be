@@ -9,15 +9,15 @@
             <div class="modal-body">
                 <div class="row mb-3">
                     <div class="col">
-                        <label class="form-label mb-1" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}"></select>
+                        <label class="form-label mb-1" for="filter_schoolId">School</label>
+                        <select name="filter_schoolId" id="filter_schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
                     </div>
                 </div>
 
                 <!-- <div class="row mb-3">
                     <div class="col">
                         <label class="form-label mb-1" for="status">Status</label>
-                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N;O;WA;WC;WO;WR" multiple></select>
+                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N;O;WA;WC;WO;WR" multiple></select>
                     </div>
                 </div> -->
             </div>

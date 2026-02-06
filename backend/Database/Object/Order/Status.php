@@ -3,7 +3,7 @@
 namespace Database\Object\Order;
 
 use Helpers\HTML;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Status extends CustomObject
 {

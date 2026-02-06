@@ -7,7 +7,7 @@ use Helpers\HTML;
 use Helpers\CString;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\TempReg\Treshhold;
 use Database\Repository\Navigation\Navigation;
 

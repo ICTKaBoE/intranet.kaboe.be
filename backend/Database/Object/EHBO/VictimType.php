@@ -2,12 +2,13 @@
 
 namespace Database\Object\EHBO;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class VictimType extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
-        "name" => self::TYPE_STRING
+        "id" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "type" => self::TYPE_STRING,
     ];
 }

@@ -21,7 +21,6 @@ use Database\Repository\Management\Building;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\Firewall;
 use Database\Repository\Management\Patchpanel;
-use Database\Repository\Navigation\Navigation;
 use Database\Repository\Management\AccessPoint;
 use Database\Repository\Management\ComputerBattery;
 use Database\Object\Management\CCTV as ManagementCCTV;
@@ -43,6 +42,8 @@ use Database\Repository\Navigation\Setting;
 
 class ManagementController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "management";
+
     // Get Functions
     protected function getLaptop($view, $id = null)
     {
@@ -424,7 +425,7 @@ class ManagementController extends ApiController
 
     protected function getPrinterMode($view, $id = null)
     {
-        $items = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("management")->id, "printer.mode")->value;
+        $items = (new Setting)->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "printer.mode")->value;
         $items = explode(PHP_EOL, $items);
         $items = Arrays::map($items, fn($i) => ["id" => trim($i), "name" => trim($i)]);
         $this->appendToJson('items', $items);
@@ -555,7 +556,7 @@ class ManagementController extends ApiController
         $_fields = [
             "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
             "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
-            "floor" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "floor" => ["default" => 0, 'type' => Input::INPUT_TYPE_INT],
             "number" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
         ];
 

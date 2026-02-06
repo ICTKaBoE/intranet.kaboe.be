@@ -3,7 +3,7 @@
 namespace Database\Object;
 
 use Ouzo\Utilities\Clock;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class SupervisionEvent extends CustomObject
 {

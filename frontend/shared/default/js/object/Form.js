@@ -165,6 +165,7 @@ export default class Form {
 		this.lastLoadedId = null;
 		this.resetValidation();
 		this.setActiveStep(1);
+		this.enable();
 
 		$(this.element)
 			.find(":input")
@@ -259,6 +260,9 @@ export default class Form {
 		});
 
 		this.disable();
+		Helpers.toggleWait(
+			data.has("_method") ? data.get("_method").toLowerCase() : ""
+		);
 
 		let done = (returnData) => {
 			if (!this.noReserAfterSubmit) this.resetAfterSubmit();
@@ -277,10 +281,15 @@ export default class Form {
 				returnData.responseText || JSON.stringify(returnData)
 			);
 
+			setTimeout(() => {
+				Helpers.closeAllModals();
+			}, 500);
+
 			Helpers.processRequestResponse(data);
 			this.processValidation(data.validation);
 			if (data.activeStep) this.setActiveStep(data.activeStep);
 			if (data.resetForm) this.reset();
+			if (data.enableForm) this.enable();
 			if (data.setId) this.prefillForm(data.setId);
 
 			if (this.afterSubmit) {
@@ -349,6 +358,7 @@ export default class Form {
 
 	prefillForm = (id = null) => {
 		this.lastLoadedId = id;
+		Helpers.toggleWait();
 
 		fetch(
 			this.source +
@@ -360,6 +370,10 @@ export default class Form {
 			.then((res) => res.json())
 			.then((json) => {
 				this.prefillFields(json.fields);
+
+				setTimeout(() => {
+					Helpers.closeAllModals();
+				}, 500);
 			});
 	};
 

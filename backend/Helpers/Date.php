@@ -2,6 +2,7 @@
 
 namespace Helpers;
 
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 
 abstract class Date
@@ -33,5 +34,15 @@ abstract class Date
 		}
 
 		return $workingDays;
+	}
+
+	static public function dayOfWeekToString($number, $language = "nl")
+	{
+		return Arrays::getNestedValue(WEEK_DAYS, [$language, $number]) ?: date('l', strtotime("Sunday +{$number} days"));
+	}
+
+	static public function stringToDayOfWeek($string, $language = "nl")
+	{
+		return Arrays::findKeyByValue(WEEK_DAYS[$language], $string);
 	}
 }

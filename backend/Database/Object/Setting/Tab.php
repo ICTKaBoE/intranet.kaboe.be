@@ -2,7 +2,7 @@
 
 namespace Database\Object\Setting;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\HTML;
 
 class Tab extends CustomObject

@@ -4,12 +4,12 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolyearId">Schooljaar</label>
-                    <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/{{url:part.module}}/schoolyear" data-load-value="id" data-load-label="formatted.nameWithCurrent" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                    <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/general/schoolyear" data-label="formatted.nameWithCurrent" required></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" required></select>
                 </div>
             </div>
 

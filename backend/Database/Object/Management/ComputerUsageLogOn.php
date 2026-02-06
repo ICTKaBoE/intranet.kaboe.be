@@ -4,7 +4,7 @@ namespace Database\Object\Management;
 
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class ComputerUsageLogOn extends CustomObject
 {

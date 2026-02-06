@@ -4,7 +4,7 @@ namespace Database\Object\Informat;
 
 use Security\Input;
 use Helpers\CString;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Employee extends CustomObject
 {
@@ -25,16 +25,14 @@ class Employee extends CustomObject
         "bis" => self::TYPE_STRING,
         "iban" => self::TYPE_STRING,
         "bic" => self::TYPE_STRING,
-        "active" => self::TYPE_BOOLEAN
+        "active" => self::TYPE_BOOLEAN,
+        "instituteId" => self::TYPE_INTEGER
     ];
 
     protected $linkedAttributes = [
-        "birthCountry" => [
-            "birthCountryId" => \Database\Repository\General\Country::class
-        ],
-        "nationality" => [
-            "nationalityId" => \Database\Repository\General\Country::class
-        ]
+        "birthCountry" => ["birthCountryId" => \Database\Repository\General\Country::class],
+        "nationality" => ["nationalityId" => \Database\Repository\General\Country::class],
+        "institute" => ["instituteId" => \Database\Repository\School\Institute::class]
     ];
 
     public function init()

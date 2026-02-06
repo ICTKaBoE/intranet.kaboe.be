@@ -2,7 +2,7 @@
 
 namespace Database\Object\User;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class LoginHistory extends CustomObject
 {

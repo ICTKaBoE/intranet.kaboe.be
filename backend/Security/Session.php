@@ -39,4 +39,9 @@ abstract class Session
         self::start();
         return Arrays::getValue($_SESSION, $key);
     }
+
+    static public function Close()
+    {
+        session_write_close();
+    }
 }

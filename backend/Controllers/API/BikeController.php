@@ -7,6 +7,7 @@ use Helpers\ZIP;
 use Helpers\Date;
 use Helpers\Form;
 use Helpers\Excel;
+use Helpers\Table;
 use Security\User;
 use Router\Helpers;
 use Security\Input;
@@ -24,14 +25,15 @@ use Database\Repository\School\School;
 use Database\Repository\Bike\DistanceType;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Bike\Event as ObjectBikeEvent;
 use Database\Repository\User\User as RepositoryUser;
 use Database\Object\Bike\Distance as ObjectBikeDistance;
-use Helpers\Table;
+use Database\Object\Export\Export as ExportExport;
 
 class BikeController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "bike";
+
     // Get Functions
     protected function getHomeWork($view, $id = null)
     {
@@ -102,7 +104,7 @@ class BikeController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        return $this->getNavigationSettings("bike");
+        return $this->getNavigationSettings();
     }
 
     // Post Functions
@@ -164,7 +166,6 @@ class BikeController extends ApiController
     protected function postEvent($view, $id, $type)
     {
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("bike");
 
         $_fields = [
             "date" => ["mandatory" => true],
@@ -173,19 +174,19 @@ class BikeController extends ApiController
         [$invalid, $fields] = Form::Validate($_fields);
         Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.enabled")->value, 'bool')) {
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.enabled")->value, 'bool')) {
             $pastDate = Clock::now()->toDateTime();
-            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.past.amount")->value);
+            if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.amount")->value !== 0) $pastDate->modify("-" . $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.past.amount")->value);
             $pastDate = Clock::at($pastDate->format('Y-m-d'));
 
-            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey($navigation->id, "lastPayDate")->value);
+            if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value && $pastDate->isBeforeOrEqualTo(Clock::at($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value))) $pastDate = Clock::at($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value);
 
             if (Clock::at($fields['date'])->isBefore($pastDate)) $this->setToast("U kan geen rit inboeken voor {$pastDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
         }
 
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.enabled")->value, 'bool')) {
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.enabled")->value, 'bool')) {
             $futureDate = Clock::now()->toDateTime();
-            if ($settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount") !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey($navigation->id, "block.future.amount")->value);
+            if ($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.amount") !== 0) $futureDate->modify("+" . $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "block.future.amount")->value);
             $futureDate = Clock::at($futureDate->format('Y-m-d'));
 
             if (Clock::at($fields['date'])->isAfter($futureDate)) $this->setToast("U kan geen rit inboeken na {$futureDate->format('d/m/Y')}", self::VALIDATION_STATE_INVALID);
@@ -238,18 +239,17 @@ class BikeController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("bike");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
             "type",
             "per",
             "school" => ["mandatory" => true],
             "start" => ["mandatory" => true],
-            "end" => ["mandatory" => true],
-            "exportAs"
+            "end" => ["mandatory" => true]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -266,10 +266,8 @@ class BikeController extends ApiController
         } else $fields['school'] = [$fields['school']];
 
         if ($this->validationIsAllGood()) {
-            if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'xlsx')) $this->exportPerSchoolAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "school") && Strings::equal($fields['exportAs'], 'pdf')) $this->exportPerSchoolAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "xlsx")) $this->exportPerTeacherAsXlsx($fields['school'], $fields['start'], $fields['end'], $fields['type']);
-            else if (Strings::equal($fields['per'], "teacher") && Strings::equal($fields['exportAs'], "pdf")) $this->exportPerTeacherAsPdf($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            if (Strings::equal($fields['per'], "school")) $this->exportPerSchool($fields['school'], $fields['start'], $fields['end'], $fields['type']);
+            else if (Strings::equal($fields['per'], "teacher")) $this->exportPerTeacher($fields['school'], $fields['start'], $fields['end'], $fields['type']);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
 
         $this->handle();
@@ -301,13 +299,13 @@ class BikeController extends ApiController
     }
 
     // Export functions
-    protected function exportPerSchoolAsXlsx($schoolIds, $start, $end, $type)
+    private function exportPerSchool($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/bike/" . date("YmdHis"));
         $filename = "Fietsvergoeding - Export Per School - {$typeFull}.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
@@ -405,109 +403,12 @@ class BikeController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    protected function exportPerSchoolAsPdf($schoolIds, $start, $end, $type)
+    private function exportPerTeacher($schoolIds, $start, $end, $type)
     {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
+        $lastPayDate = (new Setting)->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "lastPayDate")->value;
         $typeFull = (new DistanceType)->getById($type)->name;
 
-        $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per School - {$typeFull}.zip";
-        $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
-
-        foreach ($schoolIds as $index => $schoolId) {
-            $schoolTotalDistance = $schoolTotalPrice = 0;
-            $groupedEvents = $this->getEventsGroupedByTeacherAndByMonthBySchoolId($schoolId, $start, $end, $type);
-
-            $school = $schoolRepo->getById($schoolId);
-            $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Fietsvergoeding - Overzicht - {$typeFull}: {$school->name}");
-
-            $pdf->AddPage();
-            $pdf->Cell(60, 10, 'Startdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($start)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Einddatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($end)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Laatste uitbetalingsdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-
-            $table = [];
-            $table['header'][] = [
-                "title" => "Leerkracht",
-                "border" => "B",
-                "width" => 60
-            ];
-
-            foreach ($monthsBetweenDates as $month) {
-                $table['header'][] = [
-                    'title' => $month,
-                    "border" => "B"
-                ];
-            }
-
-            $table['header'][] = [
-                "title" => "Totaal",
-                "border" => "LB",
-                "width" => 30
-            ];
-
-            $table['header'][] = [
-                "border" => "B",
-                "width" => 30
-            ];
-
-            foreach ($groupedEvents as $user => $events) {
-                $userTotalDistance = $userTotalPrice = 0;
-
-                $table['data'][$user][] = $user;
-
-                foreach ($monthsBetweenDates as $month) {
-                    $table['data'][$user][] = number_format(($events[$month]['distance'] ?? 0), 2, ",", ".") . " km";
-                    $userTotalDistance += $events[$month]['distance'] ?? 0;
-                    $userTotalPrice += $events[$month]['price'] ?? 0;
-                }
-
-                $table['data'][$user][] = [
-                    "text" => number_format($userTotalDistance, 2, ",", ".") . " km",
-                    "border" => "L"
-                ];
-                $table['data'][$user][] = "€ " . number_format($userTotalPrice, 2, ",", ".");
-
-                $schoolTotalDistance += $userTotalDistance;
-                $schoolTotalPrice += $userTotalPrice;
-            }
-
-            $table['data']['total'][] = [];
-            foreach ($monthsBetweenDates as $m) {
-                $table['data']['total'][] = [];
-            }
-
-            $table['data']['total'][] = [
-                "text" => number_format($schoolTotalDistance, 2, ",", ".") . " km",
-                "border" => "T"
-            ];
-            $table['data']['total'][] = [
-                "text" => "€ " . number_format($schoolTotalPrice, 2, ",", "."),
-                "border" => "T"
-            ];
-
-            $pdf->Ln(10);
-            $pdf->table($table);
-
-            $pdf->save();
-        }
-
-        $zipFile = new ZIP("{$folder}/{$filename}");
-        $zipFile->addDir($folder);
-        $zipFile->save();
-        if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
-    }
-
-    protected function exportPerTeacherAsXlsx($schoolIds, $start, $end, $type)
-    {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
-        $typeFull = (new DistanceType)->getById($type)->name;
-
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/bike/" . date("YmdHis"));
         $filename = "Fietsvergoeding - Export Per Leerkracht - {$typeFull}.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 
@@ -638,125 +539,6 @@ class BikeController extends ApiController
         }
 
         $excel->save();
-        if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
-    }
-
-    protected function exportPerTeacherAsPdf($schoolIds, $start, $end, $type)
-    {
-        $lastPayDate = (new Setting)->getByNavigationIdAndKey((new Navigation)->getByLink("bike")->id, "lastPayDate")->value;
-        $typeFull = (new DistanceType)->getById($type)->name;
-
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $filename = "Fietsvergoeding - Export Per Leerkracht - {$typeFull}.zip";
-        $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
-        $groupedEvents = $this->getEventsGroupedByMonthByTeacherBySchool($start, $end, $schoolIds, $type);
-
-        foreach ($groupedEvents as $username => $userEvent) {
-            $index = array_search($username, array_keys($groupedEvents));
-            $user = $userEvent['user'];
-            $address = $userEvent['address'];
-            $events = $userEvent['events'];
-
-            $userTotalSingle = $userTotalDouble = $userTotalPrice = 0;
-            $pdf = new PDF($user->fullNameReversed, "{$folder}/{$user->formatted->fullNameReversed}.pdf", "P", "Fietsvergoeding - Overzicht - {$typeFull}: {$user->fullNameReversed}");
-
-            $pdf->AddPage();
-            $pdf->Cell(60, 10, 'Hoofdschool', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $user->linked->mainSchool->name, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Huidig adres', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $address->formatted->address, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Rekeningnummer', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, $user->bankAccount, ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Startdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($start)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Einddatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($end)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(60, 10, 'Laatste uitbetalingsdatum', ln: 0, align: 'L', calign: 'C', valign: 'C');
-            $pdf->Cell(0, 10, Clock::at($lastPayDate)->format("d/m/Y"), ln: 1, align: 'L', calign: 'C', valign: 'C');
-
-            $table = [];
-            $table['header'][] = ["title" => "Datum"];
-            $table['header'][] = ["title" => "Afstand - Enkel"];
-            $table['header'][] = ["title" => "Afstand - Dubbel"];
-            $table['header'][] = ["title" => "Vergoeding/km"];
-            $table['header'][] = ["title" => "Vergoeding totaal"];
-
-            foreach ($monthsBetweenDates as $month) {
-                $monthTotalSingle = $monthTotalDouble = $monthTotalPrice = 0;
-
-                $table['data'][][] = [
-                    "text" => $month,
-                    "width" => 0
-                ];
-
-                foreach ($events[$month] as $event) {
-                    $table['data'][$event->date][] = Clock::at($event->date)->format("d/m/Y");
-                    $table['data'][$event->date][] = number_format($event->distance, 2, ",", ".") . " km";
-                    $table['data'][$event->date][] = number_format($event->distance * 2, 2, ",", ".") . " km";
-                    $table['data'][$event->date][] = "€ " . number_format($event->pricePerKm, 2, ",", ".");
-                    $table['data'][$event->date][] = "€ " . number_format($event->pricePerKm * ($event->distance * 2), 2, ",", ".");
-
-                    $monthTotalSingle += $event->distance;
-                    $monthTotalDouble += $event->distance * 2;
-                    $monthTotalPrice += $event->pricePerKm * ($event->distance * 2);
-                }
-
-                $table['data'][$month][] =
-                    [
-                        "text" => count($events[$month] ?? []) . " rit(ten)",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => number_format($monthTotalSingle, 2, ",", ".") . " km",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => number_format($monthTotalDouble, 2, ",", ".") . " km",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => "",
-                        "border" => 'T'
-                    ];
-
-                $table['data'][$month][] =
-                    [
-                        "text" => "€ " . number_format($monthTotalPrice, 2, ",", "."),
-                        "border" => 'T'
-                    ];
-
-                $table['data'][][] = "";
-
-                $userTotalSingle += $monthTotalSingle;
-                $userTotalDouble += $monthTotalDouble;
-                $userTotalPrice += $monthTotalPrice;
-            }
-
-            $table2 = [];
-            $table2['header'][] = ["title" => "Totaal"];
-            $table2['header'][] = ["title" => number_format($userTotalSingle, 2, ",", ".") . " km"];
-            $table2['header'][] = ["title" => number_format($userTotalDouble, 2, ",", ".") . " km"];
-            $table2['header'][] = ["title" => ""];
-            $table2['header'][] = ["title" => "€ " . number_format($userTotalPrice, 2, ",", ".")];
-
-            $pdf->Ln(10);
-            $pdf->table($table);
-
-            $pdf->Ln(10);
-            $pdf->table($table2);
-
-            $pdf->save();
-        }
-
-        $zipFile = new ZIP("{$folder}/{$filename}");
-        $zipFile->addDir($folder);
-        $zipFile->save();
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 

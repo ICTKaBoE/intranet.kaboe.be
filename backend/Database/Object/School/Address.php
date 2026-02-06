@@ -2,7 +2,7 @@
 
 namespace Database\Object\School;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Address extends CustomObject
 {

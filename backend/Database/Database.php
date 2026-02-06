@@ -28,7 +28,7 @@ class Database
                 else return $statement->rowCount();
             });
         } catch (\Exception $e) {
-            die(var_dump("Database error: " . $e->getMessage(), $e->getTraceAsString()));
+            die("Database error: " . $e->getMessage() . "<br />" . $e->getTraceAsString());
         }
     }
 

@@ -4,7 +4,7 @@ namespace Database\Object\Order;
 
 use Helpers\CString;
 use Ouzo\Utilities\Strings;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Order\Category;
 use Database\Repository\Navigation\Navigation;
 

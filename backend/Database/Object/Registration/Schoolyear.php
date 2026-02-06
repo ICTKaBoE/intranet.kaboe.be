@@ -2,7 +2,7 @@
 
 namespace Database\Object\Registration;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\General;
 use Helpers\HTML;
 use Ouzo\Utilities\Arrays;

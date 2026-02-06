@@ -2,7 +2,7 @@
 
 namespace Database\Object\Library;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 

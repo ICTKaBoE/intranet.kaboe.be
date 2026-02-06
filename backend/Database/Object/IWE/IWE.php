@@ -5,7 +5,7 @@ namespace Database\Object\IWE;
 use stdClass;
 use Helpers\HTML;
 use Ouzo\Utilities\Clock;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Security\FileSystem;
 
 class IWE extends CustomObject

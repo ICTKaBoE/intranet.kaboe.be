@@ -1,4 +1,4 @@
-<form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto">
+<form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto" data-prefill-id="{{url:part.id}}">
     <div class="card-body">
         <div class="row">
             <h1 class="card-title">Informatie leerling en ongeval</h1>
@@ -7,17 +7,17 @@
         <div class="row">
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="schoolId">School</label>
-                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
+                <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}" required></select>
             </div>
 
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="informatSubgroupId">Klas</label>
-                <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-load-value="id" data-load-label="name" data-parent-select="schoolId" data-extra="[schoolId={{user:mainSchoolId}}]" data-search required></select>
+                <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="schoolId" data-extra="[schoolId={{user:mainSchoolId}}]" data-search required></select>
             </div>
 
             <div class="col-lg-4 mb-3">
                 <label class="form-label" for="informatStudentId">Leerling</label>
-                <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-load-value="id" data-load-label="formatted.fullNameReversed" data-parent-select="informatSubgroupId" data-search required></select>
+                <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-label="formatted.fullNameReversed" data-parent-select="informatSubgroupId" data-search required></select>
             </div>
         </div>
 
@@ -42,7 +42,7 @@
 
             <div class="col-lg-6 mb-3">
                 <label class="form-label" for="location">Locatie van het ongeval</label>
-                <select name="location" id="location" data-load-source="{{select:url:short}}/{{url:part.module}}/location" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required data-on-change="locationView" data-render-item="renderOptgroupItem"></select>
+                <select name="location" id="location" data-load-source="{{select:url:short}}/{{url:part.module}}/location" required data-on-change="locationView" data-render-item="renderOptgroupItem"></select>
             </div>
         </div>
 
@@ -67,7 +67,7 @@
         <div class="row">
             <div class="col mb-3">
                 <label class="form-label" for="party">Ongeval te wijten aan...</label>
-                <select name="party" id="party" data-load-source="{{select:url:short}}/{{url:part.module}}/party" data-load-value="id" data-load-label="name" data-on-change="partyView"></select>
+                <select name="party" id="party" data-load-source="{{select:url:short}}/{{url:part.module}}/party" data-on-change="partyView"></select>
             </div>
         </div>
 
@@ -118,7 +118,7 @@
 
             <div class="col-lg-2 mb-3">
                 <label class="form-label" for="partyExternalCountryId">Land</label>
-                <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/general/country" data-load-value="id" data-load-label="translatedName" required></select>
+                <select name="partyExternalCountryId" id="partyExternalCountryId" data-load-source="{{select:url:short}}/general/country" data-label="translatedName" required></select>
             </div>
 
             <div class="col-lg-8 mb-3">
@@ -185,7 +185,44 @@
         <div class="row d-none" id="supervision-Y">
             <div class="col mb-3">
                 <label class="form-label" for="informatSupervisorId">Naam toezichter</label>
-                <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-load-value="id" data-load-label="formatted.fullNameReversed" data-search required></select>
+                <select name="informatSupervisorId" id="informatSupervisorId" data-load-source="{{select:url:short}}/informat/employee" data-label="formatted.fullNameReversed" data-search required></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <h1 class="card-title">Getuige</h1>
+        </div>
+
+        <div class="row">
+            <div class="col" id="chbWitness" role="checkbox" data-type="checkbox" data-name="witness" data-text="Zijn er getuigen van het ongeval?" data-on-change="witnessView"></div>
+        </div>
+
+        <div class="row d-none" id="witness-Y">
+            <div class="col mb-3">
+                <label class="form-label" for="witnessInfo">Naam en contactgegevens</label>
+                <input type="text" name="witnessInfo" id="witnessInfo" class="form-control" required />
+            </div>
+        </div>
+
+        <div id="witness-N">
+            <div class="row">
+                <div class="col" id="chbWitnessAfter" role="checkbox" data-type="checkbox" data-name="witnessAfter" data-text="Indien neen, zijn er getuigen van de toestand en de klachten van de gewonde, onmiddelijk na het ongeval?" data-on-change="witnessAfterView"></div>
+            </div>
+
+            <div class="row d-none" id="witnessAfter-Y">
+                <div class="col mb-3">
+                    <label class="form-label" for="witnessAfterInfo">Naam en contactgegevens</label>
+                    <input type="text" name="witnessAfterInfo" id="witnessAfterInfo" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="row" id="whenAndWho-N">
+                <div class="col mb-3">
+                    <label for="whenAndWho" class="form-label">Wanneer en door wie heeft u kennis gekregen van het ongeval?</label>
+                    <input type="text" name="whenAndWho" id="whenAndWho" class="form-control" required />
+                </div>
             </div>
         </div>
     </div>

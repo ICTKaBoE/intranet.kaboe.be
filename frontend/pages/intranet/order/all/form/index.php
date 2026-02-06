@@ -10,13 +10,13 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
             <div class="row">
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="status">Status</label>
-                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N" required></select>
+                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N" required></select>
 
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="formatted.nameWithParent" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-label="formatted.nameWithParent" data-default-value="{{user:mainSchoolId}}" required></select>
 
                 </div>
             </div>
@@ -24,13 +24,13 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
             <div class="row">
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="acceptorUserId">Goed te keuren door</label>
-                    <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" data-search multiple required></select>
+                    <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" data-search multiple required></select>
 
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="supplierId">Leverancier</label>
-                    <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-load-value="id" data-load-label="name" data-search required></select>
+                    <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-search required></select>
 
                 </div>
             </div>
@@ -82,31 +82,37 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label" for="status">Status</label>
-                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-load-value="id" data-load-label="name" data-default-value="N" data-no-lock></select>
+                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N" data-no-lock></select>
 
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-load-value="id" data-load-label="formatted.nameWithParent" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" required></select>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-label="formatted.nameWithParent" required></select>
 
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="creatorUserId">Aangemaakt door</label>
-                        <select name="creatorUserId" id="creatorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" disabled></select>
+                        <select name="creatorUserId" id="creatorUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" disabled></select>
 
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="acceptorUserId">Goed te keuren door</label>
-                        <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-load-value="id" data-load-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" required></select>
+                        <select name="acceptorUserId" id="acceptorUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" data-extra="[id={{module:acceptableUsers}}]" required></select>
 
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="supplierId">Leverancier</label>
-                        <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" data-load-value="id" data-load-label="name" required></select>
+                        <select name="supplierId" id="supplierId" data-load-source="{{select:url:short}}/{{url:part.module}}/supplier" required></select>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="orderNumber">Bestelnummer (ProCure.Web)</label>
+                        <input type="text" class="form-control" id="orderNumber" name="orderNumber" data-no-lock required />
 
                     </div>
                 </div>

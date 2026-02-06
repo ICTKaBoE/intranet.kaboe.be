@@ -7,7 +7,7 @@ use Helpers\CString;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Management\Treshhold;
 
 class ComputerBattery extends CustomObject

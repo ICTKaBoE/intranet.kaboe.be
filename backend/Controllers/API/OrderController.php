@@ -10,7 +10,6 @@ use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
-use Security\Session;
 use Security\FileSystem;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
@@ -25,14 +24,14 @@ use Database\Repository\Order\Supplier;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Repository\Navigation\Setting;
 use Database\Object\Order\Line as OrderLine;
-use Database\Repository\Navigation\TableDef;
 use Database\Object\Order\Order as OrderOrder;
-use Database\Repository\Navigation\Navigation;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Object\Order\Supplier as OrderSupplier;
 
 class OrderController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "order";
+
     // Get Functions
     protected function getStatus($view, $id = null)
     {
@@ -241,7 +240,7 @@ class OrderController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $this->getNavigationSettings("order");
+        $this->getNavigationSettings();
     }
 
     protected function getQuotes($view, $id = null)
@@ -253,13 +252,13 @@ class OrderController extends ApiController
             $order = $repo->getById($id);
             $quotes = [];
             if ($order->quoteLink) $quotes[] = $order->quoteLink;
-            if (FileSystem::PathExists(LOCATION_UPLOAD . "/order/{$order->guid}.pdf")) $quotes[] = "{$order->guid}.pdf";
+            if (FileSystem::PathExists(LOCATION_FILES . "/order/{$order->guid}.pdf")) $quotes[] = "{$order->guid}.pdf";
 
             if (!$quotes) $this->appendToJson('raw', 'Geen bestanden!');
             else {
                 $items = Arrays::map($quotes, function ($a) use ($order) {
                     $item = new stdClass;
-                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, Strings::startsWith("http", $a) ? $a : FileSystem::GetDownloadLink(LOCATION_UPLOAD . "/order/{$order->guid}.pdf"), $a, HTML::LINK_TARGET_BLANK);
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, Strings::startsWith("http", $a) ? $a : FileSystem::GetDownloadLink(LOCATION_FILES . "/order/{$order->guid}.pdf"), $a, HTML::LINK_TARGET_BLANK);
 
                     return $item;
                 });
@@ -306,7 +305,7 @@ class OrderController extends ApiController
             $item = $repo->getById($item->id);
 
             if ($fields["quoteFile"][0] && $fields["quoteFile"][0]->getSize() > 0) {
-                $location = LOCATION_UPLOAD . "/order";
+                $location = LOCATION_FILES . "/order";
                 FileSystem::CreateFolder($location);
 
                 if ($fields["quoteFile"][0]->move("{$location}/{$item->guid}." . $fields["quoteFile"][0]->getExtension())) {
@@ -456,7 +455,7 @@ class OrderController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("order");
+        $this->postNavigationSettings();
     }
 
     // Delete functions     
@@ -521,13 +520,12 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.quote.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.quote.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -566,9 +564,9 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.quote.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.quote.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -588,13 +586,12 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.order.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.order.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -633,9 +630,9 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.order.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.order.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -654,13 +651,12 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.accept.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.accept.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -669,9 +665,9 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.accept.reply")->value, "bool")) $mail->replyTo =  $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.accept.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);
@@ -690,13 +686,12 @@ class OrderController extends ApiController
         $mailReceiverRepo = new Receiver;
 
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("order");
 
         $h = $repo->getById($id);
         $mail = new MailMail;
 
-        $subject = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.subject")->value;
-        $body = $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.body")->value;
+        $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.status.subject")->value;
+        $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.status.body")->value;
 
         foreach ($h->toArray(true) as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -705,9 +700,9 @@ class OrderController extends ApiController
 
         $mail->subject = $subject;
         $mail->body = $body;
-        if (General::convert($settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.template.status.reply")->value, "bool")) $mail->replyTo = [
-            "email" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.email")->value,
-            "name" => $settingsRepo->getByNavigationIdAndKey($navigation->id, "mail.reply.name")->value,
+        if (General::convert($settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.status.reply")->value, "bool")) $mail->replyTo = [
+            "email" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.email")->value,
+            "name" => $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.reply.name")->value,
         ];
 
         $mId = $mailRepo->set($mail);

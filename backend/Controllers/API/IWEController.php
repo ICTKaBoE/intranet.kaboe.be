@@ -10,17 +10,17 @@ use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Security\FileSystem;
-use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\EHBO\EHBO;
-use Database\Repository\School\School;
-use Database\Object\IWE\IWE as IWEIWE;
 use Database\Repository\IWE\IWE;
+use Database\Object\IWE\IWE as IWEIWE;
+use Database\Repository\School\School;
 
 class IWEController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "iwe";
+
     // Get functions
     protected function getMine($view, $id = null)
     {
@@ -63,7 +63,7 @@ class IWEController extends ApiController
 
     protected function getSettings($view)
     {
-        $this->getNavigationSettings("iwe");
+        $this->getNavigationSettings();
     }
 
     // Post functions
@@ -109,15 +109,15 @@ class IWEController extends ApiController
             $file = $fields["manual"];
             if ($file && $file[0]->getSize() > 0) {
                 $ext = $file[0]->getExtension();
-                FileSystem::CreateFolder(LOCATION_UPLOAD . "/iwe/{$item->guid}");
-                $file[0]->move(LOCATION_UPLOAD . "/iwe/{$item->guid}/manual.{$ext}");
+                FileSystem::CreateFolder(LOCATION_FILES . "/iwe/{$item->guid}");
+                $file[0]->move(LOCATION_FILES . "/iwe/{$item->guid}/manual.{$ext}");
             }
 
             $file = $fields["ce"];
             if ($file && $file[0]->getSize() > 0) {
                 $ext = $file[0]->getExtension();
-                FileSystem::CreateFolder(LOCATION_UPLOAD . "/iwe/{$item->guid}");
-                $file[0]->move(LOCATION_UPLOAD . "/iwe/{$item->guid}/ce.{$ext}");
+                FileSystem::CreateFolder(LOCATION_FILES . "/iwe/{$item->guid}");
+                $file[0]->move(LOCATION_FILES . "/iwe/{$item->guid}/ce.{$ext}");
             }
 
             $this->setReturn();
@@ -126,14 +126,13 @@ class IWEController extends ApiController
 
     protected function postSettings()
     {
-        $this->postNavigationSettings("iwe");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
-            "school" => ["mandatory" => true],
-            "exportAs"
+            "school" => ["mandatory" => true]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -150,15 +149,15 @@ class IWEController extends ApiController
         } else $fields['school'] = [$fields['school']];
 
         if ($this->validationIsAllGood()) {
-            if (Strings::equal($fields['exportAs'], 'xlsx')) $this->exportAsXlsx($fields['school']);
+            $this->export($fields['school']);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     // Export functions
-    protected function exportAsXlsx($schoolIds)
+    private function export($schoolIds)
     {
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/iwe/" . date("YmdHis"));
         $filename = "Inventaris Arbeidsmiddelen.xlsx";
 
         $items = $this->getAllGroupedBySchool($schoolIds);

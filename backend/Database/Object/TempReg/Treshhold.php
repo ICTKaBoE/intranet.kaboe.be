@@ -2,7 +2,7 @@
 
 namespace Database\Object\TempReg;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Treshhold extends CustomObject
 {

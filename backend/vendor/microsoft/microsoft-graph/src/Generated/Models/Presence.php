@@ -25,7 +25,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Gets the activity property value. The supplemental information to a user's availability. Possible values are Available, Away, BeRightBack, Busy, DoNotDisturb, InACall, InAConferenceCall, Inactive, InAMeeting, Offline, OffWork, OutOfOffice, PresenceUnknown, Presenting, UrgentInterruptionsOnly.
+     * Gets the activity property value. The supplemental information to a user's availability. Possible values are available, away, beRightBack, busy, doNotDisturb, offline, outOfOffice, presenceUnknown.
      * @return string|null
     */
     public function getActivity(): ?string {
@@ -37,7 +37,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Gets the availability property value. The base presence information for a user. Possible values are Available, availableIdle,  Away, beRightBack, Busy, busyIdle, DoNotDisturb, Offline, presenceUnknown.
+     * Gets the availability property value. The base presence information for a user. Possible values are available, away, beRightBack, busy, doNotDisturb, focusing, inACall, inAMeeting, offline, presenting, presenceUnknown.
      * @return string|null
     */
     public function getAvailability(): ?string {
@@ -60,11 +60,12 @@ class Presence extends Entity implements Parsable
             'outOfOfficeSettings' => fn(ParseNode $n) => $o->setOutOfOfficeSettings($n->getObjectValue([OutOfOfficeSettings::class, 'createFromDiscriminatorValue'])),
             'sequenceNumber' => fn(ParseNode $n) => $o->setSequenceNumber($n->getStringValue()),
             'statusMessage' => fn(ParseNode $n) => $o->setStatusMessage($n->getObjectValue([PresenceStatusMessage::class, 'createFromDiscriminatorValue'])),
+            'workLocation' => fn(ParseNode $n) => $o->setWorkLocation($n->getObjectValue([UserWorkLocation::class, 'createFromDiscriminatorValue'])),
         ]);
     }
 
     /**
-     * Gets the outOfOfficeSettings property value. The user's out-of-office settings.
+     * Gets the outOfOfficeSettings property value. The out of office settings for a user.
      * @return OutOfOfficeSettings|null
     */
     public function getOutOfOfficeSettings(): ?OutOfOfficeSettings {
@@ -76,7 +77,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Gets the sequenceNumber property value. The lexicographically sortable string stamp that represents the version of a presence object.
+     * Gets the sequenceNumber property value. The lexicographically sortable String stamp that represents the version of a presence object.
      * @return string|null
     */
     public function getSequenceNumber(): ?string {
@@ -100,6 +101,18 @@ class Presence extends Entity implements Parsable
     }
 
     /**
+     * Gets the workLocation property value. Represents the user’s aggregated work location state.
+     * @return UserWorkLocation|null
+    */
+    public function getWorkLocation(): ?UserWorkLocation {
+        $val = $this->getBackingStore()->get('workLocation');
+        if (is_null($val) || $val instanceof UserWorkLocation) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'workLocation'");
+    }
+
+    /**
      * Serializes information the current object
      * @param SerializationWriter $writer Serialization writer to use to serialize this model
     */
@@ -109,10 +122,11 @@ class Presence extends Entity implements Parsable
         $writer->writeStringValue('availability', $this->getAvailability());
         $writer->writeObjectValue('outOfOfficeSettings', $this->getOutOfOfficeSettings());
         $writer->writeObjectValue('statusMessage', $this->getStatusMessage());
+        $writer->writeObjectValue('workLocation', $this->getWorkLocation());
     }
 
     /**
-     * Sets the activity property value. The supplemental information to a user's availability. Possible values are Available, Away, BeRightBack, Busy, DoNotDisturb, InACall, InAConferenceCall, Inactive, InAMeeting, Offline, OffWork, OutOfOffice, PresenceUnknown, Presenting, UrgentInterruptionsOnly.
+     * Sets the activity property value. The supplemental information to a user's availability. Possible values are available, away, beRightBack, busy, doNotDisturb, offline, outOfOffice, presenceUnknown.
      * @param string|null $value Value to set for the activity property.
     */
     public function setActivity(?string $value): void {
@@ -120,7 +134,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Sets the availability property value. The base presence information for a user. Possible values are Available, availableIdle,  Away, beRightBack, Busy, busyIdle, DoNotDisturb, Offline, presenceUnknown.
+     * Sets the availability property value. The base presence information for a user. Possible values are available, away, beRightBack, busy, doNotDisturb, focusing, inACall, inAMeeting, offline, presenting, presenceUnknown.
      * @param string|null $value Value to set for the availability property.
     */
     public function setAvailability(?string $value): void {
@@ -128,7 +142,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Sets the outOfOfficeSettings property value. The user's out-of-office settings.
+     * Sets the outOfOfficeSettings property value. The out of office settings for a user.
      * @param OutOfOfficeSettings|null $value Value to set for the outOfOfficeSettings property.
     */
     public function setOutOfOfficeSettings(?OutOfOfficeSettings $value): void {
@@ -136,7 +150,7 @@ class Presence extends Entity implements Parsable
     }
 
     /**
-     * Sets the sequenceNumber property value. The lexicographically sortable string stamp that represents the version of a presence object.
+     * Sets the sequenceNumber property value. The lexicographically sortable String stamp that represents the version of a presence object.
      * @param string|null $value Value to set for the sequenceNumber property.
     */
     public function setSequenceNumber(?string $value): void {
@@ -149,6 +163,14 @@ class Presence extends Entity implements Parsable
     */
     public function setStatusMessage(?PresenceStatusMessage $value): void {
         $this->getBackingStore()->set('statusMessage', $value);
+    }
+
+    /**
+     * Sets the workLocation property value. Represents the user’s aggregated work location state.
+     * @param UserWorkLocation|null $value Value to set for the workLocation property.
+    */
+    public function setWorkLocation(?UserWorkLocation $value): void {
+        $this->getBackingStore()->set('workLocation', $value);
     }
 
 }

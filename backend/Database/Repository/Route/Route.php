@@ -8,7 +8,7 @@ class Route extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_route", \Database\Object\Route\Route::class, orderField: false, guidField: false);
+        parent::__construct("tbl_route", \Database\Object\Route\Route::class, orderDirection: self::ORDER_DIRECTION_DESC, guidField: false);
     }
 
     public function getByRouteGroupId($routeGroupId)

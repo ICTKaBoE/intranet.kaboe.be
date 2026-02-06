@@ -18,24 +18,17 @@ use Database\Object\User\User as ObjectUser;
 use Database\Repository\Informat\EmployeeAddress;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Object\User\Address as ObjectUserAddress;
+use Database\Repository\General\Schoolyear;
 use Database\Repository\Navigation\Setting;
 
 abstract class Local
 {
     public static function Prepare()
     {
-        define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
-        define("_LOGLOCATION_", "cron/local");
-        Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Schoolyear: " . General::getSchoolyear());
-
         $informatToUser = self::InformatEmployeeToUser();
         $informatToUserAddress = self::InformatEmployeeToUserAddress();
 
-        Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
-
         return ($informatToUser && $informatToUserAddress);
-        // return true;
     }
 
     static private function InformatEmployeeToUser()
@@ -49,7 +42,7 @@ abstract class Local
         $schoolRepo = new School;
 
         $settingRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("sync");
+        $navigation = (new Navigation)->getByLinkAndType("sync", "M");
         $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
         $_mainSchool = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.mainSchool")->value;
         $_format = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;
@@ -74,22 +67,21 @@ abstract class Local
                 $mainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool);
                 $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
 
-                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? new ObjectUser;
-                $user->informatEmployeeId = $employee->informatId;
-                $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id ?: 0;
-                $user->username = $email;
-                $user->name = $employee->name;
-                $user->firstName = $firstName;
-                $user->bankAccount = $employee->iban;
-                $user->active = $employee->active;
-                $user->api = $user->active;
+                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? null;
 
-                if ($status) {
-                    $user->active = Strings::equal($status->value, "IN DIENST");
-                    $user->api = Strings::equal($status->value, "IN DIENST");
+                if ($user) {
+                    $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id ?: 0;
+                    $user->bankAccount = $employee->iban;
+                    $user->active = $employee->active;
+                    $user->api = $user->active;
+
+                    if ($status) {
+                        $user->active = Strings::equal($status->value, "IN DIENST");
+                        $user->api = $user->active;
+                    }
+
+                    $userRepo->set($user);
                 }
-
-                $userRepo->set($user);
             } catch (\Exception $e) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
                 Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);

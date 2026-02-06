@@ -27,19 +27,22 @@ $db->beginTransaction();
 
 try {
     foreach ($lines as $line) {
-        echo "Executing line: {$line}<br />";
+        echo "Executing line: {$line}";
         $stmt = $connection->prepare($line);
         $stmt->execute();
+        echo "<span style='color: green'>OK</span><br />";
         sleep(1);
     }
 
     $db->commit();
+    echo "<br />";
     echo "Committed!<br />";
     echo "Removing directory...<br />";
     foreach (FileSystem::getFiles("./sql") as $file) FileSystem::RemoveFile("./sql/{$file}");
     FileSystem::RemoveDirectory("./sql");
     echo "DONE!";
 } catch (\Exception $e) {
+    echo "<span style='color: red'>FAIL</span><br />";
     $db->rollback();
-    echo "Failed at line:<br />{$line}<br /><br />Error Message:<br />{$e->getMessage()}";
+    echo "<br />Error Message:<br />{$e->getMessage()}";
 }

@@ -4,10 +4,8 @@ namespace Database\Object\Bike;
 
 use Helpers\HTML;
 use Helpers\CString;
-use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Bike\DistanceType;
 
 class Distance extends CustomObject
@@ -27,7 +25,7 @@ class Distance extends CustomObject
 
     protected $linkedAttributes = [
         "userAddress" => ['startId' => \Database\Repository\User\Address::class],
-        "startSchool" => ['startId' => \Database\Repository\School\Address::class],
+        "startSchool" => ['startId' => \Database\Repository\School\School::class],
         "endSchool" => ["endSchoolId" => \Database\Repository\School\School::class],
         "userMainSchool" => ["userMainSchoolId" => \Database\Repository\School\School::class],
         // "typeName" => ["type" => \Database\Repository\Bike\DistanceType::class]

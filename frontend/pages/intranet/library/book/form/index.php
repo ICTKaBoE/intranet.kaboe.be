@@ -4,13 +4,13 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-load-value="id" data-load-label="name" data-optgroup-attribute="optgroup" data-optgroup-value="id" data-optgroup-label="name" data-default-value="{{user:mainSchoolId}}" required></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/" data-default-value="{{user:mainSchoolId}}" required></select>
 
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="categoryId">Categorie</label>
-                    <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-load-value="id" data-load-label="name" data-search required></select>
+                    <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/category" data-search required></select>
 
                 </div>
             </div>
@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label class="form-label" for="authorId">Auteur</label>
-                    <select name="authorId" id="authorId" data-load-source="{{select:url:short}}/{{url:part.module}}/author" data-load-value="id" data-load-label="name" data-search required></select>
+                    <select name="authorId" id="authorId" data-load-source="{{select:url:short}}/{{url:part.module}}/author" data-search required></select>
 
                 </div>
             </div>

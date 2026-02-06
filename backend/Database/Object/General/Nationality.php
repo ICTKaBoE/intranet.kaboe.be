@@ -2,7 +2,7 @@
 
 namespace Database\Object\General;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Nationality extends CustomObject
 {

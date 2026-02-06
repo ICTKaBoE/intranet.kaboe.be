@@ -2,7 +2,7 @@
 
 namespace Database\Object\Registration;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Option extends CustomObject
 {
@@ -19,7 +19,7 @@ class Option extends CustomObject
 
     protected $linkedAttributes = [
         "school" => ['schoolId' => \Database\Repository\School\School::class],
-        "schoolyear" => ["schoolyearId" => \Database\Repository\Registration\Schoolyear::class],
+        "schoolyear" => ["schoolyearId" => \Database\Repository\General\Schoolyear::class],
         "studyyear" => ["studyyearId" => \Database\Repository\Registration\Studyyear::class],
         "field" => ["fieldId" => \Database\Repository\Registration\Field::class]
     ];

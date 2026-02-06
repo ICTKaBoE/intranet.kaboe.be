@@ -3,7 +3,7 @@
 namespace Database\Interface;
 
 use Database\Database;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Ouzo\Utilities\Arrays;
 use Security\GUID;
 use stdClass;

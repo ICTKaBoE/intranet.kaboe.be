@@ -2,7 +2,7 @@
 
 namespace Database\Object\Bike;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class Price extends CustomObject
 {

@@ -6,7 +6,7 @@ use Helpers\CString;
 use Security\Session;
 use Ouzo\Utilities\Arrays;
 use Database\Repository\Navigation\Navigation;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Navigation\Setting;
 
 class Printer extends CustomObject

@@ -35,7 +35,7 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Gets the createdBy property value. The identity of person who created the protection unit.
+     * Gets the createdBy property value. The identity of the person who created the protection unit.
      * @return IdentitySet|null
     */
     public function getCreatedBy(): ?IdentitySet {
@@ -47,7 +47,7 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Gets the createdDateTime property value. The time of creation of the protection unit.
+     * Gets the createdDateTime property value. The time of creation of the protection unit. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @return DateTime|null
     */
     public function getCreatedDateTime(): ?DateTime {
@@ -82,7 +82,9 @@ class ProtectionUnitBase extends Entity implements Parsable
             'error' => fn(ParseNode $n) => $o->setError($n->getObjectValue([PublicError::class, 'createFromDiscriminatorValue'])),
             'lastModifiedBy' => fn(ParseNode $n) => $o->setLastModifiedBy($n->getObjectValue([IdentitySet::class, 'createFromDiscriminatorValue'])),
             'lastModifiedDateTime' => fn(ParseNode $n) => $o->setLastModifiedDateTime($n->getDateTimeValue()),
+            'offboardRequestedDateTime' => fn(ParseNode $n) => $o->setOffboardRequestedDateTime($n->getDateTimeValue()),
             'policyId' => fn(ParseNode $n) => $o->setPolicyId($n->getStringValue()),
+            'protectionSources' => fn(ParseNode $n) => $o->setProtectionSources($n->getEnumValue(ProtectionSource::class)),
             'status' => fn(ParseNode $n) => $o->setStatus($n->getEnumValue(ProtectionUnitStatus::class)),
         ]);
     }
@@ -100,7 +102,7 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Gets the lastModifiedDateTime property value. Timestamp of the last modification of this protection unit.
+     * Gets the lastModifiedDateTime property value. Timestamp of the last modification of this protection unit. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @return DateTime|null
     */
     public function getLastModifiedDateTime(): ?DateTime {
@@ -109,6 +111,18 @@ class ProtectionUnitBase extends Entity implements Parsable
             return $val;
         }
         throw new \UnexpectedValueException("Invalid type found in backing store for 'lastModifiedDateTime'");
+    }
+
+    /**
+     * Gets the offboardRequestedDateTime property value. The date and time when protection unit offboard was requested. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * @return DateTime|null
+    */
+    public function getOffboardRequestedDateTime(): ?DateTime {
+        $val = $this->getBackingStore()->get('offboardRequestedDateTime');
+        if (is_null($val) || $val instanceof DateTime) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'offboardRequestedDateTime'");
     }
 
     /**
@@ -124,7 +138,19 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Gets the status property value. The status of the protection unit. The possible values are: protectRequested, protected, unprotectRequested, unprotected, removeRequested, unknownFutureValue.
+     * Gets the protectionSources property value. The protectionSources property
+     * @return ProtectionSource|null
+    */
+    public function getProtectionSources(): ?ProtectionSource {
+        $val = $this->getBackingStore()->get('protectionSources');
+        if (is_null($val) || $val instanceof ProtectionSource) {
+            return $val;
+        }
+        throw new \UnexpectedValueException("Invalid type found in backing store for 'protectionSources'");
+    }
+
+    /**
+     * Gets the status property value. The status of the protection unit. The possible values are: protectRequested, protected, unprotectRequested, unprotected, removeRequested, unknownFutureValue, offboardRequested, offboarded, cancelOffboardRequested. Use the Prefer: include-unknown-enum-members request header to get the following values from this evolvable enum: offboardRequested, offboarded, cancelOffboardRequested.
      * @return ProtectionUnitStatus|null
     */
     public function getStatus(): ?ProtectionUnitStatus {
@@ -146,12 +172,14 @@ class ProtectionUnitBase extends Entity implements Parsable
         $writer->writeObjectValue('error', $this->getError());
         $writer->writeObjectValue('lastModifiedBy', $this->getLastModifiedBy());
         $writer->writeDateTimeValue('lastModifiedDateTime', $this->getLastModifiedDateTime());
+        $writer->writeDateTimeValue('offboardRequestedDateTime', $this->getOffboardRequestedDateTime());
         $writer->writeStringValue('policyId', $this->getPolicyId());
+        $writer->writeEnumValue('protectionSources', $this->getProtectionSources());
         $writer->writeEnumValue('status', $this->getStatus());
     }
 
     /**
-     * Sets the createdBy property value. The identity of person who created the protection unit.
+     * Sets the createdBy property value. The identity of the person who created the protection unit.
      * @param IdentitySet|null $value Value to set for the createdBy property.
     */
     public function setCreatedBy(?IdentitySet $value): void {
@@ -159,7 +187,7 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Sets the createdDateTime property value. The time of creation of the protection unit.
+     * Sets the createdDateTime property value. The time of creation of the protection unit. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @param DateTime|null $value Value to set for the createdDateTime property.
     */
     public function setCreatedDateTime(?DateTime $value): void {
@@ -183,11 +211,19 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Sets the lastModifiedDateTime property value. Timestamp of the last modification of this protection unit.
+     * Sets the lastModifiedDateTime property value. Timestamp of the last modification of this protection unit. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
      * @param DateTime|null $value Value to set for the lastModifiedDateTime property.
     */
     public function setLastModifiedDateTime(?DateTime $value): void {
         $this->getBackingStore()->set('lastModifiedDateTime', $value);
+    }
+
+    /**
+     * Sets the offboardRequestedDateTime property value. The date and time when protection unit offboard was requested. The timestamp type represents date and time information using ISO 8601 format and is always in UTC. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z.
+     * @param DateTime|null $value Value to set for the offboardRequestedDateTime property.
+    */
+    public function setOffboardRequestedDateTime(?DateTime $value): void {
+        $this->getBackingStore()->set('offboardRequestedDateTime', $value);
     }
 
     /**
@@ -199,7 +235,15 @@ class ProtectionUnitBase extends Entity implements Parsable
     }
 
     /**
-     * Sets the status property value. The status of the protection unit. The possible values are: protectRequested, protected, unprotectRequested, unprotected, removeRequested, unknownFutureValue.
+     * Sets the protectionSources property value. The protectionSources property
+     * @param ProtectionSource|null $value Value to set for the protectionSources property.
+    */
+    public function setProtectionSources(?ProtectionSource $value): void {
+        $this->getBackingStore()->set('protectionSources', $value);
+    }
+
+    /**
+     * Sets the status property value. The status of the protection unit. The possible values are: protectRequested, protected, unprotectRequested, unprotected, removeRequested, unknownFutureValue, offboardRequested, offboarded, cancelOffboardRequested. Use the Prefer: include-unknown-enum-members request header to get the following values from this evolvable enum: offboardRequested, offboarded, cancelOffboardRequested.
      * @param ProtectionUnitStatus|null $value Value to set for the status property.
     */
     public function setStatus(?ProtectionUnitStatus $value): void {

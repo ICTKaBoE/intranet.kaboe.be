@@ -5,7 +5,7 @@ namespace Microsoft\Graph\Generated\DeviceAppManagement\MobileApps\Item;
 use Microsoft\Kiota\Abstractions\QueryParameter;
 
 /**
- * Read properties and relationships of the managedMobileLobApp object.
+ * The mobile apps.
 */
 class MobileAppItemRequestBuilderGetQueryParameters 
 {

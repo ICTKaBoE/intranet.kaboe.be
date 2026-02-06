@@ -2,7 +2,7 @@
 
 namespace Database\Object\Helpdesk;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Ouzo\Utilities\Clock;
 
 class Thread extends CustomObject

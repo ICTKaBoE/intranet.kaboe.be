@@ -17,16 +17,10 @@ abstract class Country
 {
     static public function Import()
     {
-        define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
-        define("_LOGLOCATION_", "cron/country");
-        Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);
-
         $general = self::General();
         $niscodes = self::NisCodes();
         $nationalities = self::Nationalities();
         $languages = self::Languages();
-
-        Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
 
         return ($general && $niscodes && $nationalities && $languages);
     }

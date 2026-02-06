@@ -2,7 +2,7 @@
 
 namespace Database\Object\Registration;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Navigation\Navigation;
 use Helpers\CString;
 use Ouzo\Utilities\Arrays;
@@ -129,7 +129,7 @@ class Registration extends CustomObject
     protected $linkedAttributes = [
         "registrationByUser" => ["registrationByUserId" => \Database\Repository\User\User::class],
         "school" => ['schoolId' => \Database\Repository\School\School::class],
-        "schoolyear" => ['schoolyearId' => \Database\Repository\Registration\Schoolyear::class],
+        "schoolyear" => ['schoolyearId' => \Database\Repository\General\Schoolyear::class],
         "studyyear" => ['studyyearId' => \Database\Repository\Registration\Studyyear::class],
         "field" => ['fieldId' => \Database\Repository\Registration\Field::class],
         "option" => ['optionId' => \Database\Repository\Registration\Option::class],

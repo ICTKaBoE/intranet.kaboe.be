@@ -11,4 +11,10 @@ class Status extends Repository
     {
         parent::__construct("tbl_accident_status", \Database\Object\Accident\Status::class, deletedField: false, guidField: false);
     }
+
+    public function getDefault()
+    {
+        $statement = $this->prepareSelect(filters: ["default" => 1]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
 }

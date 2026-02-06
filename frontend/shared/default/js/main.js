@@ -1,4 +1,3 @@
-import Helpers from "./object/Helpers.js";
 import Select from "./object/Select.js";
 import Button from "./object/Button.js";
 import Form from "./object/Form.js";
@@ -14,6 +13,8 @@ import List from "./object/List.js";
 import Checkbox from "./object/Checkbox.js";
 import Signage from "./object/Signage.js";
 
+window.SELECT_OTHER_ID = 0;
+
 $.ajaxSetup({
 	xhrFields: {
 		mode: "cors",
@@ -21,11 +22,10 @@ $.ajaxSetup({
 	},
 });
 
-Select.ScanAndCreate();
 Toast.Create();
+Select.ScanAndCreate();
 Checkbox.ScanAndCreate();
 Button.ScanAndCreate();
-SearchField.ScanAndCreate();
 TinyMCE.ScanAndCreate();
 Table.ScanAndCreate();
 Calendar.ScanAndCreate();
@@ -33,6 +33,7 @@ DatePicker.ScanAndCreate();
 Chart.ScanAndCreate();
 List.ScanAndCreate();
 ColorInput.ScanAndCreate();
+SearchField.ScanAndCreate();
 
 setTimeout(() => {
 	Form.ScanAndCreate();

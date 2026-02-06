@@ -2,7 +2,7 @@
 
 namespace Database\Object\Management;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Helpers\CString;
 
 class MSwitch extends CustomObject

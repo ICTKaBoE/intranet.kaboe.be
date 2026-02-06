@@ -5,7 +5,7 @@ namespace Database\Object\Management;
 use Helpers\HTML;
 use Helpers\CString;
 use Ouzo\Utilities\Arrays;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Management\Treshhold;
 use Database\Repository\Navigation\Navigation;
 

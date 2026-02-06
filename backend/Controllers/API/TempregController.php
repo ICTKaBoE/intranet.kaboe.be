@@ -8,6 +8,7 @@ use Helpers\Date;
 use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
+use Security\User;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -16,25 +17,26 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\TempReg\TempReg;
+use Database\Object\Export\Export as ExportExport;
+use Database\Repository\Export\Export;
 use Database\Repository\School\School;
+use Database\Repository\TempReg\TempReg;
 use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\TableDef;
 use Database\Object\TempReg\TempReg as ObjectTempReg;
-use Database\Repository\Navigation\Navigation;
 
 class TempregController extends ApiController
 {
+    const CURRENT_NAVIGATION_MODULE_NAME = "tempreg";
+
     // Get Functions
     protected function getPerson($view, $id = null)
     {
         $settingsRepo = new Setting;
-        $navigation = (new Navigation)->getByLink("tempreg");
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             if (Helpers::url()->getParam("schoolId")) {
-                $school = str_replace([" ", "-"], "", (new School)->get(Helpers::url()->getParam('schoolId'))[0]->name);
-                $who = $settingsRepo->getByNavigationIdAndKey($navigation->id, "who.{$school}")->value;
+                $school = str_replace([" ", "-"], "", (new School)->getById(Helpers::url()->getParam('schoolId'))->name);
+                $who = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "who.{$school}")->value;
 
                 $names = explode(PHP_EOL, $who);
                 if (!is_array($names)) $names = [$names];
@@ -74,11 +76,11 @@ class TempregController extends ApiController
 
     protected function getSettings($view, $id = null)
     {
-        $this->getNavigationSettings("tempreg");
+        $this->getNavigationSettings();
     }
 
     // Post functions
-    protected function postAdd($view, $id)
+    protected function postExtranetAdd($view, $id)
     {
         if ($id == "add") $id = null;
 
@@ -109,17 +111,16 @@ class TempregController extends ApiController
 
     protected function postSettings($view, $id = null)
     {
-        $this->postNavigationSettings("tempreg");
+        $this->postNavigationSettings();
     }
 
-    protected function postExport($view, $id = null)
+    protected function printExport($view, $id = null)
     {
         $_fields = [
             "school" => ["mandatory" => true],
             "start" => ["mandatory" => true],
             "end" => ["mandatory" => true],
             "showNamesAs",
-            "exportAs"
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -142,8 +143,7 @@ class TempregController extends ApiController
             }
 
             if ($this->validationIsAllGood()) {
-                if (Strings::equal($fields["exportAs"], 'pdf')) $this->exportPerSchoolAsPdf($fields["school"], $fields["start"], $fields["end"], $fields["showNamesAs"]);
-                else if (Strings::equal($fields["exportAs"], 'xlsx')) $this->exportPerSchoolAsXlsx($fields["school"], $fields["start"], $fields["end"], $fields["showNamesAs"]);
+                $this->exportPerSchool($fields["school"], $fields["start"], $fields["end"], $fields["showNamesAs"]);
                 $this->setValidation("start", "", self::VALIDATION_STATE_VALID);
                 $this->setValidation("end", "", self::VALIDATION_STATE_VALID);
             }
@@ -151,129 +151,10 @@ class TempregController extends ApiController
     }
 
     // export functions
-    protected function exportPerSchoolAsPdf($schoolIds, $start, $end, $showNamesAs)
+    private function exportPerSchool($schoolIds, $start, $end, $showNamesAs)
     {
         $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
-        $zipFileName = "Temperatuurregistratie - Export Per School.zip";
-        $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
-
-        foreach ($schoolIds as $index => $schoolId) {
-            $groupedEvents = $this->getEventsGroupedByDateBySchoolId($schoolId, $start, $end, $showNamesAs);
-
-            $school = $schoolRepo->get($schoolId)[0];
-            $pdf = new PDF($school->name, "{$folder}/{$school->name}.pdf", "L", "Temperatuurregistratie warme/koude maaltijd - Overzicht: {$school->name}");
-
-            foreach ($monthsBetweenDates as $month) {
-                $pdf->AddPage();
-                $pdf->Cell(20, 10, 'Maand:', ln: 0, align: 'L', calign: 'C', valign: 'C');
-                $pdf->Cell(0, 10, $month, ln: 1, align: 'L', calign: 'C', valign: 'C');
-
-                $table = [];
-                $table['header'][] = [
-                    "title" => "Datum/Tijd",
-                    "border" => "B",
-                    "width" => 70
-                ];
-
-                $table['header'][] = [
-                    "title" => "Soep",
-                    "border" => "LB",
-                    "width" => 25
-                ];
-
-                $table['header'][] = [
-                    "title" => "Aardappel/pasta/rijst",
-                    "border" => "LB",
-                    "width" => 50
-                ];
-
-                $table['header'][] = [
-                    "title" => "Groente",
-                    "border" => "LB",
-                    "width" => 25
-                ];
-
-                $table['header'][] = [
-                    "title" => "Vlees/vis",
-                    "border" => "LB",
-                    "width" => 25
-                ];
-
-                $table['header'][] = [
-                    "title" => "Naam" . ($showNamesAs == "initials" ? " (initialen)" : ""),
-                    "border" => "LB",
-                    "width" => 40
-                ];
-
-                $table['header'][] = [
-                    "title" => "Opmerkingen",
-                    "border" => "LB",
-                    "width" => 35
-                ];
-
-                foreach ($groupedEvents as $user => $events) {
-                    if (array_keys($events)[0] == $month) {
-                        $table['data'][$user][] = [
-                            "text" => $events[$month]['datetime'],
-                            "border" => "T"
-                        ];
-
-                        if (!is_null($events[$month]['soup'])) {
-                            $table['data'][$user][] = [
-                                "text" => $events[$month]['soup'],
-                                "border" => "LT"
-                            ];
-                        } else $table['data'][$user][] = ["border" => "LT"];
-
-                        if (!is_null($events[$month]['pasta'])) {
-                            $table['data'][$user][] = [
-                                "text" => $events[$month]['pasta'],
-                                "border" => "LT"
-                            ];
-                        } else $table['data'][$user][] = ["border" => "LT"];
-
-                        if (!is_null($events[$month]['vegetables'])) {
-                            $table['data'][$user][] = [
-                                "text" => $events[$month]['vegetables'],
-                                "border" => "LT"
-                            ];
-                        } else $table['data'][$user][] = ["border" => "LT"];
-
-                        if (!is_null($events[$month]['meat'])) {
-                            $table['data'][$user][] = [
-                                "text" => $events[$month]['meat'],
-                                "border" => "LT"
-                            ];
-                        } else $table['data'][$user][] = ["border" => "LT"];
-
-                        $table['data'][$user][] = [
-                            "text" => $events[$month]['name'],
-                            "border" => "LT"
-                        ];
-
-                        $table['data'][$user][] = [
-                            "text" => $events[$month]['notes'],
-                            "border" => "LT"
-                        ];
-                    }
-                }
-                $pdf->Ln(10);
-                $pdf->table($table);
-            }
-            $pdf->save();
-        }
-
-        $zipFile = new ZIP("{$folder}/{$zipFileName}");
-        $zipFile->addDir($folder);
-        $zipFile->save();
-        if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$zipFileName}"));
-    }
-
-    protected function exportPerSchoolAsXlsx($schoolIds, $start, $end, $showNamesAs)
-    {
-        $schoolRepo = new School();
-        $folder = FileSystem::CreateFolder(LOCATION_DOWNLOAD . "/" . date("YmdHis"));
+        $folder = FileSystem::CreateFolder(LOCATION_FILES . "/tempreg/" . date("YmdHis"));
         $filename = "Temperatuurregistratie - Export Per School.xlsx";
         $monthsBetweenDates = Date::monthsBetweenDates($start, $end, "F Y");
 

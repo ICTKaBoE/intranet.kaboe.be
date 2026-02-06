@@ -2,7 +2,7 @@
 
 namespace Database\Object\Management;
 
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 use Database\Repository\Management\ComputerBattery;
 use Database\Repository\Management\ComputerUsageLogOn;
 use Database\Repository\Management\ComputerUsageOnOff;

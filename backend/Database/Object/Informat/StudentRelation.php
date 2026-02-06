@@ -3,7 +3,7 @@
 namespace Database\Object\Informat;
 
 use Security\Input;
-use Database\Interface\CustomObject;
+use Security\CustomObject;
 
 class StudentRelation extends CustomObject
 {
