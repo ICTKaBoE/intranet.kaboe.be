@@ -32,10 +32,15 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     </div>
 
                     <div class="row">
-                        <div class="col">
+                        <div class="col mb-3">
                             <label class="form-label" for="description">Beschrijving ongeval</label>
                             <textarea name="description" id="description" rows="10" class="form-control" required></textarea>
                         </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12" id="chbMaterialDamage" role="checkbox" data-type="checkbox" data-name="materialDamage" data-text="Materiële schade"></div>
+                        <div class="col-12" id="chbPhysicalDamage" role="checkbox" data-type="checkbox" data-name="physicalDamage" data-text="Lichamelijke schade"></div>
                     </div>
                 </div>
 
@@ -265,6 +270,11 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                             <label class="form-label" for="visibleDescription">Leesbare beschrijving ongeval</label>
                             <textarea name="visibleDescription" id="visibleDescription" rows="10" class="form-control" required></textarea>
                         </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12" id="chbMaterialDamage" role="checkbox" data-type="checkbox" data-name="materialDamage" data-text="Materiële schade"></div>
+                        <div class="col-12" id="chbPhysicalDamage" role="checkbox" data-type="checkbox" data-name="physicalDamage" data-text="Lichamelijke schade"></div>
                     </div>
                 </div>
 

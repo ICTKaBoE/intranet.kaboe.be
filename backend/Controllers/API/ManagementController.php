@@ -4,6 +4,7 @@ namespace Controllers\API;
 
 use Helpers\Form;
 use Helpers\Table;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Ouzo\Utilities\Clock;
@@ -13,10 +14,12 @@ use Controllers\ApiController;
 use Database\Repository\Management\CCTV;
 use Database\Repository\Management\IPad;
 use Database\Repository\Management\Room;
+use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\Management\Beamer;
 use Database\Repository\Management\Cabinet;
 use Database\Repository\Management\MSwitch;
 use Database\Repository\Management\Printer;
+use Database\Repository\Navigation\Setting;
 use Database\Repository\Management\Building;
 use Database\Repository\Management\Computer;
 use Database\Repository\Management\Firewall;
@@ -37,8 +40,6 @@ use Database\Object\Management\Patchpanel as ManagementPatchpanel;
 use Database\Object\Management\AccessPoint as ManagementAccessPoint;
 use Database\Object\Management\ComputerBattery as ManagementComputerBattery;
 use Database\Object\Management\ComputerUsageOnOff as ManagementComputerUsageOnOff;
-use Database\Repository\Helpdesk\Helpdesk;
-use Database\Repository\Navigation\Setting;
 
 class ManagementController extends ApiController
 {
@@ -57,10 +58,7 @@ class ManagementController extends ApiController
     protected function getComputer($view, $id = null, $type = "L")
     {
         $repo = new Computer;
-        $filters = [
-            'type' => $type,
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'type']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             unset($filters['type']);
@@ -179,9 +177,7 @@ class ManagementController extends ApiController
     protected function getBuilding($view, $id = null)
     {
         $repo = new Building;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -199,10 +195,7 @@ class ManagementController extends ApiController
     protected function getRoom($view, $id = null)
     {
         $repo = new Room;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -220,11 +213,7 @@ class ManagementController extends ApiController
     protected function getCabinet($view, $id = null)
     {
         $repo = new Cabinet;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', 'roomId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -242,12 +231,7 @@ class ManagementController extends ApiController
     protected function getPatchpanel($view, $id = null)
     {
         $repo = new Patchpanel;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-            'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId", "cabinetId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -265,12 +249,7 @@ class ManagementController extends ApiController
     protected function getFirewall($view, $id = null)
     {
         $repo = new Firewall;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-            'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId", "cabinetId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -293,12 +272,7 @@ class ManagementController extends ApiController
     protected function getSwitch($view, $id = null)
     {
         $repo = new MSwitch;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-            'cabinetId' => Arrays::filter(explode(";", Helpers::url()->getParam('cabinetId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId", "cabinetId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -321,11 +295,7 @@ class ManagementController extends ApiController
     protected function getAccessPoint($view, $id = null)
     {
         $repo = new AccessPoint;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -348,9 +318,7 @@ class ManagementController extends ApiController
     protected function getIpad($view, $id = null)
     {
         $repo = new IPad;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
@@ -370,11 +338,7 @@ class ManagementController extends ApiController
     protected function getBeamer($view, $id = null)
     {
         $repo = new Beamer;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -398,11 +362,7 @@ class ManagementController extends ApiController
     protected function getPrinter($view, $id = null)
     {
         $repo = new Printer;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i)),
-            'roomId' => Arrays::filter(explode(";", Helpers::url()->getParam('roomId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId', "roomId"]);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -434,10 +394,7 @@ class ManagementController extends ApiController
     protected function getCctv($view, $id = null)
     {
         $repo = new CCTV;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'buildingId' => Arrays::filter(explode(";", Helpers::url()->getParam('buildingId')), fn($i) => Strings::isNotBlank($i))
-        ];
+        $filters = Filter::Find(['schoolId', 'buildingId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();

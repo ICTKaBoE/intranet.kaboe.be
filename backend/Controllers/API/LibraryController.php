@@ -4,6 +4,7 @@ namespace Controllers\API;
 
 use Helpers\Table;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Ouzo\Utilities\Clock;
@@ -62,11 +63,7 @@ class LibraryController extends ApiController
     protected function getBook($view, $id = null)
     {
         $repo = new Book;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            'authorId' => Arrays::filter(explode(";", Helpers::url()->getParam('authorId')), fn($i) => Strings::isNotBlank($i)),
-            'categoryId' => Arrays::filter(explode(";", Helpers::url()->getParam('categoryId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId', 'authorId', 'categoryId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();

@@ -9,8 +9,8 @@
             <div class="modal-body">
                 <div class="row mb-3">
                     <div class="col">
-                        <label class="form-label mb-1" for="filter_schoolId">School</label>
-                        <select name="filter_schoolId" id="filter_schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
+                        <label class="form-label mb-1" for="schoolId">School</label>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
                     </div>
                 </div>
 

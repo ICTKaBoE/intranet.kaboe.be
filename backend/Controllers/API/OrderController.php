@@ -7,6 +7,7 @@ use Helpers\Form;
 use Helpers\HTML;
 use Helpers\Table;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -78,10 +79,7 @@ class OrderController extends ApiController
     protected function getAll($view, $id = null)
     {
         $repo = new Order;
-        $filters = [
-            'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
-            'acceptorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("acceptorUserId")), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['status', 'acceptorUserId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -151,10 +149,7 @@ class OrderController extends ApiController
     protected function getAccept($view, $id = null)
     {
         $repo = new Order;
-        $filters = [
-            'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
-            'acceptorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("acceptorUserId")), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['status', 'acceptorUserId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -315,10 +310,10 @@ class OrderController extends ApiController
             }
 
             // Mail
-            if (Strings::equal($item->status, "QR")) $this->mailQuote($item->id);
-            else if (Strings::equal($item->status, "WA")) $this->mailAccept($item->id);
-            else if (Strings::equal($item->status, "A") || Strings::equal($item->status, "D")) $this->mailStatus($item->id);
-            else if (Strings::equal($item->status, "O")) $this->mailOrder($id);
+            if ($item->linked->status->mailQuote) $this->mailQuote($item->id);
+            else if ($item->linked->status->mailAccept) $this->mailAccept($item->id);
+            else if ($item->linked->status->mailStatus) $this->mailStatus($item->id);
+            else if ($item->linked->status->mailOrder) $this->mailOrder($id);
 
             if (!$id) $this->setRedirect("/../{$item->guid}");
             else $this->setReturn();
@@ -327,7 +322,6 @@ class OrderController extends ApiController
 
     protected function postAllLine($view, $id = null)
     {
-
         $_fields = [
             "orderId",
             "amount" => ["mandatory" => true],

@@ -17,4 +17,10 @@ class Status extends Repository
         $statement = $this->prepareSelect(filters: ["default" => 1]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getWhenInsuranceIsMailed()
+    {
+        $statement = $this->prepareSelect(filters: ["whenInsuranceIsMailed" => 1]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
 }

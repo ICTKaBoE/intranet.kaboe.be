@@ -15,7 +15,6 @@ use CloudMersive\Convert;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Smartschool\Smartschool;
 use Controllers\ApiController;
 use Database\Repository\Mail\Mail;
 use Database\Repository\Mail\Receiver;
@@ -36,7 +35,12 @@ use Database\Object\Accident\Document as AccidentDocument;
 use Database\Object\Mail\Attachment as MailAttachment;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Object\Mail\Receiver as MailReceiver;
+use Database\Object\Smartschool\Message as SmartschoolMessage;
+use Database\Object\Smartschool\MessageReceiver as SmartschoolMessageReceiver;
 use Database\Repository\Mail\Attachment;
+use Database\Repository\Smartschool\Message;
+use Database\Repository\Smartschool\MessageReceiver;
+use Helpers\Filter;
 use Helpers\HTML;
 
 class AccidentController extends ApiController
@@ -50,10 +54,7 @@ class AccidentController extends ApiController
         $repo = new Accident;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-                'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -70,9 +71,7 @@ class AccidentController extends ApiController
         $repo = new Accident;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -221,7 +220,6 @@ class AccidentController extends ApiController
         $files = FileSystem::PathExists(LOCATION_FILES . "/accident/{$item->guid}") ? FileSystem::getFiles(LOCATION_FILES . "/accident/{$item->guid}/*") : [];
         $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/B.pdf")))[0];
         $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/C.pdf")))[0];
-        $fi = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/firstInvoice.pdf")))[0];
 
         if (Strings::equal($view, self::VIEW_LIST)) {
             $items = [
@@ -232,10 +230,6 @@ class AccidentController extends ApiController
                 [
                     "title" => "Informatieblad",
                     "content" => $c ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($c), "Informatieblad.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
-                ],
-                [
-                    "title" => "Eerste factuur",
-                    "content" => $fi ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($fi), "Eerste factuur.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
                 ],
             ];
 
@@ -260,11 +254,12 @@ class AccidentController extends ApiController
         $repo = new Accident;
 
         $_fields = [
-            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "fast_schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "informatSubgroupId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "informatStudentId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "mail" => ["default" => false, "type" => Input::INPUT_TYPE_BOOL],
-            "print" => ["default" => false, "type" => Input::INPUT_TYPE_BOOL]
+            "print" => ["default" => false, "type" => Input::INPUT_TYPE_BOOL],
+            "materialDamage" => ["default" => false, "type" => Input::INPUT_TYPE_BOOL]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -272,11 +267,15 @@ class AccidentController extends ApiController
 
         if ($this->validationIsAllGood()) {
             $address = Arrays::filter((new StudentAddress)->getByInformatStudentId($fields['informatStudentId']), fn($a) => $a->domicile);
+            $bank = (new StudentBank)->getByInformatStudentId($fields['informatStudentId']);
 
             $accident = $repo->getById($id) ?? (new ObjectAccident);
             $accident->fillWithPostData();
+            $accident->schoolId = $fields['fast_schoolId'];
             $accident->status = (new Status)->getDefault()->id;
+            $accident->physicalDamage = true;
             if (count($address) == 1) $accident->informatStudentAddressId = $address[0]->id;
+            if (count($bank) == 1) $accident->informatStudentBankId = $bank[0]->id;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
             $accident->datetime = Clock::at($fields["datetime"])->format("Y-m-d H:i:s");
 
@@ -311,6 +310,8 @@ class AccidentController extends ApiController
             "datetime" => ["mandatory" => true],
             "description" => ["mandatory" => true],
             "visibleDescription",
+            "materialDamage" => ["type" => Input::INPUT_TYPE_BOOL],
+            "physicalDamage" => ["type" => Input::INPUT_TYPE_BOOL],
             "location" => ["mandatory" => true],
             "exactLocation",
             "transport",
@@ -480,7 +481,6 @@ class AccidentController extends ApiController
             "informatStudentBankId" => ["mandatory" => true],
             "documentB" => ["type" => "file"],
             "documentC" => ["type" => "file"],
-            "firstInvoice" => ["type" => "file"]
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -505,13 +505,6 @@ class AccidentController extends ApiController
                 $ext = $documentC[0]->getExtension();
                 FileSystem::CreateFolder(LOCATION_FILES . "/accident/{$item->guid}");
                 $documentC[0]->move(LOCATION_FILES . "/accident/{$item->guid}/C.{$ext}");
-            }
-
-            $firstInvoice = $fields["firstInvoice"];
-            if ($firstInvoice && $firstInvoice[0]->getSize() > 0) {
-                $ext = $documentB[0]->getExtension();
-                FileSystem::CreateFolder(LOCATION_FILES . "/accident/{$item->guid}");
-                $firstInvoice[0]->move(LOCATION_FILES . "/accident/{$item->guid}/firstInvoice.{$ext}");
             }
 
             // $this->setReturn();
@@ -552,9 +545,11 @@ class AccidentController extends ApiController
 
             $files = [
                 "{$accident->formatted->number} - Aangifte Fiche (A).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - A.docx",
-                "{$accident->formatted->number} - Geneeskundig getuigschrift (B).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/B.pdf",
                 "{$accident->formatted->number} - Informatieblad (C).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/C.pdf",
-                "{$accident->formatted->number} - Eerste factuur.pdf" => LOCATION_FILES . "/accident/{$accident->guid}/firstInvoice.pdf",
+            ];
+
+            if ($accident->physicalDamage) $files[] = [
+                "{$accident->formatted->number} - Geneeskundig getuigschrift (B).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/B.pdf",
             ];
 
             $receiver = new MailReceiver;
@@ -572,7 +567,7 @@ class AccidentController extends ApiController
                 $mailAttachmentRepo->set($attachment);
             }
 
-            $accident->status = "I";
+            $accident->status = (new Status)->getWhenInsuranceIsMailed()->id;
             $accidentRepo->set($accident);
 
             $this->setToast("Dossier {$accident->formatted->number} is verstuurd naar de verzekering");
@@ -587,6 +582,8 @@ class AccidentController extends ApiController
     private function sendSmartschoolMessageToCreator($accidentId)
     {
         $settingsRepo = new Setting;
+        $smsMessageRepo = new Message;
+        $smsMessageReceiverRepo = new MessageReceiver;
         $accident = (new Accident)->getById($accidentId);
 
         $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.creator.subject")->value;
@@ -597,7 +594,18 @@ class AccidentController extends ApiController
             $body = str_replace("{{{$key}}}", $value, $body);
         }
 
-        Smartschool::SendMessage($accident->linked->school->smartschoolSourceId ?? $accident->linked->school->linked->parentSchool->smartschoolSourceId, DEV_MODE ? DEV_CONTACT : $accident->linked->creatorUser->username, $subject, $body);
+        $message = new SmartschoolMessage;
+        $message->sourceId = $$accident->linked->school->smartschoolSourceId ?? $accident->linked->school->linked->parentSchool->smartschoolSourceId;
+        $message->subject = Strings::trimToNull($subject);
+        $message->body = Strings::trimToNull($body);
+
+        $messageId = $smsMessageRepo->set($message);
+
+        $receiver = new SmartschoolMessageReceiver;
+        $receiver->messageId = $messageId;
+        $receiver->username = DEV_MODE ? DEV_CONTACT : $accident->linked->creatorUser->username;
+
+        $smsMessageReceiverRepo->set($receiver);
     }
 
     private function createCreationMail($accidentId, $attachments = [])

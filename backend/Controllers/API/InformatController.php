@@ -58,7 +58,7 @@ class InformatController extends ApiController
     protected function getClassgroup($view, $id = null)
     {
         $repo = new ClassGroup;
-        $schoolId = Helpers::url()->getParam("schoolId");
+        $schoolId = Helpers::url()->getParam("fast_schoolId", Helpers::url()->getParam("schoolId"));
         $institutes = (new Institute)->getBySchoolId($schoolId);
         $currentSchoolyear = (new Schoolyear)->getCurrent()->name;
 

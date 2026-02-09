@@ -177,6 +177,10 @@ ALTER TABLE tbl_accident ADD witnessAfterInfo varchar(254) NULL;
 ALTER TABLE tbl_accident CHANGE witnessAfterInfo witnessAfterInfo varchar(254) NULL AFTER witnessAfter;
 ALTER TABLE tbl_accident ADD whenAndWho TEXT NULL;
 ALTER TABLE tbl_accident CHANGE whenAndWho whenAndWho TEXT NULL AFTER witnessAfterInfo;
+ALTER TABLE tbl_accident ADD materialDamage BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_accident CHANGE materialDamage materialDamage BOOL DEFAULT 0 NOT NULL AFTER visibleDescription;
+ALTER TABLE tbl_accident ADD physicalDamage BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_accident CHANGE physicalDamage physicalDamage BOOL DEFAULT 0 NOT NULL AFTER materialDamage;
 
 -- Remedy
 CREATE TABLE `tbl_remedy` (
@@ -360,6 +364,7 @@ ALTER TABLE tbl_helpdesk MODIFY COLUMN status varchar(8) CHARACTER SET utf8mb4 C
 UPDATE tbl_helpdesk SET status = (SELECT id FROM tbl_helpdesk_status WHERE _short = status);
 ALTER TABLE tbl_helpdesk MODIFY COLUMN status int NOT NULL;
 ALTER TABLE tbl_helpdesk_status DROP COLUMN _short;
+ALTER TABLE tbl_helpdesk_status ADD closed BOOL DEFAULT 0 NOT NULL;
 
 -- helpdesk - priority
 ALTER TABLE tbl_helpdesk_priority ADD _short varchar(100) NULL;
@@ -405,6 +410,8 @@ UPDATE tbl_accident SET status = (SELECT id FROM tbl_accident_status WHERE _shor
 ALTER TABLE tbl_accident MODIFY COLUMN status int NOT NULL;
 ALTER TABLE tbl_accident_status DROP COLUMN _short;
 ALTER TABLE tbl_accident_status ADD `default` BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_accident_status ADD whenInsuranceIsMailed BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_accident_status ADD closed BOOL DEFAULT 0 NOT NULL;
 
 -- accident - party
 ALTER TABLE tbl_accident_party ADD _short varchar(100) NULL;
@@ -579,5 +586,43 @@ UPDATE tbl_absent SET substituteBy = (SELECT id FROM tbl_absent_substitute WHERE
 ALTER TABLE tbl_absent MODIFY COLUMN substituteBy int NOT NULL;
 ALTER TABLE tbl_absent_substitute DROP COLUMN _short;
 
+-- order - status
+ALTER TABLE tbl_order_status ADD _short varchar(100) NULL;
+UPDATE tbl_order_status SET _short = id;
+ALTER TABLE tbl_order_status DROP PRIMARY KEY;
+UPDATE tbl_order_status SET id = 0;
+ALTER TABLE tbl_order_status MODIFY COLUMN id int(11) DEFAULT NULL auto_increment NOT NULL PRIMARY KEY;
+
+ALTER TABLE tbl_order MODIFY COLUMN status varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'N' NOT NULL;
+UPDATE tbl_order SET status = (SELECT id FROM tbl_order_status WHERE _short = status);
+ALTER TABLE tbl_order MODIFY COLUMN status int NOT NULL;
+ALTER TABLE tbl_order_status DROP COLUMN _short;
+ALTER TABLE tbl_order_status ADD mailQuote BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_order_status ADD mailAccept BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_order_status ADD mailStatus BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_order_status ADD mailOrder BOOL DEFAULT 0 NOT NULL;
+ALTER TABLE tbl_order_status ADD closed BOOL DEFAULT 0 NOT NULL;
+
+-- order - category
+ALTER TABLE tbl_order_category ADD _short varchar(100) NULL;
+ALTER TABLE tbl_order_category ADD _subshort varchar(100) NULL;
+UPDATE tbl_order_category SET _short = id;
+UPDATE tbl_order_category SET _subshort = categoryId WHERE categoryId IS NOT NULL;
+UPDATE tbl_order_category SET id = 0;
+UPDATE tbl_order_category SET categoryId = 0 WHERE categoryId IS NOT NULL;
+ALTER TABLE tbl_order_category MODIFY COLUMN id int(11) DEFAULT NULL auto_increment NOT NULL PRIMARY KEY;
+UPDATE tbl_order_category c SET c.categoryId = (SELECT id FROM tbl_order_category WHERE _short = c._subshort LIMIT 1) WHERE c._subshort IS NOT NULL;
+ALTER TABLE tbl_order_category MODIFY COLUMN categoryId int(11) DEFAULT NULL;
+
+ALTER TABLE tbl_order_category ADD managementType varchar(8) NULL;
+ALTER TABLE tbl_order_category CHANGE managementType managementType varchar(8) NULL AFTER name;
+UPDATE tbl_order_category SET managementType = _short WHERE _subshort IS NULL;
+
+UPDATE tbl_order_line th SET category = IFNULL((SELECT id FROM tbl_order_category WHERE _subshort = substring_index(th.category, "-", 1) AND _short = substring_index(th.category, "-", -1)), 0);
+ALTER TABLE tbl_order_line MODIFY COLUMN category int NOT NULL;
+ALTER TABLE tbl_order_category DROP COLUMN _short;
+ALTER TABLE tbl_order_category DROP COLUMN _subshort;
+
+-- SETTINGS
 UPDATE tbl_setting SET settingTabId=1, name='DB Versie', `type`='input', `options`=NULL, value=0x352E302E30, readonly=1, `order`=99, deleted=0 WHERE id='db.version';
 UPDATE tbl_setting SET settingTabId=1, name='Versie', `type`='input', `options`=NULL, value=0x352E302E30, readonly=1, `order`=3, deleted=0 WHERE id='site.version';

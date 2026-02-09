@@ -3,19 +3,20 @@
 namespace Controllers\API;
 
 use Helpers\Date;
+use Helpers\Filter;
 use Router\Helpers;
 use Helpers\General;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\Helpdesk\Status;
-use Database\Repository\Management\Computer;
-use Database\Repository\Management\ComputerUsageOnOff;
-use Database\Repository\Registration\Schoolyear;
 use Database\Repository\TempReg\TempReg;
+use Database\Repository\Helpdesk\Helpdesk;
 use Database\Repository\TempReg\Treshhold;
+use Database\Repository\Management\Computer;
+use Database\Repository\Registration\Schoolyear;
+use Database\Repository\Management\ComputerUsageOnOff;
 
 class ReportController extends ApiController
 {
@@ -23,11 +24,7 @@ class ReportController extends ApiController
 
     public function getComputerUsageAmount($view, $id = null)
     {
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            'schoolyear' => Helpers::url()->getParam('schoolyear'),
-            'type' => Helpers::url()->getParam('type')
-        ];
+        $filters = Filter::Find(['schoolId', 'schoolyear', 'type']);
 
         if ($filters['schoolId']) {
             $repo = new ComputerUsageOnOff;
@@ -69,11 +66,7 @@ class ReportController extends ApiController
 
     public function getComputerUsageTime($view, $id = null)
     {
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            'schoolyear' => Helpers::url()->getParam('schoolyear'),
-            'type' => Helpers::url()->getParam('type')
-        ];
+        $filters = Filter::Find(['schoolId', 'schoolyear', 'type']);
 
         if ($filters['schoolId']) {
             $repo = new ComputerUsageOnOff;
@@ -115,10 +108,7 @@ class ReportController extends ApiController
 
     public function getTempreg($view, $id = null)
     {
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            'schoolyear' => Helpers::url()->getParam('schoolyear'),
-        ];
+        $filters = Filter::Find(['schoolId', 'schoolyear']);
 
         if ($filters['schoolId']) {
             $repo = new TempReg;

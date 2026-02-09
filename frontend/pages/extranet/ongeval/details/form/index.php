@@ -60,18 +60,13 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
 
                 <div class="row">
                     <div class="col-12 mb-3">
-                        <label for="documentB" class="form-label">Doktersformulier (gedeelte B)</label>
+                        <label for="documentB" class="form-label">Geneeskundig getuigschrift (gedeelte B)</label>
                         <input type="file" name="documentB" id="documentB" class="form-control" accept=".pdf" />
                     </div>
 
                     <div class="col-12 mb-3">
                         <label for="documentC" class="form-label">Informatieblad (gedeelte C)</label>
                         <input type="file" name="documentC" id="documentC" class="form-control" accept=".pdf" />
-                    </div>
-
-                    <div class="col-12 mb-3">
-                        <label for="firstInvoice" class="form-label">Eerste factuur</label>
-                        <input type="file" name="firstInvoice" id="firstInvoice" class="form-control" accept=".pdf" />
                     </div>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -14,7 +15,6 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Export\Export as ExportExport;
 use Database\Repository\Mail\Mail;
 use Database\Repository\Violence\Out;
 use Database\Repository\Export\Export;
@@ -31,6 +31,7 @@ use Database\Repository\Violence\DamageKind;
 use Database\Repository\Violence\Consequence;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\User\User as UserUser;
+use Database\Object\Export\Export as ExportExport;
 use Database\Object\Mail\Receiver as MailReceiver;
 use Database\Repository\Violence\Form as ViolenceForm;
 use Database\Object\Violence\Violence as ViolenceViolence;
@@ -84,10 +85,7 @@ class ViolenceController extends ApiController
         $repo = new Violence;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-                'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -104,9 +102,7 @@ class ViolenceController extends ApiController
         $repo = new Violence;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);

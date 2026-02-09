@@ -7,6 +7,7 @@ use Helpers\Excel;
 use Helpers\Table;
 use Security\GUID;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Security\FileSystem;
@@ -27,10 +28,7 @@ class IWEController extends ApiController
         $repo = new IWE;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-                'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -47,9 +45,7 @@ class IWEController extends ApiController
         $repo = new IWE;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);

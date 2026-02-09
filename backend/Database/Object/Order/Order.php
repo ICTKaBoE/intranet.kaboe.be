@@ -25,7 +25,7 @@ class Order extends CustomObject
         "quoteLink" => self::TYPE_STRING,
         "quoteFile" => self::TYPE_STRING,
         "orderNumber" => self::TYPE_STRING,
-        "status" => self::TYPE_STRING,
+        "status" => self::TYPE_INTEGER,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
@@ -33,7 +33,8 @@ class Order extends CustomObject
         "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
         "acceptorUser" => ["acceptorUserId" => \Database\Repository\User\User::class],
         "school" => ["schoolId" => \Database\Repository\School\School::class],
-        "supplier" => ['supplierId' => \Database\Repository\Order\Supplier::class]
+        "supplier" => ['supplierId' => \Database\Repository\Order\Supplier::class],
+        "status" => ["status" => \Database\Repository\Order\Status::class]
     ];
 
     public function init()
@@ -44,7 +45,7 @@ class Order extends CustomObject
         $this->formatted->acceptor = is_array($this->linked->acceptorUser) ? join('<br />', Arrays::map($this->linked->acceptorUser, fn($a) => $a->formatted->fullName)) : $this->linked->acceptorUser->formatted->fullName;
 
         $this->formatted->link = (Helpers::url()->getScheme() ?? 'http') . "://" . Helpers::url()->getHost() . "/order/accept/{$this->guid}";
-        $this->_lockedForm = !Arrays::contains(["N", "WQ"], $this->status);
+        $this->_lockedForm = $this->linked->status->closed;
 
         $this->createNumber();
     }

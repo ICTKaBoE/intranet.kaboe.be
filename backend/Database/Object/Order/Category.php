@@ -8,14 +8,19 @@ use Ouzo\Utilities\Clock;
 class Category extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
-        "categoryId" => self::TYPE_STRING,
+        "id" => self::TYPE_INTEGER,
+        "categoryId" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
-        "order" => self::TYPE_INTEGER
+        "order" => self::TYPE_INTEGER,
+        "managementType" => self::TYPE_STRING,
+    ];
+
+    protected $linkedAttributes = [
+        "category" => ["categoryId" => \Database\Repository\Helpdesk\Category::class]
     ];
 
     public function init()
     {
-        $this->formatted->id = $this->categoryId ? "{$this->categoryId}-{$this->id}" : $this->id;
+        $this->formatted->name = ($this->categoryId ? "{$this->linked->category->name} - " : "") . $this->name;
     }
 }

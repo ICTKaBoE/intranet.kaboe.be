@@ -9,13 +9,13 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 mb-3">
-                        <label class="form-label mb-1" for="schoolId">School</label>
-                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
+                        <label class="form-label mb-1" for="fast_schoolId">School</label>
+                        <select name="fast_schoolId" id="fast_schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
                     </div>
 
                     <div class="col-12 mb-3">
                         <label class="form-label" for="informatSubgroupId">Klas</label>
-                        <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="schoolId" data-extra="[schoolId={{user:mainSchoolId}}]" data-search data-default-no-load required></select>
+                        <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="fast_schoolId" data-extra="[fast_schoolId={{user:mainSchoolId}}]" data-search data-default-no-load required></select>
                     </div>
 
                     <div class="col-12 mb-3">
@@ -23,6 +23,7 @@
                         <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-label="formatted.fullNameReversed" data-parent-select="informatSubgroupId" data-default-no-load data-search required></select>
                     </div>
 
+                    <div class="col-12" id="chbMaterialDamage" role="checkbox" data-type="checkbox" data-name="materialDamage" data-text="Materiële schade"></div>
                     <div class="col-12" id="chbPrint" role="checkbox" data-type="checkbox" data-name="print" data-text="Document afprinten voor de dokter"></div>
                 </div>
             </div>

@@ -37,13 +37,13 @@ class Helpdesk extends CustomObject
     ];
 
     protected $linkedAttributes = [
+        "category" => ['category' => \Database\Repository\Helpdesk\Category::class],
         "creatorUser" => ["creatorUserId" => \Database\Repository\User\User::class],
         "assignedToUser" => ["assignedToUserId" => \Database\Repository\User\User::class],
         "status" => ["status" => \Database\Repository\Helpdesk\Status::class],
         "priority" => ["priority" => \Database\Repository\Helpdesk\Priority::class],
         "school" => ["schoolId" => \Database\Repository\School\School::class],
         "computer" => ['assetId' => \Database\Repository\Management\Computer::class],
-        "category" => ['category' => \Database\Repository\Helpdesk\Category::class],
         "ipad" => ['assetId' => \Database\Repository\Management\IPad::class],
         "beamer" => ['assetId' => \Database\Repository\Management\Beamer::class],
         "printer" => ['assetId' => \Database\Repository\Management\Printer::class],
@@ -54,30 +54,22 @@ class Helpdesk extends CustomObject
 
     public function init()
     {
-        $catRepo = new Category;
-
         $this->formatted->badge->status = $this->linked->status->formatted->badge->name;
         $this->formatted->badge->priority = $this->linked->priority->formatted->badge->name;
         $this->formatted->subject = Strings::equal($this->category, SELECT_OTHER_ID) ? ($this->subject ? $this->subject : SELECT_OTHER_VALUE) : $this->linked->category->formatted->name;
 
-        // $_category = explode("-", $this->category);
-        // $category = $catRepo->getByIdAndCategoryId($_category[0], null);
-        // $this->formatted->subject = $category->name;
-        // if (!is_null($_category[1])) $this->formatted->subject .= " - " . $catRepo->getByIdAndCategoryId($_category[1], $category->id)->name;
-        // else if (Strings::equal($_category[0], "O")) $this->formatted->subject = $this->subject ?: $this->formatted->subject;
-
-        // if (Strings::equal($_category[0], "L") || Strings::equal($_category[0], "D")) $this->formatted->subject = $this->linked->computer->name . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "I")) $this->formatted->subject = $this->linked->ipad->name . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "B")) $this->formatted->subject = $this->linked->beamer->serialnumber . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "P")) $this->formatted->subject = $this->linked->printer->name . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "F")) $this->formatted->subject = $this->linked->firewall->hostname . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
-        // else if (Strings::equal($_category[0], "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
+        if (Strings::equal($this->linked->category->managementType, "L") || Strings::equal($this->linked->category->managementType, "D")) $this->formatted->subject = $this->linked->computer->name . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "I")) $this->formatted->subject = $this->linked->ipad->name . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "B")) $this->formatted->subject = $this->linked->beamer->serialnumber . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "P")) $this->formatted->subject = $this->linked->printer->name . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "F")) $this->formatted->subject = $this->linked->firewall->hostname . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "S")) $this->formatted->subject = $this->linked->switch->name . " - " . $this->formatted->subject;
+        else if (Strings::equal($this->linked->category->managementType, "A")) $this->formatted->subject = $this->linked->accesspoint->name . " - " . $this->formatted->subject;
 
         $this->formatted->link = "https://intranet.kaboe.be/helpdesk/mine/{$this->guid}";
         $this->formatted->assignedLink = "https://intranet.kaboe.be/helpdesk/assigned/{$this->guid}";
 
-        $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || Strings::equal($this->status, 'C'));
+        $this->_lockedForm = (Strings::equal(User::getLoggedInUser()->id, $this->creatorUserId) && !Strings::equal(User::getLoggedInUser()->id, $this->assignedToUserId) || $this->linked->status->closed);
 
         $this->createNumber();
         $this->createAge();

@@ -5,6 +5,7 @@ namespace Controllers\API;
 use getID3;
 use Helpers\Form;
 use Helpers\Table;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -46,9 +47,7 @@ class SignageController extends ApiController
     protected function getPlaylist($view, $id = null)
     {
         $repo = new Playlist;
-        $filters = [
-            'schoolId' => Helpers::url()->getParam('schoolId')
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -97,9 +96,7 @@ class SignageController extends ApiController
     protected function getScreen($view, $id = null)
     {
         $repo = new Screen;
-        $filters = [
-            'schoolId' => Helpers::url()->getParam('schoolId')
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -117,9 +114,7 @@ class SignageController extends ApiController
     protected function getGroup($view, $id = null)
     {
         $repo = new Group;
-        $filters = [
-            'schoolId' => Helpers::url()->getParam('schoolId')
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -137,9 +132,7 @@ class SignageController extends ApiController
     protected function getMedia($view, $id = null)
     {
         $repo = new Media;
-        $filters = [
-            'schoolId' => Helpers::url()->getParam('schoolId')
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();

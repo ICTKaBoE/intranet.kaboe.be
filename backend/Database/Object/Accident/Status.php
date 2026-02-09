@@ -12,7 +12,9 @@ class Status extends CustomObject
         "name" => self::TYPE_STRING,
         "color" => self::TYPE_STRING,
         "order" => self::TYPE_INTEGER,
-        "default" => self::TYPE_BOOLEAN
+        "default" => self::TYPE_BOOLEAN,
+        "whenInsuranceIsMailed" => self::TYPE_BOOLEAN,
+        "closed" => self::TYPE_BOOLEAN,
     ];
 
     public function init()

@@ -4,6 +4,7 @@ namespace Controllers\API;
 
 use Helpers\Form;
 use Helpers\Table;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -12,27 +13,27 @@ use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\User\User;
+use Database\Repository\School\Hour;
 use Database\Repository\Setting\Tab;
+use Database\Repository\School\Course;
 use Database\Repository\School\School;
 use Database\Repository\Security\Group;
 use Database\Repository\General\Message;
 use Database\Repository\Setting\Setting;
+use Database\Repository\School\Department;
 use Database\Repository\User\LoginHistory;
 use Database\Repository\Security\GroupUser;
 use Database\Repository\General\MessageType;
+use Database\Object\School\Hour as SchoolHour;
 use Database\Repository\Navigation\Navigation;
 use Database\Object\Route\Group as ObjectSchool;
 use Database\Repository\Security\GroupNavigation;
-use Database\Object\General\Message as GeneralMessage;
 use Database\Object\School\Course as SchoolCourse;
+use Database\Object\General\Message as GeneralMessage;
 use Database\Object\School\Department as SchoolDepartment;
-use Database\Object\School\Hour as SchoolHour;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
-use Database\Repository\School\Course;
-use Database\Repository\School\Department;
-use Database\Repository\School\Hour;
 
 class ConfigurationController extends ApiController
 {
@@ -155,9 +156,7 @@ class ConfigurationController extends ApiController
         $repo = new User;
         $loginRepo = new LoginHistory;
 
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id', 'creatorUserId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format(checkbox: false);

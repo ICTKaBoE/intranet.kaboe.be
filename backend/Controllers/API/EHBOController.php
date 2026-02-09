@@ -6,20 +6,18 @@ use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
 use Security\User;
-use Router\Helpers;
+use Helpers\Filter;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\EHBO\EHBO;
-use Database\Repository\Export\Export;
 use Database\Repository\School\School;
 use Database\Repository\EHBO\FirstHelp;
 use Database\Repository\EHBO\VictimType;
 use Database\Repository\EHBO\Description;
 use Database\Object\EHBO\EHBO as EHBOEHBO;
-use Database\Object\Export\Export as ExportExport;
 
 class EHBOController extends ApiController
 {
@@ -31,10 +29,7 @@ class EHBOController extends ApiController
         $repo = new EHBO;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-                'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -51,9 +46,7 @@ class EHBOController extends ApiController
         $repo = new EHBO;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);

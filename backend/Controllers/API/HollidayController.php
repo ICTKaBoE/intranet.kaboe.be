@@ -4,14 +4,15 @@ namespace Controllers\API;
 
 use Helpers\Form;
 use Helpers\Table;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
 use Database\Repository\Holliday;
 use Database\Object\Holliday as ObjectHolliday;
-use Ouzo\Utilities\Clock;
 
 class HollidayController extends ApiController
 {
@@ -37,6 +38,7 @@ class HollidayController extends ApiController
         $repo = new Holliday;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
+            $filters = Filter::Find(['schoolId']);
             $filters = [
                 'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
             ];

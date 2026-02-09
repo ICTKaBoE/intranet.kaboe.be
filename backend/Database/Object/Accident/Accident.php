@@ -3,13 +3,9 @@
 namespace Database\Object\Accident;
 
 use stdClass;
-use Helpers\HTML;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 use Security\CustomObject;
-use Database\Repository\Accident\Party;
-use Database\Repository\Accident\Status;
-use Database\Repository\Accident\Location;
 use Database\Repository\Navigation\Setting;
 use Database\Repository\Navigation\Navigation;
 
@@ -31,6 +27,8 @@ class Accident extends CustomObject
         "datetime" => self::TYPE_DATETIME,
         "description" => self::TYPE_STRING,
         "visibleDescription" => self::TYPE_STRING,
+        "materialDamage" => self::TYPE_BOOLEAN,
+        "physicalDamage" => self::TYPE_BOOLEAN,
         "location" => self::TYPE_INTEGER,
         "exactLocation" => self::TYPE_STRING,
         "transport" => self::TYPE_STRING,
@@ -127,7 +125,7 @@ class Accident extends CustomObject
         $this->formatted->location = $this->linked->location->formatted->name;
         $this->formatted->link = "https://intranet.kaboe.be/accident/mine/{$this->guid}";
         $this->formatted->publicLink = "https://extranet.kaboe.be/ongeval/details/{$this->guid}";
-        $this->_lockedForm = $this->status == "C";
+        $this->_lockedForm = $this->linked->status->closed;
 
         $this->createNumber();
     }

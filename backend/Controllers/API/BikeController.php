@@ -2,8 +2,6 @@
 
 namespace Controllers\API;
 
-use Helpers\PDF;
-use Helpers\ZIP;
 use Helpers\Date;
 use Helpers\Form;
 use Helpers\Excel;
@@ -28,7 +26,6 @@ use Database\Repository\Navigation\Setting;
 use Database\Object\Bike\Event as ObjectBikeEvent;
 use Database\Repository\User\User as RepositoryUser;
 use Database\Object\Bike\Distance as ObjectBikeDistance;
-use Database\Object\Export\Export as ExportExport;
 
 class BikeController extends ApiController
 {

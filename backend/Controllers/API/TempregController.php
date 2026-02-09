@@ -9,6 +9,7 @@ use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -17,11 +18,11 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
-use Database\Object\Export\Export as ExportExport;
 use Database\Repository\Export\Export;
 use Database\Repository\School\School;
 use Database\Repository\TempReg\TempReg;
 use Database\Repository\Navigation\Setting;
+use Database\Object\Export\Export as ExportExport;
 use Database\Object\TempReg\TempReg as ObjectTempReg;
 
 class TempregController extends ApiController
@@ -52,9 +53,7 @@ class TempregController extends ApiController
     protected function getOverview($view, $id = null)
     {
         $repo = new TempReg;
-        $filters = [
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['schoolId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format(checkbox: false);

@@ -6,7 +6,7 @@ use Helpers\Form;
 use Helpers\Excel;
 use Helpers\Table;
 use Security\User;
-use Router\Helpers;
+use Helpers\Filter;
 use Security\Input;
 use Security\FileSystem;
 use Ouzo\Utilities\Clock;
@@ -30,10 +30,7 @@ class AbsentController extends ApiController
         $repo = new Absent;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-                'creatorUserId' => Arrays::filter(explode(";", Helpers::url()->getParam("creatorUserId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId']);
 
             [$defaultOrder, $columns] = Table::Format(checkbox: false);
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -50,9 +47,7 @@ class AbsentController extends ApiController
         $repo = new Absent;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam("schoolId")), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);

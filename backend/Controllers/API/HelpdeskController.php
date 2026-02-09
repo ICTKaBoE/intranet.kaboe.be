@@ -7,6 +7,7 @@ use Helpers\Form;
 use Helpers\HTML;
 use Helpers\Table;
 use Security\User;
+use Helpers\Filter;
 use Router\Helpers;
 use Security\Input;
 use Helpers\General;
@@ -39,11 +40,7 @@ class HelpdeskController extends ApiController
         $repo = new Helpdesk;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'creatorUserId' => $currentUserId,
-                'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'creatorUserId', 'status']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -59,10 +56,7 @@ class HelpdeskController extends ApiController
         $repo = new Helpdesk;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'status']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -79,11 +73,7 @@ class HelpdeskController extends ApiController
         $repo = new Helpdesk;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
-            $filters = [
-                'assignedToUserId' => $currentUserId,
-                'status' => Arrays::filter(explode(";", Helpers::url()->getParam("status")), fn($i) => Strings::isNotBlank($i)),
-                'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-            ];
+            $filters = Filter::Find(['schoolId', 'assignedToUserId', 'status']);
 
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
@@ -123,29 +113,6 @@ class HelpdeskController extends ApiController
             $items = array_values(Arrays::filter($_items, fn($i) => !is_null($i->categoryId) || !count($repo->getByCategoryId($i->id))));
             Arrays::each($items, fn($i) => $i->optgroup = $i->categoryId);
             $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
-
-            // $mainCategories = $catRepo->getMainCategoryOnly();
-            // $optgroups = $items = [];
-
-            // foreach ($mainCategories as $mainCategory) {
-            //     $subCategories = $catRepo->getByCategoryId($mainCategory->id);
-
-            //     if ($subCategories) {
-            //         $optgroups[] = $mainCategory;
-            //         foreach ($subCategories as $subCategory) {
-            //             $subCategory->optgroup = $mainCategory->id;
-            //             $subCategory->optgroupName = $mainCategory->name;
-            //             $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
-
-            //             $items[] = $subCategory;
-            //         }
-            //     } else {
-            //         $mainCategory->optgroup = SELECT_OTHER_ID;
-            //         $items[] = $mainCategory;
-            //     }
-            // }
-
-            // $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
 
             $this->appendToJson('optgroups', $optgroups);
             $this->appendToJson('items', $items);

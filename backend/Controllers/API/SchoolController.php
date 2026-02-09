@@ -2,15 +2,16 @@
 
 namespace Controllers\API;
 
+use Helpers\Filter;
 use Router\Helpers;
 use Helpers\General;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Controllers\ApiController;
+use Database\Repository\School\Hour;
 use Database\Repository\School\Course;
 use Database\Repository\School\School;
 use Database\Repository\School\Department;
-use Database\Repository\School\Hour;
 
 class SchoolController extends ApiController
 {
@@ -20,9 +21,7 @@ class SchoolController extends ApiController
     protected function getList($view, $id)
     {
         $repo = new School;
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
@@ -44,9 +43,7 @@ class SchoolController extends ApiController
     protected function getAll($view, $id = null)
     {
         $repo = new School;
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
@@ -57,10 +54,7 @@ class SchoolController extends ApiController
     protected function getDepartment($view, $id = null)
     {
         $repo = new Department;
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id', 'schoolId']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
@@ -74,9 +68,7 @@ class SchoolController extends ApiController
     protected function getCourse($view, $id = null)
     {
         $repo = new Course;
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
@@ -90,10 +82,7 @@ class SchoolController extends ApiController
     protected function getHours($view, $id = null)
     {
         $repo = new Hour;
-        $filters = [
-            'id' => Arrays::filter(explode(";", Helpers::url()->getParam('id')), fn($i) => Strings::isNotBlank($i)),
-            'schoolId' => Arrays::filter(explode(";", Helpers::url()->getParam('schoolId')), fn($i) => Strings::isNotBlank($i)),
-        ];
+        $filters = Filter::Find(['id', 'schoolId']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);

@@ -7,7 +7,7 @@ use Security\CustomObject;
 class Note extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => self::TYPE_STRING,
+        "id" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
     ];
 }
