@@ -190,13 +190,16 @@ class ConfigurationController extends ApiController
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $group = $repo->getById($id);
-            $members = (new GroupUser)->getBySecurityGroupId($group->id);
-            $applications = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "P");
-            $links = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "L");
 
-            $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
-            $group->applications = join(";", Arrays::map($applications, fn($a) => $a->navigationId));
-            $group->links = join(";", Arrays::map($links, fn($a) => $a->navigationId));
+            if ($group) {
+                $members = (new GroupUser)->getBySecurityGroupId($group->id);
+                $applications = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "P");
+                $links = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "L");
+
+                $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
+                $group->applications = join(";", Arrays::map($applications, fn($a) => $a->navigationId));
+                $group->links = join(";", Arrays::map($links, fn($a) => $a->navigationId));
+            }
             $this->appendToJson('fields', $group);
         }
     }

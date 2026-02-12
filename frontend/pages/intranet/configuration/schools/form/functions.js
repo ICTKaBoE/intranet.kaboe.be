@@ -15,6 +15,14 @@ window.virtualView = (info) => {
 	}
 };
 
+window.syncView = (info) => {
+	let val = Checkbox.GetInstance("chbSync").getValue();
+
+	if (val) document.getElementById("sync-Y").classList.remove("d-none");
+	else document.getElementById("sync-Y").classList.add("d-none");
+};
+
 $(document).ready(() => {
 	window.virtualView();
+	window.syncView();
 });

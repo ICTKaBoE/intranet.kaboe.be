@@ -11,9 +11,11 @@ use Database\Repository\General\Schoolyear;
 require_once __DIR__ . "/backend/autoload.php";
 parse_str(implode('&', array_slice($argv, 1)), $args);
 
+Code::errors();
 Code::noTimeLimit();
 Session::Close();
 
+$start = Clock::now();
 define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
 define("_LOGLOCATION_", "cron/{$args['part']}");
 define("_CURRENT_SCHOOLYEAR_", (new Schoolyear)->getCurrent()->name);
@@ -37,7 +39,8 @@ else {
         $setting->value = 1;
         $settingRepo->set($setting);
 
-        if ($class::$function()) http_response_code(200);
+        unset($args['part'], $args['function'], $args['mode']);
+        if ($class::$function(...$args)) http_response_code(200);
         else http_response_code(400);
 
         $setting->value = 0;
@@ -47,4 +50,5 @@ else {
     }
 }
 
-Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_);
+$end = Clock::now();
+Log::Close(_LOGLOCATION_, _LOGTIMESTAMP_, $start->getTimestamp(), $end->getTimestamp());

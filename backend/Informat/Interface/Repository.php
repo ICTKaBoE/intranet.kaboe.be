@@ -33,9 +33,9 @@ class Repository extends stdClass
 
     public function get($schoolyear, $instituteNumber, $id = null, $raw = false)
     {
-        $endpoint = Path::normalize(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint));
-        $endpoint = Path::normalize(str_replace("<extend>", $this->extend ?: "", $endpoint));
-        $endpoint = Path::normalize(str_replace("<id>", $id ?: "", $endpoint));
+        $endpoint = rtrim(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint), "/");
+        $endpoint = rtrim(str_replace("<extend>", $this->extend ?: "", $endpoint), "/");
+        $endpoint = rtrim(str_replace("<id>", $id ?: "", $endpoint), "/");
 
         $requestHeaders = [
             "InstituteNo" => $instituteNumber

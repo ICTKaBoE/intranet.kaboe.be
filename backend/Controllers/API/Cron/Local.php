@@ -4,22 +4,19 @@ namespace Controllers\API\Cron;
 
 use Helpers\Log;
 use Security\Input;
-use Helpers\General;
-use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Database\Repository\User\User;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\User\Address;
 use Database\Repository\School\School;
-use Database\Repository\General\Country;
 use Database\Repository\Informat\Employee;
-use Database\Object\User\User as ObjectUser;
 use Database\Repository\Informat\EmployeeAddress;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Object\User\Address as ObjectUserAddress;
-use Database\Repository\General\Schoolyear;
 use Database\Repository\Navigation\Setting;
+use Helpers\CString;
+use Helpers\General;
 
 abstract class Local
 {
@@ -48,41 +45,34 @@ abstract class Local
         $_format = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;
         $_firstName = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
 
-        // Temp disable users
         foreach ($userRepo->get() as $user) {
-            if ($user->system) continue;
-
-            $user->active = false;
-            $userRepo->set($user);
-        }
-
-        $employees = $employeeRepo->get();
-        foreach ($employees as $employee) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$employee->informatId} - {$employee->name} {$employee->firstName}");
-
             try {
-                $firstName = (Strings::equalsIgnoreCase(($employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_firstName)->value ?? "Voornaam"), "voornaam") ? $employee->firstName : $employee->extraFirstName);
-                $email = Input::createEmail($_format, $firstName, $employee->name, EMAIL_SUFFIX);
+                if ($user->system) continue;
 
-                $mainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool);
-                $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status);
+                // Temp disable user
+                $user->active = false;
+                $userRepo->set($user);
 
-                $user = $userRepo->getByInformatEmployeeId($employee->informatId) ?? Arrays::firstOrNull($userRepo->getByUsername($email)) ?? null;
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "User: {$user->formatted->fullNameReversed} - " . $user->informatEmployeeId ?: "No Informat ID - SKIP");
+                if (Strings::isBlank($user->informatEmployeeId)) continue;
 
-                if ($user) {
-                    $user->mainSchoolId = $schoolRepo->getByName($mainSchool->value)->id ?: 0;
-                    $user->bankAccount = $employee->iban;
-                    $user->active = $employee->active;
-                    $user->api = $user->active;
-
-                    if ($status) {
-                        $user->active = Strings::equal($status->value, "IN DIENST");
-                        $user->api = $user->active;
-                    }
-
-                    $userRepo->set($user);
+                $employee = $employeeRepo->getByInformatId(General::removeLeadingZero(CString::getDigitsOnly($user->informatEmployeeId)));
+                if (!$employee) {
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", "Employee not found!");
+                    continue;
                 }
+
+                $userMainSchool = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_mainSchool)->value ?: false;
+                $status = $employeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($employee->id, 2, $_status)->value ?: false;
+
+                $user->mainSchoolId = $schoolRepo->getByName($userMainSchool)->id ?: $employee->linked->institute->schoolId;
+                $user->bankAccount = $employee->iban;
+                $user->active = $status ? Strings::equal($status, "IN DIENST") : $employee->active;
+                $user->api = $status ? Strings::equal($status, "IN DIENST") : $employee->active;
+
+                $userRepo->set($user);
             } catch (\Exception $e) {
+                die(var_dump($e->getMessage()));
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
                 Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
                 $_error_ = true;

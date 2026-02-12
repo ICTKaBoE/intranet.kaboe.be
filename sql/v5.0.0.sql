@@ -86,8 +86,10 @@ ALTER TABLE tbl_holliday MODIFY COLUMN `end` date DEFAULT NULL NULL;
 ALTER TABLE tbl_informat_student_address ADD domicile BOOL DEFAULT 0 NOT NULL;
 
 -- School
+ALTER TABLE tbl_school ADD warnPasswordExpiration BOOL DEFAULT 1 NOT NULL;
+ALTER TABLE tbl_school CHANGE warnPasswordExpiration warnPasswordExpiration BOOL DEFAULT 1 NOT NULL AFTER `phone`;
 ALTER TABLE tbl_school ADD import BOOL DEFAULT 1 NOT NULL;
-ALTER TABLE tbl_school CHANGE import import BOOL DEFAULT 1 NOT NULL AFTER `phone`;
+ALTER TABLE tbl_school CHANGE import import BOOL DEFAULT 1 NOT NULL AFTER warnPasswordExpiration;
 ALTER TABLE tbl_school ADD sync BOOL DEFAULT 1 NOT NULL;
 ALTER TABLE tbl_school CHANGE sync sync BOOL DEFAULT 1 NOT NULL AFTER import;
 ALTER TABLE tbl_school ADD syncEmployeeCompanyName varchar(254) NULL;

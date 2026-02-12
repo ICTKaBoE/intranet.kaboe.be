@@ -44,15 +44,17 @@ abstract class M365
         $securityGroupRepo = new SecurityGroup;
         $sguRepo = new GroupUser;
         $userRepo = new RepositoryUser;
+        $m365User = new User;
 
         $securityGroups = Arrays::filter($securityGroupRepo->get(), fn($s) => Strings::isNotBlank($s->m365GroupId));
 
         foreach ($securityGroups as $sg) {
             $sguRepo->delete(["securityGroupId" => $sg->id]);
-            $members = (new User)->getGroupMembersByGroupId($sg->m365GroupId, ['id', 'mail', 'employeeId', 'surname', 'givenName', 'companyName']);
+            $members = $m365User->getGroupMembersByGroupId($sg->m365GroupId, ['id', 'mail', 'employeeId', 'surname', 'givenName', 'companyName']);
 
             foreach ($members as $member) {
                 if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
+                if (Strings::isBlank($member->getEmployeeId())) continue;
 
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "User: {$member->getEmployeeId()} - {$member->getSurname()} {$member->getGivenName()}");
                 $user = $userRepo->getByEntraId($member->getId()) ?? (new UserUser);
@@ -61,9 +63,9 @@ abstract class M365
                 $user->entraCompany = $member->getCompanyName();
                 $user->informatEmployeeId = $member->getEmployeeId();
                 $user->mainSchoolId = 0;
-                $user->username = $member->getMail();
-                $user->name = $member->getSurname();
-                $user->firstName = $member->getGivenName();
+                $user->username = Strings::trimToNull($member->getMail());
+                $user->name = Strings::trimToNull($member->getSurname());
+                $user->firstName = Strings::trimToNull($member->getGivenName());
                 $nId = $userRepo->set($user);
                 if (!$user->id) $user = $userRepo->getById($nId);
 
@@ -282,8 +284,8 @@ abstract class M365
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
 
-        $groupId = Arrays::firstOrNull((new Setting)->get("m365.employee.groupId"))->value;
-        $members = (new User)->getGroupMembersByGroupId($groupId, ['id', 'accountEnabled', 'mail', 'employeeId', 'lastPasswordChangeDateTime', 'onPremisesExtensionAttributes']);
+        // $groupId = Arrays::firstOrNull((new Setting)->get("m365.employee.groupId"))->value;
+        $members = (new User)->getAllEmployees(['id', 'accountEnabled', 'mail', 'employeeId', 'lastPasswordChangeDateTime', 'onPremisesExtensionAttributes']);
 
         foreach ($members as $member) {
             if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
@@ -298,6 +300,7 @@ abstract class M365
 
             $employee = $employeeRepo->getByInformatId($member->getEmployeeId());
             if (!$employee) continue;
+            if (!$employee->linked->institute->linked->school->warnPasswordExpiration && !$employee->linked->institute->linked->school->linked->parentSchool->warnPasswordExpiration) continue;
 
             $subject = str_replace("{{days}}", ($difference->invert ? "-" : "") . $difference->days, $_subject);
             $subject = str_replace("{{expirationDate}}", $passwordExpirationDate->format("d/m/Y"), $subject);

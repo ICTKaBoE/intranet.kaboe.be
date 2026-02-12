@@ -23,6 +23,7 @@ class School extends CustomObject
         "countryId" => self::TYPE_INTEGER,
         "phone" => self::TYPE_STRING,
         "number" => self::TYPE_STRING,
+        "warnPasswordExpiration" => self::TYPE_BOOLEAN,
         "import" => self::TYPE_BOOLEAN,
         "sync" => self::TYPE_BOOLEAN,
         "syncEmployeeCompanyName" => self::TYPE_STRING,
@@ -54,6 +55,7 @@ class School extends CustomObject
         ]);
 
         $this->formatted->icon->virtual = HTML::Icon($this->virtual ? "cloud" : "building");
+        $this->formatted->icon->warnPasswordExpiration = HTML::Icon($this->warnPasswordExpiration ? "check" : "x", color: $this->warnPasswordExpiration ? "green" : "red");
         $this->formatted->icon->import = HTML::Icon($this->import ? "check" : "x", color: $this->import ? "green" : "red");
         $this->formatted->icon->sync = HTML::Icon($this->sync ? "check" : "x", color: $this->sync ? "green" : "red");
 
