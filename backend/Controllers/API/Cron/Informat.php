@@ -46,26 +46,26 @@ use Database\Repository\Informat\EmployeeOwnfield as InformatEmployeeOwnfield;
 use Database\Repository\Informat\Registration as RepositoryInformatRegistration;
 use Database\Repository\Informat\RegistrationClass as InformatRegistrationClass;
 use Database\Repository\School\School;
+use Ouzo\Utilities\Arrays;
 
 abstract class Informat
 {
-    static public function Import()
+    static public function Import(...$args)
     {
-
         $institutes = [];
         foreach ((new School)->getImport() as $school) {
             foreach ((new Institute)->getBySchoolId($school->id) as $inst) $institutes[] = $inst;
         }
         define("_INSTITUTES_", $institutes);
 
-        if (Helpers::url()->hasParam("image")) {
+        if (Arrays::keyExists($args, 'image')) {
             $studentPhoto = self::StudentPhotos();
             $employeePhoto = self::EmployeePhotos();
 
             return ($studentPhoto && $employeePhoto);
         } else {
             $schoolyear = _CURRENT_SCHOOLYEAR_;
-            if (Helpers::url()->hasParam("nextSchoolyear")) {
+            if (Arrays::keyExists($args, 'nextSchoolyear')) {
                 $schoolyear = (new Schoolyear)->getByName(General::getSchoolyear(Clock::now()->plusYears(1)->format("Y-m-d")))->name;
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Switching to schoolyear {$schoolyear}");
             }
@@ -84,29 +84,36 @@ abstract class Informat
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import students...");
         $_error_ = false;
-
         $informatRepo = new Student;
-        FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
+        $repo = new RepositoryInformatStudent;
+
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Removing institute ID from students...");
+        foreach ($repo->get() as $student) {
+            $student->instituteId = 0;
+            $repo->set($student);
+        }
 
         foreach (_INSTITUTES_ as $institute) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
-            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
+            $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            $repo = new RepositoryInformatStudent;
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            if (!$import) continue;
+
+            $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$iItem->pPersoon} ({$iItem->persoonId}) - {$iItem->naam} {$iItem->voornaam}");
 
                 try {
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->persoonId) ?? new InformatStudent;
-                    $item->informatId = $iItem->pPersoon;
-                    $item->informatGuid = $iItem->persoonId;
-                    $item->name = trim($iItem->naam);
-                    $item->firstName = trim($iItem->voornaam);
+                    $item->informatId = Strings::trimToNull($iItem->pPersoon);
+                    $item->informatGuid = Strings::trimToNull($iItem->persoonId);
+                    $item->name = Strings::trimToNull($iItem->naam);
+                    $item->firstName = Strings::trimToNull($iItem->voornaam);
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
-                    $item->birthPlace = $iItem->geboorteplaats;
-                    $item->insz = $iItem->rijksregisternr ?: $iItem->bisnr ?: null;
+                    $item->birthPlace = Strings::trimToNull($iItem->geboorteplaats);
+                    $item->insz = Strings::trimToNull($iItem->rijksregisternr ?: $iItem->bisnr ?: null);
                     $item->instituteId = $institute->id;
 
                     $nId = $repo->set($item);
@@ -141,7 +148,11 @@ abstract class Informat
         FileSystem::CreateFolder(LOCATION_IMAGE . "/informat/student");
 
         foreach (_INSTITUTES_ as $institute) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
+            $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
+
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            if (!$import) continue;
+
             $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
@@ -181,7 +192,11 @@ abstract class Informat
         $studentRepo = new RepositoryInformatStudent;
 
         foreach (_INSTITUTES_ as $institute) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
+            $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
+
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            if (!$import) continue;
+
             $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
             $repo = new RepositoryInformatRegistration;
 
@@ -190,17 +205,17 @@ abstract class Informat
                     if (!is_null($iItem->einddatum) && Clock::at($iItem->einddatum)->format("m-d") === "06-30") $iItem->einddatum = Clock::at($iItem->einddatum)->format("Y-08-31");
 
                     $item = $repo->getByInformatId($iItem->pInschr) ?? $repo->getByInformatGuid($iItem->inschrijvingsId) ?? new InformatRegistration;
-                    $item->informatId = $iItem->pInschr;
-                    $item->informatGuid = $iItem->inschrijvingsId;
-                    $item->informatStudentId = $studentRepo->getByInformatGuid($iItem->persoonId)->id;
-                    $item->schoolInstituteId = $institute->id;
-                    $item->basenumber = $iItem->stamnr;
-                    $item->departmentCode = $iItem->afdCode;
-                    $item->grade = $iItem->graad;
-                    $item->year = $iItem->leerjaar;
-                    $item->start = $iItem->begindatum;
-                    $item->end = $iItem->einddatum;
-                    $item->status = $iItem->status;
+                    $item->informatId = Strings::trimToNull($iItem->pInschr);
+                    $item->informatGuid = Strings::trimToNull($iItem->inschrijvingsId);
+                    $item->informatStudentId = Strings::trimToNull($studentRepo->getByInformatGuid($iItem->persoonId)->id);
+                    $item->schoolInstituteId = Strings::trimToNull($institute->id);
+                    $item->basenumber = Strings::trimToNull($iItem->stamnr);
+                    $item->departmentCode = Strings::trimToNull($iItem->afdCode);
+                    $item->grade = Strings::trimToNull($iItem->graad);
+                    $item->year = Strings::trimToNull($iItem->leerjaar);
+                    $item->start = Strings::trimToNull($iItem->begindatum);
+                    $item->end = Strings::trimToNull($iItem->einddatum);
+                    $item->status = Strings::trimToNull($iItem->status);
                     $item->current = ($iItem->status == 0 && Clock::now()->isAfterOrEqualTo(Clock::at($iItem->begindatum)) && (is_null($iItem->einddatum) || Clock::now()->isBeforeOrEqualTo(Clock::at($iItem->einddatum))));
 
                     $nId = $repo->set($item);
@@ -229,33 +244,44 @@ abstract class Informat
 
         $informatRepo = new Employee;
         $cRepo = new Country;
+        $repo = new RepositoryInformatEmployee;
+
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Removing institute ID from employees and disable them all temp...");
+        foreach ($repo->get() as $employee) {
+            $employee->instituteId = 0;
+            $employee->active = 0;
+            $repo->set($employee);
+        }
+
 
         foreach (_INSTITUTES_ as $institute) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
+            $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
+
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
-            $repo = new RepositoryInformatEmployee;
 
             foreach ($iItems as $iItem) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->pPersoon} ({$iItem->personId}) - {$iItem->naam} {$iItem->voornaam}");
 
                 try {
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->personId) ?? new InformatEmployee;
-                    $item->informatId = $iItem->pPersoon;
-                    $item->informatGuid = $iItem->personId;
-                    $item->name = trim($iItem->naam);
-                    $item->firstName = trim($iItem->voornaam);
-                    $item->extraFirstName = trim($iItem->bijkomendeVoornamen);
-                    $item->basenumber = $iItem->stamnr;
+                    $item->informatId = Strings::trimToNull($iItem->pPersoon);
+                    $item->informatGuid = Strings::trimToNull($iItem->personId);
+                    $item->name = Strings::trimToNull($iItem->naam);
+                    $item->firstName = Strings::trimToNull($iItem->voornaam);
+                    $item->extraFirstName = Strings::trimToNull($iItem->bijkomendeVoornamen);
+                    $item->basenumber = Strings::trimToNull($iItem->stamnr);
                     $item->sex = (Strings::equalsIgnoreCase($iItem->geslacht, "m") ? "M" : "F");
                     $item->birthDate = $iItem->geboortedatum;
-                    $item->birthPlace = $iItem->geboorteplaats;
+                    $item->birthPlace = Strings::trimToNull($iItem->geboorteplaats);
                     $item->birthCountryId = $cRepo->getByNisCode(General::removeLeadingZero($iItem->geboortelandCode))->id;
                     $item->nationalityId = $cRepo->getByNisCode(General::removeLeadingZero($iItem->nationaliteitCode))->id;
-                    $item->insz = $iItem->rijksregisternr;
-                    $item->bis = $iItem->bisnr;
-                    $item->iban = $iItem->bank->iban;
-                    $item->bic = $iItem->bank->bic;
+                    $item->insz = Strings::trimToNull($iItem->rijksregisternr);
+                    $item->bis = Strings::trimToNull($iItem->bisnr);
+                    $item->iban = Strings::trimToNull($iItem->bank->iban);
+                    $item->bic = Strings::trimToNull($iItem->bank->bic);
                     $item->active = $iItem->isActive;
                     $item->instituteId = $institute->id;
 
@@ -289,20 +315,24 @@ abstract class Informat
         $repo->delete();
 
         foreach (_INSTITUTES_ as $institute) {
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat}");
+            $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
+
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            if (!$import) continue;
+
             $iItems = $informatRepo->get($schoolyear, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->personId}; Item: {$iItem->naam} - {$iItem->waarde}");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->personId}; Item: {$iItem->naam} = {$iItem->waarde}");
 
                 try {
                     $employeeId = $employeeRepo->getByInformatGuid($iItem->personId)->id;
                     $item = $repo->getByInformatGuidAndEmployeeId($iItem->vvId, $employeeId) ?? new EmployeeOwnfield;
                     $item->informatEmployeeId = $employeeId;
                     $item->informatGuid = $iItem->vvId;
-                    $item->name = $iItem->naam;
-                    $item->value = $iItem->waarde;
-                    $item->type = $iItem->dataType;
+                    $item->name = Strings::trimToNull($iItem->naam);
+                    $item->value = Strings::trimToNull($iItem->waarde);
+                    $item->type = Strings::trimToNull($iItem->dataType);
                     $item->section = $iItem->rubriek;
 
                     $repo->set($item);
@@ -361,11 +391,11 @@ abstract class Informat
         $address->informatStudentId = $studentId;
         $address->informatId = $adres->pAdres;
         $address->informatGuid = $adres->adresId;
-        $address->street = $adres->straat;
-        $address->number = $adres->nr;
-        $address->bus = $adres->bus;
-        $address->zipcode = $adres->postcode;
-        $address->city = $adres->gemeente;
+        $address->street = Strings::trimToNull($adres->straat);
+        $address->number = Strings::trimToNull($adres->nr);
+        $address->bus = Strings::trimToNull($adres->bus);
+        $address->zipcode = Strings::trimToNull($adres->postcode);
+        $address->city = Strings::trimToNull($adres->gemeente);
         $address->countryId = (new Country)->getByNisCode(General::removeLeadingZero($adres->landCode))->id;
         $address->domicile = is_null($domicile) ? $address->domicile : $domicile;
 
@@ -378,9 +408,9 @@ abstract class Informat
         $number = $numberRepo->getByInformatId($comnr->pComnr) ?? new StudentNumber;
         $number->informatStudentId = $studentId;
         $number->informatId = $comnr->pComnr;
-        $number->number = $comnr->nr;
-        $number->type = $comnr->type;
-        $number->category = $comnr->soort;
+        $number->number = Strings::trimToNull($comnr->nr);
+        $number->type = Strings::trimToNull($comnr->type);
+        $number->category = Strings::trimToNull($comnr->soort);
 
         $numberRepo->set($number);
     }
@@ -391,8 +421,8 @@ abstract class Informat
         $mail = $emailRepo->getByInformatId($email->pEmail) ?? new StudentEmail;
         $mail->informatStudentId = $studentId;
         $mail->informatId = $email->pEmail;
-        $mail->email = $email->email;
-        $mail->type = $email->type;
+        $mail->email = Strings::trimToNull($email->email);
+        $mail->type = Strings::trimToNull($email->type);
 
         $emailRepo->set($mail);
     }
@@ -402,9 +432,9 @@ abstract class Informat
         $bankRepo = new InformatStudentBank;
         $bank = $bankRepo->getByInformatStudentIdAndIban($studentId, $bankr->iban) ?? new StudentBank;
         $bank->informatStudentId = $studentId;
-        $bank->type = $bankr->type;
-        $bank->iban = $bankr->iban;
-        $bank->bic = $bankr->bic;
+        $bank->type = Strings::trimToNull($bankr->type);
+        $bank->iban = Strings::trimToNull($bankr->iban);
+        $bank->bic = Strings::trimToNull($bankr->bic);
 
         $bankRepo->set($bank);
     }
@@ -416,16 +446,16 @@ abstract class Informat
         $relation->informatStudentId = $studentId;
         $relation->informatId = $relatie->pRelatie;
         $relation->informatGuid = $relatie->relatieId;
-        $relation->type = $relatie->type;
-        $relation->name = $relatie->naam;
-        $relation->firstName = $relatie->voornaam;
-        $relation->insz = $relatie->insz;
+        $relation->type = Strings::trimToNull($relatie->type);
+        $relation->name = Strings::trimToNull($relatie->naam);
+        $relation->firstName = Strings::trimToNull($relatie->voornaam);
+        $relation->insz = Strings::trimToNull($relatie->insz);
         $relation->birthDate = $relatie->geboortedatum;
         $relation->sex = (Strings::equalsIgnoreCase("m", $relatie->geslacht) ? "M" : (Strings::equalsIgnoreCase("v", $relatie->geslacht) ? "F" : "X"));
         $relation->nationalityId = (new Country)->getByNisCode(General::removeLeadingZero($relatie->nationaliteitCode))->id;
-        $relation->job = $relatie->beroep;
-        $relation->civilStatus = $relatie->burgerlijkeStand;
-        $relation->rank = $relatie->lpv;
+        $relation->job = Strings::trimToNull($relatie->beroep);
+        $relation->civilStatus = Strings::trimToNull($relatie->burgerlijkeStand);
+        $relation->rank = Strings::trimToNull($relatie->lpv);
         $relationRepo->set($relation);
 
         foreach ($relatie->adressen as $adres) self::CreateStudentAddress($studentId, General::convertToObject($adres), null);
@@ -441,12 +471,12 @@ abstract class Informat
         $classgroup->informatGuid = $inschr->klasId;
         $classgroup->schoolInstituteId = $instituteId;
         $classgroup->schoolyear = (new Schoolyear)->getByDate($inschr->begindatum)->name;
-        $classgroup->administrativeGroupCode = $administrativeGroupCode;
-        $classgroup->departmentCode = $departmentCode;
-        $classgroup->grade = $grade;
-        $classgroup->year = $year;
-        $classgroup->code = trim($inschr->klasCode);
-        $classgroup->name = trim($inschr->klas);
+        $classgroup->administrativeGroupCode = Strings::trimToNull($administrativeGroupCode);
+        $classgroup->departmentCode = Strings::trimToNull($departmentCode);
+        $classgroup->grade = Strings::trimToNull($grade);
+        $classgroup->year = Strings::trimToNull($year);
+        $classgroup->code = Strings::trimToNull($inschr->klasCode);
+        $classgroup->name = Strings::trimToNull($inschr->klas);
         $classgroup->type = $inschr->groepType == 0 ? 'C' : 'S';
 
         $nId = $classgroupRepo->set($classgroup);
@@ -478,11 +508,11 @@ abstract class Informat
         $address = $addressRepo->getByInformatGuid($adres->id) ?? new EmployeeAddress;
         $address->informatEmployeeId = $employeeId;
         $address->informatGuid = $adres->id;
-        $address->street = $adres->straat;
-        $address->number = $adres->nummer;
-        $address->bus = $adres->bus;
-        $address->zipcode = $adres->postcode;
-        $address->city = $adres->gemeente;
+        $address->street = Strings::trimToNull($adres->straat);
+        $address->number = Strings::trimToNull($adres->nummer);
+        $address->bus = Strings::trimToNull($adres->bus);
+        $address->zipcode = Strings::trimToNull($adres->postcode);
+        $address->city = Strings::trimToNull($adres->gemeente);
         $address->countryId = (new Country)->getByNisCode(General::removeLeadingZero($adres->landCode))->id;
         $address->current = $adres->isDomicilie;
 
@@ -496,9 +526,9 @@ abstract class Informat
         $number = $numberRepo->getByInformatGuid($comnr->id) ?? new EmployeeNumber;
         $number->informatEmployeeId = $employeeId;
         $number->informatGuid = $comnr->id;
-        $number->number = $comnr->nr;
-        $number->type = $comnr->type;
-        $number->category = $comnr->soort;
+        $number->number = Strings::trimToNull($comnr->nr);
+        $number->type = Strings::trimToNull($comnr->type);
+        $number->category = Strings::trimToNull($comnr->soort);
 
         $numberRepo->set($number);
     }
@@ -509,8 +539,8 @@ abstract class Informat
         $mail = $emailRepo->getByInformatGuid($email->id) ?? new EmployeeEmail;
         $mail->informatEmployeeId = $employeeId;
         $mail->informatGuid = $email->id;
-        $mail->email = $email->email;
-        $mail->type = $email->type;
+        $mail->email = Strings::trimToNull($email->email);
+        $mail->type = Strings::trimToNull($email->type);
 
         $emailRepo->set($mail);
     }

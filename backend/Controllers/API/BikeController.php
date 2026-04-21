@@ -99,11 +99,6 @@ class BikeController extends ApiController
         }
     }
 
-    protected function getSettings($view, $id = null)
-    {
-        return $this->getNavigationSettings();
-    }
-
     // Post Functions
     protected function postHomeWork($view, $id = null)
     {
@@ -232,11 +227,6 @@ class BikeController extends ApiController
             else $this->setToast("Rit '{$distance->alias} ({$distance->formatted->distance})' op datum {$rDate} opgeslagen!");
             $this->setReloadCalendar();
         }
-    }
-
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
     }
 
     protected function printExport($view, $id = null)

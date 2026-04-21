@@ -11,6 +11,7 @@ class Location extends CustomObject
         "categoryId" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
         "extendedOptions" => self::TYPE_BOOLEAN,
+        "replacementPattern" => self::TYPE_STRING,
         "order" => self::TYPE_INTEGER
     ];
 

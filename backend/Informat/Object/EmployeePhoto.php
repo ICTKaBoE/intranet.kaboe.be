@@ -7,8 +7,8 @@ use Security\CustomObject;
 class EmployeePhoto extends CustomObject
 {
     protected $objectAttributes = [
-        "id" => "string",
-        "personId" => "string",
-        "photo" => "base64"
+        "id" => self::TYPE_STRING,
+        "personId" => self::TYPE_STRING,
+        "photo" => self::TYPE_BASE64
     ];
 }

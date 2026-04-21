@@ -184,7 +184,7 @@ export default class Helpers {
 	static processRequestResponse = (data) => {
 		if (data.redirect) Helpers.redirect(data.redirect);
 		if (data.return) window.history.back();
-		if (data.toast) Toast.INSTANCE.show(data.toast);
+		if (data.toast) Toast.GetInstance("toast").show(data.toast);
 		if (data.closeModal)
 			typeof data.closeModal == "boolean"
 				? Helpers.closeAllModals()
@@ -226,13 +226,15 @@ export default class Helpers {
 	static sleep = (delay) =>
 		new Promise((resolve) => setTimeout(resolve, delay));
 
-	static CheckAllLoaded = (callback) => {
+	static CheckAllLoaded = (callback, components = []) => {
 		let intv = setInterval(() => {
 			allLoaded();
 		}, 100);
 
 		let allLoaded = () => {
-			if (Select.Loaded()) {
+			let loaded = !components.map((i) => i.Loaded()).includes(false);
+
+			if (loaded) {
 				clearInterval(intv);
 				callback();
 			}

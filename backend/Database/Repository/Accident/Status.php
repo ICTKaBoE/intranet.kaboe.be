@@ -23,4 +23,16 @@ class Status extends Repository
         $statement = $this->prepareSelect(filters: ["whenInsuranceIsMailed" => 1]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getClosed()
+    {
+        $statement = $this->prepareSelect(filters: ["closed" => 1]);
+        return $this->executeSelect($statement);
+    }
+
+    public function getClosedNoFollow()
+    {
+        $statement = $this->prepareSelect(filters: ["closedNoFollow" => 1]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
 }

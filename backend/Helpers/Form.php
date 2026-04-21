@@ -36,11 +36,9 @@ abstract class Form
                     }
 
                     if ($precondMet) {
-                        if (Arrays::getValue($value, 'type') == "file") {
-                            if ($$key[0]->getSize() == 0) array_push($invalid, $key);
-                        } else {
-                            if (!Input::check($$key, Arrays::getValue($value, 'type', Input::INPUT_TYPE_STRING)) || Input::empty($$key)) array_push($invalid, $key);
-                        }
+                        if (Arrays::getValue($value, 'type') == "file" && $$key[0]->getSize() == 0) array_push($invalid, $key);
+                        else if (Arrays::getValue($value, 'type') === Input::INPUT_TYPE_INT && Input::empty($$key)) array_push($invalid, $key);
+                        else if (!Input::check($$key, Arrays::getValue($value, 'type', Input::INPUT_TYPE_STRING)) || Input::empty($$key)) array_push($invalid, $key);
                     }
                 }
             }

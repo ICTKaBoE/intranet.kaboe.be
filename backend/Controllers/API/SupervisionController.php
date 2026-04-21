@@ -57,11 +57,6 @@ class SupervisionController extends ApiController
         }
     }
 
-    protected function getSettings($view, $id = null)
-    {
-        return $this->getNavigationSettings();
-    }
-
     // Post functions
     protected function postFill($view, $id = null)
     {
@@ -133,11 +128,6 @@ class SupervisionController extends ApiController
 
         $this->setCloseModal();
         $this->setReloadCalendar();
-    }
-
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
     }
 
     protected function printExport($view, $id = null)

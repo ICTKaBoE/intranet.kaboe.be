@@ -73,6 +73,7 @@ class ManagementController extends ApiController
 
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
+            $filters['type'] = $type;
             $items = $repo->get(filters: $filters);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }

@@ -1,9 +1,13 @@
+import MasterObject from "../MasterObject.js";
 import Helpers from "./Helpers.js";
 
-export default class Signage {
-	static INSTANCES = {};
+export default class Signage extends MasterObject {
+	static OBJ_SELECTOR = "div[role='signage']";
+	static OBJ_ID_PREFIX = "sgn";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -19,27 +23,6 @@ export default class Signage {
 
 		this.init();
 	}
-
-	static ScanAndCreate() {
-		$("div[role='signage']").each((ids, el) => {
-			if (!Signage.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Signage.INSTANCES[el.getAttribute("id")] = new Signage(el);
-		});
-	}
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("sgn"))
-			id = `sgn${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Signage.INSTANCES[id] || false;
-	};
-
-	static ReloadAll = () => {
-		for (const sgn in Signage.INSTANCES) {
-			Signage.INSTANCES[sgn].reload();
-		}
-	};
 
 	init = async () => {
 		this.createStructure();

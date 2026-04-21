@@ -172,12 +172,12 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     </div>
 
                     <div class="row">
-                        <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst Politie" data-on-change="policeView"></div>
+                        <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst verbaliserende autoriteit" data-on-change="policeView"></div>
                     </div>
 
                     <div class="row d-none" id="police-Y">
                         <div class="col-lg-8 mb-3">
-                            <label class="form-label" for="policeName">Naam agent(e)</label>
+                            <label class="form-label" for="policeName">Welke autoriteit</label>
                             <input type="text" name="policeName" id="policeName" class="form-control" required />
                         </div>
 
@@ -235,7 +235,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
 
                         <div class="row" id="whenAndWho-N">
                             <div class="col mb-3">
-                                <label for="whenAndWho" class="form-label">Wanneer en door wie heeft u kennis gekregen van het ongeval?</label>
+                                <label for="whenAndWho" class="form-label">Door wie heeft u kennis gekregen van het ongeval?</label>
                                 <input type="text" name="whenAndWho" id="whenAndWho" class="form-control" required />
                             </div>
                         </div>
@@ -426,12 +426,12 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     </div>
 
                     <div class="row">
-                        <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst Politie" data-on-change="policeView"></div>
+                        <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst verbaliserende autoriteit" data-on-change="policeView"></div>
                     </div>
 
                     <div class="row d-none" id="police-Y">
                         <div class="col-lg-8 mb-3">
-                            <label class="form-label" for="policeName">Naam agent(e)</label>
+                            <label class="form-label" for="policeName">Welke autoriteit</label>
                             <input type="text" name="policeName" id="policeName" class="form-control" required />
 
                         </div>
@@ -532,7 +532,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
 
                         <div class="row" id="whenAndWho-N">
                             <div class="col mb-3">
-                                <label for="whenAndWho" class="form-label">Wanneer en door wie heeft u kennis gekregen van het ongeval?</label>
+                                <label for="whenAndWho" class="form-label">Door wie heeft u kennis gekregen van het ongeval?</label>
                                 <input type="text" name="whenAndWho" id="whenAndWho" class="form-control" required />
                             </div>
                         </div>

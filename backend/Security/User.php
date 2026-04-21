@@ -4,14 +4,11 @@ namespace Security;
 
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Module;
-use Database\Repository\ModuleSetting;
 use Database\Repository\Security\Group;
 use Database\Repository\Security\GroupNavigation;
 use Database\Repository\Security\GroupUser;
 use Database\Repository\Setting\Setting;
 use Database\Repository\User\User as RepositoryUser;
-use Ouzo\Utilities\Comparator;
 
 abstract class User
 {
@@ -50,6 +47,7 @@ abstract class User
 
         $userSecurityGroups = (new GroupUser)->getByUserId($user->id);
         if (!$userSecurityGroups) return false;
+        if (Arrays::contains(Arrays::map($userSecurityGroups, fn($usg) => $usg->linked->securityGroup->admin), true)) return true;
 
         $sgnRepo = new GroupNavigation;
         $navigationIds = [];

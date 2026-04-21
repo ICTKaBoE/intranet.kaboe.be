@@ -1,4 +1,4 @@
-<form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto" data-prefill-id="{{url:part.id}}">
+<form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto" data-prefill-id="{{url:part.id}}" data-locked-value="_lockedForm">
     <div class="card-body">
         <div class="row">
             <h1 class="card-title">Informatie leerling en ongeval</h1>
@@ -162,12 +162,12 @@
         </div>
 
         <div class="row">
-            <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst Politie" data-on-change="policeView"></div>
+            <div class="col" id="chbPolice" role="checkbox" data-type="checkbox" data-name="police" data-text="Tussenkomst verbaliserende autoriteit" data-on-change="policeView"></div>
         </div>
 
         <div class="row d-none" id="police-Y">
             <div class="col-lg-8 mb-3">
-                <label class="form-label" for="policeName">Naam agent(e)</label>
+                <label class="form-label" for="policeName">Welke autoriteit</label>
                 <input type="text" name="policeName" id="policeName" class="form-control" required />
             </div>
 
@@ -184,7 +184,7 @@
         </div>
 
         <div class="row">
-            <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht" data-on-change="supervisionView"></div>
+            <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht" data-on-change="supervisionView" data-required></div>
         </div>
 
         <div class="row d-none" id="supervision-Y">
@@ -225,7 +225,7 @@
 
             <div class="row" id="whenAndWho-N">
                 <div class="col mb-3">
-                    <label for="whenAndWho" class="form-label">Wanneer en door wie heeft u kennis gekregen van het ongeval?</label>
+                    <label for="whenAndWho" class="form-label">Door wie heeft u kennis gekregen van het ongeval?</label>
                     <input type="text" name="whenAndWho" id="whenAndWho" class="form-control" required />
                 </div>
             </div>

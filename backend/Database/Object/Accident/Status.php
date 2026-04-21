@@ -14,6 +14,7 @@ class Status extends CustomObject
         "order" => self::TYPE_INTEGER,
         "default" => self::TYPE_BOOLEAN,
         "whenInsuranceIsMailed" => self::TYPE_BOOLEAN,
+        "closedNoFollow" => self::TYPE_BOOLEAN,
         "closed" => self::TYPE_BOOLEAN,
     ];
 

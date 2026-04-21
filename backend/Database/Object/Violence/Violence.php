@@ -17,6 +17,7 @@ class Violence extends CustomObject
         "creatorUserId" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
         "anonymous" => self::TYPE_BOOLEAN,
+        "victimId" => self::TYPE_INTEGER,
         "factsDate" => self::TYPE_DATE,
         "identityParty" => self::TYPE_STRING,
         "ageParty" => self::TYPE_INTEGER,
@@ -73,10 +74,10 @@ class Violence extends CustomObject
         $this->formatted->victim = $this->anonymous ? "Anoniem" : $this->linked->victim->formatted->fullNameReversed;
         $this->formatted->party = $this->identityParty ? "{$this->identityParty} ({$this->ageParty} jaar)" : "";
         $this->formatted->workingHours = $this->workingHours ? "Ja" : "Nee";
-        $this->formatted->form = $this->linked->form ? implode("<br />", Arrays::map($this->linked->form, fn($i) => Strings::equal($i->id, "O") ? $this->formOther : $i->name)) : "";
-        $this->formatted->out = $this->linked->out ? implode("<br />", Arrays::map($this->linked->out, fn($i) => Strings::equal($i->id, "O") ? $this->outOther : $i->name)) : "";
-        $this->formatted->intention = $this->linked->intention ? implode("<br />", Arrays::map($this->linked->intention, fn($i) => Strings::equal($i->id, "O") ? $this->intentionOther : $i->name)) : "";
-        $this->formatted->cause = $this->linked->cause ? implode("<br />", Arrays::map($this->linked->cause, fn($i) => Strings::equal($i->id, "O") ? $this->causeOther : $i->name)) : "";
+        $this->formatted->form = $this->linked->form ? implode("<br />", Arrays::map($this->linked->form, fn($i) => Strings::equal($i->id, SELECT_OTHER_ID) ? $this->formOther : $i->name)) : "";
+        $this->formatted->out = $this->linked->out ? implode("<br />", Arrays::map($this->linked->out, fn($i) => Strings::equal($i->id, SELECT_OTHER_ID) ? $this->outOther : $i->name)) : "";
+        $this->formatted->intention = $this->linked->intention ? implode("<br />", Arrays::map($this->linked->intention, fn($i) => Strings::equal($i->id, SELECT_OTHER_ID) ? $this->intentionOther : $i->name)) : "";
+        $this->formatted->cause = $this->linked->cause ? implode("<br />", Arrays::map($this->linked->cause, fn($i) => Strings::equal($i->id, SELECT_OTHER_ID) ? $this->causeOther : $i->name)) : "";
         $this->formatted->damage = $this->linked->damage ? implode("<br />", Arrays::map($this->linked->damage, fn($i) => $i->name)) : "";
         $this->formatted->damageKind = $this->linked->damageKind ? implode("<br />", Arrays::map($this->linked->damageKind, fn($i) => $i->name)) : "";
         $this->formatted->police = $this->police ? "Ja" : "Nee";

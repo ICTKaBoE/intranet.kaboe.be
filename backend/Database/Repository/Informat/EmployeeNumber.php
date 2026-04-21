@@ -23,4 +23,10 @@ class EmployeeNumber extends Repository
         $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getByCategory($category)
+    {
+        $statement = $this->prepareSelect(filters: ['category' => $category]);
+        return $this->executeSelect($statement);
+    }
 }

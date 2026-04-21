@@ -10,7 +10,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
             <div class="row">
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="status">Status</label>
-                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N" required></select>
+                    <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" required></select>
 
                 </div>
 
@@ -49,7 +49,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                     <h2 class="card-title">Items</h2>
                 </div>
 
-                <table role="table" id="tbl{{page:id}}Line" data-source="{{table:url:full}}Line" data-no-paging data-no-info data-double-click-action="edit" data-extra="[orderId={{url:part.id}}]"></table>
+                <table role="table" id="tbl{{page:id}}Line" data-source="{{table:url:full}}Line" data-no-paging data-no-info data-double-click-action="edit" data-checkbox data-extra="[orderId={{url:part.id}}]"></table>
             </div>
         </div>
 
@@ -82,7 +82,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label" for="status">Status</label>
-                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-default-value="N" data-no-lock></select>
+                        <select name="status" id="status" data-load-source="{{select:url:short}}/{{url:part.module}}/status" data-no-lock></select>
 
                     </div>
 

@@ -1,5 +1,7 @@
-export default class TinyMCE {
-	static INSTANCES = {};
+import MasterObject from "../MasterObject.js";
+
+export default class TinyMCE extends MasterObject {
+	static OBJ_SELECTOR = "[role='tinymce']";
 
 	constructor(element) {
 		this.element = element;
@@ -8,17 +10,6 @@ export default class TinyMCE {
 
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("[role='tinymce']").each((ids, el) => {
-			if (!TinyMCE.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				TinyMCE.INSTANCES[el.getAttribute("id")] = new TinyMCE(el);
-		});
-	};
-
-	static GetInstance = (id) => {
-		return TinyMCE.INSTANCES[id] || false;
-	};
 
 	init = () => {
 		let options = {

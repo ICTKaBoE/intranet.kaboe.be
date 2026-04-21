@@ -1,12 +1,17 @@
+import MasterObject from "../MasterObject.js";
 import Helpers from "./Helpers.js";
 
-export default class Button {
+export default class Button extends MasterObject {
+	static OBJ_SELECTOR = "button,.btn*";
+	static OBJ_ID_PREFIX = "btn";
+
 	static TYPE_ICON = "icon";
 	static TYPE_ICON_TEXT = "icon-text";
 	static TYPE_TEXT = "text";
-	static INSTANCES = {};
 
 	constructor({ element = null, options = {} }) {
+		super();
+
 		this.options = options;
 		if (element !== null) this.element = element;
 		else this.element = document.createElement("button");
@@ -15,23 +20,6 @@ export default class Button {
 
 		this.id = this.element.id || Helpers.generateId("btn");
 	}
-
-	static ScanAndCreate = () => {
-		$("button,.btn*").each((ids, el) => {
-			if (!Button.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Button.INSTANCES[el.getAttribute("id")] = new Button({
-					element: el,
-				});
-		});
-	};
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("btn"))
-			id = `btn${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Button.INSTANCES[id] || false;
-	};
 
 	create = (full = false) => {
 		if (full) {

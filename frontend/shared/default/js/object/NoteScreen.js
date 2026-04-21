@@ -1,7 +1,11 @@
-export default class NoteScreen {
-	static INSTANCES = {};
+import MasterObject from "../MasterObject.js";
+
+export default class NoteScreen extends MasterObject {
+	static OBJ_SELECTOR = "*[role='notescreen']";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -21,12 +25,6 @@ export default class NoteScreen {
 		// });
 
 		this.init();
-	}
-
-	static ScanAndCreate() {
-		$("*[role='notescreen']").each((ids, el) => {
-			NoteScreen.INSTANCES[el.id] = new NoteScreen(el);
-		});
 	}
 
 	init = async () => {

@@ -7,6 +7,7 @@ use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
+use Security\CustomObject;
 
 abstract class General
 {
@@ -154,6 +155,7 @@ abstract class General
     {
         if (!$template) $template = Helpers::url()->getParam("template");
         $output = "";
+        $items = Arrays::map($items, fn($i) => $i instanceof CustomObject ? $i?->toArray(true) : $i);
 
         foreach ($items as $i) {
             $t = $template;

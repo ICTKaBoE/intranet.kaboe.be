@@ -40,7 +40,7 @@ class EHBO extends CustomObject
 
     public function init()
     {
-        $this->formatted->victim = (Strings::equal($this->victimType, SELECT_OTHER_ID) ? "Andere" : (Strings::equal($this->linked->victimType->type, "S") ? $this->linked->victimStudent->formatted->fullNameReversed : $this->linked->victimEmployee->formatted->fullNameReversed)) . " ({$this->linked->victimType->name})";
+        $this->formatted->victim = (Strings::equal($this->victimType, SELECT_OTHER_ID) ? SELECT_OTHER_VALUE : (Strings::equal($this->linked->victimType->type, "S") ? $this->linked->victimStudent->formatted->fullNameReversed : $this->linked->victimEmployee->formatted->fullNameReversed)) . " ({$this->linked->victimType->name})";
         $this->formatted->description = Strings::equal($this->description, SELECT_OTHER_ID) ? $this->descriptionOther : $this->linked->description->name;
         $this->formatted->firstHelp = Strings::equal($this->firstHelp, SELECT_OTHER_ID) ? $this->firstHelpOther : $this->linked->firstHelp->name;
         $this->formatted->firstHelpWithDateTime = $this->formatted->firstHelp . " - " . Clock::at($this->firstHelpDateTime)->format("d/m/Y H:i");

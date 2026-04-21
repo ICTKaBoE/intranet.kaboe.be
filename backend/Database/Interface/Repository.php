@@ -36,10 +36,8 @@ class Repository extends stdClass
     {
         $statement = $this->repoTable->select();
         if (!is_null($id)) {
-            if ($this->guidField) {
-                if (strlen($id) > 12) $statement->where($this->guidField, $id);
-                else $statement->where($this->idField, $id);
-            } else $statement->where($this->idField, $id);
+            if ($this->guidField && strlen($id) > 12) $statement->where($this->guidField, $id);
+            else $statement->where($this->idField, $id);
         }
 
         if ($this->deletedField && !$deleted) $statement->where($this->deletedField, "0");

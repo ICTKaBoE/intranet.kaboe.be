@@ -45,31 +45,15 @@ class OrderController extends ApiController
 
     protected function getCategory($view, $id = null)
     {
-        $catRepo = new Category;
+        $repo = new Category;
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $mainCategories = $catRepo->getMainCategoryOnly();
-            $optgroups = $items = [];
+            $_items = $repo->get();
 
-            foreach ($mainCategories as $mainCategory) {
-                $subCategories = $catRepo->getByCategoryId($mainCategory->id);
-
-                if ($subCategories) {
-                    $optgroups[] = $mainCategory;
-                    foreach ($subCategories as $subCategory) {
-                        $subCategory->optgroup = $mainCategory->id;
-                        $subCategory->optgroupName = $mainCategory->name;
-                        $subCategory->id = "{$mainCategory->id}-{$subCategory->id}";
-
-                        $items[] = $subCategory;
-                    }
-                } else {
-                    $mainCategory->optgroup = SELECT_OTHER_ID;
-                    $items[] = $mainCategory;
-                }
-            }
-
-            $optgroups[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
+            $optgroups = array_values(Arrays::filter($_items, fn($i) => is_null($i->categoryId) && count($repo->getByCategoryId($i->id))));
+            $items = array_values(Arrays::filter($_items, fn($i) => !is_null($i->categoryId) || !count($repo->getByCategoryId($i->id))));
+            Arrays::each($items, fn($i) => $i->optgroup = $i->categoryId);
+            $items[] = ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE];
 
             $this->appendToJson('optgroups', $optgroups);
             $this->appendToJson('items', $items);
@@ -233,11 +217,6 @@ class OrderController extends ApiController
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
-    protected function getSettings($view, $id = null)
-    {
-        $this->getNavigationSettings();
-    }
-
     protected function getQuotes($view, $id = null)
     {
         $repo = new Order;
@@ -337,7 +316,7 @@ class OrderController extends ApiController
         Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
-            if (!Arrays::contains(["O"], Arrays::first(explode("-", $fields["category"])))) {
+            if ($fields["category"] !== SELECT_OTHER_ID) {
                 if (!Input::check($fields["assetId"]) || Input::empty($fields["assetId"])) $this->setValidation("assetId", self::VALIDATION_STATE_INVALID);
             } else {
                 if (!Input::check($fields["clarifycation"]) || Input::empty($fields["clarifycation"])) $this->setValidation("clarifycation", self::VALIDATION_STATE_INVALID);
@@ -351,7 +330,6 @@ class OrderController extends ApiController
                 $line = $repo->getById($id) ?? new OrderLine;
                 $line->fillWithPostData();
                 $line->orderId = $order->id;
-                $line->assetId = Arrays::contains(["O"], Arrays::first(explode("-", $fields["category"]))) ? "" : $fields["assetId"];
                 $repo->set($line);
             }
         }
@@ -363,14 +341,14 @@ class OrderController extends ApiController
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
-    protected function postOrderRequestQuote($view, $id = null)
+    protected function postAllRequestQuote($view, $id = null)
     {
         $id = explode("_", $id);
         $repo = new Order;
 
         foreach ($id as $_id) {
             $item = $repo->getById($_id);
-            $item->status = "QR";
+            $item->status = (new Status)->getMailQuote()->id;
             $repo->set($item);
 
             $this->mailQuote($item->id);
@@ -382,14 +360,14 @@ class OrderController extends ApiController
     }
 
 
-    protected function postOrderRequestAccept($view, $id = null)
+    protected function postAllRequestAccept($view, $id = null)
     {
         $id = explode("_", $id);
         $repo = new Order;
 
         foreach ($id as $_id) {
             $item = $repo->getById($_id);
-            $item->status = "WA";
+            $item->status = (new Status)->getMailAccept()->id;
             $repo->set($item);
 
             $this->mailAccept($item->id);
@@ -400,14 +378,14 @@ class OrderController extends ApiController
         $this->setCloseModal();
     }
 
-    protected function postOrderOrder($view, $id = null)
+    protected function postAllOrder($view, $id = null)
     {
         $id = explode("_", $id);
         $repo = new Order;
 
         foreach ($id as $_id) {
             $item = $repo->getById($_id);
-            $item->status = "O";
+            $item->status = (new Status)->getMailOrder()->id;;
             $repo->set($item);
 
             $this->mailOrder($item->id);
@@ -445,11 +423,6 @@ class OrderController extends ApiController
 
         if ($this->validationIsAllGood()) $this->setReturn();
         else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
-    }
-
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
     }
 
     // Delete functions     

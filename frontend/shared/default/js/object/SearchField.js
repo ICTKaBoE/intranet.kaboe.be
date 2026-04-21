@@ -1,28 +1,21 @@
 import Table from "./Table.js";
 import List from "./List.js";
+import MasterObject from "../MasterObject.js";
 
-export default class SearchField {
-	static INSTANCES = {};
+export default class SearchField extends MasterObject {
+	static OBJ_SELECTOR = "*[role='searchField']";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
 		this.init();
 	}
 
-	static ScanAndCreate() {
-		$("*[role='searchField']").each((ids, el) => {
-			if (!SearchField.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				SearchField.INSTANCES[el.getAttribute("id")] = new SearchField(
-					el
-				);
-		});
-	}
-
 	init = () => {
 		this.input = $(this.element).find("input")[0];
-
 		this.input.addEventListener("input", this.debounce(this.search));
 	};
 

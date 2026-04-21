@@ -42,6 +42,7 @@ use Database\Repository\Smartschool\Message;
 use Database\Repository\Smartschool\MessageReceiver;
 use Helpers\Filter;
 use Helpers\HTML;
+use PhpOffice\PhpWord\IOFactory;
 
 class AccidentController extends ApiController
 {
@@ -118,8 +119,8 @@ class AccidentController extends ApiController
             $items = array_values(Arrays::filter($_items, fn($i) => !is_null($i->categoryId) || !count($repo->getByCategoryId($i->id))));
             Arrays::each($items, fn($i) => $i->optgroup = $i->categoryId);
 
-            $this->appendToJson('optgroups', $optgroups);
-            $this->appendToJson('items', $items);
+            $this->appendToJson('optgroups', Arrays::orderBy($optgroups, "order"));
+            $this->appendToJson('items', Arrays::orderBy($items, "order"));
         }
     }
 
@@ -128,11 +129,6 @@ class AccidentController extends ApiController
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $this->appendToJson('items', (new Party)->get());
         }
-    }
-
-    protected function getSettings($view)
-    {
-        $this->getNavigationSettings();
     }
 
     protected function getDetailsExtranetUpdate($view, $id = null)
@@ -199,12 +195,12 @@ class AccidentController extends ApiController
                     "content" => $item->linked->informatStudent->formatted->fullNameReversed
                 ],
                 [
-                    "title" => "Beschrijving ongeval",
-                    "content" => $item->visibleDescription
-                ],
-                [
                     "title" => "Vond plaats op",
                     "content" => $item->formatted->date . " "  . $item->formatted->time
+                ],
+                [
+                    "title" => "Locatie",
+                    "content" => $item->formatted->location
                 ]
             ];
 
@@ -388,6 +384,7 @@ class AccidentController extends ApiController
 
             $accident = $repo->getById($id) ?? (new ObjectAccident);
             $accident->fillWithPostData();
+            if (!$accident->id) $accident->status = (new Status)->getDefault()->id;
             if (!$accident->creatorUserId) $accident->creatorUserId = User::getLoggedInUser()->id;
             $accident->datetime = Clock::at($fields["datetime"])->format("Y-m-d H:i:s");
             if (count($address) == 1 && is_null($fields['informatStudentAddressId'])) $accident->informatStudentAddressId = $address[0]->id;
@@ -397,7 +394,7 @@ class AccidentController extends ApiController
 
             // Create all files
             $this->createDocumentsWord($accident->id ?? $nId);
-            if (!$accident->id) $this->createCreationMail($nId);
+            if (!$accident->id) $this->createCreationMail($nId, fromFast: false);
 
             $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
@@ -445,11 +442,6 @@ class AccidentController extends ApiController
         if (!$id) $this->setToast("Geen aangifte geselecteerd!", self::VALIDATION_STATE_INVALID);
     }
 
-    protected function postSettings()
-    {
-        $this->postNavigationSettings();
-    }
-
     protected function postExtranetRequest($view, $id = null)
     {
         $_fields = [
@@ -481,6 +473,7 @@ class AccidentController extends ApiController
             "informatStudentBankId" => ["mandatory" => true],
             "documentB" => ["type" => "file"],
             "documentC" => ["type" => "file"],
+            "status"
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -491,6 +484,7 @@ class AccidentController extends ApiController
 
             $item = $repo->getById($id);
             $item->fillWithPostData();
+            if ($fields['status'] == "CNF") $item->status = (new Status)->getClosedNoFollow()->id;
             $repo->set($item);
 
             $documentB = $fields["documentB"];
@@ -508,6 +502,7 @@ class AccidentController extends ApiController
             }
 
             // $this->setReturn();
+            $this->setReload();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
@@ -522,6 +517,7 @@ class AccidentController extends ApiController
 
         foreach (explode("_", $id) as $_id) {
             $accident = $accidentRepo->getById($_id);
+            $this->createDocumentsWord($accident->id);
 
             $mail = new MailMail;
 
@@ -530,6 +526,16 @@ class AccidentController extends ApiController
             $toEmail = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "insurance.email")->value;
             $subject = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.insurance.subject")->value;
             $body = $settingsRepo->getByNavigationIdAndKey(CURRENT_NAVIGATION_MODULE_ID, "mail.template.insurance.body")->value;
+
+            $files = [
+                "{$accident->formatted->number} - Aangifte Fiche (A).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - A.docx",
+                "{$accident->formatted->number} - Geneeskundig getuigschrift (B).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/B.pdf",
+                "{$accident->formatted->number} - Informatieblad (C).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/C.pdf",
+            ];
+
+            foreach ($files as $name => $path) {
+                if (!Strings::endsWith($path, ".pdf")) (new Convert)->convert($path, str_replace(".docx", ".pdf", $path));
+            }
 
             foreach ($accident->toArray(true) as $key => $value) {
                 $subject = str_replace("{{{$key}}}", $value, $subject);
@@ -540,26 +546,21 @@ class AccidentController extends ApiController
             $mail->fromName = $fromName;
             $mail->subject = $subject;
             $mail->body = $body;
+            $mail->replyTo = ["email" => $mail->fromEmail, "name" => $mail->fromName];
 
             $mId = $mailRepo->set($mail);
-
-            $files = [
-                "{$accident->formatted->number} - Aangifte Fiche (A).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - A.docx",
-                "{$accident->formatted->number} - Informatieblad (C).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/C.pdf",
-            ];
-
-            if ($accident->physicalDamage) $files[] = [
-                "{$accident->formatted->number} - Geneeskundig getuigschrift (B).pdf" => LOCATION_FILES . "/accident/{$accident->guid}/B.pdf",
-            ];
 
             $receiver = new MailReceiver;
             $receiver->mailId = $mId;
             $receiver->email = $toEmail;
             $mailReceiverRepo->set($receiver);
 
-            foreach ($files as $name => $path) {
-                if (!Strings::endsWith($path, ".pdf")) (new Convert)->convert($path, str_replace(".docx", ".pdf", $path));
+            $receiver = new MailReceiver;
+            $receiver->mailId = $mId;
+            $receiver->email = $mail->fromEmail;
+            $mailReceiverRepo->set($receiver);
 
+            foreach ($files as $name => $path) {
                 $attachment = new MailAttachment;
                 $attachment->mailId = $mId;
                 $attachment->path = str_replace(".docx", ".pdf", $path);
@@ -595,7 +596,7 @@ class AccidentController extends ApiController
         }
 
         $message = new SmartschoolMessage;
-        $message->sourceId = $$accident->linked->school->smartschoolSourceId ?? $accident->linked->school->linked->parentSchool->smartschoolSourceId;
+        $message->sourceId = $accident->linked->school->smartschoolSourceId ?? $accident->linked->school->linked->parentSchool->smartschoolSourceId;
         $message->subject = Strings::trimToNull($subject);
         $message->body = Strings::trimToNull($body);
 
@@ -608,7 +609,7 @@ class AccidentController extends ApiController
         $smsMessageReceiverRepo->set($receiver);
     }
 
-    private function createCreationMail($accidentId, $attachments = [])
+    private function createCreationMail($accidentId, $attachments = [], $fromFast = true)
     {
         $settingsRepo = new Setting;
         $accident = (new Accident)->getById($accidentId);
@@ -616,6 +617,10 @@ class AccidentController extends ApiController
         $mailRepo = new Mail;
         $mailReceiverRepo = new Receiver;
         $mailAttachmentRepo = new Attachment;
+
+        foreach (["Geneeskundig getuigschrift" => "B", "Informatieblad" => "C"] as $name => $part) {
+            (new Convert)->convert(LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - {$part}.docx", LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - {$part}.pdf");
+        }
 
         $mail = new MailMail;
 
@@ -638,6 +643,8 @@ class AccidentController extends ApiController
         $mail->fromName = $fromName;
         $mail->subject = $subject;
         $mail->body = $body;
+        if (!$fromFast) $mail->sendAfterDateTime = Clock::nowAsString("Y-m-d 16:00:00");
+        $mail->replyTo = ["email" => $mail->fromEmail, "name" => $mail->fromName];
 
         $mId = $mailRepo->set($mail);
 
@@ -651,9 +658,13 @@ class AccidentController extends ApiController
             $mailReceiverRepo->set($receiver);
         }
 
-        foreach (["Geneeskundig getuigschrift" => "B", "Informatieblad" => "C"] as $name => $part) {
-            (new Convert)->convert(LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - {$part}.docx", LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - {$part}.pdf");
+        $receiver = new MailReceiver;
+        $receiver->mailId = $mId;
+        $receiver->email = DEV_MODE ? DEV_CONTACT : $mail->fromEmail;
+        $receiver->name = $mail->fromName;
+        $mailReceiverRepo->set($receiver);
 
+        foreach (["Geneeskundig getuigschrift" => "B", "Informatieblad" => "C"] as $name => $part) {
             $attachment = new MailAttachment;
             $attachment->mailId = $mId;
             $attachment->path = LOCATION_FILES . "/accident/{$accident->guid}/{$accident->formatted->number} - {$part}.pdf";
@@ -707,8 +718,8 @@ class AccidentController extends ApiController
             $template->setValue("witnessAfter:n", (!$item->witnessAfter ? 'X' : ''));
 
             foreach ($locations as $location) {
-                if (!$location->categoryId) continue;
-                $template->setValue("location:{$location->categoryId}-{$location->id}", (Strings::equalsIgnoreCase($item->location, "{$location->categoryId}-{$location->id}") ? "X" : ""));
+                if (!$location->replacementPattern) continue;
+                $template->setValue("location:{$location->replacementPattern}", (Strings::equal($item->location, $location->id) ? "X" : ""));
             }
 
             foreach ($parties as $party) {
@@ -720,6 +731,7 @@ class AccidentController extends ApiController
             $template->setValue("police:n", (!$item->police ? 'X' : ''));
 
             $extraInfo = "";
+            $witness = "";
 
             $party = (new Party)->getById($item->party)->extendedOptions;
             if ($party == "E") {
@@ -740,22 +752,36 @@ class AccidentController extends ApiController
             }
 
             if ($item->witness) {
-                if (Strings::isNotBlank($extraInfo)) $extraInfo .= "\n";
-                $extraInfo .= "5:  {$item->witnessInfo}";
+                if (Strings::isNotBlank($extraInfo)) $witness .= "\n";
+                $witness .= "A:  {$item->witnessInfo}";
             }
 
             if ($item->witnessAfter) {
-                if (Strings::isNotBlank($extraInfo)) $extraInfo .= "\n";
-                $extraInfo .= "6:  {$item->witnessAfterInfo}";
+                if (Strings::isNotBlank($extraInfo)) $witness .= "\n";
+                $witness .= "B:  {$item->witnessAfterInfo}";
+            }
+
+            if ($item->whenAndWho) {
+                if (Strings::isNotBlank($extraInfo)) $witness .= "\n";
+                $witness .= "C:  {$item->whenAndWho}";
             }
 
             $extraInfo = ltrim($extraInfo);
             $extraInfo = rtrim($extraInfo);
             $template->setValue("extraInfo", $extraInfo);
-            $template->setValue("date:now", Clock::nowAsString("d/m/Y H:i:s"));
+
+            $witness = ltrim($witness);
+            $witness = rtrim($witness);
+            $template->setValue("witness", $witness);
+            $template->setValue("date:now", Clock::nowAsString("d/m/Y"));
 
             foreach ($template->getVariables() as $var) $template->setValue($var, '');
             $template->saveAs($saveFilename);
+
+            // $word = IOFactory::load($saveFilename);
+            // $word->setDefaultFontName("aptos");
+            // $word->setDefaultFontSize(11);
+            // $word->save($saveFilename);
         }
     }
 }

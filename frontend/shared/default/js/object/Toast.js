@@ -1,23 +1,19 @@
+import MasterObject from "../MasterObject.js";
 import Helpers from "./Helpers.js";
 
-export default class Toast {
-	static INSTANCE = null;
+export default class Toast extends MasterObject {
+	static OBJ_SELECTOR = ".toast-container";
 
-	constructor() {
+	constructor(element) {
+		super();
+
+		this.element = element;
+
 		this.init();
 	}
 
-	static Create = () => {
-		Toast.INSTANCE = new Toast();
-	};
-
 	init = async () => {
-		this.getToastContainer();
-		if (this.container.dataset?.notifications) this.getNotifications();
-	};
-
-	getToastContainer = () => {
-		this.container = $(".toast-container")[0];
+		if (this.element.dataset?.notifications) this.getNotifications();
 	};
 
 	show = (toasts) => {
@@ -72,13 +68,13 @@ export default class Toast {
 		dflex.appendChild(btn);
 
 		toast.appendChild(dflex);
-		this.container.appendChild(toast);
+		this.element.appendChild(toast);
 		bootstrap.Toast.getOrCreateInstance(toast).show();
 	};
 
 	getNotifications = () => {
 		Helpers.request({
-			url: this.container.dataset.notifications,
+			url: this.element.dataset.notifications,
 			always: (data) => {
 				Helpers.processRequestResponse(data);
 			},
@@ -86,7 +82,7 @@ export default class Toast {
 
 		setInterval(() => {
 			Helpers.request({
-				url: this.container.dataset.notifications,
+				url: this.element.dataset.notifications,
 				always: (data) => {
 					Helpers.processRequestResponse(data);
 				},

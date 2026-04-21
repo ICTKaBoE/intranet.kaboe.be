@@ -12,7 +12,7 @@ use Database\Object\Management\IPad as ManagementIPad;
 use Database\Repository\Navigation\Setting;
 use Ouzo\Utilities\Clock;
 
-abstract class JAMF
+abstract class Jamf
 {
     public static function Import()
     {

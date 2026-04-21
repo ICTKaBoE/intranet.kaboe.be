@@ -1,7 +1,11 @@
-export default class Clock {
-	static INSTANCES = {};
+import MasterObject from "../MasterObject.js";
+
+export default class Clock extends MasterObject {
+	static OBJ_SELECTOR = "*[role='clock']";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -10,12 +14,6 @@ export default class Clock {
 		this.backgroundColor = this.element.dataset.backgroundColor;
 
 		this.init();
-	}
-
-	static ScanAndCreate() {
-		$("*[role='clock']").each((ids, el) => {
-			if (!Clock.INSTANCES.hasOwnProperty(el.getAttribute("id"))) Clock.INSTANCES[el.getAttribute("id")] = new Clock(el);
-		});
 	}
 
 	init = () => {
@@ -33,14 +31,18 @@ export default class Clock {
 			let day = today.getDate();
 			let month = today.getMonth();
 			let year = today.getFullYear();
-			string += `${day < 10 ? '0' : ''}${day}/${month + 1 < 10 ? '0' : ''}${month + 1}/${year}`;
+			string += `${day < 10 ? "0" : ""}${day}/${
+				month + 1 < 10 ? "0" : ""
+			}${month + 1}/${year}`;
 		}
 
 		if (this.showTime) {
 			let hours = today.getHours();
 			let minutes = today.getMinutes();
 			let seconds = today.getSeconds();
-			string += ` ${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+			string += ` ${hours}:${minutes < 10 ? "0" : ""}${minutes}:${
+				seconds < 10 ? "0" : ""
+			}${seconds}`;
 		}
 
 		return string;

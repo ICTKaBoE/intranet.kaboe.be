@@ -31,9 +31,11 @@ use Database\Repository\Security\GroupNavigation;
 use Database\Object\School\Course as SchoolCourse;
 use Database\Object\General\Message as GeneralMessage;
 use Database\Object\School\Department as SchoolDepartment;
+use Database\Object\School\Direction as SchoolDirection;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
+use Database\Repository\School\Direction;
 
 class ConfigurationController extends ApiController
 {
@@ -103,6 +105,23 @@ class ConfigurationController extends ApiController
     protected function getDepartment($view, $id = null)
     {
         $repo = new Department;
+
+        if (Strings::equal($view, self::VIEW_TABLE)) {
+            [$defaultOrder, $columns] = Table::Format();
+            $this->appendToJson('defaultOrder', $defaultOrder);
+            $this->appendToJson('columns', $columns);
+
+            $items = $repo->get();
+            $this->appendToJson("rows", $items);
+        } else if (Strings::equal($view, self::VIEW_FORM)) {
+            $group = $repo->getById($id);
+            $this->appendToJson('fields', $group);
+        }
+    }
+
+    protected function getDirection($view, $id = null)
+    {
+        $repo = new Direction;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -190,13 +209,17 @@ class ConfigurationController extends ApiController
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $group = $repo->getById($id);
-            $members = (new GroupUser)->getBySecurityGroupId($group->id);
-            $applications = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "P");
-            $links = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "L");
 
-            $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
-            $group->applications = join(";", Arrays::map($applications, fn($a) => $a->navigationId));
-            $group->links = join(";", Arrays::map($links, fn($a) => $a->navigationId));
+            if ($group) {
+                $members = (new GroupUser)->getBySecurityGroupId($group->id) ?: [];
+                $applications = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "P") ?: [];
+                $links = Arrays::filter((new GroupNavigation)->getBySecurityGroupId($group->id), fn($i) => $i->linked->navigation->type == "L") ?: [];
+
+                $group->members = join(";", Arrays::map($members, fn($m) => $m->userId));
+                $group->applications = join(";", Arrays::map($applications, fn($a) => $a->navigationId));
+                $group->links = join(";", Arrays::map($links, fn($a) => $a->navigationId));
+            }
+
             $this->appendToJson('fields', $group);
         }
     }
@@ -304,6 +327,35 @@ class ConfigurationController extends ApiController
 
             if ($this->validationIsAllGood()) {
                 $item = $repo->getById($id) ?? new SchoolDepartment;
+                $item->fillWithPostData();
+
+                $repo->set($item);
+            }
+        }
+
+        if ($this->validationIsAllGood()) $this->setReturn();
+        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
+    protected function postDirection($view, $id = null)
+    {
+        if ($id == "add") $id = null;
+
+        $_fields = [
+            "name" => ["mandatory" => true],
+            "schoolId" => ["mandatory" => true],
+            "departmentId" => ["mandatory" => true],
+            "codes"
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Direction;
+
+            if ($this->validationIsAllGood()) {
+                $item = $repo->getById($id) ?? new SchoolDirection;
                 $item->fillWithPostData();
 
                 $repo->set($item);
@@ -508,6 +560,25 @@ class ConfigurationController extends ApiController
             $repo->set($item);
 
             $this->setToast("De gebruikersgroep '{$item->name}' is verwijderd!");
+        }
+
+        $this->setReloadTable();
+        $this->setCloseModal();
+    }
+    protected function deleteDirection($view, $id)
+    {
+        $id = explode("_", $id);
+        $repo = new Direction;
+
+        foreach ($id as $_id) {
+            $item = $repo->getById($_id);
+
+            if ($item) {
+                $item->deleted = 1;
+                $repo->set($item);
+
+                $this->setToast("De richting '{$item->name}' is verwijderd!");
+            }
         }
 
         $this->setReloadTable();

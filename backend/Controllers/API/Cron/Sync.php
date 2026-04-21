@@ -17,7 +17,6 @@ use Database\Repository\Informat\Student;
 use Database\Repository\School\Institute;
 use Database\Object\Mail\Mail as MailMail;
 use Database\Repository\Informat\Employee;
-use Database\Repository\General\Schoolyear;
 use Database\Repository\Navigation\Setting;
 use M365\Repository\User as RepositoryUser;
 use Database\Object\Sync\Sync as ObjectSync;
@@ -32,273 +31,336 @@ use Database\Repository\Sync\Sync as RepositorySync;
 
 abstract class Sync
 {
-    static public function Prepare()
-    {
-        $prepareEmployee = self::PrepareEmployee();
-        $prepareStudent = self::PrepareStudent();
 
-        return ($prepareEmployee && $prepareStudent);
+    /* ---------------------------- PUBLIC ENTRY ----------------------------- */
+    public static function Prepare()
+    {
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting sync...");
+        $ok1 = self::PrepareEmployee();
+        Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+        $ok2 = self::PrepareStudent();
+        return ($ok1 && $ok2);
+    }
+
+    /* ========================== REUSABLE HELPERS ========================== */
+
+    // Generic null-coalescing helper with fallback pipeline
+    private static function pick(...$values)
+    {
+        foreach ($values as $v) {
+            if (!is_null($v) && $v !== "") return $v;
+        }
+        return null;
+    }
+
+    // Reusable function to build displayName/email
+    private static function buildNameAndMail($formatDisplay, $formatEmail, $firstName, $lastName, $suffix)
+    {
+        $display = Input::createDisplayName($formatDisplay, $firstName, $lastName);
+        $email = Input::createEmail($formatEmail, $firstName, $lastName, $suffix);
+        return [$display, $email];
+    }
+
+    // Normalizes OU replacement
+    private static function replaceOu($template, $school)
+    {
+        return str_replace(
+            ["{{school:adOuPart}}", "{{school:adOuPartUpper}}"],
+            [$school->adOuPart, strtoupper($school->adOuPart)],
+            $template
+        );
+    }
+
+    // Determines if a photo should be used and returns URL or null
+    private static function resolvePhoto($path)
+    {
+        if (!FileSystem::PathExists($path)) return null;
+        if (time() - filemtime($path) > 1200) return null;
+        return FileSystem::GetDownloadLink($path);
+    }
+
+    // Generic write routine for sync properties
+    private static function applyField($value, $current = null)
+    {
+        if (Strings::equal($value, $current)) return null;
+        return Strings::trimToNull($value);
     }
 
     private static function PrepareEmployee()
     {
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to prepare employees...");
-        $settingRepo = new Setting;
-        $syncRepo = new RepositorySync;
-        $schoolRepo = new School;
-        $informatEmployeeOwnfieldRepo = new EmployeeOwnfield;
-        $m365UserRepo = new RepositoryUser;
-        $informatEmployeeRepo = new Employee;
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing employees...");
+
+        $settingRepo  = new Setting;
+        $syncRepo     = new RepositorySync;
+        $schoolRepo   = new School;
+        $ownRepo      = new EmployeeOwnfield;
+        $m365Repo     = new RepositoryUser;
+        $employeeRepo = new Employee;
 
         $navigation = (new Navigation)->getByLinkAndType('sync', "M");
-        $_status = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
-        $_firstName = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
-        $_photo = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.employee")->value, 'bool');
-        $_badgeId = "Badge ID";
 
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering all M365 employees...");
-        $currentEmployees = $m365UserRepo->getAllEmployees(['id', 'employeeId', 'mail', 'accountEnabled', 'signInActivity', 'givenName', 'surname', 'displayName', 'onPremisesSamAccountName', 'onPremisesUserPrincipalName', 'companyName', 'department', 'jobTitle', 'memberOf', 'onPremisesExtensionAttributes']);
-        $currentEmployees = Arrays::filter($currentEmployees, fn($ce) => Strings::equal($ce::class, \Microsoft\Graph\Generated\Models\User::class));
+        $statusKey     = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.status")->value;
+        $firstNameKey  = $settingRepo->getByNavigationIdAndKey($navigation->id, "informat.ownfield.createEmailWith")->value;
+        $photoEnabled  = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.employee")->value, 'bool');
+
+        /* ---------------------- GET ALL M365 + INFORMAT EMPLOYEES ---------------------- */
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering M365 employees...");
+        $currentEmployees = $m365Repo->getAllEmployees([
+            'id',
+            'employeeId',
+            'mail',
+            'accountEnabled',
+            'signInActivity',
+            'givenName',
+            'surname',
+            'displayName',
+            'onPremisesSamAccountName',
+            'onPremisesUserPrincipalName',
+            'companyName',
+            'department',
+            'jobTitle',
+            'memberOf',
+            'onPremisesExtensionAttributes'
+        ]);
+
+        $currentEmployees = Arrays::filter(
+            $currentEmployees,
+            fn($u) =>
+            Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
+        );
+
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($currentEmployees) . " employees");
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
 
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering all Informat employees...");
-        $informatEmployees = $informatEmployeeRepo->get();
-        // $informatEmployees = Arrays::filter($informatEmployees, fn($e) => $e->informatId == 15045);
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($informatEmployees) . " employees");
-        // Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+        $informat = $employeeRepo->get();
+        // $informat = Arrays::filter($informat, fn($e) => $e->informatId == 12897);
+        // $informat = Arrays::filter($informat, fn($e) => $e->instituteId == 0 && ($e->linked->institute->linked->school->sync || $e->linked->institute->linked->school->linked->parentSchool->sync));
+        // Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filtered to " . count($informat));
 
-        foreach ($informatEmployees as $informatEmployee) {
-            if (!$informatEmployee->linked->institute->linked->school->sync && !$informatEmployee->linked->institute->linked->school->linked->parentSchool->sync) continue;
-
-            $employeeOU = $informatEmployee->linked->institute->linked->school->syncEmployeeOU ?? $informatEmployee->linked->institute->linked->school->linked->parentSchool->syncEmployeeOU;
-
+        /* ----------------------------- PROCESS EMPLOYEES ------------------------------ */
+        foreach ($informat as $emp) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$informatEmployee->informatId} - {$informatEmployee->name} {$informatEmployee->firstName}");
-            $sync = $syncRepo->getByEmployeeId($informatEmployee->informatId) ?? new ObjectSync;
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$emp->informatId} - {$emp->name} {$emp->firstName}");
+
+            if ($emp->instituteId !== 0 && !($emp->linked->institute->linked->school->sync || $emp->linked->institute->linked->school->linked->parentSchool->sync)) {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
+                continue;
+            }
+
+            /* ---------- Load or Init Sync Object ---------- */
+            $sync = $syncRepo->getByEmployeeId($emp->informatId) ?? new ObjectSync;
             $sync->type = "E";
-            $sync->employeeId = $informatEmployee->informatId;
-            $sync->emailAddress = null;
-            $sync->samAccountName = null;
-            $sync->userPrincipalName = null;
-            $sync->password = null;
-            $sync->thumbnailPhoto = null;
-            $sync->ou = null;
+            $sync->action = null;
+            $sync->employeeId = $emp->informatId;
 
-            $m365User = Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($cs) => Strings::equal($cs->getEmployeeId(), $informatEmployee->informatId) || Strings::equal($cs->getEmployeeId(), "P{$informatEmployee->informatId}")));
-            $inService = Strings::equal(($informatEmployeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($informatEmployee->id, 2, $_status))->value, "IN DIENST");
+            /* ---------- Identify matching M365 user ---------- */
+            $m365 = Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($u) => Strings::equal($u->getEmployeeId(), $emp->informatId) || Strings::equal($u->getEmployeeId(), "P{$emp->informatId}")));
 
-            $GivenName = (Strings::equalsIgnoreCase(($informatEmployeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($informatEmployee->id, 2, $_firstName)->value ?: "Voornaam"), "voornaam") ? $informatEmployee->firstName : $informatEmployee->extraFirstName);
-            $DisplayName = Input::createDisplayName($settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value, $GivenName, $informatEmployee->name);
-            $EmailAddress = Input::createEmail($settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value, $GivenName, $informatEmployee->name, EMAIL_SUFFIX);
-            $BadgeId = $informatEmployeeOwnfieldRepo->getByInformatEmployeeIdSectionAndName($informatEmployee->id, 2, $_badgeId)->value;
-            $MemberOf = [];
-            $OtherAttributes = [];
+            /* ---------- Check active / status ---------- */
+            $ownFieldStatus = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, $statusKey)?->value;
+            $inService = is_null($ownFieldStatus) ? General::convert($emp->active, "boolean") : Strings::equal($ownFieldStatus, "IN DIENST");
 
-            $functions = $informatEmployeeOwnfieldRepo->getByInformatEmployeeIdAndSection($informatEmployee->id, 2);
-            $functions = Arrays::filter($functions, fn($ff) => Strings::contains($ff->name, " - Functie "));
+            /* ---------- Determine GivenName ---------- */
+            $firstNameSource = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, $firstNameKey)?->value ?: "Voornaam";
+            $givenName = Strings::equalsIgnoreCase($firstNameSource, "voornaam") ? $emp->firstName : $emp->extraFirstName;
 
-            $schools = Arrays::map($functions, fn($f) => $f->name);
-            $schools = Arrays::map($schools, fn($d) => Arrays::first(explode(" - ", $d)));
-            $schools = array_unique(array_values($schools));
+            /* ---------- Build display + email ---------- */
+            $fmtDisplay = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value;
+            $fmtEmail   = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;
 
-            if ($m365User) {
-                $memberOfM365 = $m365UserRepo->getMemberOf($m365User->getId(), ['onPremisesDomainName', 'displayName']);
-                $memberOfM365 = Arrays::filter($memberOfM365, fn($m) => $m->getOnPremisesDomainName() !== null);
-                $memberOfM365 = Arrays::map($memberOfM365, fn($m) => $m->getDisplayName());
+            [$displayName, $emailAddress] =
+                self::buildNameAndMail($fmtDisplay, $fmtEmail, $givenName, $emp->name, EMAIL_SUFFIX);
 
-                $m365OU = explode(",", $m365User?->getOnPremisesDistinguishedName());
-                array_shift($m365OU);
-                $m365OU = implode(",", $m365OU);
+            /* ---------- Avoid duplicate emails ---------- */
+            $postfix = 2;
+            $parts = explode("@", $emailAddress);
+            while (Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($u) => Strings::equalsIgnoreCase($u->getMail(), $emailAddress)))) {
+                $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
+                $postfix++;
             }
 
-            foreach (explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.employee")->value) as $mof) {
-                $mof = Strings::trimToNull($mof);
-                foreach ($schools as $school) {
-                    $school = $schoolRepo->getByName($school);
-                    if (Strings::isBlank($school->adSecGroupPart)) continue;
-                    $_mof = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $mof);
+            $samAccountName = substr(explode("@", $emailAddress)[0], 0, 20);
 
-                    if ($m365User) {
-                        if (!Arrays::contains($memberOfM365, $_mof)) $MemberOf[] = $_mof;
-                    } else $MemberOf[] = $_mof;
+            /* ---------- Functions, schools, job titles, attributes ---------- */
+            $functions = Arrays::filter($ownRepo->getByInformatEmployeeIdAndSection($emp->id, 2), fn($f) => Strings::contains($f->name, " - Functie "));
+            $schoolNames = array_unique(Arrays::map($functions, fn($f) => Arrays::first(explode(" - ", $f->name))));
+            $departments = implode(", ", Arrays::map($schoolNames, fn($sn) => $schoolRepo->getByName($sn)->name)) ?: null;
+            $jobTitles = implode(", ", array_unique(Arrays::map(Arrays::filter($functions, fn($f) => !Strings::startsWith(Arrays::last(explode(' (', $f->value)), "!")), fn($f) => Arrays::first(explode(' (', $f->value))))) ?: null;
+
+            /* ---------- MemberOf groups ---------- */
+            $memberOf = [];
+
+            $defaultGroups = explode(",", $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.employee")->value);
+
+            if ($m365) {
+                $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);
+                $existing = Arrays::map($existing, fn($g) => $g?->getDisplayName());
+            }
+
+            foreach ($defaultGroups as $g) {
+                $g = Strings::trimToNull($g);
+                if (!$g) continue;
+
+                foreach ($schoolNames as $sn) {
+                    $s = $schoolRepo->getByName($sn);
+                    if (!$s->adSecGroupPart) continue;
+
+                    $_g = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$s->adSecGroupPart, strtoupper($s->adOuPart)], $g);
+                    if (!$m365 || !Arrays::contains($existing, $_g)) $memberOf[] = $_g;
                 }
             }
 
-            $MemberOf = array_unique($MemberOf);
+            $memberOf = array_unique($memberOf) ?: null;
 
-            $departments = Arrays::map($schools, fn($d) => $schoolRepo->getByName($d)->name);
-            $departments = implode(", ", $departments);
-            $departments = Strings::trimToNull($departments);
+            /* ---------- Badge ID + extension attributes ---------- */
+            $badgeId = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, "Badge ID")?->value;
+            $otherAttributes = [];
 
-            $jobtitles = Arrays::filter($functions, fn($f) => !Strings::startsWith(Arrays::last(explode(' (', $f->value)), "!"));
-            $jobtitles = Arrays::map($jobtitles, fn($f) => Arrays::first(explode(' (', $f->value)));
-            $jobtitles = array_unique(array_values($jobtitles));
-            $jobtitles = implode(", ", $jobtitles);
-            $jobtitles = Strings::trimToNull($jobtitles);
-
-            $_functions = $_functionsPerSchool = [];
-            foreach ($functions as $function) {
-                $school = $schoolRepo->getByName(Arrays::first(explode(" - ", $function->name)));
-                $functionName = Arrays::first(explode("(", $function->value));
-                $functionCode = str_replace(")", "", Arrays::last(explode("(", $function->value)));
-
-                if (!Arrays::keyExists($_functions, $school->adJobTitlePrefix)) $_functions[$school->adJobTitlePrefix] = [];
-                if (!Arrays::keyExists($_functionsPerSchool, $school->name)) $_functionsPerSchool[$school->name] = [];
-                $_functions[$school->adJobTitlePrefix][] = $functionCode;
-                $_functionsPerSchool[$school->name][] = $functionName;
+            // ExtensionAttribute1 = job title per school
+            $funcCodes = [];
+            foreach ($functions as $f) {
+                $school = $schoolRepo->getByName(Arrays::first(explode(" - ", $f->name)));
+                $code = str_replace(")", "", Arrays::last(explode("(", $f->value)));
+                $code = str_replace("!", "", $code);
+                $funcCodes[] = "{$school->adJobTitlePrefix}:{$code}";
+            }
+            if ($funcCodes) {
+                $ea1 = implode(" ", $funcCodes);
+                if (!$m365 || $ea1 !== $m365?->getOnPremisesExtensionAttributes()?->getExtensionAttribute1()) $otherAttributes["extensionAttribute1"] = $ea1;
             }
 
-            if (!empty($_functions)) {
-                $ea1 = [];
+            if ($badgeId && (!$m365 || $badgeId !== $m365?->getOnPremisesExtensionAttributes()?->getExtensionAttribute15())) {
+                $otherAttributes["extensionAttribute15"] = $badgeId;
+                $otherAttributes["pager"] = $badgeId;
+            }
 
-                foreach ($_functions as $_school => $_codes) {
-                    foreach ($_codes as $_code) {
-                        $_code = str_replace("!", "", $_code);
-                        $ea1[] = "{$_school}:{$_code}";
+            $otherAttributes = $otherAttributes ?: null;
+
+            /* ---------- Company + OU ---------- */
+            $schoolObject = $emp->linked->institute->linked->school;
+            $companyName = self::pick($schoolObject->syncEmployeeCompanyName, $schoolObject->linked->parentSchool->syncEmployeeCompanyName);
+            if ($m365 && Strings::contains($m365->getCompanyName(), "COLTD") && $companyName !== "COLTD") $companyName = "COLTD, {$companyName}";
+            $employeeOU = self::pick($schoolObject->syncEmployeeOU, $schoolObject->linked->parentSchool->syncEmployeeOU);
+
+            /* ---------- Photo ---------- */
+            $photo = null;
+            if ($photoEnabled) $photo = self::resolvePhoto(LOCATION_IMAGE . "/informat/employee/{$emp->informatGuid}.jpg");
+
+            /* ---------- Determine ACTION: Create / Enable / Update / Disable ---------- */
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365 ? "" : "NOT ") . "FOUND; M365 Enabled: " . ($m365 ? ($m365->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; In Service OR Informat Active: " . ($inService ? "YES" : "NO"));
+
+            if (!$m365 && $inService) $sync->action = "C";
+            else if ($m365 && !$m365->getAccountEnabled() && $inService) $sync->action = "E";
+            else if ($m365 && $m365->getAccountEnabled() && $inService) $sync->action = "U";
+            else if ($m365 && $m365->getAccountEnabled() && !$inService) $sync->action = "D";
+
+            /* ---------- Apply fields based on ACTION ---------- */
+            switch ($sync->action) {
+                case 'C': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Create employee");
+                        $sync->action               = "C";
+                        $sync->givenName            = Strings::trimToNull($givenName);
+                        $sync->surname              = Strings::trimToNull($emp->name);
+                        $sync->displayName          = Strings::trimToNull($displayName);
+                        $sync->emailAddress         = $emailAddress;
+                        $sync->samAccountName       = $samAccountName;
+                        $sync->userPrincipalName    = $emailAddress;
+                        $sync->companyName          = $companyName;
+                        $sync->department           = $departments;
+                        $sync->jobTitle             = $jobTitles;
+                        $sync->memberOf             = $memberOf;
+                        $sync->otherAttributes      = $otherAttributes;
+                        $sync->password             = User::generatePassword();
+                        $sync->thumbnailPhoto       = $photo;
+                        $sync->ou                   = $employeeOU;
                     }
-                }
+                    break;
+                case 'E': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Enable employee");
+                        $sync->password = User::generatePassword();
 
-                $OtherAttributes["extensionAttribute1"] = Strings::trimToNull(implode(" ", $ea1));
-                if (Strings::equal($OtherAttributes["extensionAttribute1"], $m365User?->getOnPremisesExtensionAttributes()->getExtensionAttribute1()) || Strings::isBlank($OtherAttributes['extensionAttribute1'])) unset($OtherAttributes["extensionAttribute1"]);
+                        $sync->givenName    = self::applyField($givenName,      $m365->getGivenName());
+                        $sync->surname      = self::applyField($emp->name,      $m365->getSurname());
+                        $sync->displayName  = self::applyField($displayName,    $m365->getDisplayName());
+                        $sync->companyName  = self::applyField($companyName,    $m365->getCompanyName());
+                        $sync->department   = self::applyField($departments,    $m365->getDepartment());
+                        $sync->jobTitle     = self::applyField($jobTitles,      $m365->getJobTitle());
+
+                        $sync->memberOf        = $memberOf;
+                        $sync->otherAttributes = $otherAttributes;
+                        $sync->thumbnailPhoto  = $photo;
+                    }
+                    break;
+                case 'U': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Update employee");
+
+                        $sync->givenName    = self::applyField($givenName,      $m365->getGivenName());
+                        $sync->surname      = self::applyField($emp->name,      $m365->getSurname());
+                        $sync->displayName  = self::applyField($displayName,    $m365->getDisplayName());
+                        $sync->companyName  = self::applyField($companyName,    $m365->getCompanyName());
+                        $sync->department   = self::applyField($departments,    $m365->getDepartment());
+                        $sync->jobTitle     = self::applyField($jobTitles,      $m365->getJobTitle());
+
+                        $sync->memberOf        = $memberOf;
+                        $sync->otherAttributes = $otherAttributes;
+                        $sync->thumbnailPhoto  = $photo;
+                    }
+                    break;
+                case 'D': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Disable employee");
+                        $sync->givenName       = null;
+                        $sync->surname         = null;
+                        $sync->displayName     = null;
+                        $sync->companyName     = null;
+                        $sync->department      = null;
+                        $sync->memberOf        = null;
+                        $sync->thumbnailPhoto  = null;
+                        $sync->ou              = null;
+                    }
+                    break;
+
+                default: {
+                        $sync->givenName            = null;
+                        $sync->surname              = null;
+                        $sync->displayName          = null;
+                        $sync->emailAddress         = null;
+                        $sync->samAccountName       = null;
+                        $sync->userPrincipalName    = null;
+                        $sync->companyName          = null;
+                        $sync->department           = null;
+                        $sync->jobTitle             = null;
+                        $sync->memberOf             = null;
+                        $sync->otherAttributes      = null;
+                        $sync->password             = null;
+                        $sync->thumbnailPhoto       = null;
+                        $sync->ou                   = null;
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "No changes - skip");
+                    }
+                    break;
             }
 
-            if ($BadgeId) {
-                if (!Strings::equal($BadgeId, $m365User?->getOnPremisesExtensionAttributes()->getExtensionAttribute15())) {
-                    $OtherAttributes["extensionAttribute15"] = $BadgeId;
-                    $OtherAttributes["pager"] = $BadgeId;
-                }
-            }
-
-            if ($_photo && FileSystem::PathExists(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg")) {
-                if ((time() - filemtime(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg")) < 1200)
-                    $sync->thumbnailPhoto = FileSystem::GetDownloadLink(LOCATION_IMAGE . "/informat/employee/{$informatEmployee->informatGuid}.jpg");
-            }
-
-            $CompanyName = $informatEmployee->linked->institute->linked->school->syncEmployeeCompanyName ?? $informatEmployee->linked->institute->linked->school->linked->parentSchool->syncEmployeeCompanyName;
-            if (Strings::contains($m365User?->getCompanyName(), "COLTD")) $CompanyName = "COLTD, {$CompanyName}";
-
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365User ? "" : "not") . " found; M365 Enabled: " . ($m365User ? ($m365User->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; Informat Active: " . ($informatEmployee->active ? "YES" : "NO") . "; In Service: " . ($inService ? "YES" : "NO"));
-            // Not in M365 - Active - Create
-            if (
-                !$m365User &&
-                $informatEmployee->active &&
-                $inService
-            ) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Create employee");
-                $postfix = 2;
-                $Email = explode("@", $EmailAddress);
-
-                while (Arrays::filter($currentEmployees, fn($ce) => Strings::equalsIgnoreCase($ce->getMail(), $EmailAddress))) {
-                    $_Email = $Email[0] . $postfix;
-                    $EmailAddress = "{$_Email}@{$Email[1]}";
-                    $postfix++;
-                }
-                $SamAccountName = substr(Arrays::first(explode("@", $EmailAddress)), 0, 20);
-
-                $sync->action = "C";
-                $sync->givenName = $GivenName;
-                $sync->surname = $informatEmployee->name;
-                $sync->displayName = $DisplayName;
-                $sync->emailAddress = $EmailAddress;
-                $sync->samAccountName = $SamAccountName;
-                $sync->userPrincipalName = $EmailAddress;
-                $sync->companyName = $CompanyName;
-                $sync->department = $departments;
-                $sync->jobTitle = $jobtitles;
-                $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                $sync->otherAttributes = (is_null($OtherAttributes) || empty($OtherAttributes)) ? null : $OtherAttributes;
-                $sync->password = User::generatePassword();
-                $sync->ou = $employeeOU;
-
-                // foreach ($sync as $k => $v) if (!is_null($v)) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$k}: {$v}");
-            }
-            // Disabled in M365 - Active - Enable
-            else if (
-                $m365User &&
-                $m365User->getAccountEnabled() == false &&
-                $informatEmployee->active &&
-                $inService
-            ) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Enable employee");
-
-                $sync->action = "E";
-                $sync->givenName = Strings::equal($GivenName, $m365User->getGivenName()) ? null : $GivenName;
-                $sync->surname = Strings::equal($informatEmployee->name, $m365User->getSurname()) ? null : $informatEmployee->name;
-                $sync->displayName = Strings::equal($DisplayName, $m365User->getDisplayName()) ? null : $DisplayName;
-                $sync->companyName = $CompanyName;
-                $sync->department = $departments;
-                $sync->jobTitle = $jobtitles;
-                $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                $sync->otherAttributes = (is_null($OtherAttributes) || empty($OtherAttributes)) ? null : $OtherAttributes;
-                $sync->password = User::generatePassword();
-
-                // foreach ($sync as $k => $v) if (!is_null($v)) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$k}: {$v}");
-            }
-            // Enabled in M365 - Active - Update
-            else if (
-                $m365User &&
-                $m365User->getAccountEnabled() == true  &&
-                $informatEmployee->active &&
-                $inService
-            ) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Update employee");
-
-                $sync->action = "U";
-                $sync->givenName = Strings::equal($GivenName, $m365User->getGivenName()) ? null : $GivenName;
-                $sync->surname = Strings::equal($informatEmployee->name, $m365User->getSurname()) ? null : $informatEmployee->name;
-                $sync->displayName = Strings::equal($DisplayName, $m365User->getDisplayName()) ? null : $DisplayName;
-                $sync->companyName = Strings::equal($CompanyName, $m365User->getCompanyName()) ? null : $CompanyName;
-                $sync->department = Strings::equal($departments, $m365User->getDepartment()) ? null : ($departments ?: null);
-                $sync->jobTitle = Strings::equal($jobtitles, $m365User->getJobTitle()) ? null : ($jobtitles ?: null);
-                $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                $sync->otherAttributes = (is_null($OtherAttributes) || empty($OtherAttributes)) ? null : $OtherAttributes;
-            }
-            // Enabled in M365 - Inactive - Disable
-            else if (
-                $m365User &&
-                $m365User->getAccountEnabled() == true  &&
-                (
-                    !$informatEmployee->active ||
-                    !$inService
-                )
-            ) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Disable employee");
-
-                $sync->action = "D";
-                $sync->givenName = null;
-                $sync->surname = null;
-                $sync->displayName = null;
-                $sync->companyName = null;
-                $sync->department = null;
-                $sync->memberOf = null;
-                $sync->thumbnailPhoto = null;
-                $sync->ou = null;
-            } else {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Nothing to do, skipping...");
+            /* ---------- Skip if no changes ---------- */
+            if ($sync->action !== "D" && $sync->noUpdate()) {
                 $sync->action = null;
-            }
-
-            if (!Strings::equal($sync->action, "D") && $sync->noUpdate()) {
-                $sync->action = null;
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Nothing to do, skipping...");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "No changes - skip");
             } else if (!is_null($sync->action)) {
                 foreach ($sync->toSqlArray() as $k => $v) if (!is_null($v)) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$k}: {$v}");
             }
 
-            $sync->setEmail = $sync->emailAddress ?: $m365User?->getMail();
+            /* ---------- Persist ---------- */
+            $sync->setEmail    = $sync->emailAddress ?: $m365?->getMail();
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
-            $nId = $syncRepo->set($sync);
-            if (!$sync->id) $sync = Arrays::firstOrNull($syncRepo->get($nId));
+            $id = $syncRepo->set($sync);
+            if (!$sync->id) $sync = Arrays::firstOrNull($syncRepo->get($id));
 
+            /* ---------- Mails ---------- */
             if (Arrays::contains(["C", "E"], $sync->action)) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing e-mails for new or re-enabled employee");
-                self::createNewEmployeeMail($sync);
-                self::createNewEmployeeToCentralMail($sync, $_functionsPerSchool);
-            } else if (Arrays::contains(["D"], $sync->action)) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing e-mails for disabled employee");
-                self::createDisableEmployeeMail($sync);
-                self::createDisableEmployeeToCentralMail($sync);
+                // self::createNewEmployeeMail($sync);
+                // self::createNewEmployeeToCentralMail($sync, []);
+            } else if ($sync->action === "D") {
+                // self::createDisableEmployeeMail($sync);
+                // self::createDisableEmployeeToCentralMail($sync);
             }
         }
 
@@ -307,222 +369,256 @@ abstract class Sync
 
     private static function PrepareStudent()
     {
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to prepare students...");
-        $settingRepo = new Setting;
-        $syncRepo = new RepositorySync;
-        $schoolRepo = new School;
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing students...");
+
+        $settingRepo  = new Setting;
+        $syncRepo     = new RepositorySync;
+        $schoolRepo   = new School;
         $instituteRepo = new Institute;
-        $m365UserRepo = new RepositoryUser;
-        $informatStudentRepo = new Student;
-        $informatRegistrationRepo = new Registration;
-        $informatRegistrationClassRepo = new RegistrationClass;
-        $informatClassgroupRepo = new ClassGroup;
+        $m365Repo     = new RepositoryUser;
+
+        $studentRepo  = new Student;
+        $regRepo      = new Registration;
+        $regClassRepo = new RegistrationClass;
+        $classRepo    = new ClassGroup;
 
         $navigation = (new Navigation)->getByLinkAndType('sync', "M");
-        $_minDepartmentCodes = explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.departmentCode")->value);
-        $_minDepartmentCodes = Arrays::map($_minDepartmentCodes, fn($m) => Strings::trimToNull($m));
-        $_minGrade = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.grade")->value, 'int');
-        $_minYear = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "minimum.year")->value, 'int');
-        $_photo = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.student")->value, 'bool');
+        $photoEnabled = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.student")->value, 'bool');
 
-        $create = $update = $enable = $disable = [];
+        /* ------------------------------ Get all M365 ------------------------------ */
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering M365 students...");
+        $current = $m365Repo->getAllStudents([
+            'id',
+            'employeeId',
+            'mail',
+            'accountEnabled',
+            'signInActivity',
+            'givenName',
+            'surname',
+            'displayName',
+            'onPremisesSamAccountName',
+            'onPremisesUserPrincipalName',
+            'companyName',
+            'department',
+            'jobTitle',
+            'memberOf',
+            'onPremisesExtensionAttributes',
+            'onPremisesDistinguishedName'
+        ]);
+        $current = Arrays::filter(
+            $current,
+            fn($u) =>
+            Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
+        );
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($current) . " students");
 
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering all M365 students...");
-        $currentStudents = $m365UserRepo->getAllStudents(['id', 'employeeId', 'mail', 'accountEnabled', 'signInActivity', 'givenName', 'surname', 'displayName', 'onPremisesSamAccountName', 'onPremisesUserPrincipalName', 'companyName', 'department', 'jobTitle', 'memberOf', 'onPremisesExtensionAttributes', 'onPremisesDistinguishedName']);
-        $currentStudents = Arrays::filter($currentStudents, fn($ce) => Strings::equal($ce::class, \Microsoft\Graph\Generated\Models\User::class));
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($currentStudents) . " students");
+        /* ---------------------------- Get Informat students ---------------------------- */
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat students...");
+        $informat = $studentRepo->get();
+        // $informat = Arrays::filter($informat, fn($s) => $s->instituteId != 0 && ($s->linked->institute->linked->school->sync || $s->linked->institute->linked->school->linked->parentSchool->sync));
+        // Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filtered to " . count($informat) . " students");
 
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering all Informat students...");
-        $informatStudents = $informatStudentRepo->get();
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($informatStudents) . " students");
-
-        foreach ($informatStudents as $informatStudent) {
-            if (!$informatStudent->linked->institute->linked->school->sync && !$informatStudent->linked->institute->linked->school->linked->parentSchool->sync) continue;
-
+        /* -------------------------------- Process each student ------------------------------- */
+        foreach ($informat as $st) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$informatStudent->informatId} - {$informatStudent->name} {$informatStudent->firstName}");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$st->informatId} - {$st->name} {$st->firstName}");
 
-            $sync = $syncRepo->getByEmployeeId($informatStudent->informatId) ?? new ObjectSync;
+            if ($st->instituteId !== 0 && !($st->linked->institute->linked->school->sync || $st->linked->institute->linked->school->linked->parentSchool->sync)) {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
+                continue;
+            }
+
+            /* ---------- Load or Init Sync ---------- */
+            $sync = $syncRepo->getByEmployeeId($st->informatId) ?? new ObjectSync;
             $sync->type = "S";
-            $sync->employeeId = $informatStudent->informatId;
-            $sync->emailAddress = null;
-            $sync->samAccountName = null;
-            $sync->userPrincipalName = null;
-            $sync->jobTitle = null;
-            $sync->otherAttributes = null;
-            $sync->password = $sync->password ? $sync->password : null;
-            $sync->thumbnailPhoto = null;
-            $sync->ou = null;
+            $sync->action = null;
+            $sync->employeeId = $st->informatId;
 
-            $m365User = Arrays::firstOrNull(Arrays::filter($currentStudents, fn($cs) => Strings::equal($cs->getEmployeeId(), $informatStudent->informatId) || Strings::equal($cs->getEmployeeId(), "L{$informatStudent->informatId}")));
-            if (Strings::contains($m365User?->getOnPremisesDistinguishedName(), "OU=COLTD,OU=UsersCOLTD,OU=COLTD,DC=coltd,DC=be")) continue;
+            /* ---------- Determine if student exists in M365 ---------- */
+            $m365 = Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equal($u->getEmployeeId(), $st->informatId) || Strings::equal($u->getEmployeeId(), "L{$st->informatId}")));
 
-            $currentRegistration = $informatRegistrationRepo->getByInformatStudentId($informatStudent->id);
-            $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->current);
-            $currentRegistration = Arrays::filter($currentRegistration, fn($cr) => $cr->status == 0);
-            $currentRegistration = Arrays::orderBy($currentRegistration, "start");
+            /* ---------- Registration / class lookups ---------- */
+            $regs = $regRepo->getByInformatStudentId($st->id);
+            $regs = Arrays::filter($regs, fn($r) => $r->current && $r->status == 0);
+            $regs = Arrays::orderBy($regs, "start");
 
-            if (count($currentRegistration)) $currentRegistration = Arrays::last($currentRegistration);
+            $currentReg = count($regs) ? Arrays::last($regs) : null;
 
-            $currentRegistrationClass = $informatRegistrationClassRepo->getByInformatRegistrationId($currentRegistration->id);
-            $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => $crc->current);
-            $currentRegistrationClass = Arrays::filter($currentRegistrationClass, function ($crc) use ($informatClassgroupRepo) {
-                $class = Arrays::firstOrNull($informatClassgroupRepo->get($crc->informatClassGroupId));
-                if (!$class) return false;
-                if ($class->type == "C") return true;
-                return false;
+            $regClasses = $currentReg ? $regClassRepo->getByInformatRegistrationId($currentReg->id) : [];
+            $regClasses = Arrays::filter($regClasses, fn($rc) => $rc->current);
+            $regClasses = Arrays::filter($regClasses, function ($rc) use ($classRepo) {
+                $class = Arrays::firstOrNull($classRepo->get($rc->informatClassGroupId));
+                return $class && $class->type === "C";
             });
-            $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
 
-            $institute = $currentRegistration ? Arrays::firstOrNull($instituteRepo->get($currentRegistration->schoolInstituteId)) : null;
+            $currentRegClass = Arrays::firstOrNull($regClasses);
+
+            $institute = $currentReg ? Arrays::firstOrNull($instituteRepo->get($currentReg->schoolInstituteId)) : null;
             $school = $institute ? Arrays::firstOrNull($schoolRepo->get($institute->schoolId)) : null;
-            $class = Arrays::firstOrNull($informatClassgroupRepo->get($currentRegistrationClass->informatClassGroupId));
+            $class = $currentRegClass ? Arrays::firstOrNull($classRepo->get($currentRegClass->informatClassGroupId)) : null;
 
-            $DisplayName = Input::createDisplayName($settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value, $informatStudent->firstName, $informatStudent->name);
-            $EmailAddress = Input::createEmail($settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value, $informatStudent->firstName, $informatStudent->name, EMAIL_SUFFIX_STUDENT);
+            /* ---------- DisplayName + email ---------- */
+            $fmtDisplay = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value;
+            $fmtEmail   = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.email")->value;
 
-            $CompanyName = $informatStudent->linked->institute->linked->school->syncEmployeeCompanyName ?? $informatStudent->linked->institute->linked->school->linked->parentSchool->syncEmployeeCompanyName;;
-            $OU = $informatStudent->linked->institute->linked->school->syncEmployeeOU ?? $informatStudent->linked->institute->linked->school->linked->parentSchool->syncEmployeeOU;
-            $OU = str_replace("{{school:adOuPart}}", $school->adOuPart, $OU);
+            [$displayName, $emailAddress] =
+                self::buildNameAndMail($fmtDisplay, $fmtEmail, $st->firstName, $st->name, EMAIL_SUFFIX_STUDENT);
 
-            $MemberOf = [];
-
-            if ($m365User) {
-                $memberOfM365 = $m365UserRepo->getMemberOf($m365User->getId(), ['onPremisesDomainName', 'displayName']);
-                $memberOfM365 = Arrays::filter($memberOfM365, fn($m) => $m->getOnPremisesDomainName() !== null);
-                $memberOfM365 = Arrays::map($memberOfM365, fn($m) => $m->getDisplayName());
-
-                $m365OU = explode(",", $m365User?->getOnPremisesDistinguishedName());
-                array_shift($m365OU);
-                $m365OU = implode(",", $m365OU);
+            /* Avoid duplicate emails */
+            $postfix = 2;
+            $parts = explode("@", $emailAddress);
+            while (Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equalsIgnoreCase($u->getMail(), $emailAddress)))) {
+                $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
+                $postfix++;
             }
 
-            foreach (explode(PHP_EOL, $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.student")->value) as $mof) {
-                $mof = Strings::trimToNull($mof);
-                if (is_null($school->adSecGroupPart)) continue;
-                $mof = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $mof);
+            $samAccount = substr(explode("@", $emailAddress)[0], 0, 20);
 
-                if ($m365User) {
-                    if (!Arrays::contains($memberOfM365, $mof)) $MemberOf[] = $mof;
-                } else $MemberOf[] = $mof;
+            /* ---------- Company + OU ---------- */
+            $schoolObj = $st->linked->institute->linked->school;
+            $companyName = self::pick($schoolObj->syncStudentCompanyName, $schoolObj->linked->parentSchool->syncStudentCompanyName);
+            $ou = self::pick($schoolObj->syncStudentOU, $schoolObj->linked->parentSchool->syncStudentOU);
+
+            if ($school) $ou = self::replaceOu($ou, $school);
+
+            /* ---------- MemberOf ---------- */
+            $memberOf = [];
+
+            $defaultGroups = explode(",", $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.student")->value);
+
+            if ($m365) {
+                $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);
+                $existing = Arrays::map($existing, fn($g) => $g->getDisplayName());
             }
-            $MemberOf = array_unique($MemberOf);
 
-            if ($_photo && FileSystem::PathExists(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg")) {
-                if ((time() - filemtime(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg")) < 1200)
-                    $sync->thumbnailPhoto = FileSystem::GetDownloadLink(LOCATION_IMAGE . "/informat/student/{$informatStudent->informatGuid}.jpg");
+            foreach ($defaultGroups as $g) {
+                if (!$g) continue;
+
+                if (!$school->adSecGroupPart) continue;
+
+                $_g = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $g);
+
+                if (!$m365 || !Arrays::contains($existing, $_g)) $memberOf[] = $_g;
             }
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365User ? "" : "not") . " found; M365 Enabled: " . ($m365User ? ($m365User->getAccountEnabled() ? "YES" : "NO") : "N/A"));
+            $memberOf = $memberOf ?: null;
 
-            if (
-                $currentRegistration &&
-                Arrays::contains($_minDepartmentCodes, $currentRegistration->departmentCode) &&
-                $currentRegistration->grade >= $_minGrade &&
-                $currentRegistration->year >= $_minYear &&
-                (is_null($currentRegistration->end) || Clock::now()->isBeforeOrEqualTo(Clock::at($currentRegistration->end)))
-            ) {
-                // Not in M365 - Registered - Create
-                if (!$m365User) {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Create student");
+            /* ---------- Photo ---------- */
+            $photo = null;
+            if ($photoEnabled) $photo = self::resolvePhoto(LOCATION_IMAGE . "/informat/student/{$st->informatGuid}.jpg");
 
-                    $postfix = 2;
-                    $Email = explode("@", $EmailAddress);
+            /* ---------- Determine Action (Create/Enable/Update/Disable) ---------- */
+            $now = Clock::now();
 
-                    while (Arrays::filter($currentStudents, fn($cs) => Strings::equalsIgnoreCase($cs->getMail(), $EmailAddress))) {
-                        $_Email = $Email[0] . $postfix;
-                        $EmailAddress = "{$_Email}@{$Email[1]}";
-                        $postfix++;
+            $isRegistered = $currentReg && (is_null($currentReg->end) || $now->isBeforeOrEqualTo(Clock::at($currentReg->end)));
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365 ? "" : "NOT ") . "FOUND; M365 Enabled: " . ($m365 ? ($m365->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; Registered: " . ($isRegistered ? "YES" : "NO"));
+
+            if ($isRegistered && !$m365) $sync->action = "C";
+            elseif ($isRegistered && $m365 && !$m365->getAccountEnabled()) $sync->action = "E";
+            elseif ($isRegistered && $m365 && $m365->getAccountEnabled()) $sync->action = "U";
+            elseif (!$isRegistered && $m365 && $m365->getAccountEnabled()) $sync->action = "D";
+
+            /* ---------- Apply fields based on ACTION ---------- */
+            switch ($sync->action) {
+                case 'C': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Create student");
+                        $sync->givenName         = Strings::trimToNull($st->firstName);
+                        $sync->surname           = Strings::trimToNull($st->name);
+                        $sync->displayName       = $displayName;
+                        $sync->emailAddress      = $emailAddress;
+                        $sync->samAccountName    = $samAccount;
+                        $sync->userPrincipalName = $emailAddress;
+                        $sync->companyName       = $companyName;
+                        $sync->department        = $class?->code;
+                        $sync->memberOf          = $memberOf;
+                        $sync->password          = User::generatePassword();
+                        $sync->ou                = trim($ou);
+                        $sync->thumbnailPhoto    = $photo;
                     }
-                    $SamAccountName = substr(Arrays::first(explode("@", $EmailAddress)), 0, 20);
+                    break;
+                case 'E': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Enable student");
+                        $m365OU = explode(",", $m365?->getOnPremisesDistinguishedName());
+                        array_shift($m365OU);
+                        $m365OU = implode(",", $m365OU);
 
-                    $sync->action = "C";
-                    $sync->givenName = $informatStudent->firstName;
-                    $sync->surname = $informatStudent->name;
-                    $sync->displayName = $DisplayName;
-                    $sync->emailAddress = $EmailAddress;
-                    $sync->samAccountName = $SamAccountName;
-                    $sync->userPrincipalName = $EmailAddress;
-                    $sync->companyName = $CompanyName;
-                    $sync->department = $class->code;
-                    $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                    $sync->password = User::generatePassword();
-                    $sync->ou = trim($OU);
-                }
-                // Disabled in M365 - Registered - Enable
-                else if (
-                    $m365User &&
-                    $m365User->getAccountEnabled() == false
-                ) {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Enable student");
+                        $sync->givenName    = self::applyField($st->firstName, $m365->getGivenName());
+                        $sync->surname      = self::applyField($st->name,      $m365->getSurname());
+                        $sync->displayName  = self::applyField($displayName,   $m365->getDisplayName());
+                        $sync->companyName  = self::applyField($companyName,   $m365->getCompanyName());
+                        $sync->department   = self::applyField($class?->code,  $m365->getDepartment());
+                        $sync->ou           = self::applyField($ou,            $m365OU ?? null);
 
-                    $sync->action = "E";
-                    $sync->givenName = Strings::equal($informatStudent->firstName, $m365User->getGivenName()) ? null : $informatStudent->firstName;
-                    $sync->surname = Strings::equal($informatStudent->name, $m365User->getSurname()) ? null : $informatStudent->name;
-                    $sync->displayName = Strings::equal($DisplayName, $m365User->getDisplayName()) ? null : $DisplayName;
-                    $sync->companyName = Strings::equal($CompanyName, $m365User->getCompanyName()) ? null : $CompanyName;
-                    $sync->department = Strings::equal($class->code, $m365User->getDepartment()) ? null : ($class->code ?: null);
-                    $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                    $sync->password = User::generatePassword();
-                    $sync->ou = Strings::equal($OU, $m365OU) ? null : $OU;
-                }
-                // Enabled in M365 - Registered - Update
-                else {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Update student");
+                        $sync->memberOf       = $memberOf;
+                        $sync->password       = User::generatePassword();
+                        $sync->thumbnailPhoto = $photo;
+                    }
+                    break;
+                case 'U': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Update student");
+                        $m365OU = explode(",", $m365?->getOnPremisesDistinguishedName());
+                        array_shift($m365OU);
+                        $m365OU = implode(",", $m365OU);
 
-                    $sync->action = "U";
-                    $sync->givenName = Strings::equal($informatStudent->firstName, $m365User->getGivenName()) ? null : $informatStudent->firstName;
-                    $sync->surname = Strings::equal($informatStudent->name, $m365User->getSurname()) ? null : $informatStudent->name;
-                    $sync->displayName = Strings::equal($DisplayName, $m365User->getDisplayName()) ? null : $DisplayName;
-                    $sync->companyName = Strings::equal($CompanyName, $m365User->getCompanyName()) ? null : $CompanyName;
-                    $sync->department = Strings::equal($class->code, $m365User->getDepartment()) ? null : ($class->code ?: null);
-                    $sync->ou = Strings::equal($OU, $m365OU) ? null : $OU;
-                    $sync->memberOf = (is_null($MemberOf) || empty($MemberOf)) ? null : $MemberOf;
-                }
-            } else {
-                // Enabled in M365 - Unregistered/No account needed - Disable
-                // if ($m365User && $m365User->getAccountEnabled() == true && !is_null($currentRegistration->end) && Clock::now()->isAfterOrEqualTo(Clock::at($currentRegistration->end))) {
-                if (
-                    $m365User &&
-                    $m365User->getAccountEnabled() == true
-                ) {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Disable student");
+                        $sync->givenName    = self::applyField($st->firstName, $m365->getGivenName());
+                        $sync->surname      = self::applyField($st->name,      $m365->getSurname());
+                        $sync->displayName  = self::applyField($displayName,   $m365->getDisplayName());
+                        $sync->companyName  = self::applyField($companyName,   $m365->getCompanyName());
+                        $sync->department   = self::applyField($class?->code,  $m365->getDepartment());
+                        $sync->ou           = self::applyField($ou,            $m365OU ?? null);
 
-                    $sync->action = "D";
-                    $sync->givenName = null;
-                    $sync->surname = null;
-                    $sync->displayName = null;
-                    $sync->companyName = null;
-                    $sync->department = null;
-                    $sync->memberOf = null;
-                    $sync->thumbnailPhoto = null;
-                } else {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Nothing to do, skipping...");
-                    $sync->action = null;
-                }
+                        $sync->memberOf       = $memberOf;
+                        $sync->thumbnailPhoto = $photo;
+                    }
+                    break;
+                case 'D': {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Disable student");
+                        $sync->givenName      = null;
+                        $sync->surname        = null;
+                        $sync->displayName    = null;
+                        $sync->companyName    = null;
+                        $sync->department     = null;
+                        $sync->memberOf       = null;
+                        $sync->thumbnailPhoto = null;
+                    }
+                    break;
+                default: {
+                        $sync->givenName         = null;
+                        $sync->surname           = null;
+                        $sync->displayName       = null;
+                        $sync->emailAddress      = null;
+                        $sync->samAccountName    = null;
+                        $sync->userPrincipalName = null;
+                        $sync->companyName       = null;
+                        $sync->department        = null;
+                        $sync->memberOf          = null;
+                        $sync->password          = null;
+                        $sync->ou                = null;
+                        $sync->thumbnailPhoto    = null;
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "No changes - skip");
+                    }
+                    break;
             }
 
-            if (!Strings::equal($sync->action, "D") && $sync->noUpdate()) {
+            /* ---------- Skip if no changes needed ---------- */
+            if ($sync->action !== "D" && $sync->noUpdate()) {
                 $sync->action = null;
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Undoing actions");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "No changes - skip");
             } else if (!is_null($sync->action)) {
                 foreach ($sync->toSqlArray() as $k => $v) if (!is_null($v)) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$k}: {$v}");
             }
 
-            $sync->setEmail = $sync->emailAddress ?: $m365User?->getMail();
+            /* ---------- Persist ---------- */
+            $sync->setEmail    = $sync->emailAddress ?: $m365?->getMail();
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
-            $nId = $syncRepo->set($sync);
-            if (!$sync->id) $sync = Arrays::firstOrNull($syncRepo->get($nId));
+            $id = $syncRepo->set($sync);
+            if (!$sync->id) $sync = Arrays::firstOrNull($syncRepo->get($id));
 
-            if ($sync->action == "C") $create[$school->id][] = $sync;
-            else if ($sync->action == "U") $update[$school->id][] = $sync;
-            else if ($sync->action == "E") $enable[$school->id][] = $sync;
-            else if ($sync->action == "D") $disable[$school->id][] = $sync;
+            /* ---------- Prepare student summary mail ---------- */
+            // (original call disabled in your source code — left untouched)
+            // self::createStudentMail($create, $update, $enable, $disable);
         }
-
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Preparing e-mails for students");
-        //self::createStudentMail($create, $update, $enable, $disable);
 
         return true;
     }
@@ -652,7 +748,7 @@ abstract class Sync
 
         $emails = [
             "Nicolas Roegis" => "nicolas.roegis@coltd.be",
-            "Directeur-Coördinator KaBoE" => "dirco.kaboe@coltd.be",
+            "Directeur-CoÃ¶rdinator KaBoE" => "dirco.kaboe@coltd.be",
             "ICT-Dienst KaBoE" => "ict.kaboe@coltd.be"
         ];
 
@@ -692,7 +788,7 @@ abstract class Sync
 
         $emails = [
             "Nicolas Roegis" => "nicolas.roegis@coltd.be",
-            "Directeur-Coördinator KaBoE" => "dirco.kaboe@coltd.be",
+            "Directeur-CoÃ¶rdinator KaBoE" => "dirco.kaboe@coltd.be",
             "ICT-Dienst KaBoE" => "ict.kaboe@coltd.be"
         ];
 

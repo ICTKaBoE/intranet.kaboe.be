@@ -38,7 +38,7 @@ class DefaultController extends stdClass
 		"extraPageInfo" => \Controllers\COMPONENT\ExtraPageInfoComponentController::class,
 		"toast" => \Controllers\COMPONENT\ToastComponentController::class,
 		"generalMessage" => \Controllers\COMPONENT\GeneralMessageComponentController::class,
-		"manual" => \Controllers\COMPONENT\ManualComponentController::class
+		"manual" => \Controllers\COMPONENT\ManualComponentController::class,
 	];
 
 	public function index()

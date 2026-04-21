@@ -7,11 +7,11 @@ use Security\CustomObject;
 class EmployeeOwnfield extends CustomObject
 {
     protected $objectAttributes = [
-        "personId" => "string",
-        "vvId" => "string",
-        "naam" => "string",
-        "waarde" => "string",
-        "dataType" => "string",
-        "rubriek" => "int"
+        "personId" => self::TYPE_STRING,
+        "vvId" => self::TYPE_STRING,
+        "naam" => self::TYPE_STRING,
+        "waarde" => self::TYPE_STRING,
+        "dataType" => self::TYPE_STRING,
+        "rubriek" => self::TYPE_INTEGER
     ];
 }

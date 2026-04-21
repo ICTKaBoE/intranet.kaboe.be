@@ -79,8 +79,11 @@ abstract class M365
         return true;
     }
 
+    // /usr/bin/php /data/sites/web/kaboebe/www/cron.php part=m365 function=importComputers
     static public function ImportComputers()
     {
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import M365 Computers...");
+
         $start = Clock::now();
         $settings = new Setting;
         $schools = (new School)->get();
@@ -90,13 +93,16 @@ abstract class M365
 
         foreach ($members as $member) {
             if (Arrays::contains(["#microsoft.graph.group"], $member->getOdataType())) continue;
+            $orderId = Arrays::last(explode(":", Arrays::first(Arrays::filter($member->getPhysicalIds(), fn($p) => Strings::contains($p, 'OrderId')))));
+            $school = Arrays::firstOrNull(Arrays::filter($schools, fn($s) => Strings::isNotBlank(Strings::trimToNull($s->intuneOrderIdPrefix)) && Strings::containsIgnoreCase($orderId, $s->intuneOrderIdPrefix)));
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$member->getDisplayName()} - {$orderId} - {$school->name}");
 
             $computer = $managementComputerRepo->getByEntraId($member->getId()) ?? $managementComputerRepo->getByName($member->getDisplayName()) ?? new ManagementComputer;
             $computer->entraId = $member->getId();
-            $computer->schoolId = Arrays::firstOrNull(Arrays::filter($schools, fn($s) => Strings::containsIgnoreCase(Arrays::first(Arrays::filter($member->getPhysicalIds(), fn($p) => Strings::contains($p, 'OrderId'))), $s->intuneOrderIdPrefix)))->id ?? 0;
             $computer->type = (Strings::contains(Arrays::first(Arrays::filter($member->getPhysicalIds(), fn($p) => Strings::contains($p, 'OrderId'))), "DESKTOP") ? "D" : "L");
             $computer->name = $member->getDisplayName();
-            $computer->orderId = Arrays::last(explode(":", Arrays::first(Arrays::filter($member->getPhysicalIds(), fn($p) => Strings::contains($p, 'OrderId')))));
+            $computer->orderId = $orderId;
+            $computer->schoolId = $school->id ?: 0;
             $computer->enrollmentProfileName = $member->getEnrollmentProfileName();
             $computer->osType = $member->getOperatingSystem();
             $computer->osVersion = $member->getOperatingSystemVersion();

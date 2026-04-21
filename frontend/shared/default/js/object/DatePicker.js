@@ -1,26 +1,16 @@
-export default class DatePicker {
-	static INSTANCES = {};
+import MasterObject from "../MasterObject.js";
+
+export default class DatePicker extends MasterObject {
+	static OBJ_SELECTOR = "[role='datepicker']";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("[role='datepicker']").each((ids, el) => {
-			if (!DatePicker.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				DatePicker.INSTANCES[el.getAttribute("id")] = new DatePicker(
-					el
-				);
-		});
-	};
-
-	static GetInstance = (id) => {
-		// if (!id.startsWith("cin")) id = `cin${id}`;
-		return DatePicker.INSTANCES[id] || false;
-	};
 
 	init = () => {
 		this.element.autocomplete = "off";
@@ -38,6 +28,10 @@ export default class DatePicker {
 		};
 
 		this.litePicker = new Litepicker(settings);
+	};
+
+	setDateNow = () => {
+		this.setDate(new Date().toISOString().split("T")[0]);
 	};
 
 	setDate = (date) => {

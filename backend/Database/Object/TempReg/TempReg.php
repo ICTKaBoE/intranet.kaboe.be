@@ -6,10 +6,8 @@ use stdClass;
 use Helpers\HTML;
 use Helpers\CString;
 use Ouzo\Utilities\Clock;
-use Ouzo\Utilities\Arrays;
 use Security\CustomObject;
 use Database\Repository\TempReg\Treshhold;
-use Database\Repository\Navigation\Navigation;
 
 class TempReg extends CustomObject
 {
@@ -36,7 +34,7 @@ class TempReg extends CustomObject
     {
         $this->formatted->datetime = Clock::at($this->datetime)->format("d/m/Y H:i:s");
         $this->formatted->datetimeWithDay = new stdClass;
-        $this->formatted->datetimeWithDay->display = Clock::at($this->datetime)->format("l d/m/Y H:i:s");
+        $this->formatted->datetimeWithDay->display = WEEK_DAYS["nl"][Clock::at($this->datetime)->format("N")] . " {$this->formatted->datetime}";
         $this->formatted->datetimeWithDay->sort = Clock::at($this->datetime)->format("U");
 
         $this->formatted->soup = CString::formatNumber($this->soup, 2) . "°C";
@@ -59,7 +57,7 @@ class TempReg extends CustomObject
 
         if (!$level) return;
         $this->formatted->badge->soup = new stdClass;
-        $this->formatted->badge->soup->display = $this->soup > 0 ? HTML::Badge($this->formatted->soup, backgroundColor: $level->color) : "";
+        $this->formatted->badge->soup->display = $this->soup > 0 ? HTML::Badge($this->formatted->soup, backgroundColor: $level->color) : null;
         $this->formatted->badge->soup->sort = $this->soup;
     }
 
@@ -69,7 +67,7 @@ class TempReg extends CustomObject
 
         if (!$level) return;
         $this->formatted->badge->pasta = new stdClass;
-        $this->formatted->badge->pasta->display = $this->pasta > 0 ? HTML::Badge($this->formatted->pasta, backgroundColor: $level->color) : "";
+        $this->formatted->badge->pasta->display = $this->pasta > 0 ? HTML::Badge($this->formatted->pasta, backgroundColor: $level->color) : null;
         $this->formatted->badge->pasta->sort = $this->pasta;
     }
 
@@ -79,7 +77,7 @@ class TempReg extends CustomObject
 
         if (!$level) return;
         $this->formatted->badge->vegetables = new stdClass;
-        $this->formatted->badge->vegetables->display = $this->vegetables > 0 ? HTML::Badge($this->formatted->vegetables, backgroundColor: $level->color) : "";
+        $this->formatted->badge->vegetables->display = $this->vegetables > 0 ? HTML::Badge($this->formatted->vegetables, backgroundColor: $level->color) : null;
         $this->formatted->badge->vegetables->sort = $this->vegetables;
     }
 
@@ -89,7 +87,7 @@ class TempReg extends CustomObject
 
         if (!$level) return;
         $this->formatted->badge->meat = new stdClass;
-        $this->formatted->badge->meat->display = $this->meat > 0 ? HTML::Badge($this->formatted->meat, backgroundColor: $level->color) : "";
+        $this->formatted->badge->meat->display = $this->meat > 0 ? HTML::Badge($this->formatted->meat, backgroundColor: $level->color) : null;
         $this->formatted->badge->meat->sort = $this->meat;
     }
 }

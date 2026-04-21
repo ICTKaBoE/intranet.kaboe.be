@@ -37,6 +37,8 @@ class School extends CustomObject
         "syncUpdateMail" => self::TYPE_LIST,
         "dynamicTeam" => self::TYPE_BOOLEAN,
         "smartschoolSourceId" => self::TYPE_STRING,
+        "eetjemeeKey" => self::TYPE_STRING,
+        "eetjemeeSmartschoolGroup" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
 

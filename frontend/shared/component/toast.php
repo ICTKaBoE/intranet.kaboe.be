@@ -1,1 +1,1 @@
-<div class="toast-container position-fixed top-0 end-0 p-3" data-notifications="{{notifications:url:short}}"></div>
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toast" data-notifications="{{notifications:url:short}}"></div>

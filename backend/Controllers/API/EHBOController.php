@@ -85,11 +85,6 @@ class EHBOController extends ApiController
         }
     }
 
-    protected function getSettings($view)
-    {
-        $this->getNavigationSettings();
-    }
-
     // Post functions
     protected function postMine($view, $id = null)
     {
@@ -132,11 +127,6 @@ class EHBOController extends ApiController
 
             $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
-    }
-
-    protected function postSettings()
-    {
-        $this->postNavigationSettings();
     }
 
     protected function printExport($view, $id = null)

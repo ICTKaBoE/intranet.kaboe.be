@@ -1,0 +1,74 @@
+<?php
+
+namespace Database\Object\StrategicDashboard;
+
+use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Strings;
+use Security\CustomObject;
+
+class Item extends CustomObject
+{
+    protected $objectAttributes = [
+        "id" => self::TYPE_INTEGER,
+        "schoolId" => self::TYPE_INTEGER,
+        "typeId" => self::TYPE_INTEGER,
+        "name" => self::TYPE_STRING,
+        "minimum" => self::TYPE_INTEGER,
+        "target" => self::TYPE_INTEGER,
+        "canEditUserId" => self::TYPE_STRING,
+        "width" => self::TYPE_INTEGER,
+        "order" => self::TYPE_INTEGER,
+        "valueTemplate" => self::TYPE_ALL,
+        "deleted" => self::TYPE_BOOLEAN
+    ];
+
+    protected $linkedAttributes = [
+        "school" => ["schoolId" => \Database\Repository\School\School::class],
+        "type" => ["typeId" => \Database\Repository\StrategicDashboard\ItemType::class]
+    ];
+
+    public function init()
+    {
+        $this->formatted->html = "";
+        $this->formatted->valueHtml = "";
+
+        if (Strings::equal($this->linked->type->short, "number")) $this->formatted->html = "<span class='fs-1'>@value@</span>";
+        else if (Strings::equal($this->linked->type->short, "rating:circle")) $this->formatted->html = "<div role='rating' id='rtn{$this->id}' data-icon='circle' data-color='green' data-size='1' data-value='@value@'></div>";
+        else if (Strings::equal($this->linked->type->short, "chart:pie")) $this->formatted->html = "<div role='chart' data-type='donut' id='crt{$this->id}' data-height='300vh' data-source='https://" . (DEV_MODE ? "dev." : "") . "api.kaboe.be/chart/strategicDashboard/dashboard/{$this->id}?type=pie'></div>";
+        else if (Strings::equal($this->linked->type->short, "chart:bar")) $this->formatted->html = "<div role='chart' data-type='bar' id='crt{$this->id}' data-height='200vh' data-source='https://" . (DEV_MODE ? "dev." : "") . "api.kaboe.be/chart/strategicDashboard/dashboard/{$this->id}?type=bar'></div>";
+
+        if (Arrays::contains(["number", "rating:circle"], $this->linked->type->short))
+            $this->formatted->valueHtml = "
+                <div class='col-12 mb-3'>
+                    <label class='form-label' for='value'>Waarde</label>
+                    <input type='number' class='form-control' id='value' name='value' />
+                </div>
+            ";
+        else if (Arrays::contains(["chart:pie", "chart:bar"], $this->linked->type->short)) {
+            $template = json_decode($this->valueTemplate, true);
+
+            foreach ($template as $k => $v) {
+                if (Strings::startsWith($k, "LOOP:")) {
+                    $k = str_replace("LOOP:", "", $k);
+                    [$rep, $att] = explode("@", $k);
+
+                    foreach ((new $rep)->get() as $i) {
+                        $this->formatted->valueHtml .= "
+                            <div class='col-lg-6 col-12 mb-3'>
+                                <label class='form-label' for='{$i->$att}'>{$i->$att}</label>
+                                <input type='number' class='form-control' id='{$i->$att}' name='{$i->$att}' />
+                            </div>
+                        ";
+                    }
+                } else {
+                    $this->formatted->valueHtml .= "
+                        <div class='col-lg-6 col-12 mb-3'>
+                            <label class='form-label' for='{$k}'>{$k}</label>
+                            <input type='number' class='form-control' id='{$k}' name='{$k}' />
+                        </div>
+                    ";
+                }
+            }
+        }
+    }
+}

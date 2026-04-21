@@ -12,6 +12,8 @@ import SearchField from "./object/SearchField.js";
 import List from "./object/List.js";
 import Checkbox from "./object/Checkbox.js";
 import Signage from "./object/Signage.js";
+import Rating from "./object/Rating.js";
+import Helpers from "./object/Helpers.js";
 
 window.SELECT_OTHER_ID = 0;
 
@@ -22,20 +24,33 @@ $.ajaxSetup({
 	},
 });
 
-Toast.Create();
-Select.ScanAndCreate();
-Checkbox.ScanAndCreate();
-Button.ScanAndCreate();
-TinyMCE.ScanAndCreate();
-Table.ScanAndCreate();
-Calendar.ScanAndCreate();
-DatePicker.ScanAndCreate();
-Chart.ScanAndCreate();
-List.ScanAndCreate();
-ColorInput.ScanAndCreate();
-SearchField.ScanAndCreate();
+const components = [
+	Toast,
+	List,
+	Select,
+	Checkbox,
+	Button,
+	TinyMCE,
+	Table,
+	Calendar,
+	DatePicker,
+	Chart,
+	Rating,
+	ColorInput,
+	SearchField,
+];
 
+components.forEach((c) => c.ScanAndCreate());
+
+// Uitgestelde initialisaties
 setTimeout(() => {
-	Form.ScanAndCreate();
-	Signage.ScanAndCreate();
+	[Form, Signage].forEach((c) => c.ScanAndCreate());
 }, 250);
+
+$(document).ready(() => {
+	Helpers.CheckAllLoaded(() => {
+		setTimeout(() => {
+			window.fillFilter();
+		}, 500);
+	}, [Select, Table]);
+});

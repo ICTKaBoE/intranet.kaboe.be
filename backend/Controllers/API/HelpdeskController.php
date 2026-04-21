@@ -36,7 +36,6 @@ class HelpdeskController extends ApiController
     // Get functions
     protected function getMine($view, $id = null)
     {
-        $currentUserId = User::getLoggedInUser()->id;
         $repo = new Helpdesk;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
@@ -138,13 +137,13 @@ class HelpdeskController extends ApiController
 
         if (Strings::equal($view, self::VIEW_LIST)) {
             $ticket = $repo->getById($id);
-            $attachments = FileSystem::getFiles(LOCATION_FILES . "/helpdesk/{$ticket->guid}");
+            $attachments = FileSystem::getFiles(LOCATION_FILES . "/helpdesk/{$ticket->guid}/*");
 
             if (!$attachments) $this->appendToJson('raw', 'Geen bestanden!');
             else {
                 $items = Arrays::map($attachments, function ($a) use ($ticket) {
                     $item = new stdClass;
-                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($a), $a, HTML::LINK_TARGET_BLANK);
+                    $item->link = HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($a), basename($a), HTML::LINK_TARGET_BLANK);
 
                     return $item;
                 });
@@ -152,11 +151,6 @@ class HelpdeskController extends ApiController
                 $this->appendToJson('raw', General::processTemplate($items));
             }
         }
-    }
-
-    protected function getSettings($view, $id = null)
-    {
-        $this->getNavigationSettings();
     }
 
     // Post functions
@@ -181,12 +175,13 @@ class HelpdeskController extends ApiController
 
         $repo = new Helpdesk;
         $threadRepo = new Thread;
+        $statusRepo = new Status;
 
         $_fields = [
             "schoolId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
             "priority",
-            "status",
-            "category" => ["mandatory" => true],
+            "status" => ["default" => $statusRepo->getNew()->id],
+            "category" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
             "subject",
             "roomId" => ["mandatory" => false, 'type' => Input::INPUT_TYPE_INT],
             "assetId" => ["mandatory" => false, 'type' => Input::INPUT_TYPE_INT],
@@ -204,8 +199,9 @@ class HelpdeskController extends ApiController
             if (!Input::check($fields['content']) || Input::empty($fields['content'])) $this->setValidation("content", state: self::VALIDATION_STATE_INVALID);
         }
 
-        if (Arrays::first(explode("-", $fields['category'])) !== "O") {
-            if (!Input::check($fields['assetId'], Input::INPUT_TYPE_INT) || Input::empty($fields['assetId'])) $this->setValidation("assetId", state: self::VALIDATION_STATE_INVALID);
+        if ($fields['category'] !== SELECT_OTHER_ID) {
+            $category = (new Category)->getById($fields['category']);
+            if (!is_null($category->managementType ?: $category->linked->category->managementType) && (!Input::check($fields['assetId'], Input::INPUT_TYPE_INT) || Input::empty($fields['assetId']))) $this->setValidation("assetId", state: self::VALIDATION_STATE_INVALID);
         }
 
         if ($this->validationIsAllGood()) {
@@ -216,7 +212,7 @@ class HelpdeskController extends ApiController
                 $helpdesk->assignedToUserId = $fields['assignedToUserId'];
             }
 
-            $helpdesk->fillWithPostData();
+            $helpdesk->fillWithPostData($fields);
             if (!$helpdesk->creatorUserId) $helpdesk->creatorUserId = User::getLoggedInUser()->id;
             $helpdesk->lastActionDateTime = Clock::nowAsString("Y-m-d H:i:s");
 
@@ -241,8 +237,8 @@ class HelpdeskController extends ApiController
 
                 $threadRepo->set($thread);
 
-                if ($helpdesk->status == "C") {
-                    $helpdesk->status = "O";
+                if ($helpdesk->status == $statusRepo->getClose()->id) {
+                    $helpdesk->status = $statusRepo->getReopen()->id;
                     $repo->set($helpdesk);
                 }
             }
@@ -258,11 +254,6 @@ class HelpdeskController extends ApiController
             if (!$id) $this->setRedirect("/../{$helpdesk->guid}");
             else $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
-    }
-
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
     }
 
     // Delete functions

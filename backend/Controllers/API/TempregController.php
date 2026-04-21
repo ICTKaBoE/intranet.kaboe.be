@@ -73,13 +73,8 @@ class TempregController extends ApiController
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
-    protected function getSettings($view, $id = null)
-    {
-        $this->getNavigationSettings();
-    }
-
     // Post functions
-    protected function postExtranetAdd($view, $id)
+    protected function postExtranet($view, $id)
     {
         if ($id == "add") $id = null;
 
@@ -104,13 +99,10 @@ class TempregController extends ApiController
             $repo->set($item);
         }
 
-        if ($this->validationIsAllGood()) $this->setResetForm();
-        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
-    }
-
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
+        if ($this->validationIsAllGood()) {
+            $this->setResetForm();
+            $this->setToast("De temperaturen zijn opgeslagen!");
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
     protected function printExport($view, $id = null)

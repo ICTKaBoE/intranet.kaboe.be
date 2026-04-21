@@ -4,11 +4,15 @@ import DatePicker from "./DatePicker.js";
 import TinyMCE from "./TinyMCE.js";
 import Checkbox from "./Checkbox.js";
 import ColorInput from "./ColorInput.js";
+import MasterObject from "../MasterObject.js";
 
-export default class Form {
-	static INSTANCES = {};
+export default class Form extends MasterObject {
+	static OBJ_SELECTOR = "form";
+	static OBJ_ID_PREFIX = "frm";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 
 		this.id = this.element.getAttribute("id") || false;
@@ -31,23 +35,10 @@ export default class Form {
 		this.lastLoadedId = null;
 		this.locked = false;
 
+		this.loaded = false;
+
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("form").each((ids, el) => {
-			if (!Form.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Form.INSTANCES[el.getAttribute("id")] = new Form(el);
-		});
-	};
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("frm"))
-			id = `frm${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Form.INSTANCES[id] || false;
-	};
 
 	init = () => {
 		this.checkDefaultStates();
@@ -60,6 +51,8 @@ export default class Form {
 
 		if (this.prefillId) this.prefillForm(this.prefillId);
 		else if (this.prefill) this.prefillForm();
+
+		this.loaded = true;
 	};
 
 	checkDefaultStates = () => {
@@ -161,6 +154,8 @@ export default class Form {
 	};
 
 	reset = () => {
+		this.loaded = false;
+
 		this.element.reset();
 		this.lastLoadedId = null;
 		this.resetValidation();
@@ -172,8 +167,10 @@ export default class Form {
 			.each((idx, el) => {
 				if (!el.id) return;
 
-				if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.clear();
+				if (el.tagName === "SELECT") Select.GetInstance(el.id)?.clear();
 			});
+
+		this.loaded = true;
 	};
 
 	disable = () => {
@@ -183,7 +180,8 @@ export default class Form {
 				if (!el.id) return;
 				if (this.defaultStates[el.id]?.noLock === true) return;
 
-				if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.disable();
+				if (el.tagName === "SELECT")
+					Select.GetInstance(el.id)?.disable();
 				else if (el.role === "tinymce")
 					TinyMCE.INSTANCES[el.id]?.disable();
 				else el.disabled = true;
@@ -197,9 +195,10 @@ export default class Form {
 				if (!el.id) return;
 				if (this.defaultStates[el.id]?.disabled === true) return;
 
-				if (el.tagName === "SELECT") Select.INSTANCES[el.id]?.enable();
+				if (el.tagName === "SELECT")
+					Select.GetInstance(el.id)?.enable();
 				else if (el.role === "tinymce")
-					TinyMCE.INSTANCES[el.id]?.enable();
+					TinyMCE.GetInstance(el.id)?.enable();
 				else el.disabled = false;
 			});
 	};
@@ -227,7 +226,7 @@ export default class Form {
 				let v = Select.GetInstance(el.id).getValue();
 				data[name] = typeof v == "string" ? v : v.join(";");
 			} else if (el.role === "tinymce")
-				data[name] = TinyMCE.INSTANCES[el.id].getValue();
+				data[name] = TinyMCE.GetInstance(el.id).getValue();
 			else if (el.role === "checkbox") {
 				name = Checkbox.GetInstance(el.id).getName();
 				data[name] = Checkbox.GetInstance(el.id).getValue();
@@ -372,7 +371,7 @@ export default class Form {
 				this.prefillFields(json.fields);
 
 				setTimeout(() => {
-					Helpers.closeAllModals();
+					Helpers.toggleWait();
 				}, 500);
 			});
 	};
@@ -399,15 +398,15 @@ export default class Form {
 		field = field[0];
 		switch (field.role || field.type) {
 			case "select":
-				Select.INSTANCES[field.id].setValue(value);
+				Select.GetInstance(field.id).setValue(value);
 				break;
 
 			case "datepicker":
-				DatePicker.INSTANCES[field.id].setDate(value);
+				DatePicker.GetInstance(field.id).setDate(value);
 				break;
 
 			case "tinymce":
-				TinyMCE.INSTANCES[field.id].setValue(value);
+				TinyMCE.GetInstance(field.id).setValue(value);
 				break;
 
 			case "checkbox":

@@ -171,11 +171,6 @@ class ViolenceController extends ApiController
         }
     }
 
-    protected function getSettings($view)
-    {
-        $this->getNavigationSettings();
-    }
-
     // Post functions 
     protected function postMine($view, $id = null)
     {
@@ -241,11 +236,6 @@ class ViolenceController extends ApiController
 
             if ($this->validationIsAllGood()) $this->setReturn();
         }
-    }
-
-    protected function postSettings()
-    {
-        $this->postNavigationSettings();
     }
 
     protected function printExport($view, $id = null)

@@ -1,9 +1,12 @@
-import Helpers from "./Helpers.js";
+import MasterObject from "../MasterObject.js";
 
-export default class List {
-	static INSTANCES = {};
+export default class List extends MasterObject {
+	static OBJ_SELECTOR = "[role='list']";
+	static OBJ_ID_PREFIX = "lst";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -13,6 +16,8 @@ export default class List {
 		this.limit = this.element.dataset.limit || 200;
 		this.stopCheckNext = false;
 		this.noItemsText = this.element.dataset.noItemsText || false;
+		this.afterLoadCallback =
+			this.element.dataset.afterLoadCallback || false;
 
 		this.element.removeAttribute("data-template");
 
@@ -34,49 +39,30 @@ export default class List {
 		this.extraData.limit = this.limit;
 		this.extraData.page = 0;
 
+		this.loaded = false;
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("[role='list']").each((ids, el) => {
-			if (!List.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				List.INSTANCES[el.getAttribute("id")] = new List(el);
-		});
-	};
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("lst"))
-			id = `lst${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return List.INSTANCES[id] || false;
-	};
-
-	static ReloadAll = () => {
-		for (const lst in List.INSTANCES) {
-			List.INSTANCES[lst].reload();
-		}
-	};
-
-	static SearchAll = (value) => {
-		for (const lst in List.INSTANCES) {
-			List.INSTANCES[lst].search(value);
-		}
-	};
 
 	init = async () => {
 		await this.getData();
 		this.fill();
-		if (!this.stopCheckNext) this.checkNext();
+		if (!this.stopCheckNext) await this.checkNext();
+		this.loaded = true;
+
+		if (this.afterLoadCallback) window[this.afterLoadCallback]();
 	};
 
 	reload = async () => {
+		this.loaded = false;
 		this.stopCheckNext = true;
 		this.extraData.page = 0;
 
 		await this.getData();
 		this.fill();
 		if (!this.stopCheckNext) await this.checkNext();
+		this.loaded = true;
+
+		if (this.afterLoadCallback) window[this.afterLoadCallback]();
 	};
 
 	getData = () => {

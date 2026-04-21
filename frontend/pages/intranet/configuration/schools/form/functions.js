@@ -1,5 +1,7 @@
 import Select from "../../../../../shared/default/js/object/Select.js";
 import Checkbox from "../../../../../shared/default/js/object/Checkbox.js";
+import Helpers from "../../../../../shared/default/js/object/Helpers.js";
+import Form from "../../../../../shared/default/js/object/Form.js";
 
 window.virtualView = (info) => {
 	let val = Checkbox.GetInstance("chbVirtual").getValue();
@@ -15,6 +17,37 @@ window.virtualView = (info) => {
 	}
 };
 
+window.syncADView = () => {
+	let val = Checkbox.GetInstance("chbSync").getValue();
+
+	if (val) {
+		document.getElementById("tab-ad-item").classList.remove("d-none");
+		document
+			.getElementById("tab-ad-employee-item")
+			.classList.remove("d-none");
+		document
+			.getElementById("tab-ad-student-item")
+			.classList.remove("d-none");
+
+		document.getElementById("tab-ad").classList.remove("d-none");
+		document.getElementById("tab-ad-employee").classList.remove("d-none");
+		document.getElementById("tab-ad-student").classList.remove("d-none");
+	} else {
+		document.getElementById("tab-ad-item").classList.add("d-none");
+		document.getElementById("tab-ad-employee-item").classList.add("d-none");
+		document.getElementById("tab-ad-student-item").classList.add("d-none");
+
+		document.getElementById("tab-ad").classList.add("d-none");
+		document.getElementById("tab-ad-employee").classList.add("d-none");
+		document.getElementById("tab-ad-student").classList.add("d-none");
+	}
+};
+
 $(document).ready(() => {
-	window.virtualView();
+	setTimeout(() => {
+		Helpers.CheckAllLoaded(() => {
+			window.virtualView();
+			window.syncADView();
+		}, [Form]);
+	}, 500);
 });

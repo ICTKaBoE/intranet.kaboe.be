@@ -26,6 +26,7 @@ class CustomObject extends stdClass
     const TYPE_ARRAY = "array";
     const TYPE_OBJECT = "object";
     const TYPE_ARRAY_OR_OBJECT = "arrayOrObject";
+    const TYPE_BASE64 = "base64";
 
     protected $objectAttributes = [];
     protected $encodeAttributes = [];

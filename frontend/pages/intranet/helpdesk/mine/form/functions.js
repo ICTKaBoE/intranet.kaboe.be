@@ -27,8 +27,8 @@ window.deviceView = (info) => {
 		if (roomId)
 			Select.GetInstance("assetId").setExtraLoadParam("roomId", roomId);
 		Select.GetInstance("assetId").setDetails(
-			category?.linked?.category?.managementType ||
-				category?.managementType
+			category?.managementType ||
+				category?.linked?.category?.managementType
 		);
 
 		setTimeout(() => {

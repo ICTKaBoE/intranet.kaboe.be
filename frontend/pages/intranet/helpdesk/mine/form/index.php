@@ -26,7 +26,7 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
 
                 <div class="col-lg-4 mb-3">
                     <label class="form-label" for="priority">Prioriteit</label>
-                    <select name="priority" id="priority" data-load-source="{{select:url:short}}/{{url:part.module}}/priority" required></select>
+                    <select name="priority" id="priority" data-load-source="{{select:url:short}}/{{url:part.module}}/priority" data-default-value="{{module:defaultPriority}}" required></select>
                 </div>
 
                 <div class="col-lg-4 mb-3">

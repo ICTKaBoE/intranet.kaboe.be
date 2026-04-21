@@ -1,7 +1,12 @@
-export default class Calendar {
-	static INSTANCES = {};
+import MasterObject from "../MasterObject.js";
+
+export default class Calendar extends MasterObject {
+	static OBJ_SELECTOR = "div[role='calendar']";
+	static OBJ_ID_PREFIX = "cal";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 		this.view = this.element.dataset.view || "dayGridMonth";
@@ -30,27 +35,6 @@ export default class Calendar {
 
 		this.init();
 	}
-
-	static ScanAndCreate() {
-		$("div[role='calendar']").each((ids, el) => {
-			if (!Calendar.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Calendar.INSTANCES[el.getAttribute("id")] = new Calendar(el);
-		});
-	}
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("cal"))
-			id = `cal${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Calendar.INSTANCES[id] || false;
-	};
-
-	static ReloadAll = () => {
-		for (const cal in Calendar.INSTANCES) {
-			Calendar.INSTANCES[cal].reload();
-		}
-	};
 
 	init = () => {
 		this.createCalendar();

@@ -9,9 +9,10 @@ abstract class Connection
 {
     const SOURCE_ID = "smartschool";
 
-    static public function init($sourceId)
+    static public function init($sourceId, $timeout = 300)
     {
-        return new SoapClient(self::GetHost($sourceId));
+        ini_set('default_socket_timeout', $timeout);
+        return new SoapClient(self::GetHost($sourceId), ['cache_wsdl' => WSDL_CACHE_NONE]);
     }
 
     static public function GetHost($sourceId)

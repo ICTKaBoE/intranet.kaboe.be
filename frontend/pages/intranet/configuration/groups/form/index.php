@@ -23,7 +23,7 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label class="form-label" for="applications">Applicaties</label>
-                    <select name="applications" id="applications" data-load-source="{{select:url:short}}/navigation/extended" data-optgroup-attribute="parentId" data-render-item="renderOptgroupItem" multiple data-search></select>
+                    <select name="applications" id="applications" data-load-source="{{select:url:short}}/navigation/extended" data-optgroup="parentId" data-render-item="renderOptgroupItem" multiple data-search></select>
                 </div>
 
                 <div class="col-12 mb-3">

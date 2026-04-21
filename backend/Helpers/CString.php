@@ -117,7 +117,6 @@ abstract class CString
 
 	public static function getDigitsOnly($input)
 	{
-		preg_match_all('/\d+/', $input, $matches);
-		return $matches[0][0];
+		return preg_replace('/[^0-9]/', '', $input);
 	}
 }

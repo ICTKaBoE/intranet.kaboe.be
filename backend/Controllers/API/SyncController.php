@@ -57,14 +57,11 @@ class SyncController extends ApiController
 
         if (Strings::equal($view, self::VIEW_PS)) {
             $items = $repo->get();
+            $items = Arrays::filter($items, fn($i) => !is_null(Strings::trimToNull($i->action)));
             $items = Arrays::orderBy($items, "type");
+            $items = array_values($items);
             $this->appendToJson("items", Arrays::map($items, fn($i) => $i->toArray()));
         }
-    }
-
-    protected function getSettings($view, $id = null)
-    {
-        $this->getNavigationSettings();
     }
 
     protected function postEmployeeChangePassword($view, $id = null)
@@ -115,21 +112,16 @@ class SyncController extends ApiController
         }
     }
 
-    protected function postSettings($view, $id = null)
-    {
-        $this->postNavigationSettings();
-    }
-
     protected function postUpdate($view, $id = null)
     {
         if (!$id) {
             $this->setError("No ID given...");
         } else {
             $_fields = [
-                "action" => ["default" => null],
-                "lastAction" => ["default" => null],
-                "lastError" => ["default" => null],
-                "lastSync" => ["default" => null],
+                "action" => ["default" => null, "trimToNull" => true],
+                "lastAction" => ["default" => null, "trimToNull" => true],
+                "lastError" => ["default" => null, "trimToNull" => true],
+                "lastSync" => ["default" => null, "trimToNull" => true],
             ];
 
             [$invalid, $fields] = Form::Validate($_fields);

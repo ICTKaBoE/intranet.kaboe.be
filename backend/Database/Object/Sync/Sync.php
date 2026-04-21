@@ -65,8 +65,8 @@ class Sync extends CustomObject
             is_null($this->companyName) &&
             is_null($this->department) &&
             is_null($this->jobTitle) &&
-            is_null($this->memberOf) &&
-            is_null($this->otherAttributes) &&
+            (is_null($this->memberOf) || empty($this->memberOf)) &&
+            (is_null($this->otherAttributes) || empty($this->otherAttributes)) &&
             is_null($this->password) &&
             is_null($this->ou) &&
             is_null($this->thumbnailPhoto)

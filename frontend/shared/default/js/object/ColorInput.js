@@ -1,9 +1,12 @@
-import Helpers from "./Helpers.js";
+import MasterObject from "../MasterObject.js";
 
-export default class ColorInput {
-	static INSTANCES = {};
+export default class ColorInput extends MasterObject {
+	static OBJ_SELECTOR = "[role='colorinput']";
+	static OBJ_ID_PREFIX = "cin";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id;
 
@@ -15,24 +18,6 @@ export default class ColorInput {
 
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("[role='colorinput']").each((ids, el) => {
-			if (!ColorInput.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				ColorInput.INSTANCES[el.getAttribute("id")] = new ColorInput(
-					el
-				);
-		});
-	};
-
-	static GetInstance = (id) => {
-		console.log(id);
-		if (!id.startsWith("cin"))
-			id = `cin${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return ColorInput.INSTANCES[id] || false;
-	};
 
 	init = () => {
 		this.createStructure();

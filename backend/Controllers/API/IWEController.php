@@ -57,11 +57,6 @@ class IWEController extends ApiController
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
     }
 
-    protected function getSettings($view)
-    {
-        $this->getNavigationSettings();
-    }
-
     // Post functions
     protected function postMine($view, $id = null)
     {
@@ -118,11 +113,6 @@ class IWEController extends ApiController
 
             $this->setReturn();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
-    }
-
-    protected function postSettings()
-    {
-        $this->postNavigationSettings();
     }
 
     protected function printExport($view, $id = null)

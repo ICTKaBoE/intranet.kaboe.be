@@ -13,17 +13,19 @@ window.renderOptgroupItem = (data, escape) => {
 };
 
 window.deviceView = (info) => {
-	let category = Select.GetInstance("category").getValue();
-	category = category.split("-")[0];
+	let category = Select.GetInstance("category").getItemDetails();
 
-	if (category == "O") {
+	if (category.id == window.SELECT_OTHER_ID) {
 		Select.GetInstance("assetId").disable();
 	} else {
 		Select.GetInstance("assetId").setExtraLoadParam(
 			"schoolId",
 			Select.GetInstance("schoolId").getValue()
 		);
-		Select.GetInstance("assetId").setDetails(category);
+		Select.GetInstance("assetId").setDetails(
+			category?.linked?.category?.managementType ||
+				category?.managementType
+		);
 
 		setTimeout(() => {
 			if (Form.GetInstance(pageId).locked) {
@@ -34,7 +36,7 @@ window.deviceView = (info) => {
 	}
 };
 
-window.edit = () => {
+window.editLine = () => {
 	Form.GetInstance(`${pageId}Line`).prefillForm(
 		Table.GetInstance(`${pageId}Line`)
 			.getSelectedRowData()

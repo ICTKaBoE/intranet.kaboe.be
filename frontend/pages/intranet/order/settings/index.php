@@ -7,12 +7,13 @@
 
             <div class="card-body">
                 <div class="col-12 mb-3">
-                    <label class="form-label" for="lastNumber">Laatste nummer</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="lastNumber" id="lastNumber">
-                        <button class="btn" type="button" id="btnResetLastNumber">Reset</button>
-                    </div>
+                    <label class="form-label" for="defaultFilter">Standaard filter</label>
+                    <select name="defaultFilter" id="defaultFilter" data-load-source="{{select:url:short}}/{{url:part.module}}/status" multiple></select>
+                </div>
 
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="acceptFilter">Door mij goed te keuren filter</label>
+                    <select name="acceptFilter" id="acceptFilter" data-load-source="{{select:url:short}}/{{url:part.module}}/status" multiple></select>
                 </div>
 
                 <div class="col-12 mb-3">

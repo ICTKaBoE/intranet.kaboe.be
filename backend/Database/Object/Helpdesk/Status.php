@@ -10,7 +10,10 @@ class Status extends CustomObject
     protected $objectAttributes = [
         "id" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
-        "color" => self::TYPE_STRING
+        "color" => self::TYPE_STRING,
+        "new" => self::TYPE_BOOLEAN,
+        "reopen" => self::TYPE_BOOLEAN,
+        "close" => self::TYPE_BOOLEAN
     ];
 
     public function init()

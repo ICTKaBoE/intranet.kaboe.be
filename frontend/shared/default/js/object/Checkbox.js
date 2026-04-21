@@ -1,9 +1,12 @@
-import Helpers from "./Helpers.js";
+import MasterObject from "../MasterObject.js";
 
-export default class Checkbox {
-	static INSTANCES = {};
+export default class Checkbox extends MasterObject {
+	static OBJ_SELECTOR = "[role='checkbox']";
+	static OBJ_ID_PREFIX = "chb";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -20,21 +23,6 @@ export default class Checkbox {
 
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("[role='checkbox']").each((ids, el) => {
-			if (!Checkbox.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Checkbox.INSTANCES[el.getAttribute("id")] = new Checkbox(el);
-		});
-	};
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("chb"))
-			id = `chb${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Checkbox.INSTANCES[id] || false;
-	};
 
 	init = () => {
 		this.build();

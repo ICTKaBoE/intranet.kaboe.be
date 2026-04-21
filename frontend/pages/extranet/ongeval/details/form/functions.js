@@ -7,23 +7,18 @@ let btnDeny = new Button({
 	element: document.getElementById("btnClose"),
 	options: {
 		onclick: () => {
-			document.getElementById("status").value = "C";
+			if (confirm("BEVESTIGING: Sluiten zonder gevolg")) {
+				document.getElementById("status").value = "CNF";
 
-			setTimeout(() => {
-				Form.GetInstance(pageId).submit();
-			}, 500);
+				setTimeout(() => {
+					Form.GetInstance(pageId).submit();
+				}, 500);
+			}
 		},
 	},
 });
 
 Helpers.CheckAllLoaded(() => {
-	// setTimeout(() => {
-	// 	window.locationView();
-	// 	window.partyView();
-	// 	window.policeView();
-	// 	window.supervisionView();
-	// }, 250);
-
 	setTimeout(() => {
 		Select.GetInstance("informatStudentRelationId").setExtraLoadParam(
 			"informatStudentId",

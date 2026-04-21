@@ -16,8 +16,13 @@ class EmployeeNumber extends CustomObject
         "category" => self::TYPE_STRING
     ];
 
+    protected $linkedAttributes = [
+        "informatEmployee" => ["informatEmployeeId" => \Database\Repository\Informat\Employee::class]
+    ];
+
     public function init()
     {
         $this->formatted->link = HTML::Link(HTML::LINK_TYPE_PHONE, $this->number);
+        $this->formatted->employeeFullNameReversedWithNumberAndType = "{$this->linked->informatEmployee->formatted->fullNameReversed} - {$this->number} ({$this->type})";
     }
 }

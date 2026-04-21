@@ -1,0 +1,38 @@
+<div class="row mb-3">
+	<div class="col">
+		<label class="form-label mb-1" for="schoolId">School</label>
+		<select
+			name="schoolId"
+			id="schoolId"
+			data-load-source="{{select:url:short}}/school"
+		></select>
+	</div>
+</div>
+
+<div class="row mb-3">
+	<div class="col">
+		<label class="form-label mb-1" for="departmentId">Afdeling</label>
+		<select
+			name="departmentId"
+			id="departmentId"
+			data-load-source="{{select:url:short}}/school/department"
+			data-parent-select="schoolId"
+			data-default-no-load
+			data-disable-if-no-options
+		></select>
+	</div>
+</div>
+
+<div class="row mb-3">
+	<div class="col">
+		<label class="form-label mb-1" for="typeId">Type</label>
+		<select
+			name="typeId"
+			id="typeId"
+			data-load-source="{{select:url:short}}/{{url:part.module}}/type"
+			data-parent-select="departmentId"
+			data-default-no-load
+			data-disable-if-no-options
+		></select>
+	</div>
+</div>

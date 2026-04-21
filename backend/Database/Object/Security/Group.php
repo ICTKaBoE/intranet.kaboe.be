@@ -3,7 +3,6 @@
 namespace Database\Object\Security;
 
 use Security\CustomObject;
-use Helpers\HTML;
 
 class Group extends CustomObject
 {
@@ -12,6 +11,7 @@ class Group extends CustomObject
         "name" => self::TYPE_STRING,
         "priority" => self::TYPE_INTEGER,
         "m365GroupId" => self::TYPE_GUID,
+        "admin" => self::TYPE_BOOLEAN,
         "deleted" => self::TYPE_BOOLEAN,
     ];
 }

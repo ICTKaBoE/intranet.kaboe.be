@@ -1,20 +1,25 @@
-import Helpers from "./Helpers.js";
+import MasterObject from "../MasterObject.js";
 
-export default class Chart {
-	static INSTANCES = {};
+export default class Chart extends MasterObject {
+	static OBJ_SELECTOR = "div[role='chart']";
+	static OBJ_ID_PREFIX = "crt";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 		this.type = this.element.dataset.type || "line";
 		this.source = this.element.dataset.source || false;
 		this.title = this.element.dataset.title || false;
 		this.group = this.element.dataset.group || false;
+		this.legend = this.element.hasAttribute("data-legend") || false;
 		this.legendPosition = this.element.dataset.legendPosition || "bottom";
 		this.noDataText = this.element.dataset.noDataText || "Loading...";
 		this.formatter = this.element.dataset.formatter || false;
 		this.xaxisType = this.element.dataset.xaxisType || "category";
 		this.height = this.element.dataset.height || "350vh";
+		this.horizontal = this.element.hasAttribute("data-horizontal") || false;
 
 		this.data = {};
 		this.extraData = {};
@@ -23,27 +28,6 @@ export default class Chart {
 
 		this.init();
 	}
-
-	static ScanAndCreate() {
-		$("div[role='chart']").each((ids, el) => {
-			if (!Chart.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Chart.INSTANCES[el.getAttribute("id")] = new Chart(el);
-		});
-	}
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("crt"))
-			id = `crt${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Chart.INSTANCES[id] || false;
-	};
-
-	static ReloadAll = () => {
-		for (const crt in Chart.INSTANCES) {
-			Chart.INSTANCES[crt].reload();
-		}
-	};
 
 	init = async () => {
 		this.createOptions();
@@ -110,7 +94,7 @@ export default class Chart {
 				},
 			},
 			legend: {
-				show: true,
+				show: this.legend,
 				position: this.legendPosition,
 				horizontalAlign: "left",
 				offsetX: 40,
@@ -167,6 +151,12 @@ export default class Chart {
 							},
 						},
 					},
+				},
+			};
+		} else if (this.type == "bar") {
+			this.options.plotOptions = {
+				bar: {
+					horizontal: this.horizontal,
 				},
 			};
 		}

@@ -1,9 +1,13 @@
+import MasterObject from "../MasterObject.js";
 import Button from "./Button.js";
 
-export default class Table {
-	static INSTANCES = {};
+export default class Table extends MasterObject {
+	static OBJ_SELECTOR = "table[role='table']";
+	static OBJ_ID_PREFIX = "tbl";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -105,35 +109,10 @@ export default class Table {
 		if (this.noInfo) this.tableOptions.info = false;
 		if (this.noPaging) this.tableOptions.paging = false;
 
+		this.loaded = false;
+
 		this.init();
 	}
-
-	static ScanAndCreate = () => {
-		$("table[role='table']").each((ids, el) => {
-			if (!Table.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Table.INSTANCES[el.getAttribute("id")] = new Table(el);
-		});
-	};
-
-	static GetInstance = (id) => {
-		if (!id.startsWith("tbl"))
-			id = `tbl${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
-		return Table.INSTANCES[id] || false;
-	};
-
-	static ReloadAll = () => {
-		for (const tbl in Table.INSTANCES) {
-			Table.INSTANCES[tbl].reload();
-		}
-	};
-
-	static SearchAll = (value) => {
-		for (const tbl in Table.INSTANCES) {
-			Table.INSTANCES[tbl].search(value);
-		}
-	};
 
 	init = async () => {
 		this.createStructure();
@@ -142,7 +121,22 @@ export default class Table {
 		this.createDataTable();
 		this.checkButtonStates();
 
+		this.loaded = true;
+
 		if (this.autoRefresh) this.startAutoRefresh();
+	};
+
+	reload = async () => {
+		this.loaded = false;
+
+		await this.getData();
+		this.datatable
+			.clear()
+			.rows.add(this.data?.rows ?? [])
+			.draw();
+		this.datatable.columns.adjust().draw();
+
+		this.loaded = true;
 	};
 
 	createStructure = () => {
@@ -271,15 +265,6 @@ export default class Table {
 
 	deleteSelectedRows = () => {
 		this.datatable.row(".selected").remove().draw(false);
-	};
-
-	reload = async () => {
-		await this.getData();
-		this.datatable
-			.clear()
-			.rows.add(this.data?.rows ?? [])
-			.draw();
-		this.datatable.columns.adjust().draw();
 	};
 
 	search = (value) => {

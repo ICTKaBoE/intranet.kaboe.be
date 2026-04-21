@@ -36,7 +36,6 @@ class NavigationController extends ApiController
             $optgroups = $repo->getByRouteGroupId((new Group)->getByDomain($domain)->id);
             $optgroups = Arrays::filter($optgroups, fn($o) => Strings::equal($o->type, "M"));
             $optgroups = Arrays::map($optgroups, fn($o) => ["id" => $o->id, "name" => $o->name]);
-            // $optgroups[] = ["id" => "LINKS", "name" => "Links"];
 
             $items = [];
             foreach ($optgroups as $optgroup) $items = array_merge($items, Arrays::map($repo->getByParentId($optgroup['id']), fn($i) => ["optgroupName" => $optgroup["name"], ...$i->toArray()]));

@@ -3,8 +3,6 @@
 namespace Database\Object\Accident;
 
 use Security\CustomObject;
-use Database\Repository\Navigation\Navigation;
-use Helpers\HTML;
 
 class Document extends CustomObject
 {

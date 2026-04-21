@@ -1,9 +1,12 @@
+import MasterObject from "../MasterObject.js";
 import Helpers from "./Helpers.js";
 
-export default class Select {
-	static INSTANCES = {};
+export default class Select extends MasterObject {
+	static OBJ_SELECTOR = "select";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 
@@ -90,48 +93,20 @@ export default class Select {
 		}
 
 		if (this.defaultExtraData) {
-			let extraData = this.defaultExtraData
-				.replace("[", "")
-				.replace("]", "")
-				.split("|");
+			this.defaultExtraData = Object.fromEntries(
+				this.defaultExtraData
+					.replace("[", "")
+					.replace("]", "")
+					.split("|")
+					.map((v) => v.split("="))
+			);
 
-			this.extraData = {};
-			extraData.forEach((v) => {
-				v = v.split("=");
-				this.loadParams[v[0]] = v[1];
-			});
+			this.loadParams = { ...this.defaultExtraData };
 		}
 
 		this.loaded = false;
 		this.init();
 	}
-
-	static ScanAndCreate() {
-		$("select").each((ids, el) => {
-			if (!Select.INSTANCES.hasOwnProperty(el.getAttribute("id")))
-				Select.INSTANCES[el.getAttribute("id")] = new Select(el);
-		});
-	}
-
-	static GetInstance = (id) => {
-		return Select.INSTANCES[id] || false;
-	};
-
-	static Loaded() {
-		let allLoaded = true;
-
-		Object.keys(Select.INSTANCES).forEach((key) => {
-			if (!Select.INSTANCES[key].loaded) allLoaded = false;
-		});
-
-		return allLoaded;
-	}
-
-	static ReloadAll = () => {
-		for (const sel in Select.INSTANCES) {
-			Select.INSTANCES[sel].clear();
-		}
-	};
 
 	init = async () => {
 		this.element.setAttribute("role", "select");
@@ -375,7 +350,15 @@ export default class Select {
 				"change",
 				(value) => {
 					this.data.items = [];
-					this.setExtraLoadParam(this.parent, value);
+					console.log(
+						this.parent,
+						value,
+						this.defaultExtraData[this.parent]
+					);
+					this.setExtraLoadParam(
+						this.parent,
+						value ?? this.defaultExtraData[this.parent]
+					);
 					this.reload();
 				}
 			);

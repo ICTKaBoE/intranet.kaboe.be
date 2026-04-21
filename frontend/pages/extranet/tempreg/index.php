@@ -1,4 +1,4 @@
-<form action="{{form:url:full}}/extranet/add" method="post" class="card col-md-5 m-auto">
+<form action="{{form:url:full}}extranet" method="post" class="card col-md-5 m-auto">
     <div class="card-body">
         <div class="row mb-3">
             <div class="col">

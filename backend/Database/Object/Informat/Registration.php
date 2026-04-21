@@ -15,6 +15,7 @@ class Registration extends CustomObject
         "schoolInstituteId" => self::TYPE_INTEGER,
         "basenumber" => self::TYPE_STRING,
         "departmentCode" => self::TYPE_STRING,
+        "departmentName" => self::TYPE_STRING,
         "grade" => self::TYPE_INTEGER,
         "year" => self::TYPE_INTEGER,
         "start" => self::TYPE_DATE,
