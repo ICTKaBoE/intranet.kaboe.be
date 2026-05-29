@@ -43,6 +43,18 @@ CREATE TABLE `tbl_strategicdashboard_item_value` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --INSERTS
+INSERT INTO tbl_strategicdashboard_category (guid, name, image, `order`, deleted) VALUES('E4E3B508-B282-4023-A0F1-013F942E7FE1', 'Breed onderwijsaanbod', 1, 1, 0);
+INSERT INTO tbl_strategicdashboard_category (guid, name, image, `order`, deleted) VALUES('5CE13270-802C-441D-B3CE-856BDD63DB96', 'Kwaliteitsvol onderwijs', 1, 2, 0);
+INSERT INTO tbl_strategicdashboard_category (guid, name, image, `order`, deleted) VALUES('27612A3A-88F6-465F-AB60-16A007578A00', 'Innovatie en digitalisering', 1, 3, 0);
+INSERT INTO tbl_strategicdashboard_category (guid, name, image, `order`, deleted) VALUES('D6B92E19-C155-4985-A7BB-AACC21E6024E', 'Betrokken medewerkers', 1, 4, 0);
+INSERT INTO tbl_strategicdashboard_category (guid, name, image, `order`, deleted) VALUES('7FB0054F-62F9-47E0-A457-A05DB612E6D4', 'Infrastructuur en Financieel', 1, 5, 0);
+
+INSERT INTO tbl_strategicdashboard_item_type (short, name) VALUES('rating:circle', 'Rating: Cirkel');
+INSERT INTO tbl_strategicdashboard_item_type (short, name) VALUES('chart:pie', 'Chart: Pie');
+INSERT INTO tbl_strategicdashboard_item_type (short, name) VALUES('chart:bar', 'Chart: Bar');
+INSERT INTO tbl_strategicdashboard_item_type (short, name) VALUES('number', 'Getal');
+
 -- --NAVIGATION
 INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', 0, 'M', 0, 90, 'strategicDashboard', 'Strategisch Dashboard', 'dashboard', 'blue', 0);
 SET @nId = (SELECT id FROM tbl_navigation WHERE link="strategicDashboard" AND `type` = "M");
@@ -160,6 +172,100 @@ CREATE TABLE `tbl_school_direction` (
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --INSERTS
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('5D71658A-B74A-4B9B-ADCE-0D7EB77B966E', 6, 1, 'Bedrijfswetenschappen', 'BWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('266C9C1F-E813-4A97-BC43-E2B438475BF1', 6, 1, 'Biotechnologishe STEM-wetenschappen', 'BIOWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('FE925B38-4E98-4AC9-AAFB-4929B736A0F2', 6, 1, 'Economische wetenschappen', 'ECWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('3DC748CC-68DB-4D04-B3FE-D9CE23991E13', 6, 1, 'Grieks-Latijn', 'GRLA', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D33CC0C4-80D4-42E8-BA78-A2A2222E9E87', 6, 1, 'Humane wetenschappen', 'HUWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('A596E252-0A90-4357-9565-7120410966D3', 6, 1, 'Latijn', 'LA', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('511B5661-AE7D-45FA-AEC0-0ADE0AC6C85E', 6, 1, 'Maatschappij- en welzijnswetenschappen', 'MWWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('384F58B6-C754-421B-BD58-3680F8F7A3A1', 6, 1, 'Moderne talen', 'MT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('BA131C47-0327-429B-B9D7-5EBB684D829E', 6, 1, 'Natuurwetenschappen', 'NATWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('8CA4FAD8-8451-4CCF-B055-81A06CA8E6E5', 6, 1, 'Sportwetenschappen', 'SPWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('AACDA7C0-9D20-4FAE-91D3-2C93C4744606', 6, 1, 'Economie - moderne talen', 'ECMT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('B068E984-D8D5-4622-BF7C-61265C7B6A57', 6, 1, 'Economie - wiskunde', 'ECWI', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('B5CBBC00-A4D5-4850-B929-4C0CCED1836F', 6, 1, 'Grieks - Latijn', 'GRLA', 1);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('28DC9378-00D3-4BC9-BAFD-B475548C6C45', 6, 1, 'Grieks - wiskunde', 'GRWI', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D382E2F0-03A0-4F2F-BC3D-116CA0DAABC5', 6, 1, 'Latijn - moderne talen', 'LAMT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('0BAF6FA1-58A3-4CCA-B2A8-CEF626E07F46', 6, 1, 'Latijn - wetenschappen', 'LAWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('32185F54-5464-4D51-A7C4-D3F9C9F3FDB5', 6, 1, 'Latijn - wiskunde', 'LAWI', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('773E93BC-A612-4316-AEE2-D189A514E9FC', 6, 1, 'Moderne talen - wetenschappen', 'MTWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('2BC7F4A0-AA49-4ED0-86F4-9B38CC503539', 6, 1, 'Moderne talen', 'MT', 1);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('3BD83604-C5E5-4E13-B398-C5F456BD3D12', 6, 1, 'Wetenschappen- wiskunde (6u)', 'WEW6', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('E6A81E71-3C83-4027-B589-998A316E08B5', 6, 1, 'Wetenschappen- wiskunde (8u)', 'WEW8', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('8CF6BDAC-5EE3-41F1-AD54-91FDE501BC93', 6, 1, 'Welzijnswetenschappen', 'WWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('5D82D971-4089-47C0-A03B-4C913D9B9929', 6, 3, '1A basis Frans - basis wiskunde', 'A', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D1D31EB8-8716-421A-B993-3A0B5431BAF9', 6, 3, '1A met Latijn', 'ALA', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('006AC001-A190-431D-AF08-80647E94651D', 6, 3, '1A met Latijn (CLIL Engels en Frans)', 'ALAC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('E751C709-A4D1-447D-B940-2C2BDE8A49FE', 6, 3, '1A verdieping Frans - basis wiskunde', 'AF', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('FAE501FD-7CAB-475C-89DD-BDE71087FD77', 6, 3, '1A verdieping Frans - basis wiskunde (CLIL Engels en Frans)', 'AFC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('7D625E38-DB36-42B0-A2FD-DF2972E31B9C', 6, 3, '1A basis Frans - verdieping wiskunde', 'AW', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('6E914C34-1C95-4B57-B7BE-2734ECA56130', 6, 3, '1A verdieping Frans - verdieping wiskunde', 'AWF', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('A401E8F3-7DA9-49B0-92B7-1CDAE37D919C', 6, 3, '1A verdieping Frans - verdieping wiskunde (CLIL Engels en Frans)', 'AWFC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('F7899FED-B3DC-498A-9BA7-DE45B9268AC9', 6, 3, '1B', 'B', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('665C79A6-97D4-4F11-96A0-10A4DFCC7578', 6, 3, '2A Economie en organisatie - basis', 'AECOB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('5AC81A98-501F-4D6D-9CE4-2ECFE69B6682', 6, 3, '2A Economie en organisatie - verdieping', 'AECOV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('7074D955-32BB-4A5F-8007-2D4AFF932462', 6, 3, '2A Klassieke talen met Grieks-Latijn ', 'AKTGLA', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('A6992742-391B-43D6-848A-F20D062FFAD8', 6, 3, '2A Klassieke talen met Grieks-Latijn (CLIL Frans)', 'AKTGLAC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('C4591CC4-E3D4-41E0-B4B7-87EA109A1D0A', 6, 3, '2A Klassieke talen met Latijn ', 'AKTLA', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('EBA48733-5541-4E96-9366-C7D91A7779C8', 6, 3, '2A Klassieke talen met Latijn (CLIL Frans)', 'AKTLAC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('E388FB89-23B6-4EEA-9285-E5922D84ED50', 6, 3, '2A Klassieke talen met Latijn en STEM-project', 'AKTLAST', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('EA0F7494-E3E1-40E0-93CE-2B6087EE1A52', 6, 3, '2A Klassieke talen met Latijn en STEM-project (CLIL Engels en/of Frans)', 'AKTLASTC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('3ADCF04C-060D-4101-8A73-37A26ED07542', 6, 3, '2A Maatschappij en welzijn - basis', 'AMWB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('DB16EC11-B690-4D39-BB19-562628276B94', 6, 3, '2A Maatschappij en welzijn - verdieping', 'AMWV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('122AEE13-ABA8-44A9-AC05-CB33515250EC', 6, 3, '2A Moderne talen en wetenschappen ', 'AMTWE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('F4BB5226-78BB-4A53-8355-8025B1A38C06', 6, 3, '2A Moderne talen en wetenschappen (CLIL Engels en/of Frans)', 'AMTWEC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('DA071D99-ECA8-4710-9B2C-668BDE31CA2D', 6, 3, '2A Moderne talen en wetenschappen en STEM-project (CLIL Engels en/of Frans)', 'AMTWEST', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('F40C2FEB-2A38-4147-AD81-C3BBF20774AD', 6, 3, '2A Sport - basis', 'ASPB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('116F79C9-6E64-47DC-AC19-BE25BCEB1D7B', 6, 3, '2A Sport - verdieping', 'ASPV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('654CF5A3-9275-46A9-9353-8DCED6DBD2F9', 6, 3, '2A STEM-technieken', 'ASTTE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('DFBEF670-9188-4634-AEA4-BF5E72CFCB45', 6, 3, '2A STEM-wetenschappen - basis', 'ASTWEB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D61EB05F-22C0-492A-9170-96C9D5EB70D2', 6, 3, '2A STEM-wetenschappen - verdieping', 'ASTWEV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('CD05C6B0-DF8B-4795-8658-EB014F32D8DF', 6, 3, '2A STEM-wetenschappen - verdieping (CLIL Engels)', 'ASTWEVC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('7EF08C30-66FE-4462-A2D2-360B869E3229', 6, 3, '2B Economie en organisatie - Maatschappij en welzijn', 'BECOMV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('3BB4ECEE-8D46-4A62-85D0-8D46BB877578', 6, 3, '2B Economie en organisatie - Voeding en horeca', 'BECOVH', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('33C0D670-0837-4D49-BAFA-22267D858F28', 6, 3, '2B Maatschappij en welzijn ', 'BMW', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D89C29F6-F527-45E0-8B39-CD6D9ECAF9C3', 6, 3, '2B Sport - Maatschappij en welzijn', 'BMWSP', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('272507D7-FF32-4B1A-AB9B-077B5B4854DF', 6, 3, '2B STEM-technieken', 'BSTTE', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('5ECA4865-AED6-4696-BC80-D3F68F5645AA', 6, 2, 'Bedrijf en organisatie CLIL', 'BO', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('F100FB59-925F-41A3-8B55-C3A5EFEE0904', 6, 2, 'Biotechnieken', 'BIOT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('EE3B1734-63E0-4C69-BA22-B0E0E893373D', 6, 2, 'Maatschappij en welzijn', 'MW', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('16347C53-0828-4115-AC00-250941D07EAE', 6, 2, 'Plant, dier- en milieutechnieken', 'PDMT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('B2D612E8-1C4F-4AED-B980-91C3D2CB65D6', 6, 2, 'Sport', 'SP', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('1F8395AB-BEFC-4707-8A55-1154F190E9E8', 6, 2, 'Taal en communicatie CLIL', 'TC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('4E88786B-74FE-4D7D-955A-A4D91A177A17', 6, 2, 'Wellness & lifestyle', 'WL', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('4D904190-58B7-40F1-A607-85878C1DFDAB', 6, 2, 'Agrotechnieken dier', 'AGRO', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('9554B9C4-5796-4909-8194-F15DBE89A73F', 6, 2, 'Applicatie- en databeheer', 'ADB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('A9F9C01A-BF88-4B93-A4B2-899D8B89E7AD', 6, 2, 'Biotechnologische en chemische technieken', 'BIOCT', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('E3A95E63-B101-41F9-A0AF-1A1A2385D829', 6, 2, 'Bedrijfsorganisatie', 'BORG', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('592F869E-9C7E-49D3-87F1-8E13DD3C3709', 6, 2, 'Commerciële organisatie', 'CO', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('C9007734-0D21-4D95-9AB5-7A21C7D6B111', 6, 2, 'Gezondheidszorg', 'GZ', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('1BE575AF-3B0E-4138-9648-F8680076A724', 6, 2, 'Opvoeding en begeleiding', 'OBG', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('7365DD3D-B0BE-4654-AA7C-77C1BE780C60', 6, 2, 'Sportbegeleiding', 'SPBG', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('56C0632E-C9F6-42E5-B338-B1E3F82E7B90', 6, 2, 'Tuinaanleg en beheer', 'TAB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('ADD06E46-0D48-431D-BD0C-1E57607AF824', 6, 2, 'Wellness en schoonheid', 'WS', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('0199E0FD-33FE-4039-B26D-989BA09B4212', 6, 4, 'Haar- en schoonheidsverzorging', 'HSV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('6014A276-F048-461F-ABBD-5CDEC057A9C8', 6, 4, 'Organisatie en logistiek', 'ORL', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D6B6FF79-AF5F-4A33-B290-6E45BE47F11D', 6, 4, 'Plant, dier en milieu', 'PDM', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('499E696C-3FC2-4FB5-952E-2CB753697040', 6, 4, 'Zorg en welzijn', 'ZW', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('85C61467-88E8-4CD2-B5F8-39D56BE9C9B0', 6, 4, 'Restaurant en keuken', 'RK', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('43738979-83FA-4E12-BED8-04741AB80F49', 6, 4, 'Assistentie in wonen, zorg en welzijn', 'AWZW', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('D28EF329-29E9-42E1-8817-5B7EA88127F1', 6, 4, 'Basiszorg en ondersteuning', 'BZ', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('76770FBF-A7B9-42F1-A81E-2EBE51562BB4', 6, 4, 'Dier en milieu', 'DM', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('C50D4E60-A9C6-4035-AD85-1464B2A048A5', 6, 4, 'Groenaanleg- en beheer', 'GB', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('6240D4F9-92DD-4A6E-9B65-B94D3EA8E2FB', 6, 4, 'Grootkeuken en catering', 'GC', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('9F15D925-9257-4EB6-A6BE-52140ECF18C5', 6, 4, 'Haarverzorging', 'HV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('483E9214-3669-4AAB-9CCD-1C211B16B862', 6, 4, 'Logistiek', 'LOG', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('8D44281C-AD8D-42F5-B4DA-25825FFB094E', 6, 4, 'Onthaal, organisatie en sales', 'OOS', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('02DC7649-8FA5-42A8-8B6D-4F62774134ED', 6, 4, 'Schoonheidsverzorging (bso)', 'SV', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('64B301C6-5175-41B6-B176-01A1D76BBD2F', 6, 4, 'Haarstilist', 'HS', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('50679758-AAEF-44B7-8ED7-69D58A50B4F2', 6, 4, 'Kantooradministratie en gegevensbeheer (Business Support)', 'BS', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('E1ACA7B3-61CC-4806-AA63-64F69A953336', 6, 4, 'Kinderzorg', 'KZ', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('CA82195A-9B74-42F0-8360-1D55A67645FE', 6, 4, 'Thuis- en bejaardenzorg/Zorgkundige', 'TZBZ', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('DA0D094D-9DEA-4BCA-97DA-C4704DCD428A', 6, 4, 'Tuinaanleg en -onderhoud', 'TUIN', 0);
+INSERT INTO tbl_school_direction (guid, schoolId, departmentId, name, code, deleted) VALUES('2D25F745-8662-44E1-B565-097703C13D64', 6, 4, 'Veehouderij en landbouwteelten', 'VH', 0);
 
 -- -- --NAVIGATION
 SET @nId = (SELECT id FROM tbl_navigation WHERE link="configuration" AND `type` = "M");
