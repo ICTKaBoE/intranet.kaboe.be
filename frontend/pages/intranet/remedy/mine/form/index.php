@@ -1,20 +1,27 @@
 <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" class="row">
-    <input type="hidden" name="postData" id="postData" />
-    <div class="col-lg-4 col-12 mb-3">
+    <!-- <input type="hidden" name="postData" id="postData" /> -->
+    <div class="col-lg-4 mx-auto col-12 mb-3">
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4 col-12 mb-3">
-                        <label class="form-label" for="departmentId">Afdeling</label>
-                        <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-on-change="departmentView" required></select>
+                    <div class="col-12 col-lg-6 mb-3">
+                        <label for="schoolId" class="form-label">School</label>
+                        <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
                     </div>
 
-                    <div class="col-lg-4 col-12 mb-3">
+                    <div class="col-lg-6 col-12 mb-3">
+                        <label class="form-label" for="departmentId">Afdeling</label>
+                        <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-parent-select="schoolId" data-on-change="departmentView" data-default-no-load required></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-12 mb-3">
                         <label for="typeId" class="form-label">Type</label>
                         <select name="typeId" id="typeId" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-parent-select="departmentId" data-on-change="typeView" data-extra="[show=limit]" data-disable-if-no-options data-default-no-load required></select>
                     </div>
 
-                    <div class="col-lg-4 col-12 mb-3">
+                    <div class="col-lg-6 col-12 mb-3">
                         <label for="courseId" class="form-label">Vak</label>
                         <select name="courseId" id="courseId" data-load-source="{{select:url:short}}/{{url:part.module}}/course" data-parent-select="typeId" data-on-change="courseView" data-search data-disable-if-no-options data-default-no-load required></select>
                     </div>
@@ -28,14 +35,20 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-3 col-12 mb-3">
+                    <!-- <div class="col-lg-3 col-12 mb-3">
                         <label for="classgroupId" class="form-label">Klas</label>
                         <select name="classgroupId" id="classgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-disable-if-no-options data-default-no-load data-search required></select>
-                    </div>
+                    </div> -->
 
-                    <div class="col-lg-9 col-12 mb-3">
+                    <!-- <div class="col-lg-9 col-12 mb-3">
                         <label for="informatStudentId" class="form-label">Leerling</label>
                         <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentByClass" data-label="formatted.fullNameReversed" data-on-change="studentView" data-parent-select="classgroupId" data-disable-if-no-options data-default-no-load data-search required></select>
+                    </div> -->
+
+                    <div class="col-12 mb-3">
+                        <label for="informatStudentId" class="form-label">Leerling</label>
+                        <input type="hidden" name="informatClassgroupId" id="informatClassgroupId" />
+                        <select name="informatStudentId" id="informatStudentId" data-load-source="{{select:url:short}}/informat/studentPerClassByDepartment" data-label="formatted.fullNameReversed" data-on-change="studentView" data-render-item="renderOptgroupItem" data-disable-if-no-options data-default-no-load data-search multiple required></select>
                     </div>
                 </div>
 
@@ -69,17 +82,16 @@
                         <textarea name="remark" id="remark" class="form-control" rows="5" required></textarea>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <button type="button" id="btnAdd" class="btn btn-success">Toevoegen</button>
-                    </div>
-                </div>
+            <div class="card-footer">
+                <button type="button" id="btnSave"></button>
+                <button type="button" id="btnCancel"></button>
             </div>
         </div>
     </div>
 
-    <div class="col-12 col-lg-8">
+    <!-- <div class="col-12 col-lg-8">
         <div class="card">
             <div class="card-header btn-list">
                 <button type="button" class="btn btn-danger ms-auto" id="btnRemove">Verwijderen</button>
@@ -100,5 +112,5 @@
                 </thead>
             </table>
         </div>
-    </div>
+    </div> -->
 </form>

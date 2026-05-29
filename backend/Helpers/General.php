@@ -15,6 +15,7 @@ abstract class General
     {
         try {
             if (is_null($value) && $type !== "json") return $value;
+            else if (is_null($value)) return null;
             else if ($type == "int") $value = intval($value);
             else if ($type == "string") $value = (string)$value;
             else if ($type == "bool" || $type == "boolean") $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);

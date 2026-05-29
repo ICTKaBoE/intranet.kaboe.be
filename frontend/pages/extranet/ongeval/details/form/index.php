@@ -71,8 +71,8 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                 </div>
             </div>
 
-            <div class="card-footer text-end">
-                <button type="button" class="btn btn-secondary ms-auto" id="btnClose">Sluiten zonder gevolg</button>
+            <div class="card-footer d-flex">
+                <button type="button" class="me-auto" id="btnClose">Sluiten zonder gevolg</button>
                 <button type="submit" class="btn btn-success">Opslaan</button>
             </div>
         </form>

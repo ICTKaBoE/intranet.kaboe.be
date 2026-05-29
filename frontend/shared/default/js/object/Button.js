@@ -22,18 +22,17 @@ export default class Button extends MasterObject {
 	}
 
 	create = (full = false) => {
-		if (full) {
-			this.element.type = "button";
-			this.element.classList.add("btn");
+		this.element.innerHTML = "";
+		this.element.type = "button";
+		this.element.classList.add("btn");
 
-			if (this.options.bgColor || false)
-				this.element.classList.add(`btn-${this.options.bgColor}`);
+		if (this.options.bgColor || false)
+			this.element.classList.add(`btn-${this.options.bgColor}`);
 
-			if (this.options.title || false) {
-				this.element.title = this.options.title;
-				this.element.dataset.bsToggle = "tooltip";
-				this.element.dataset.bsPlacement = "top";
-			}
+		if (this.options.title || false) {
+			this.element.title = this.options.title;
+			this.element.dataset.bsToggle = "tooltip";
+			this.element.dataset.bsPlacement = "top";
 		}
 
 		if (this.options.onclick || false)
@@ -48,40 +47,30 @@ export default class Button extends MasterObject {
 				Helpers.toggleModal(this.options.modal);
 			});
 
-		if (full) {
-			switch (this.options.type || Button.TYPE_TEXT) {
-				case Button.TYPE_ICON:
-					{
-						let icon = document.createElement("i");
-						icon.classList.add(
-							"icon",
-							"ti",
-							`ti-${this.options.icon}`
-						);
+		switch (this.options.type || Button.TYPE_TEXT) {
+			case Button.TYPE_ICON:
+				{
+					let icon = document.createElement("i");
+					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
 
-						this.element.classList.add("btn-icon");
-						this.element.appendChild(icon);
-					}
-					break;
+					this.element.classList.add("btn-icon");
+					this.element.appendChild(icon);
+				}
+				break;
 
-				case Button.TYPE_ICON_TEXT:
-					{
-						let icon = document.createElement("i");
-						icon.classList.add(
-							"icon",
-							"ti",
-							`ti-${this.options.icon}`
-						);
+			case Button.TYPE_ICON_TEXT:
+				{
+					let icon = document.createElement("i");
+					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
 
-						this.element.appendChild(icon);
-						this.element.innerHTML += this.options.text;
-					}
-					break;
+					this.element.appendChild(icon);
+					this.element.innerHTML += this.options.text;
+				}
+				break;
 
-				default:
-					this.element.innerHTML = this.options.text;
-					break;
-			}
+			default:
+				this.element.innerHTML = this.options.text;
+				break;
 		}
 	};
 

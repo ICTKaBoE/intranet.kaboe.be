@@ -44,6 +44,8 @@ class Moment extends CustomObject
 
     public function init()
     {
+        $this->isPast = ($this->date ? Clock::at($this->date . " " . $this->linked->hour->start)->isBefore(Clock::now()) : false);
+
         $this->formatted->date = new stdClass;
         $this->formatted->date->display = is_null($this->date) ? ucfirst(Date::dayOfWeekToString($this->dayOfWeek)) : Clock::at($this->date)->format("d/m/Y");
         $this->formatted->date->sort = is_null($this->date) ? ucfirst(Date::dayOfWeekToString($this->dayOfWeek)) :  Clock::at($this->date)->format("U");

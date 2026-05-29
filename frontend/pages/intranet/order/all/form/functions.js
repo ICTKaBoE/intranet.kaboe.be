@@ -73,14 +73,7 @@ let btnDelete = new Button({
 		title: "Verwijderen",
 		bgColor: "red",
 		modal: "delete",
-		onclick: () => {
-			Form.GetInstance(`${pageId}LineDelete`).setLastLoadedId(
-				Table.GetInstance(`${pageId}Line`)
-					.getSelectedRowData()
-					.map((r) => r.guid || r.id)
-					.join("_")
-			);
-		},
+		onclick: "delete",
 	},
 });
 

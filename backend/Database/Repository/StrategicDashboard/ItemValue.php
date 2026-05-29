@@ -12,6 +12,12 @@ class ItemValue extends Repository
         parent::__construct("tbl_strategicdashboard_item_value", \Database\Object\StrategicDashboard\ItemValue::class, orderField: "datetime", orderDirection: self::ORDER_DIRECTION_DESC, guidField: false);
     }
 
+    public function getByItemId($itemId)
+    {
+        $statement = $this->prepareSelect(filters: ['itemId' => $itemId]);
+        return $this->executeSelect($statement);
+    }
+
     public function getLastValueByItemId($itemId)
     {
         $statement = $this->prepareSelect(filters: ['itemId' => $itemId]);

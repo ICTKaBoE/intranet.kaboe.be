@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers\API\Cron;
+namespace Controllers\Cron;
 
 use Database\Repository\COLTDAlert\COLTDAlertMessage;
 use Database\Repository\Setting\Setting;

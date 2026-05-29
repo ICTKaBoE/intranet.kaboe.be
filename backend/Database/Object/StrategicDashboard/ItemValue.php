@@ -2,6 +2,7 @@
 
 namespace Database\Object\StrategicDashboard;
 
+use Helpers\CString;
 use Security\CustomObject;
 
 class ItemValue extends CustomObject
@@ -14,4 +15,9 @@ class ItemValue extends CustomObject
         "editedByUserId" => self::TYPE_INTEGER,
         "deleted" => self::TYPE_BOOLEAN
     ];
+
+    public function init()
+    {
+        $this->formatted->value = is_int($this->value) ? CString::formatNumber($this->value, 2) : $this->value;
+    }
 }

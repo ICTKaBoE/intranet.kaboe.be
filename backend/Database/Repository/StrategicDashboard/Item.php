@@ -10,4 +10,10 @@ class Item extends Repository
     {
         parent::__construct("tbl_strategicdashboard_item", \Database\Object\StrategicDashboard\Item::class, guidField: false);
     }
+
+    public function getByCategoryId($categoryId)
+    {
+        $statement = $this->prepareSelect(filters: ["categoryId" => $categoryId]);
+        return $this->executeSelect($statement);
+    }
 }

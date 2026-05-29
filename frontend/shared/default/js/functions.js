@@ -2,10 +2,20 @@ import Helpers from "./object/Helpers.js";
 import Table from "./object/Table.js";
 import Select from "./object/Select.js";
 import List from "./object/List.js";
+import Form from "./object/Form.js";
 
 window.edit = () => {
 	let selected = Table.GetInstance(pageId).getSelectedRowData();
 	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
+};
+
+window.delete = () => {
+	Form.GetInstance(`${pageId}Delete`).setLastLoadedId(
+		Table.GetInstance(pageId)
+			.getSelectedRowData()
+			.map((r) => r.guid || r.id)
+			.join("_")
+	);
 };
 
 window.view = () => edit();

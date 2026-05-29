@@ -2,43 +2,40 @@
 
 namespace Controllers\API;
 
-use Helpers\Date;
-use Helpers\Form;
-use Helpers\Excel;
-use Helpers\Table;
-use Security\User;
-use Helpers\Filter;
-use Router\Helpers;
-use Security\Input;
-use Helpers\General;
-use Security\FileSystem;
-use Ouzo\Utilities\Clock;
-use Ouzo\Utilities\Arrays;
-use Ouzo\Utilities\Strings;
-use Smartschool\Smartschool;
 use Controllers\ApiController;
-use Database\Repository\Holliday;
-use Database\Repository\Sync\Sync;
-use Database\Repository\Remedy\Type;
-use Database\Repository\Remedy\Moment;
-use Database\Repository\Remedy\Remedy;
-use Database\Repository\School\Course;
-use Database\Repository\School\School;
 use Database\Object\Navigation\TableDef;
-use Database\Repository\Informat\Employee;
-use Database\Repository\School\Department;
-use Database\Repository\General\Schoolyear;
-use Database\Repository\Remedy\ComputerType;
-use Database\Repository\Smartschool\Message;
-use Database\Object\Remedy\Type as RemedyType;
-use Database\Repository\User\User as UserUser;
 use Database\Object\Remedy\Moment as RemedyMoment;
 use Database\Object\Remedy\Remedy as RemedyRemedy;
-use Database\Repository\Smartschool\MessageReceiver;
-use Database\Repository\School\CourseInformatStudent;
+use Database\Object\Remedy\Type as RemedyType;
 use Database\Object\Smartschool\Message as SmartschoolMessage;
-use Database\Repository\School\CourseInformatEmployeeClassgroup;
 use Database\Object\Smartschool\MessageReceiver as SmartschoolMessageReceiver;
+use Database\Repository\General\Schoolyear;
+use Database\Repository\Holliday;
+use Database\Repository\Informat\Employee;
+use Database\Repository\Remedy\ComputerType;
+use Database\Repository\Remedy\Moment;
+use Database\Repository\Remedy\Remedy;
+use Database\Repository\Remedy\Type;
+use Database\Repository\School\CourseInformatEmployeeClassgroup;
+use Database\Repository\School\CourseInformatEmployeeStudentClassgroup;
+use Database\Repository\School\Department;
+use Database\Repository\Smartschool\Message;
+use Database\Repository\Smartschool\MessageReceiver;
+use Database\Repository\Sync\Sync;
+use Database\Repository\User\User as UserUser;
+use Helpers\Date;
+use Helpers\Excel;
+use Helpers\Filter;
+use Helpers\Form;
+use Helpers\General;
+use Helpers\Table;
+use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Clock;
+use Ouzo\Utilities\Strings;
+use Router\Helpers;
+use Security\FileSystem;
+use Security\Input;
+use Security\User;
 
 class RemedyController extends ApiController
 {
@@ -100,6 +97,7 @@ class RemedyController extends ApiController
             $items = $repo->get(filters: $filters);
             $items = Arrays::filter($items, fn($i) => !$i->full);
             $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::at($i->date . " " . $i->linked->hour->start)->isAfterOrEqualTo(Clock::at(date("Y-m-d H:i:s", strtotime("next " . WEEK_DAYS['en'][$i->linked->type->closeRegistrationAt] . " 8:59:00")))));
+            $items = Arrays::filter($items, fn($i) => !$i->isPast);
 
             $items = array_values($items);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
@@ -136,20 +134,22 @@ class RemedyController extends ApiController
 
     protected function getCoursePerStudent($view, $id = null)
     {
-        $repo = new CourseInformatStudent;
-        $courseRepo = new Course;
-        $courseTeacherRepo = new CourseInformatEmployeeClassgroup;
+        $repo = new CourseInformatEmployeeStudentClassgroup;
 
-        $filters = Filter::Find(['informatStudentId']);
+        $filters = Filter::Find(['informatStudentId', 'informatClassgroupId']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            $items = [];
+            if (empty(Arrays::getNestedValue($filters, ['informatStudentId', 0]))) {
+                $this->appendToJson('items', []);
+                return;
+            }
+
             $items = $repo->get(filters: $filters);
-            $items = Arrays::map($items, fn($i) => $i->schoolCourseId);
-            $items = array_unique($items);
-            $items = Arrays::map($items, fn($i) => $courseRepo->getById($i));
+            Arrays::each($items, fn($i) => $i->id = "{$i->schoolCourseId}-{$i->informatEmployeeId}-{$i->informatStudentId}-{$i->informatClassgroupId}");
+            Arrays::each($items, fn($i) => $i->name = "{$i->linked->schoolCourse->name} - {$i->linked->informatEmployee->formatted->fullNameReversed}");
             $items = Arrays::orderBy($items, "name");
-            Arrays::each($items, fn($i) => $i->name .= " - " . $courseTeacherRepo->getBySchoolCourseIdAndInformatClassgroupId($i->id, Helpers::url()->getParam('classgroupId'))->linked->informatEmployee->formatted->fullNameReversed);
+            $items = Arrays::uniqueBy($items, fn($i) => $i->name);
+            $items = array_values($items);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         }
     }
@@ -195,6 +195,7 @@ class RemedyController extends ApiController
                                 "title" => "{$assignedStudent->linked->informatStudent->formatted->fullNameReversed} ({$assignedStudent->linked->classgroup->name})",
                                 "color" => "lime" . ($date->isBefore(Clock::now()) ? "-lt" : ""),
                                 "allDay" => true,
+                                "disabled" => ($date->isBefore(Clock::now()))
                             ]);
                         };
                     }
@@ -241,7 +242,7 @@ class RemedyController extends ApiController
             $items = Arrays::filter($items, fn($i) => Strings::equal($i->linked->moment->userId, $currentUserId));
             $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate);
             $items = Arrays::filter($items, fn($i) => !is_null($i->assignedDate));
-            $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate)->isBeforeOrEqualTo(Clock::now()));
+            // $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate . " 23:59:59")->isBeforeOrEqualTo(Clock::at(Clock::nowAsString("Y-m-d 23:59:59"))));
             $items = Arrays::uniqueBy($items, fn($i) => $i->assignedDate);
             $items = Arrays::uniqueBy($items, fn($i) => $i->momentId);
 
@@ -462,9 +463,9 @@ class RemedyController extends ApiController
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
-            $courseTeacherRepo = new CourseInformatEmployeeClassgroup;
+            $courseTeacherRepo = new CourseInformatEmployeeStudentClassgroup;
             $items = $item->linked->type->manualAssignDate ? $repo->getByMomentIdAndAssignedDate($item->momentId, $item->assignedDate) : $repo->getByMomentId($item->momentId);
-            Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdAndInformatClassgroupId($i->schoolId, $i->classgroupId)->linked->informatEmployee);
+            Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->schoolId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
             $this->appendToJson("rows", $items);
         }
     }
@@ -533,12 +534,13 @@ class RemedyController extends ApiController
             $informatEmployeeRepo = new Employee;
 
             if ($this->validationIsAllGood()) {
-                $userId = ($fields['informatEmployeeId'] ? $userRepo->getByInformatEmployeeId($informatEmployeeRepo->getById($fields['informatEmployeeId'])->informatId)->id : NULL);
+                $informatEmployee = $informatEmployeeRepo->getById($fields['informatEmployeeId']);
+                $user = $userRepo->getByInformatEmployeeId($informatEmployee->informatId) ?? $userRepo->getByInformatEmployeeId("P{$informatEmployee->informatId}");
 
                 if (is_null($fields['repeat']) || Strings::equal($fields['repeat'], "N")) {
                     $item = $repo->getById($id) ?? new RemedyMoment;
                     $item->fillWithPostData();
-                    $item->userId = $userId;
+                    $item->userId = $user->id;
                     if (!$fields['date']) $item->date = $fields['startDate'];
 
                     if ($manualAssignDate) {
@@ -564,7 +566,7 @@ class RemedyController extends ApiController
                             $item = $repo->getById($id) ?? new RemedyMoment;
                             $item->fillWithPostData();
                             $item->date = $date->format("Y-m-d");
-                            $item->userId = $userId;
+                            $item->userId = $user->id;
 
                             if ($manualAssignDate) {
                                 $item->dayOfWeek = $id ? $fields['dayOfWeek'] : Date::stringToDayOfWeek($fields['repeatAt'], "en");
@@ -589,18 +591,23 @@ class RemedyController extends ApiController
         if ($id == "add") $id = null;
 
         $_fields = [
-            "postData" => ["type" => Input::INPUT_TYPE_STRING],
+            "schoolId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "departmentId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
             "typeId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "courseId" => ['type' => Input::INPUT_TYPE_INT],
             "momentId" => ["type" => Input::INPUT_TYPE_INT],
+            "informatStudentId" => ["mandatory" => true],
+            "informatClassgroupId",
+            "coursePerStudent",
+            "computerType",
             "computerTypeOther" => ["mandatory" => true, "preconditions" => ["computerType" => "O"]],
-            "remark" => ["type" => Input::INPUT_TYPE_STRING]
+            "computerPassword",
+            "remark" => ["type" => Input::INPUT_TYPE_STRING],
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
         Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
-        $fields['postData'] = json_decode($fields['postData'], true);
         $repo = new Remedy;
         $department = (new Department)->getById($fields['departmentId']);
         $type = (new Type)->getById($fields['typeId']);
@@ -613,14 +620,15 @@ class RemedyController extends ApiController
 
         if (!$type->manualAssignDate && $moment->seats != 0) {
             $currentSeats = count($repo->getByMomentId($fields['momentId']));
-            $newSeats = count($fields['postData']);
+            $newSeats = count(explode(";", $fields['informatStudentId']));
             $seats = $newSeats + $currentSeats;
             $availableSeats = $moment->seats - $currentSeats;
             if ($seats >= $moment->seats) $this->setToast("Helaas zijn er nog {$availableSeats} plaatsen vrij, u probeert er {$newSeats} in te schrijven...", self::VALIDATION_STATE_INVALID);
         }
 
         if ($this->validationIsAllGood()) {
-            $user = User::getLoggedInUser()->formatted->fullNameReversed;
+            $user = User::getLoggedInUser();
+            [$schoolCourseId, $informatEmployeeId, $informatStudentId, $informatClassgroupId] = explode("-", $fields['coursePerStudent']);
 
             $smartschoolSourceId = $department->linked->school->smartschoolSourceId ?? $department->linked->school->linked->parentSchool->smartschoolSourceId;
 
@@ -632,7 +640,7 @@ class RemedyController extends ApiController
                 $body = "
                 Beste {$moment->linked->informatEmployee->formatted->fullNameReversed}, <br />
                 <br />
-                <p>Onderstaande leerlingen werden door {$user} <a href=\"http://intranet.coltd.be/intranetv2/modules/Remedieringen/toewijzen.php\" target=\"_blank\">ingeschreven via intranet</a> om een {$type->name} bij u te volgen" . ($fields['remark'] ? " met volgende opmerking" : "") . ":</p>";
+                <p>Onderstaande leerlingen werden door {$user->formatted->fullNameReversed} <a href=\"https://intranet.kaboe.be/remedy/presence.php\" target=\"_blank\">ingeschreven via intranet</a> om een {$type->name} bij u te volgen" . ($fields['remark'] ? " met volgende opmerking" : "") . ":</p>";
                 if ($fields['remark']) $body .= "<p>{$fields['remark']}</p>";
 
                 $body .= "
@@ -648,30 +656,29 @@ class RemedyController extends ApiController
                 ";
             }
 
-            foreach ($fields['postData'] as $postData) {
+            foreach (explode(";", $fields['informatStudentId']) as $index => $_informatStudentId) {
                 $item = new RemedyRemedy;
                 $item->fillWithPostData($fields);
                 $item->creatorUserId = User::getLoggedInUser()->id;
-                $item->schoolId = $postData['schoolId'];
-                $item->courseId = $postData['courseId'];
-                $item->informatStudentId = $postData['informatStudentId'];
-                $item->classgroupId = $postData['classgroupId'];
+                $item->informatStudentId = $_informatStudentId;;
+                if (!$type->manualAssignDate) $item->courseId = $schoolCourseId;
+                $item->classgroupId = !$type->manualAssignDate ? $informatClassgroupId : (explode(";", $fields['informatClassgroupId'])[$index] ?? null);
 
-                $repo->set($item);
+                $item = $repo->getById($repo->set($item));
 
-                if ($type->manualAssignDate) {
+                if ($item->linked->type->manualAssignDate) {
                     $body .= "
                 <tr>
-                    <td style=\"border: solid 1px black; width: 300px; padding: 10px;\">{$postData['fullNameReversed']}</td>
-                    <td style=\"border: solid 1px black; width: 50px; padding: 10px;\">{$postData['className']}</td>
+                    <td style=\"border: solid 1px black; width: 300px; padding: 10px;\">{$item->linked->informatStudent->formatted->fullNameReversed}</td>
+                    <td style=\"border: solid 1px black; width: 50px; padding: 10px;\">{$item->linked->classgroup->name}</td>
                 </tr>
                 ";
                 } else {
-                    $title = "{$type->name} voor {$postData['courseName']}";
+                    $title = "{$item->linked->type->name} voor {$item->linked->course->name}";
                     $body = "
-                    Beste {$postData['fullNameReversed']}, beste ouders,<br />
+                    Beste {$item->linked->informatStudent->formatted->fullNameReversed}, beste ouders,<br />
                     <br />
-                    Je bent ingeschreven voor de {$type->name} van {$postData['courseName']} op {$moment->formatted->date->display} {$moment->linked->hour->formatted->start} in lokaal {$moment->linked->room->formatted->full}.<br />
+                    Je bent ingeschreven voor de {$item->linked->type->name} van {$item->linked->course->name} op {$item->linked->moment->formatted->date->display} {$item->linked->moment->linked->hour->formatted->start} in lokaal {$item->linked->moment->linked->room->formatted->full}.<br />
                     Gelieve dit te noteren in je agenda en hiervoor aanwezig te zijn a.u.b.
                     ";
 
@@ -1111,12 +1118,12 @@ class RemedyController extends ApiController
     {
         $return = [];
         $repo = new Remedy;
-        $courseTeacherRepo = new CourseInformatEmployeeClassgroup;
+        $courseTeacherRepo = new CourseInformatEmployeeStudentClassgroup;
 
         $items = $repo->get();
         $items = Arrays::filter($items, fn($i) => Strings::equal($i->schoolId, $schoolId));
         $items = Arrays::filter($items, fn($i) => Strings::equal($i->departmentId, $departmentId));
-        Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdAndInformatClassgroupId($i->schoolId, $i->classgroupId)->linked->informatEmployee);
+        Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->schoolId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
 
         if ($start) $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate ?: $i->linked->moment->date)->isAfterOrEqualTo(Clock::at($start)));
         if ($end) $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate ?: $i->linked->moment->date)->isBeforeOrEqualTo(Clock::at($end)));

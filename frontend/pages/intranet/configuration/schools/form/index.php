@@ -1,30 +1,3 @@
-<!-- <div class="card col-12 col-lg-6 mx-auto">
-    <form action="{{form:url:full}}" method="post" autocomplete="off" id="frm{{page:id}}" data-prefill-id="{{url:part.id}}">
-        <div class="card-body">
-            
-        </div>
-
-        <div class="card-body">
-            
-        </div>
-
-        <div class="card-body">
-
-            <div class="row mb-3">
-                <div class="col-12 mb-3">
-                    <label for="syncUpdateMail" class="form-label">Update ontvangen over Sync</label>
-                    <textarea name="syncUpdateMail" id="syncUpdateMail" class="form-control" rows="5"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-footer text-end">
-            <button type="button" class="btn" onclick="history.back();">Annuleren</button>
-            <button type="submit" class="btn btn-primary">Opslaan</button>
-        </div>
-    </form>
-</div> -->
-
 <form action="{{form:url:full}}" method="post" id="frm{{page:id}}" class="card col-12 col-lg-6 mx-auto" data-prefill-id="{{url:part.id}}">
     <div class="card-header">
         <ul class='nav nav-tabs card-header-tabs' data-bs-toggle='tabs'>
@@ -72,6 +45,13 @@
                             De gegevens die hieronder niet ingevuld worden, worden automatisch vervangen door de gegevens ingevoerd bij de hoofdschool.<br />
                             Wil je dit niet? Zet dan hier de gegevens in of verwijder ze globaal uit de hoofdschool.
                         </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="hrEmail" class="form-label">E-mailadres Personeelsdienst</label>
+                        <input type="text" name="hrEmail" id="hrEmail" class="form-control" />
                     </div>
                 </div>
 

@@ -5,7 +5,6 @@ namespace Database\Object\School;
 use Helpers\HTML;
 use Helpers\CString;
 use Security\CustomObject;
-use Security\Input;
 
 class School extends CustomObject
 {
@@ -39,6 +38,7 @@ class School extends CustomObject
         "smartschoolSourceId" => self::TYPE_STRING,
         "eetjemeeKey" => self::TYPE_STRING,
         "eetjemeeSmartschoolGroup" => self::TYPE_STRING,
+        "hrEmail" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
@@ -52,6 +52,10 @@ class School extends CustomObject
         $this->formatted->nameWithParent = ($this->linked->parentSchool ? $this->linked->parentSchool->name . " - " : "") . $this->name;
         $this->formatted->badge->name = HTML::Badge($this->name, style: [
             "margin-top" => "2px",
+            "background-color" => $this->color
+        ]);
+        $this->formatted->badge->color = HTML::Badge("", style: [
+            "padding" => "10px",
             "background-color" => $this->color
         ]);
 

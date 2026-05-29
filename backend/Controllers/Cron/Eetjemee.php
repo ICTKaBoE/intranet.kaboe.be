@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers\API\Cron;
+namespace Controllers\Cron;
 
 use Database\Repository\School\School;
 use Database\Repository\Source;

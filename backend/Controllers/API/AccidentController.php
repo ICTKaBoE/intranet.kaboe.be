@@ -542,6 +542,11 @@ class AccidentController extends ApiController
                 $body = str_replace("{{{$key}}}", $value, $body);
             }
 
+            foreach ($accident->linked->informatStudent->toArray(true) as $key => $value) {
+                $subject = str_replace("{{student:{$key}}}", $value, $subject);
+                $body = str_replace("{{student:{$key}}}", $value, $body);
+            }
+
             $mail->fromEmail = $fromEmail;
             $mail->fromName = $fromName;
             $mail->subject = $subject;
@@ -649,7 +654,7 @@ class AccidentController extends ApiController
         $mId = $mailRepo->set($mail);
 
         foreach ((new StudentEmail)->getByInformatStudentId($accident->informatStudentId) as $email) {
-            if (!Arrays::contains(["moeder", "vader", "plusvader", "plusmoeder", "pleegmoeder", "pleegvader", "meemoeder", "meevader", "ouders"], strtolower($email->type))) continue;
+            if (!$email->communication) continue;
 
             $receiver = new MailReceiver;
             $receiver->mailId = $mId;
@@ -777,11 +782,6 @@ class AccidentController extends ApiController
 
             foreach ($template->getVariables() as $var) $template->setValue($var, '');
             $template->saveAs($saveFilename);
-
-            // $word = IOFactory::load($saveFilename);
-            // $word->setDefaultFontName("aptos");
-            // $word->setDefaultFontSize(11);
-            // $word->save($saveFilename);
         }
     }
 }

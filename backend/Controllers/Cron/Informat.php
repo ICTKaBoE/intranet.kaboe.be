@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers\API\Cron;
+namespace Controllers\Cron;
 
 use Helpers\Log;
 use Router\Helpers;
@@ -423,6 +423,7 @@ abstract class Informat
         $mail->informatId = $email->pEmail;
         $mail->email = Strings::trimToNull($email->email);
         $mail->type = Strings::trimToNull($email->type);
+        $mail->communication = $email->schoolcom;
 
         $emailRepo->set($mail);
     }

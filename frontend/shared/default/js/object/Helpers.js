@@ -147,16 +147,16 @@ export default class Helpers {
 		return value;
 	};
 
-	static fetch = ({ url, options = {} }) => {};
+	static fetch = ({ url, options = {} }) => { };
 
 	static request = ({
 		url,
 		method = "GET",
 		data = null,
 		initiator,
-		done = () => {},
-		fail = () => {},
-		always = () => {},
+		done = () => { },
+		fail = () => { },
+		always = () => { },
 	}) => {
 		let properties = {
 			url: url,

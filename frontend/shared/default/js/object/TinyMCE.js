@@ -4,6 +4,8 @@ export default class TinyMCE extends MasterObject {
 	static OBJ_SELECTOR = "[role='tinymce']";
 
 	constructor(element) {
+		super();
+
 		this.element = element;
 		this.id = this.element.id || false;
 		this.disabled = this.element.hasAttribute("disabled");

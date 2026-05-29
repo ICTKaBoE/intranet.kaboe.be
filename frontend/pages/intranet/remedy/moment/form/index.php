@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label class="form-label" for="courseId">Vak</label>
-                <select name="courseId" id="courseId" data-load-source="{{select:url:short}}/school/course"></select>
+                <select name="courseId" id="courseId" data-load-source="{{select:url:short}}/school/course" data-search></select>
             </div>
         </div>
 
@@ -53,7 +53,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <label for="informatEmployeeId" class="form-label">Leerkracht</label>
-                <select name="informatEmployeeId" id="informatEmployeeId" data-load-source="{{select:url:short}}/informat/employee" data-label="formatted.fullNameReversed"></select>
+                <select name="informatEmployeeId" id="informatEmployeeId" data-load-source="{{select:url:short}}/informat/employee" data-label="formatted.fullNameReversed" data-search></select>
             </div>
         </div>
 

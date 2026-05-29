@@ -18,39 +18,45 @@ import Helpers from "./object/Helpers.js";
 window.SELECT_OTHER_ID = 0;
 
 $.ajaxSetup({
-	xhrFields: {
-		mode: "cors",
-		withCredentials: true,
-	},
+  xhrFields: {
+    mode: "cors",
+    withCredentials: true,
+  },
 });
 
 const components = [
-	Toast,
-	List,
-	Select,
-	Checkbox,
-	Button,
-	TinyMCE,
-	Table,
-	Calendar,
-	DatePicker,
-	Chart,
-	Rating,
-	ColorInput,
-	SearchField,
+  Toast,
+  List,
+  Select,
+  Checkbox,
+  Button,
+  TinyMCE,
+  Table,
+  Calendar,
+  DatePicker,
+  Chart,
+  Rating,
+  ColorInput,
+  SearchField,
 ];
 
 components.forEach((c) => c.ScanAndCreate());
 
 // Uitgestelde initialisaties
 setTimeout(() => {
-	[Form, Signage].forEach((c) => c.ScanAndCreate());
+  [Form, Signage].forEach((c) => c.ScanAndCreate());
 }, 250);
 
 $(document).ready(() => {
-	Helpers.CheckAllLoaded(() => {
-		setTimeout(() => {
-			window.fillFilter();
-		}, 500);
-	}, [Select, Table]);
+  Helpers.CheckAllLoaded(() => {
+    setTimeout(() => {
+      window.fillFilter();
+      const popoverTriggerList = document.querySelectorAll(
+        '[data-bs-toggle="popover"]',
+      );
+      const popoverList = [...popoverTriggerList].map(
+        (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl),
+      );
+    }, 500);
+  }, [Select, Table]);
 });

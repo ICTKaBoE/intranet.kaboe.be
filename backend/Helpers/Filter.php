@@ -8,7 +8,7 @@ use Ouzo\Utilities\Strings;
 
 abstract class Filter
 {
-    static public function Find($filters)
+    static public function Find($filters = [])
     {
         $newFilters = [];
         foreach ($filters as $filter) $newFilters[$filter] = Arrays::filter(explode(";", Helpers::url()->getParam($filter)), fn($i) => Strings::isNotBlank($i));

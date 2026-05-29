@@ -17,10 +17,16 @@ export default class MasterObject {
 
 	static GetInstance(id) {
 		if (this.OBJ_ID_PREFIX && !id.startsWith(this.OBJ_ID_PREFIX))
-			id = `${this.OBJ_ID_PREFIX}${
-				String(id).charAt(0).toUpperCase() + String(id).slice(1)
-			}`;
+			id = `${this.OBJ_ID_PREFIX}${String(id).charAt(0).toUpperCase() + String(id).slice(1)
+				}`;
 		return this.INSTANCES[this.name][id] || null;
+	}
+
+	static RemoveInstance(id) {
+		if (this.OBJ_ID_PREFIX && !id.startsWith(this.OBJ_ID_PREFIX))
+			id = `${this.OBJ_ID_PREFIX}${String(id).charAt(0).toUpperCase() + String(id).slice(1)
+				}`;
+		delete this.INSTANCES[this.name][id];
 	}
 
 	static ReloadAll() {
@@ -31,6 +37,7 @@ export default class MasterObject {
 	}
 
 	static Loaded() {
+		if (!this.INSTANCES.hasOwnProperty(this.name)) return true;
 		return !Object.keys(this.INSTANCES[this.name])
 			.map((i) => i.loaded)
 			.includes(false);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers\API\Cron;
+namespace Controllers\Cron;
 
 use Database\Repository\Mail\Attachment;
 use Helpers\Log;
@@ -40,6 +40,7 @@ abstract class Mail
             foreach ($attachments as $a) $m->setAttachment($a->path, $a->name);
 
             try {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Sending mail to " . count($receivers) . " receiver(s): " . implode(", ", Arrays::map($receivers, fn($r) => $r->email)));
                 $m->send();
                 $mail->sentDateTime = Clock::nowAsString("Y-m-d H:i:s");
                 $mail->error = null;

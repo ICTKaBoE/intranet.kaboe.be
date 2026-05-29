@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School (geen = algemeen)</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-default-value="{{user:mainSchoolId}}"></select>
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">

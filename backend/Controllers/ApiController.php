@@ -200,16 +200,18 @@ class ApiController extends stdClass
 		return $this->validation;
 	}
 
-	protected function getSettings()
+	protected function getSettings($return = false)
 	{
 		$settings = [];
 		foreach ((new Setting)->getByNavigationId(CURRENT_NAVIGATION_MODULE_ID) as $setting) $settings[$setting->key] = $setting->value;
-		$this->appendToJson('fields', Arrays::flattenKeysRecursively($settings));
+
+		if ($return) return $settings;
+		else $this->appendToJson('fields', Arrays::flattenKeysRecursively($settings));
 	}
 
-	protected function postSettings()
+	protected function postSettings($settings = [])
 	{
-		$_settings = Helpers::input()->all();
+		$_settings = $settings ?? Helpers::input()->all();
 		$_settings = Arrays::mapKeys($_settings, fn($s) => str_replace("_", ".", $s));
 
 		$repo = new Setting;

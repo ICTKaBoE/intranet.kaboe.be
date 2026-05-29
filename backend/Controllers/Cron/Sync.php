@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers\API\Cron;
+namespace Controllers\Cron;
 
 use Helpers\Log;
 use Security\User;

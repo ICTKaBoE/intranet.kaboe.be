@@ -9,12 +9,17 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-6 col-12 mb-3">
+                <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="schoolId">School (geen = algemeen)</label>
-                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" data-default-value="{{user:mainSchoolId}}"></select>
+                    <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school/all" data-default-value="{{user:mainSchoolId}}"></select>
                 </div>
 
-                <div class="col-lg-6 col-12 mb-3">
+                <div class="col-lg-4 col-12 mb-3">
+                    <label class="form-label" for="categoryId">Categorie</label>
+                    <select name="categoryId" id="categoryId" data-load-source="{{select:url:short}}/{{url:part.module}}/categories"></select>
+                </div>
+
+                <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="typeId">Type</label>
                     <select name="typeId" id="typeId" data-load-source="{{select:url:full}}Type" required></select>
                 </div>
@@ -41,6 +46,20 @@
                 <div class="col-12 mb-3">
                     <label for="canEditUserId" class="form-label">Mogen bewerken</label>
                     <select name="canEditUserId" id="canEditUserId" data-load-source="{{select:url:short}}/user" data-label="formatted.fullNameReversed" multiple data-search></select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label for="info" class="form-label">Extra info</label>
+                    <textarea name="info" id="info" class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label for="valueTemplate" class="form-label">Template</label>
+                    <textarea name="valueTemplate" id="valueTemplate" class="form-control" rows="6"></textarea>
                 </div>
             </div>
         </div>

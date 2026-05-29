@@ -5,11 +5,11 @@ namespace Database\Repository\School;
 use Database\Interface\Repository;
 use Ouzo\Utilities\Arrays;
 
-class CourseInformatEmployeeClassgroup extends Repository
+class CourseInformatEmployeeStudentClassgroup extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_school_course_informat_employee_classgroup", \Database\Object\School\CourseInformatEmployeeClassgroup::class, orderField: false, deletedField: false, guidField: false);
+        parent::__construct("tbl_school_course_informat_employee_student_classgroup", \Database\Object\School\CourseInformatEmployeeStudentClassgroup::class, orderField: false, deletedField: false, guidField: false);
     }
 
     public function getBySchoolCourseId($schoolCourseId)
@@ -42,9 +42,21 @@ class CourseInformatEmployeeClassgroup extends Repository
         return $this->executeSelect($statement);
     }
 
+    public function getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($schoolCourseId, $informatStudentId, $informatClassgroupId)
+    {
+        $statement = $this->prepareSelect(filters: ['schoolCourseId' => $schoolCourseId, 'informatStudentId' => $informatStudentId, 'informatClassgroupId' => $informatClassgroupId]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
     public function getBySchoolCourseIdInformatEmployeeIdAndInformatClassgroupId($schoolCourseId, $informatEmployeeId, $informatClassgroupId)
     {
         $statement = $this->prepareSelect(filters: ['schoolCourseId' => $schoolCourseId, 'informatEmployeeId' => $informatEmployeeId, 'informatClassgroupId' => $informatClassgroupId]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
+    public function getBySchoolCourseIdInformatEmployeeIdInformatStudentIdAndInformatClassgroupId($schoolCourseId, $informatEmployeeId, $informatStudentId, $informatClassgroupId)
+    {
+        $statement = $this->prepareSelect(filters: ['schoolCourseId' => $schoolCourseId, 'informatEmployeeId' => $informatEmployeeId, 'informatStudentId' => $informatStudentId, 'informatClassgroupId' => $informatClassgroupId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

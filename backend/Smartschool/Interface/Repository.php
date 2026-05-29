@@ -17,6 +17,7 @@ class Repository extends stdClass
     const OUTPUT_ARRAY = "array";
     const OUTPUT_BASE64 = "b64";
     const OUTPUT_JSON = "json";
+    const OUTPUT_EXTRACT = "extract";
 
     public function __construct($sourceId, $function, $object, $output = self::OUTPUT_RAW, $outputRemoveKeys = [], $timeout = 300)
     {
@@ -64,14 +65,18 @@ class Repository extends stdClass
         if (Strings::equal($outputType, self::OUTPUT_XML)) {
             $array = General::xmlToArray($output);
             if ($this->outputRemoveKeys) $array = Arrays::getNestedValue($array, $this->outputRemoveKeys);
-
             $return = $array;
         } else if (Strings::equal($outputType, self::OUTPUT_JSON)) $return = json_decode($output, true);
         else if (Strings::equal($outputType, self::OUTPUT_ARRAY)) $return = $this->convertToObjects($output);
         else if (Strings::equal($outputType, self::OUTPUT_BASE64)) $return = base64_decode($output);
         else if (Strings::equal($outputType, self::OUTPUT_RAW)) $return = $output;
-
+        else if (Strings::equal($outputType, self::OUTPUT_EXTRACT)) $this->extract($output['group'], $return);
         return $return;
+    }
+
+    protected function extract($node, &$result)
+    {
+        return $result;
     }
 
     private function convertToObjects($result)

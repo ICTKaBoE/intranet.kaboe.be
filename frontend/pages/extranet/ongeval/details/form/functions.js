@@ -6,6 +6,9 @@ import Form from "../../../../../shared/default/js/object/Form.js";
 let btnDeny = new Button({
 	element: document.getElementById("btnClose"),
 	options: {
+		type: Button.TYPE_TEXT,
+		text: "Sluiten zonder gevolg",
+		bgColor: "danger",
 		onclick: () => {
 			if (confirm("BEVESTIGING: Sluiten zonder gevolg")) {
 				document.getElementById("status").value = "CNF";

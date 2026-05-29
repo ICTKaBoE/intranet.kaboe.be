@@ -18,7 +18,10 @@ use Database\Repository\Informat\StudentBank;
 use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
+use Database\Repository\School\Department;
 use Database\Repository\School\Institute;
+use Database\Repository\School\School;
+use Helpers\Filter;
 use Ouzo\Utilities\Clock;
 
 class InformatController extends ApiController
@@ -163,7 +166,50 @@ class InformatController extends ApiController
 
                 $student = $repo->getById($registration->informatStudentId);
                 $student->optgroup = $class->id;
-                $student->class = $class;
+                $student->linked->class = $class;
+                $students[] = $student;
+            }
+
+            $students = Arrays::orderBy($students, "name");
+            $items = array_merge($items, $students);
+        }
+
+        $this->appendToJson('optgroups', $optgroups);
+        $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+    }
+
+    protected function getStudentPerClassByDepartment($view, $id = null)
+    {
+        $repo = new Student;
+        $filters = Filter::Find(['schoolId', 'departmentId']);
+
+        $classRepo = new ClassGroup;
+
+        $optgroups = [];
+        $items = [];
+
+        $department = (new Department)->getById($filters['departmentId'][0]);
+        foreach (explode(";", $department->informatClassId) as $classId) {
+            $class = $classRepo->getById($classId);
+            $optgroups[] = $class;
+        }
+        $optgroups = Arrays::orderBy($optgroups, "code");
+
+        foreach ($optgroups as $class) {
+            $students = [];
+            $registrationClasses = (new RegistrationClass)->getByInformatClassgroupId($class->id);
+
+            $registrationRepo = new Registration;
+            foreach ($registrationClasses as $rc) {
+                if (!$rc->current) continue;
+
+                $registration = $registrationRepo->getById($rc->informatRegistrationId);
+                if (!$registration) continue;
+
+                $student = $repo->getById($registration->informatStudentId);
+                $student->optgroup = $class->id;
+                $student->linked->class = $class;
+                $student->formatted->name = "{$class->code} - {$student->formatted->fullNameReversed}";
                 $students[] = $student;
             }
 

@@ -163,8 +163,12 @@ abstract class Input
 			'/Ç/'           =>   'C',
 			'/ñ/'           =>   'n',
 			'/Ñ/'           =>   'N',
-			'/–/'           =>   '', // UTF-8 hyphen to "normal" hyphen
-			'/-/'           =>   '', // UTF-8 hyphen to "normal" hyphen
+			'/–/'           =>   '', // UTF-8 hyphen
+			'/-/'           =>   '', // UTF-8 hyphen
+			'/&/'           =>   '', // UTF-8 &
+			'/\//'          =>   '', // UTF-8 /
+			'/\(/'          =>   '', // UTF-8 (
+			'/\)/'          =>   '', // UTF-8 )
 			'/[’‘\'‹›‚]/u'  =>   '', // Literally a single quote
 			'/[“”«»„]/u'    =>   '', // Double quote
 			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)

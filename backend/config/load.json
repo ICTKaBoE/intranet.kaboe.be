@@ -1,188 +1,194 @@
 {
-	"head": [
-		{
-			"tag": "meta",
-			"attributes": {
-				"charset": "UTF-8"
-			}
-		},
-		{
-			"tag": "meta",
-			"attributes": {
-				"http-equiv": "X-UA-Compatible",
-				"content": "IE=edge"
-			}
-		},
-		{
-			"tag": "meta",
-			"attributes": {
-				"name": "viewport",
-				"content": "width=device-width, initial-scale=1.0"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"rel": "icon",
-				"type": "image/png",
-				"href": "{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-socials.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-vendors.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-themes.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/tabler-icons.min.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "link",
-			"attributes": {
-				"href": "{{site:url}}/frontend/shared/default/css/main.css",
-				"rel": "stylesheet"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://code.jquery.com/jquery-3.6.0.min.js",
-				"integrity": "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=",
-				"crossorigin": "anonymous"
-			}
-		}
-	],
-	"body": [
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/list.js/dist/list.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/tinymce/tinymce.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/imask"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js",
-				"integrity": "sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI",
-				"crossorigin": "anonymous"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"type": "module",
-				"src": "{{site:url}}/frontend/shared/default/js/main.js"
-			}
-		},
-		{
-			"tag": "script",
-			"attributes": {
-				"type": "module",
-				"src": "{{site:url}}/frontend/shared/default/js/functions.js"
-			}
-		}
-	]
+  "head": [
+    {
+      "tag": "meta",
+      "attributes": {
+        "charset": "UTF-8"
+      }
+    },
+    {
+      "tag": "meta",
+      "attributes": {
+        "http-equiv": "X-UA-Compatible",
+        "content": "IE=edge"
+      }
+    },
+    {
+      "tag": "meta",
+      "attributes": {
+        "name": "viewport",
+        "content": "width=device-width, initial-scale=1.0"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "rel": "icon",
+        "type": "image/png",
+        "href": "{{site:url}}/frontend/shared/default/images/SGKaBoE blad.png"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-socials.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-vendors.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-themes.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/tabler-icons.min.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "href": "{{site:url}}/frontend/shared/default/css/main.css",
+        "rel": "stylesheet"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://code.jquery.com/jquery-3.6.0.min.js",
+        "integrity": "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=",
+        "crossorigin": "anonymous"
+      }
+    }
+  ],
+  "body": [
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/list.js/dist/list.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/tinymce/tinymce.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/imask"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/@popperjs/core/dist/umd/popper.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js",
+        "integrity": "sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI",
+        "crossorigin": "anonymous"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "type": "module",
+        "src": "{{site:url}}/frontend/shared/default/js/main.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "type": "module",
+        "src": "{{site:url}}/frontend/shared/default/js/functions.js"
+      }
+    }
+  ]
 }

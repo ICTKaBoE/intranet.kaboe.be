@@ -26,7 +26,7 @@ $part = ucfirst($args["part"]);
 $function = ucfirst($args["function"]);
 $mode = $args['mode'];
 
-$class = "\\Controllers\\API\\Cron\\{$part}";
+$class = "\\Controllers\\Cron\\{$part}";
 
 if (class_exists($class) && method_exists($class, $function)) {
     $settingRepo = new Setting;
@@ -35,7 +35,7 @@ if (class_exists($class) && method_exists($class, $function)) {
     $busy = false;
 
     if (General::convert($setting->value, 'bool') == false) {
-        if (!isset($args['mode'])) {
+        if (!isset($mode)) {
             $setting->value = 1;
             $settingRepo->set($setting);
         }
@@ -47,7 +47,7 @@ if (class_exists($class) && method_exists($class, $function)) {
         } catch (\Exception $e) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
         } finally {
-            if (!isset($args['mode'])) {
+            if (!isset($mode)) {
                 $setting->value = 0;
                 $settingRepo->set($setting);
             }
