@@ -13,6 +13,7 @@ use Database\Repository\Informat\Student;
 use Database\Repository\School\Course;
 use Database\Repository\School\CourseInformatEmployeeStudentClassgroup;
 use Database\Repository\School\CourseInformatStudent;
+use Database\Repository\School\Institute;
 use Database\Repository\School\School;
 use Database\Repository\Smartschool\Message;
 use Database\Repository\Smartschool\MessageReceiver;
@@ -218,34 +219,36 @@ abstract class Smartschool
         $classgroupTeacherRepo = new ClassGroupTeacher;
         $userRepo = new RepositoryUser;
         $schoolyear = (new Schoolyear)->getCurrent();
+        $instituteRepo = new Institute;
         $sources = Arrays::filter($sourceRepo->get(), fn($s) => Strings::startsWith($s->id, "smartschool"));
 
         foreach ($sources as $source) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Source: {$source->id}");
             $errorCodes = SmartschoolSmartschool::GetErrorCodes($source->id);
             $classes = (new AllGroupsAndClasses($source->id))->get();
-            $classes = Arrays::uniqueBy(Arrays::filter($classes, fn($c) => Strings::equal('K', $c['type'])), 'name');
+            $classes = array_values(Arrays::filter($classes, fn($c) => Strings::equal('K', $c['type']) && Strings::equal($c['isOfficial'], 1)));
 
             foreach ($classes as $class) {
-                $classgroups = $classgroupRepo->getAllBySchoolyearAndCode($schoolyear->name, $class['name']);
+                $instituteId = $instituteRepo->getByInstituteNumber(CString::getDigitsOnly($class['instituteNumber']))->id;
+                $classgroup = $classgroupRepo->getBySchoolInstituteIdAdministrativeGroupCodeSchoolyearAndCode($instituteId, CString::leadingZeros($class['adminNumber'], 6), $schoolyear->name, $class['name']);
 
-                foreach ($classgroups as $classgroup) {
-                    Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-                    $sync = $classgroup->linked->schoolInstitute->linked->school->smsSyncClassTeachers ?: $classgroup->linked->schoolInstitute->linked->school->linked->parentSchool->smsSyncClassTeachers;
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$classgroup->linked->schoolInstitute->linked->school->name} - {$class['name']}" . ($sync ? "" : "... NO SYNC"));
-                    if (!$sync) continue;
+                Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+                $sync = $classgroup->linked->schoolInstitute->linked->school->smsSyncClassTeachers ?: $classgroup->linked->schoolInstitute->linked->school->linked->parentSchool->smsSyncClassTeachers;
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$classgroup->linked->schoolInstitute->linked->school->name} - {$class['name']}" . ($sync ? "" : "... NO SYNC"));
+                if (!$sync) continue;
 
-                    $classgroupTeachers = $classgroupTeacherRepo->getByInformatClassgroupId($classgroup->id);
-                    $usernames = [];
+                $classgroupTeachers = $classgroupTeacherRepo->getByInformatClassgroupId($classgroup->id);
+                $usernames = [];
 
-                    foreach ($classgroupTeachers as $classgroupTeacher) {
-                        $username = ($userRepo->getByInformatEmployeeId($classgroupTeacher->linked->informatEmployee->informatId) ?: $userRepo->getByInformatEmployeeId("P{$classgroupTeacher->linked->informatEmployee->informatId}"))?->username;
+                foreach ($classgroupTeachers as $classgroupTeacher) {
+                    $username = ($userRepo->getByInformatEmployeeId($classgroupTeacher->linked->informatEmployee->informatId) ?: $userRepo->getByInformatEmployeeId("P{$classgroupTeacher->linked->informatEmployee->informatId}"))?->username;
 
-                        if ($username) {
-                            $usernames[] = $username;
-                        }
+                    if ($username) {
+                        $usernames[] = $username;
                     }
+                }
 
+                if (count($usernames)) {
                     $usernames = implode(",", $usernames);
                     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Link " . implode(", ", explode(",", $usernames)) . " to class...");
                     $result = SmartschoolSmartschool::ChangeGroupOwners($source->id, $class['code'], $usernames);

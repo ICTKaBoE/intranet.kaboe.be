@@ -21,6 +21,6 @@ class Institute extends Repository
     public function getByInstituteNumber($number)
     {
         $statement = $this->prepareSelect(filters: ['number' => $number]);
-        return $this->executeSelect($statement);
+        return Arrays::firstOrNull($this->executeSelect($statement));
     }
 }

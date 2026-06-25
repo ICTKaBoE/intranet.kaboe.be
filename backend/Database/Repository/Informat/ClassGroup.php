@@ -92,4 +92,16 @@ class ClassGroup extends Repository
 
         return $this->executeSelect($statement);
     }
+
+    public function getBySchoolInstituteIdAdministrativeGroupCodeSchoolyearAndCode($schoolInstituteId, $administrativeGroupCode, $schoolyear, $code)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'schoolInstituteId' => $schoolInstituteId,
+            'administrativeGroupCode' => $administrativeGroupCode,
+            'schoolyear' => $schoolyear,
+            'code' => $code
+        ]);
+
+        return Arrays::firstOrNull($this->executeSelect($statement));
+    }
 }
