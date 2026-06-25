@@ -27,11 +27,6 @@ class Student extends CustomObject
         "institute" => ["instituteId" => \Database\Repository\School\Institute::class]
     ];
 
-    // protected $decodeAttributes = [
-    //     "name",
-    //     "firstName"
-    // ];
-
     public function init()
     {
         $this->formatted->informatGuidOrId = $this->informatGuid ?: $this->id;

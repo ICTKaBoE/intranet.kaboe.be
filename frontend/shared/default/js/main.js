@@ -1,5 +1,4 @@
 import Select from "./object/Select.js";
-import Button from "./object/Button.js";
 import Form from "./object/Form.js";
 import Toast from "./object/Toast.js";
 import Table from "./object/Table.js";
@@ -15,7 +14,7 @@ import Signage from "./object/Signage.js";
 import Rating from "./object/Rating.js";
 import Helpers from "./object/Helpers.js";
 
-window.SELECT_OTHER_ID = 0;
+window.SELECT_OTHER_ID = -1;
 
 $.ajaxSetup({
   xhrFields: {
@@ -29,7 +28,6 @@ const components = [
   List,
   Select,
   Checkbox,
-  Button,
   TinyMCE,
   Table,
   Calendar,
@@ -51,6 +49,7 @@ $(document).ready(() => {
   Helpers.CheckAllLoaded(() => {
     setTimeout(() => {
       window.fillFilter();
+
       const popoverTriggerList = document.querySelectorAll(
         '[data-bs-toggle="popover"]',
       );

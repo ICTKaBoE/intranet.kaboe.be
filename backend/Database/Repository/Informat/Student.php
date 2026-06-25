@@ -23,4 +23,10 @@ class Student extends Repository
         $statement = $this->prepareSelect(filters: ['informatGuid' => $informatGuid]);
         return Arrays::firstOrNull($this->executeSelect($statement));
     }
+
+    public function getByInstituteId($instituteId)
+    {
+        $statement = $this->prepareSelect(filters: ['instituteId' => $instituteId]);
+        return $this->executeSelect($statement);
+    }
 }

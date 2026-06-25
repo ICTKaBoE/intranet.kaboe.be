@@ -69,4 +69,12 @@ abstract class Smartschool
 
         return $connection->removeUserFromGroup($connectionPassword, $username, $groupCode);
     }
+
+    static public function ChangeGroupOwners($sourceId, $groupCode, $userlist)
+    {
+        $connection = Connection::init($sourceId);
+        $connectionPassword = Connection::GetPassword($sourceId);
+
+        return $connection->changeGroupOwners($connectionPassword, $groupCode, $userlist);
+    }
 }

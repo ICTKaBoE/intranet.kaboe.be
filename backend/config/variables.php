@@ -1,6 +1,6 @@
 <?php
 
-define("VERSION_DB", "5.2.0");
+define("VERSION_DB", "5.2.1");
 define("URL_MAIN", "kaboe.be");
 define("DEV_MODE", (PHP_SAPI !== "cli" ? str_starts_with($_SERVER["HTTP_HOST"], "dev") : array_search("mode=dev", $argv)));
 define("DEV_CONTACT", "jano.lampaert@coltd.be");
@@ -45,10 +45,10 @@ define("ROUTER_DEFAULT_CONTROLLER", "\\Controllers\\DefaultController");
 define("ROUTER_DEFAULT_FUNCTION", "index");
 
 define("SELECT_ALL_VALUES", "Alle");
-define("SELECT_OTHER_ID", 0);
+define("SELECT_OTHER_ID", -1);
 define("SELECT_OTHER_VALUE", "Andere");
 define("SELECT_OTHER", ["id" => SELECT_OTHER_ID, "name" => SELECT_OTHER_VALUE]);
-define("SELECT_ALL_ID", 0);
+define("SELECT_ALL_ID", -1);
 define("SELECT_ALL_VALUE", "Alle");
 
 define("EMAIL_SUFFIX", "coltd.be");

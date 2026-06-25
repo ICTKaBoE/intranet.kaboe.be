@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-lg-4 col-12 mb-3">
                 <label class="form-label" for="schoolyearId">Schooljaar</label>
-                <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/general/schoolyear" data-label="formatted.nameWithCurrent" data-default-value="{{schoolyear:default}}" required></select>
+                <select name="schoolyearId" id="schoolyearId" data-load-source="{{select:url:short}}/general/schoolyear" data-label="formatted.nameWithCurrent" data-default-value="{{schoolyear:default.id}}" required></select>
             </div>
 
             <div class="col-lg-4 col-12 mb-3">

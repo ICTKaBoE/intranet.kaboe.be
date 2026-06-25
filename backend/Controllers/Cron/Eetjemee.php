@@ -17,23 +17,24 @@ abstract class Eetjemee
     {
         $schoolRepo = new School;
 
-        $schools = Arrays::filter($schoolRepo->get(), fn($i) => !is_null(Strings::trimToNull($i->eetjemeeKey)));
+        $schools = Arrays::filter($schoolRepo->get(), fn($i) => !is_null(Strings::trimToNull($i->eetjemeeKey)) && !is_null(Strings::trimToNull($i->smsGroupStudents)));
         $client = new Client(['base_uri' => "https://api.eetjemee.be"]);
 
         foreach ($schools as $school) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "School: {$school->name}");
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering AllAccountsExtended...");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering AllAccountsExtended in group '{$school->smsGroupStudents}'...");
             $aaeRepo = new AllAccountsExtended($school->linked->parentSchool->smartschoolSourceId ?: $school->smartschoolSourceId);
-            $students = $aaeRepo->get($school->eetjemeeSmartschoolGroup, '1');
+            $students = $aaeRepo->get($school->smsGroupStudents, '1');
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Total: " . count($students));
 
-            $upsert = Arrays::filter($students, fn($s) => !$s->schoolverlater && !is_null($s->rijksregisternummer) && !is_null($s->internnummer) && !is_null($s->BadgeID) && !is_null($s->Cateringtarief));
+            $upsert = Arrays::filter($students, fn($s) => !$s->schoolverlater && !is_null(Strings::trimToNull($s->rijksregisternummer)) && !is_null(Strings::trimToNull($s->internnummer)));
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Upsert: " . count($upsert));
 
             $archive = Arrays::filter($students, fn($s) => $s->schoolverlater);
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Archive: " . count($archive));
-            $upsert = array_slice($upsert, 0, 5, true);
-            $archive = array_slice($archive, 0, 5, true);
+
+            Arrays::each($upsert, fn($u) => $u->officialClass = Arrays::firstOrNull(Arrays::filter($u->groups, fn($uoc) => $uoc->isKlas && $uoc->isOfficial))->name);
+            $upsert = Arrays::filter($upsert, fn($u) => !is_null($u->officialClass) || !is_null($u->Cateringtarief));
 
             $upsert = Arrays::map($upsert, fn($u) => [
                 'child_firstname' => $u->voornaam,
@@ -41,15 +42,15 @@ abstract class Eetjemee
                 'child_dateofbirth' => $u->geboortedatum,
                 'child_regnr' => CString::getDigitsOnly($u->rijksregisternummer),
                 'fk_external_ref' => $u->internnummer,
-                'external_barcode' => $u->BadgeID,
+                'external_barcode' => $u->BadgeID ?: null,
                 'child_goout' => 0,
-                'class_name' => $u->Cateringtarief
+                'class_name' => $u->Cateringtarief ?: $u->officialClass
             ]);
 
             $archive = Arrays::map($archive, fn($a) => [
                 'child_regnr' => CString::getDigitsOnly($a->rijksregisternummer),
                 'fk_external_ref' => $a->internnummer,
-                'external_barcode' => $a->BadgeID
+                'external_barcode' => $a->BadgeID ?: null
             ]);
 
             $upsert = array_values($upsert);

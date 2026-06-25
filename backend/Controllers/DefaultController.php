@@ -215,7 +215,8 @@ class DefaultController extends stdClass
 		$this->layout = str_replace("{{site:url}}", $this->siteUrl, $this->layout);
 
 		$currentSchoolyear = (new Schoolyear)->getCurrent();
-		$this->layout = str_replace("{{schoolyear:default}}", $currentSchoolyear->id, $this->layout);
+		$this->layout = str_replace("{{schoolyear:default.id}}", $currentSchoolyear->id, $this->layout);
+		$this->layout = str_replace("{{schoolyear:default.name}}", $currentSchoolyear->name, $this->layout);
 	}
 
 	private function loadSettings()

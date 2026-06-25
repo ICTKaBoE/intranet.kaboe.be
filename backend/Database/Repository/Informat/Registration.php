@@ -34,12 +34,8 @@ class Registration extends Repository
 
     public function getCurrentByInformatStudentId($informatStudentId)
     {
-        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId]);
-        // $statement->where('status', 0);
-        // $statement->where('start', '>=', Clock::nowAsString("Y-m-d"));
-        // $statement->whereNotNull('end');
-
-        return $this->executeSelect($statement);
+        $statement = $this->prepareSelect(filters: ['informatStudentId' => $informatStudentId, 'current' => 1]);
+        return Arrays::firstOrNull($this->executeSelect($statement));
     }
 
     public function getBySchoolInstituteId($schoolInstituteId)

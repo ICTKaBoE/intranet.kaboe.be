@@ -275,7 +275,8 @@ export default class Select extends MasterObject {
 
   getItemDetails = () => {
     let details = [];
-    this.getValue()
+    this.tomSelect
+      .getValue()
       .split(";")
       .forEach((value) => {
         details.push(this.tomSelect.options[value]);

@@ -25,6 +25,7 @@ use Database\Repository\Informat\Registration;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Informat\EmployeeEmail;
 use Database\Object\Mail\Receiver as MailReceiver;
+use Database\Repository\General\Schoolyear;
 use Database\Repository\Informat\EmployeeOwnfield;
 use Database\Repository\Informat\RegistrationClass;
 use Database\Repository\Sync\Sync as RepositorySync;
@@ -36,7 +37,7 @@ abstract class Sync
     public static function Prepare()
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting sync...");
-        $ok1 = self::PrepareEmployee();
+        // $ok1 = self::PrepareEmployee();
         Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
         $ok2 = self::PrepareStudent();
         return ($ok1 && $ok2);
@@ -133,16 +134,15 @@ abstract class Sync
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
 
         $informat = $employeeRepo->get();
-        // $informat = Arrays::filter($informat, fn($e) => $e->informatId == 12897);
-        // $informat = Arrays::filter($informat, fn($e) => $e->instituteId == 0 && ($e->linked->institute->linked->school->sync || $e->linked->institute->linked->school->linked->parentSchool->sync));
-        // Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filtered to " . count($informat));
 
         /* ----------------------------- PROCESS EMPLOYEES ------------------------------ */
         foreach ($informat as $emp) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$emp->informatId} - {$emp->name} {$emp->firstName}");
 
-            if ($emp->instituteId !== 0 && !($emp->linked->institute->linked->school->sync || $emp->linked->institute->linked->school->linked->parentSchool->sync)) {
+            $schoolObject = $emp->linked->institute->linked->school;
+
+            if ($emp->instituteId !== 0 && !($schoolObject->syncEmployee || $schoolObject->linked->parentSchool->syncEmployee)) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
                 continue;
             }
@@ -190,7 +190,7 @@ abstract class Sync
             /* ---------- MemberOf groups ---------- */
             $memberOf = [];
 
-            $defaultGroups = explode(",", $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.employee")->value);
+            $defaultGroups = explode(",", self::pick($schoolObject->syncEmployeeDefaultMemberOf, $schoolObject->linked->parentSchool->syncEmployeeDefaultMemberOf));
 
             if ($m365) {
                 $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);
@@ -237,7 +237,6 @@ abstract class Sync
             $otherAttributes = $otherAttributes ?: null;
 
             /* ---------- Company + OU ---------- */
-            $schoolObject = $emp->linked->institute->linked->school;
             $companyName = self::pick($schoolObject->syncEmployeeCompanyName, $schoolObject->linked->parentSchool->syncEmployeeCompanyName);
             if ($m365 && Strings::contains($m365->getCompanyName(), "COLTD") && $companyName !== "COLTD") $companyName = "COLTD, {$companyName}";
             $employeeOU = self::pick($schoolObject->syncEmployeeOU, $schoolObject->linked->parentSchool->syncEmployeeOU);
@@ -384,6 +383,7 @@ abstract class Sync
 
         $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $photoEnabled = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.student")->value, 'bool');
+        $schoolyear = (new Schoolyear)->getCurrent();
 
         /* ------------------------------ Get all M365 ------------------------------ */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering M365 students...");
@@ -415,20 +415,19 @@ abstract class Sync
         /* ---------------------------- Get Informat students ---------------------------- */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat students...");
         $informat = $studentRepo->get();
-        // $informat = Arrays::filter($informat, fn($s) => $s->instituteId != 0 && ($s->linked->institute->linked->school->sync || $s->linked->institute->linked->school->linked->parentSchool->sync));
-        // Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filtered to " . count($informat) . " students");
 
         /* -------------------------------- Process each student ------------------------------- */
         foreach ($informat as $st) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$st->informatId} - {$st->name} {$st->firstName}");
+            $schoolObj = $st->linked->institute->linked->school;
 
-            if ($st->instituteId !== 0 && !($st->linked->institute->linked->school->sync || $st->linked->institute->linked->school->linked->parentSchool->sync)) {
+            if ($st->instituteId !== 0 && !($schoolObj->syncStudent || $schoolObj->linked->parentSchool->syncStudent)) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
                 continue;
             }
 
-            /* ---------- Load or Init Sync ---------- */
+            /* ---------- Load or Init Sync Object ---------- */
             $sync = $syncRepo->getByEmployeeId($st->informatId) ?? new ObjectSync;
             $sync->type = "S";
             $sync->action = null;
@@ -438,11 +437,14 @@ abstract class Sync
             $m365 = Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equal($u->getEmployeeId(), $st->informatId) || Strings::equal($u->getEmployeeId(), "L{$st->informatId}")));
 
             /* ---------- Registration / class lookups ---------- */
+            $takeInAccountStartDate = General::convert(self::pick($schoolObj->takeInAccountStartDate, $schoolObj->linked->parentSchool->takeInAccountStartDate), "bool");
             $regs = $regRepo->getByInformatStudentId($st->id);
-            $regs = Arrays::filter($regs, fn($r) => $r->current && $r->status == 0);
+            die(var_dump($schoolyear));
+            if ($takeInAccountStartDate) $regs = Arrays::filter($regs, fn($r) => $r->current && $r->status == 0);
+            else $regs = Arrays::filter($regs, fn($r) => Clock::at($r->start)->isAfterOrEqualTo(Clock::at($schoolyear->start)) && (is_null($r->end) || Clock::at($r->end)->isBeforeOrEqualTo(Clock::at($schoolyear->end))) && $r->status == 0);
             $regs = Arrays::orderBy($regs, "start");
-
-            $currentReg = count($regs) ? Arrays::last($regs) : null;
+            $regs = array_reverse($regs);
+            $currentReg = Arrays::firstOrNull($regs);
 
             $regClasses = $currentReg ? $regClassRepo->getByInformatRegistrationId($currentReg->id) : [];
             $regClasses = Arrays::filter($regClasses, fn($rc) => $rc->current);
@@ -475,7 +477,6 @@ abstract class Sync
             $samAccount = substr(explode("@", $emailAddress)[0], 0, 20);
 
             /* ---------- Company + OU ---------- */
-            $schoolObj = $st->linked->institute->linked->school;
             $companyName = self::pick($schoolObj->syncStudentCompanyName, $schoolObj->linked->parentSchool->syncStudentCompanyName);
             $ou = self::pick($schoolObj->syncStudentOU, $schoolObj->linked->parentSchool->syncStudentOU);
 
@@ -484,7 +485,7 @@ abstract class Sync
             /* ---------- MemberOf ---------- */
             $memberOf = [];
 
-            $defaultGroups = explode(",", $settingRepo->getByNavigationIdAndKey($navigation->id, "default.memberOf.student")->value);
+            $defaultGroups = explode(",", self::pick($schoolObj->syncStudentDefaultMemberOf, $schoolObj->linked->parentSchool->syncStudentDefaultMemberOf));
 
             if ($m365) {
                 $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);

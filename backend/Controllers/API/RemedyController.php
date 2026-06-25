@@ -107,7 +107,7 @@ class RemedyController extends ApiController
     protected function getMine($view, $id = null)
     {
         $repo = new Remedy;
-        $filters = Filter::Find(['schoolId', 'departmentId', 'typeId']);
+        $filters = Filter::Find(['creatorUserId', 'schoolId', 'departmentId', 'typeId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();

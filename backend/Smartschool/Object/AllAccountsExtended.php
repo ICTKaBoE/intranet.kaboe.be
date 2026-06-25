@@ -16,6 +16,7 @@ class AllAccountsExtended extends CustomObject
         "rijksregisternummer" => self::TYPE_STRING,
         "BadgeID" => self::TYPE_STRING,
         "Cateringtarief" => self::TYPE_STRING,
-        "schoolverlater" => self::TYPE_BOOLEAN
+        "schoolverlater" => self::TYPE_BOOLEAN,
+        "groups" => self::TYPE_ARRAY_OR_OBJECT
     ];
 }

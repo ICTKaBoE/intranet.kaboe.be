@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-12 mb-3">
                     <label for="informatClassId" class="form-label">Klassen</label>
-                    <select name="informatClassId" id="informatClassId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="schoolId" multiple></select>
+                    <select name="informatClassId" id="informatClassId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="schoolId" data-search multiple></select>
                 </div>
             </div>
         </div>

@@ -469,7 +469,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="form-label" for="informatStudentAddressId">Adres</label>
-                            <select name="informatStudentAddressId" id="informatStudentAddressId" data-load-source="{{select:url:short}}/informat/studentAddress" data-label="formatted.full" required></select>
+                            <select name="informatStudentAddressId" id="informatStudentAddressId" data-load-source="{{select:url:short}}/informat/studentAddress" data-label="formatted.full" data-default-no-load required></select>
                         </div>
                     </div>
                 </div>

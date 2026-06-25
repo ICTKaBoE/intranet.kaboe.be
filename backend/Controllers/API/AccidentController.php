@@ -64,7 +64,7 @@ class AccidentController extends ApiController
             $items = $repo->get($id, filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
-        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+        } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id) ?: []);
     }
 
     protected function getDeclarations($view, $id = null)
@@ -213,7 +213,7 @@ class AccidentController extends ApiController
         $repo = new Accident;
         $item = $repo->getById($id);
 
-        $files = FileSystem::PathExists(LOCATION_FILES . "/accident/{$item->guid}") ? FileSystem::getFiles(LOCATION_FILES . "/accident/{$item->guid}/*") : [];
+        $files = FileSystem::getFiles(LOCATION_FILES . "/accident/{$item->guid}/*") ?: [];
         $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/B.pdf")))[0];
         $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/C.pdf")))[0];
 

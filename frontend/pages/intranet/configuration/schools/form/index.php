@@ -3,11 +3,13 @@
         <ul class='nav nav-tabs card-header-tabs' data-bs-toggle='tabs'>
             <li class='nav-item'><a href='#tab-general' class='nav-link active' data-bs-toggle='tab'>Algemeen</a></li>
             <li class='nav-item'><a href='#tab-address' class='nav-link' data-bs-toggle='tab'>Adres</a></li>
-            <li class='nav-item' id="tab-ad-item"><a href='#tab-ad' class='nav-link' data-bs-toggle='tab'>ActiveDirectory</a></li>
-            <li class='nav-item' id="tab-ad-employee-item"><a href='#tab-ad-employee' class='nav-link' data-bs-toggle='tab'>ActiveDirectory - Werknemer</a></li>
-            <li class='nav-item' id="tab-ad-student-item"><a href='#tab-ad-student' class='nav-link' data-bs-toggle='tab'>ActiveDirectory - Student</a></li>
+            <li class='nav-item'><a href='#tab-ad' class='nav-link' data-bs-toggle='tab'>AD</a></li>
+            <li class='nav-item' id="tab-ad-employee-item"><a href='#tab-ad-employee' class='nav-link' data-bs-toggle='tab'>AD - Werknemer</a></li>
+            <li class='nav-item' id="tab-ad-student-item"><a href='#tab-ad-student' class='nav-link' data-bs-toggle='tab'>AD - Student</a></li>
             <li class='nav-item'><a href='#tab-intune' class='nav-link' data-bs-toggle='tab'>Intune</a></li>
             <li class='nav-item'><a href='#tab-jamf' class='nav-link' data-bs-toggle='tab'>JAMF</a></li>
+            <li class='nav-item'><a href='#tab-eetjemee' class='nav-link' data-bs-toggle='tab'>EetJeMee</a></li>
+            <li class='nav-item'><a href='#tab-sms' class='nav-link' data-bs-toggle='tab'>Smartschool</a></li>
         </ul>
     </div>
 
@@ -42,22 +44,16 @@
                         </div>
 
                         <div>
-                            De gegevens die hieronder niet ingevuld worden, worden automatisch vervangen door de gegevens ingevoerd bij de hoofdschool.<br />
-                            Wil je dit niet? Zet dan hier de gegevens in of verwijder ze globaal uit de hoofdschool.
+                            De gegevens die hierna niet ingevuld worden (ook in andere tabbladen), worden automatisch vervangen door de gegevens ingevoerd bij de hoofdschool.<br />
+                            Wil je dit niet? Vul dan hier de gegevens in of verwijder ze globaal uit de hoofdschool.
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="hrEmail" class="form-label">E-mailadres Personeelsdienst</label>
-                        <input type="text" name="hrEmail" id="hrEmail" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-12" id="chbImport" role="checkbox" data-type="checkbox" data-name="import" data-text="Importeren uit Informat"></div>
-                    <div class="col-12" id="chbSync" role="checkbox" data-type="checkbox" data-name="sync" data-text="Synchroniseren naar ActiveDirectory" data-on-change="syncADView"></div>
+                    <div class="col-12" id="chbSyncEmployee" role="checkbox" data-type="checkbox" data-name="syncEmployee" data-text="Personeel synchroniseren naar ActiveDirectory" data-on-change="syncEmployeeADView"></div>
+                    <div class="col-12" id="chbSyncStudent" role="checkbox" data-type="checkbox" data-name="syncStudent" data-text="Leerlingen synchroniseren naar ActiveDirectory" data-on-change="syncStudentADView"></div>
                 </div>
             </div>
 
@@ -97,7 +93,7 @@
                 </div>
             </div>
 
-            <div class="tab-pane d-none" id="tab-ad">
+            <div class="tab-pane" id="tab-ad">
                 <div class="row">
                     <div class="col-12 mb-3">
                         <label class="form-label" for="adOuPart">OU Part</label>
@@ -132,6 +128,8 @@
 
             <div class="tab-pane d-none" id="tab-ad-student">
                 <div class="row">
+                    <div class="col-12" id="chbTakeInAccountStartDate" role="checkbox" data-type="checkbox" data-name="takeInAccountStartDate" data-text="Rekening houden met start datum (nee = schooljaar)"></div>
+
                     <div class="col-12 mb-3">
                         <label for="syncStudentCompanyName" class="form-label">Bedrijf</label>
                         <input type="text" name="syncStudentCompanyName" id="syncStudentCompanyName" class="form-control" />
@@ -163,6 +161,31 @@
                     <div class="col-12 mb-3">
                         <label class="form-label" for="jamfIpadPrefix">iPad Prefix</label>
                         <input type="text" name="jamfIpadPrefix" id="jamfIpadPrefix" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab-eetjemee">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="eetjemeeKey">Platform KEY</label>
+                        <input type="text" name="eetjemeeKey" id="eetjemeeKey" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab-sms">
+                <div class="row">
+                    <div class="col-12" id="chbSmsSyncClassTeachers" role="checkbox" data-type="checkbox" data-name="smsSyncClassTeachers" data-text="Klastitularissen zetten"></div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="smsGroupStudents">Smartschoolgroep - Leerlingen</label>
+                        <input type="text" name="smsGroupStudents" id="smsGroupStudents" class="form-control" required />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="smsGroupEmployee">Smartschoolgroep - Personeel</label>
+                        <input type="text" name="smsGroupEmployee" id="smsGroupEmployee" class="form-control" required />
                     </div>
                 </div>
             </div>

@@ -56,9 +56,9 @@ class StrategicDashboardController extends ApiController
                 Arrays::each($items, fn($i) => $i->lastValue = $valueRepo->getLastValueByItemId($i->id));
                 Arrays::each($items, fn($i) => $i->formatted->html = General::processTemplate([$i->lastValue], $i->formatted->html));
                 Arrays::each($items, function ($i) {
-                    if ($i->minimum == $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->value < $i->minimum ? "danger" : ($i->lastValue->value > $i->target ? "success" : "warning")) : "secondary";
-                    else if ($i->minimum > $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->value > $i->minimum ? "danger" : ($i->lastValue->value <= $i->target ? "success" : "warning")) : "secondary";
-                    else if ($i->minimum < $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->value < $i->minimum ? "danger" : ($i->lastValue->value >= $i->target ? "success" : "warning")) : "secondary";
+                    if ($i->minimum == $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->calculated < $i->target ? "danger" : ($i->lastValue->calculated >= $i->target ? "primary" : "success")) : "transparent";
+                    else if ($i->minimum > $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->calculated > $i->minimum ? "danger" : ($i->lastValue->calculated <= $i->target ? "primary" : "success")) : "transparent";
+                    else if ($i->minimum < $i->target) $i->bordercolor = $i->lastValue ? ($i->lastValue->calculated < $i->minimum ? "danger" : ($i->lastValue->calculated >= $i->target ? "primary" : "success")) : "transparent";
                 });
 
                 $category->items = General::processTemplate($items, self::TEMPLATE_CARD);
@@ -206,7 +206,7 @@ class StrategicDashboardController extends ApiController
             $newValue->editedByUserId = User::getLoggedInUser()->id;
 
             $item = (new Item)->getById($newValue->itemId);
-            if (Arrays::contains(["chart:pie", "chart:bar"], $item->linked->type->short)) {
+            if (Arrays::contains(["chart:pie", "chart:bar", "multirating:circle"], $item->linked->type->short)) {
                 $lastValue = json_decode((new ItemValue)->getLastValueByItemId($item->id)->value, true);
                 $template = json_decode(str_replace(PHP_EOL, "", $item->valueTemplate), true);
                 $json = [];

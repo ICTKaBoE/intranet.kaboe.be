@@ -140,31 +140,25 @@ window.computerTypeView = () => {
 //   },
 // });
 
-let btnCancel = new Button({
-  element: document.getElementById("btnCancel"),
-  options: {
-    type: Button.TYPE_ICON_TEXT,
-    icon: "x",
-    text: "Annuleren",
-    title: "Annuleren",
-    bgColor: "red",
-    onclick: () => {
-      history.back();
-    },
+let btnCancel = new Button(document.getElementById("btnCancel"), {
+  type: Button.TYPE_ICON_TEXT,
+  icon: "x",
+  text: "Annuleren",
+  title: "Annuleren",
+  bgColor: "red",
+  onclick: () => {
+    history.back();
   },
 });
 
-let btnSave = new Button({
-  element: document.getElementById("btnSave"),
-  options: {
-    type: Button.TYPE_ICON_TEXT,
-    icon: "check",
-    text: "Opslaan",
-    title: "Opslaan",
-    bgColor: "success",
-    onclick: () => {
-      Form.GetInstance(pageId).submit();
-    },
+let btnSave = new Button(document.getElementById("btnSave"), {
+  type: Button.TYPE_ICON_TEXT,
+  icon: "check",
+  text: "Opslaan",
+  title: "Opslaan",
+  bgColor: "success",
+  onclick: () => {
+    Form.GetInstance(pageId).submit();
   },
 });
 

@@ -43,7 +43,7 @@ class Repository extends stdClass
                     $errorCodes = json_decode($errorCodes);
                     $errorMessage = $errorCodes->{$output};
 
-                    throw new Exception("Failed: {$errorMessage}");
+                    throw new Exception($errorMessage);
                 }
             } else {
                 if (is_array($this->output)) {
@@ -54,7 +54,7 @@ class Repository extends stdClass
                 return $result;
             }
         } catch (\Exception $e) {
-            die("General error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            die("Smartschool error: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
         }
     }
 

@@ -1,8 +1,8 @@
-**/downloads
-**/uploads
-**/powershell
-**/logs
-**/files
+/downloads
+/uploads
+/powershell
+/logs
+/files
 **/*.old
 **/*.bak
 info.php

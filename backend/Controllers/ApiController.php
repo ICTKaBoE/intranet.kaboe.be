@@ -3,13 +3,14 @@
 namespace Controllers;
 
 use Database\Object\Navigation\Setting as NavigationSetting;
-use stdClass;
-use Security\Code;
-use Router\Helpers;
+use Database\Repository\General\Schoolyear;
+use Database\Repository\Navigation\Navigation;
+use Database\Repository\Navigation\Setting;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
-use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\Navigation;
+use Router\Helpers;
+use Security\Code;
+use stdClass;
 
 class ApiController extends stdClass
 {
@@ -42,6 +43,8 @@ class ApiController extends stdClass
 		if (static::CURRENT_NAVIGATION_MODULE_NAME) {
 			define("CURRENT_NAVIGATION_MODULE_ID", (new Navigation)->getByLinkAndType(static::CURRENT_NAVIGATION_MODULE_NAME, "M")->id ?: false);
 		}
+
+		define("_CURRENT_SCHOOLYEAR_", (new Schoolyear)->getCurrent()->name);
 	}
 
 	public function any($view = null, $what = null, $id = null)
@@ -202,6 +205,8 @@ class ApiController extends stdClass
 
 	protected function getSettings($return = false)
 	{
+		if (!is_bool($return)) $return = false;
+
 		$settings = [];
 		foreach ((new Setting)->getByNavigationId(CURRENT_NAVIGATION_MODULE_ID) as $setting) $settings[$setting->key] = $setting->value;
 

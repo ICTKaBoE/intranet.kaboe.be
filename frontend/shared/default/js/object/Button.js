@@ -2,102 +2,111 @@ import MasterObject from "../MasterObject.js";
 import Helpers from "./Helpers.js";
 
 export default class Button extends MasterObject {
-	static OBJ_SELECTOR = "button,.btn*";
-	static OBJ_ID_PREFIX = "btn";
+  static OBJ_SELECTOR = "button,.btn*";
+  static OBJ_ID_PREFIX = "btn";
 
-	static TYPE_ICON = "icon";
-	static TYPE_ICON_TEXT = "icon-text";
-	static TYPE_TEXT = "text";
+  static TYPE_ICON = "icon";
+  static TYPE_ICON_TEXT = "icon-text";
+  static TYPE_TEXT = "text";
 
-	constructor({ element = null, options = {} }) {
-		super();
+  constructor(element = null, options = {}) {
+    super();
 
-		this.options = options;
-		if (element !== null) this.element = element;
-		else this.element = document.createElement("button");
+    this.options = options;
 
-		this.create(element === null);
+    if (element) this.element = element;
+    else this.element = document.createElement("button");
 
-		this.id = this.element.id || Helpers.generateId("btn");
-	}
+    this.id =
+      this.element.getAttribute("id") ||
+      Helpers.generateId(Button.OBJ_ID_PREFIX);
 
-	create = (full = false) => {
-		this.element.innerHTML = "";
-		this.element.type = "button";
-		this.element.classList.add("btn");
+    if (!MasterObject.INSTANCES.hasOwnProperty("Button"))
+      MasterObject.INSTANCES["Button"] = {};
+    MasterObject.INSTANCES["Button"][this.id] = this;
 
-		if (this.options.bgColor || false)
-			this.element.classList.add(`btn-${this.options.bgColor}`);
+    this.create();
+  }
 
-		if (this.options.title || false) {
-			this.element.title = this.options.title;
-			this.element.dataset.bsToggle = "tooltip";
-			this.element.dataset.bsPlacement = "top";
-		}
+  create = () => {
+    this.element.innerHTML = "";
+    this.element.type = "button";
+    this.element.classList.add("btn");
 
-		if (this.options.onclick || false)
-			this.element.addEventListener("click", () => {
-				if (this.options.onclick instanceof Function)
-					this.options.onclick();
-				else window[this.options.onclick]();
-			});
+    if (this.options.bgColor || false)
+      this.element.classList.add(`btn-${this.options.bgColor}`);
 
-		if (this.options.modal || false)
-			this.element.addEventListener("click", () => {
-				Helpers.toggleModal(this.options.modal);
-			});
+    if (this.options.classes || false)
+      this.element.classList.add(...this.options.classes);
 
-		switch (this.options.type || Button.TYPE_TEXT) {
-			case Button.TYPE_ICON:
-				{
-					let icon = document.createElement("i");
-					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
+    if (this.options.title || false) {
+      this.element.title = this.options.title;
+      this.element.dataset.bsToggle = "tooltip";
+      this.element.dataset.bsPlacement = "top";
+    }
 
-					this.element.classList.add("btn-icon");
-					this.element.appendChild(icon);
-				}
-				break;
+    if (this.options.onclick || false)
+      this.element.addEventListener("click", () => {
+        if (this.options.onclick instanceof Function) this.options.onclick();
+        else window[this.options.onclick]();
+      });
 
-			case Button.TYPE_ICON_TEXT:
-				{
-					let icon = document.createElement("i");
-					icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
+    if (this.options.modal || false)
+      this.element.addEventListener("click", () => {
+        Helpers.toggleModal(this.options.modal);
+      });
 
-					this.element.appendChild(icon);
-					this.element.innerHTML += this.options.text;
-				}
-				break;
+    switch (this.options.type || Button.TYPE_TEXT) {
+      case Button.TYPE_ICON:
+        {
+          let icon = document.createElement("i");
+          icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
 
-			default:
-				this.element.innerHTML = this.options.text;
-				break;
-		}
-	};
+          this.element.classList.add("btn-icon");
+          this.element.appendChild(icon);
+        }
+        break;
 
-	setOnClick = (func) => {
-		this.element.addEventListener("click", () => {
-			if (func instanceof Function) func();
-			else window[func]();
-		});
-	};
+      case Button.TYPE_ICON_TEXT:
+        {
+          let icon = document.createElement("i");
+          icon.classList.add("icon", "ti", `ti-${this.options.icon}`);
 
-	write = () => {
-		return this.element;
-	};
+          this.element.appendChild(icon);
+          this.element.innerHTML += this.options.text;
+        }
+        break;
 
-	enable = () => {
-		this.element.removeAttribute("disabled");
-	};
+      default:
+        this.element.innerHTML = this.options.text;
+        break;
+    }
+  };
 
-	disable = () => {
-		this.element.setAttribute("disabled", null);
-	};
+  setOnClick = (func) => {
+    this.element.addEventListener("click", () => {
+      if (func instanceof Function) func();
+      else window[func]();
+    });
+  };
 
-	show = () => {
-		this.element.classList.remove("d-none");
-	};
+  write = () => {
+    return this.element;
+  };
 
-	hide = () => {
-		this.element.classList.add("d-none");
-	};
+  enable = () => {
+    this.element.removeAttribute("disabled");
+  };
+
+  disable = () => {
+    this.element.setAttribute("disabled", null);
+  };
+
+  show = () => {
+    this.element.classList.remove("d-none");
+  };
+
+  hide = () => {
+    this.element.classList.add("d-none");
+  };
 }

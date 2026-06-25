@@ -31,8 +31,8 @@ try {
         echo $line;
         $stmt = $connection->prepare($line);
         $stmt->execute();
-        echo "<span style='color: green'>OK</span><br />";
-        sleep(5);
+        echo "<span style='color: green; margin-left: 10px'>OK</span><br />";
+        sleep(2);
     }
 
     $db->commit();
@@ -43,8 +43,7 @@ try {
     FileSystem::RemoveDirectory("./sql");
     echo "DONE!";
 } catch (\Exception $e) {
-    sleep(5);
-    echo "<span style='color: red'>FAIL</span><br />";
+    echo "<span style='color: red; margin-left: 10px'>FAIL</span><br />";
     $db->rollback();
     echo "<br />Error Message:<br />{$e->getMessage()}";
 }

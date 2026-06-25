@@ -3,13 +3,13 @@ import Table from "../../../../shared/default/js/object/Table.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
 window.batteryStatus = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
+  let selected = Table.GetInstance(pageId).getSelectedRowData();
 
-	Table.GetInstance(pageId + "Battery").appendSource(
-		selected[0].guid || selected[0].id
-	);
+  Table.GetInstance(pageId + "Battery").appendSource(
+    selected[0].guid || selected[0].id,
+  );
 
-	Table.GetInstance(pageId + "Battery").reload();
+  Table.GetInstance(pageId + "Battery").reload();
 };
 
 // window.usage = () => {
@@ -36,25 +36,21 @@ window.batteryStatus = () => {
 // 	return ret;
 // };
 
-let btnFilter = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "filter",
-		title: "Filteren",
-		bgColor: "blue",
-		modal: "filter",
-	},
+let btnFilter = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "filter",
+  title: "Filteren",
+  bgColor: "blue",
+  modal: "filter",
 });
 
-let btnBattery = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "battery-1",
-		title: "Batterijstatus",
-		bgColor: "blue",
-		onclick: "batteryStatus",
-		modal: "battery",
-	},
+let btnBattery = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "battery-1",
+  title: "Batterijstatus",
+  bgColor: "blue",
+  onclick: "batteryStatus",
+  modal: "battery",
 });
 
 // let btnUsage = new Button({
@@ -72,6 +68,6 @@ Component.addActionButton(btnFilter, btnBattery);
 Component.addExtraPageInfo(`Laatste sync: ${lastSyncTime}`);
 
 $(document).ready(() => {
-	Table.GetInstance(pageId).attachButton(btnBattery, "==1");
-	// Table.GetInstance(pageId).attachButton(btnUsage, "==1");
+  Table.GetInstance(pageId).attachButton(btnBattery, "==1");
+  // Table.GetInstance(pageId).attachButton(btnUsage, "==1");
 });

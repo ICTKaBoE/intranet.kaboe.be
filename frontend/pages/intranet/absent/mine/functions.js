@@ -3,34 +3,30 @@ import Helpers from "../../../../shared/default/js/object/Helpers.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
 window.edit = () => {
-	let selected = Table.GetInstance(pageId).getSelectedRowData();
-	Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
+  let selected = Table.GetInstance(pageId).getSelectedRowData();
+  Helpers.redirect(`/${selected[0].guid || selected[0].id}`);
 };
 
-let btnAdd = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "plus",
-		title: "Toevoegen",
-		bgColor: "green",
-		onclick: () => {
-			Helpers.redirect("/add");
-		},
-	},
+let btnAdd = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "plus",
+  title: "Toevoegen",
+  bgColor: "green",
+  onclick: () => {
+    Helpers.redirect("/add");
+  },
 });
 
-let btnEdit = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "pencil",
-		title: "Bewerken",
-		bgColor: "orange",
-		onclick: "edit",
-	},
+let btnEdit = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "pencil",
+  title: "Bewerken",
+  bgColor: "orange",
+  onclick: "edit",
 });
 
 Component.addActionButton(btnAdd, btnEdit);
 
 $(document).ready(() => {
-	Table.GetInstance(pageId).attachButton(btnEdit, "==1");
+  Table.GetInstance(pageId).attachButton(btnEdit, "==1");
 });

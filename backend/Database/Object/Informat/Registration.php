@@ -26,6 +26,7 @@ class Registration extends CustomObject
 
     public function init()
     {
+        $this->actualYear = ($this->grade - 1) * 2 + $this->year;
         $this->formatted->dates = Clock::at($this->start)->format("d/m/Y") . (is_null($this->end) ? "" : " - " . Clock::at($this->end)->format("d/m/Y"));
     }
 }

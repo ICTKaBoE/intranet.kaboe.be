@@ -26,4 +26,9 @@ class ClassGroup extends CustomObject
             "schoolInstituteId" => \Database\Repository\School\Institute::class
         ]
     ];
+
+    public function init()
+    {
+        $this->actualYear = ($this->grade - 1) * 2 + $this->year;
+    }
 }

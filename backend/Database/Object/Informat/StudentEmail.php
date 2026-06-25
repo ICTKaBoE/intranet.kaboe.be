@@ -12,7 +12,8 @@ class StudentEmail extends CustomObject
         "informatStudentId" => self::TYPE_INTEGER,
         "informatId" => self::TYPE_INTEGER,
         "email" => self::TYPE_STRING,
-        "type" => self::TYPE_STRING
+        "type" => self::TYPE_STRING,
+        "communication" => self::TYPE_BOOLEAN,
     ];
 
     public function init()

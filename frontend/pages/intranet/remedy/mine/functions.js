@@ -4,41 +4,35 @@ import Table from "../../../../shared/default/js/object/Table.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 import Form from "../../../../shared/default/js/object/Form.js";
 
-let btnFilter = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "filter",
-		title: "Filteren",
-		bgColor: "blue",
-		modal: "filter",
-	},
+let btnFilter = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "filter",
+  title: "Filteren",
+  bgColor: "blue",
+  modal: "filter",
 });
 
-let btnAdd = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "plus",
-		title: "Toevoegen",
-		bgColor: "green",
-		onclick: () => {
-			Helpers.redirect("/add");
-		},
-	},
+let btnAdd = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "plus",
+  title: "Toevoegen",
+  bgColor: "green",
+  onclick: () => {
+    Helpers.redirect("/add");
+  },
 });
 
-let btnDelete = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "trash",
-		title: "Verwijderen",
-		bgColor: "red",
-		modal: "delete",
-		onclick: "delete",
-	},
+let btnDelete = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "trash",
+  title: "Verwijderen",
+  bgColor: "red",
+  modal: "delete",
+  onclick: "delete",
 });
 
 Component.addActionButton(btnFilter, btnAdd, btnDelete);
 
 $(document).ready(() => {
-	Table.GetInstance(pageId).attachButton(btnDelete, ">0");
+  Table.GetInstance(pageId).attachButton(btnDelete, ">0");
 });

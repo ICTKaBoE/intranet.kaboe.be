@@ -13,9 +13,7 @@ class AllGroupsAndClasses extends Repository
 
     protected function extract($node, &$result)
     {
-        if (!is_array($node)) {
-            return;
-        }
+        if (!is_array($node)) return;
 
         // Als dit een groep is
         if (isset($node['name'])) {
@@ -32,15 +30,9 @@ class AllGroupsAndClasses extends Repository
         if (isset($node['children']['group'])) {
             $children = $node['children']['group'];
 
-            // Eén object
-            if (isset($children['name'])) {
-                $this->extract($children, $result);
-            }
-            // Array van objecten
+            if (isset($children['name'])) $this->extract($children, $result);
             else {
-                foreach ($children as $child) {
-                    $this->extract($child, $result);
-                }
+                foreach ($children as $child) $this->extract($child, $result);
             }
         }
     }

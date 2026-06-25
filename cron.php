@@ -3,7 +3,6 @@
 use Helpers\Log;
 use Security\Code;
 use Helpers\General;
-use Security\Session;
 use Ouzo\Utilities\Clock;
 use Database\Repository\Setting\Setting;
 use Database\Repository\General\Schoolyear;
@@ -16,7 +15,7 @@ Code::noTimeLimit();
 
 $start = Clock::now();
 define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d H-i-s"));
-define("_LOGLOCATION_", "cron/{$args['part']}/{$args['function']}");
+define("_LOGLOCATION_", "cron/{$args['part']}/{$args['function']}/" . Clock::nowAsString("Y-m-d"));
 define("_CURRENT_SCHOOLYEAR_", (new Schoolyear)->getCurrent()->name);
 
 Log::Open(_LOGLOCATION_, _LOGTIMESTAMP_);

@@ -21,24 +21,29 @@ class School extends CustomObject
         "city" => self::TYPE_STRING,
         "countryId" => self::TYPE_INTEGER,
         "phone" => self::TYPE_STRING,
-        "number" => self::TYPE_STRING,
+        "warnPasswordExpiration" => self::TYPE_BOOLEAN,
         "import" => self::TYPE_BOOLEAN,
-        "sync" => self::TYPE_BOOLEAN,
+        "syncEmployee" => self::TYPE_BOOLEAN,
         "syncEmployeeCompanyName" => self::TYPE_STRING,
-        "syncStudentCompanyName" => self::TYPE_STRING,
         "syncEmployeeOU" => self::TYPE_STRING,
+        "syncEmployeeDefaultMemberOf" => self::TYPE_STRING,
+        "syncStudent" => self::TYPE_BOOLEAN,
+        "syncStudentCompanyName" => self::TYPE_STRING,
         "syncStudentOU" => self::TYPE_STRING,
+        "syncStudentDefaultMemberOf" => self::TYPE_STRING,
+        "syncUpdateMail" => self::TYPE_LIST,
+        "takeInAccountStartDate" => self::TYPE_BOOLEAN,
         "intuneOrderIdPrefix" => self::TYPE_STRING,
         "jamfIpadPrefix" => self::TYPE_STRING,
         "adJobTitlePrefix" => self::TYPE_STRING,
         "adOuPart" => self::TYPE_STRING,
         "adSecGroupPart" => self::TYPE_STRING,
-        "syncUpdateMail" => self::TYPE_LIST,
         "dynamicTeam" => self::TYPE_BOOLEAN,
-        "smartschoolSourceId" => self::TYPE_STRING,
         "eetjemeeKey" => self::TYPE_STRING,
-        "eetjemeeSmartschoolGroup" => self::TYPE_STRING,
-        "hrEmail" => self::TYPE_STRING,
+        "smartschoolSourceId" => self::TYPE_STRING,
+        "smsSyncClassTeachers" => self::TYPE_BOOLEAN,
+        "smsGroupStudents" => self::TYPE_STRING,
+        "smsGroupEmployee" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
@@ -61,7 +66,7 @@ class School extends CustomObject
 
         $this->formatted->icon->virtual = HTML::Icon($this->virtual ? "cloud" : "building");
         $this->formatted->icon->import = HTML::Icon($this->import ? "check" : "x", color: $this->import ? "green" : "red");
-        $this->formatted->icon->sync = HTML::Icon($this->sync ? "check" : "x", color: $this->sync ? "green" : "red");
+        $this->formatted->icon->sync = HTML::Icon($this->syncEmployee ? "check" : "x", "Personeel", $this->syncEmployee ? "green" : "red") . HTML::Icon($this->syncStudent ? "check" : "x", "Leerling", $this->syncStudent ? "green" : "red");
 
         $this->formatted->address = CString::formatAddress($this->street, $this->number, $this->bus, $this->zipcode, $this->city, $this->linked->country->name);
         $this->formatted->addressDoubleLine = CString::formatAddress($this->street, $this->number, $this->bus, $this->zipcode, $this->city, $this->linked->country->name, true);

@@ -37,7 +37,7 @@ export default class Form extends MasterObject {
     this.init();
   }
 
-  init = () => {
+  init = async () => {
     this.checkDefaultStates();
     this.disableAutocomplete();
     this.disableValidation();
@@ -46,8 +46,8 @@ export default class Form extends MasterObject {
     // this.createSteps();
     this.attachDefaultEvents();
 
-    if (this.prefillId) this.prefillForm(this.prefillId);
-    else if (this.prefill) this.prefillForm();
+    if (this.prefillId) await this.prefillForm(this.prefillId);
+    else if (this.prefill) await this.prefillForm();
 
     this.loaded = true;
   };
@@ -340,7 +340,7 @@ export default class Form extends MasterObject {
     this.lastLoadedId = id;
     Helpers.toggleWait();
 
-    fetch(
+    return fetch(
       this.source + (this.lastLoadedId == null ? "" : `/${this.lastLoadedId}`),
       {
         credentials: "include",

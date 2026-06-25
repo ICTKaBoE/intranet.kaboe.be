@@ -279,7 +279,8 @@ class ConfigurationController extends ApiController
             "parentSchoolId" => ['default' => 0, 'trimToNull' => true],
             "color",
             "import",
-            "sync",
+            "syncEmployee",
+            "syncStudent",
             "syncEmployeeCompanyName",
             "syncStudentCompanyName",
             "syncEmployeeOU",
@@ -289,7 +290,9 @@ class ConfigurationController extends ApiController
             "adJobTitlePrefix",
             "adOuPart",
             "adSecGroupPart",
-            "syncUpdateMail"
+            "syncUpdateMail",
+            "takeInAccountStartDate",
+            "smsSyncClassTeachers"
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);

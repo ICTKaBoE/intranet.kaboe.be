@@ -18,8 +18,14 @@ window.insertNew = (index, roleIdDefaultValue = "", toDefaultValue = "") => {
   template.id = template.id.replace("<INDEX>", index);
   template.innerHTML = template.innerHTML.replaceAll("<INDEX>", index);
   template.innerHTML = template.innerHTML.replace("data-no-create", "");
-  template.innerHTML = template.innerHTML.replace("<ROLE_ID_DEFAULTVALUE>", roleIdDefaultValue);
-  template.innerHTML = template.innerHTML.replace("<TO_DEFAULTVALUE>", toDefaultValue);
+  template.innerHTML = template.innerHTML.replace(
+    "<ROLE_ID_DEFAULTVALUE>",
+    roleIdDefaultValue,
+  );
+  template.innerHTML = template.innerHTML.replace(
+    "<TO_DEFAULTVALUE>",
+    toDefaultValue,
+  );
 
   container.appendChild(template);
   document.getElementById(`btnDeleteNew${index}`).onclick = () =>
@@ -27,7 +33,11 @@ window.insertNew = (index, roleIdDefaultValue = "", toDefaultValue = "") => {
   [Select].forEach((c) => c.ScanAndCreate());
 };
 
-window.insertEdit = (index, parameterDefaultValue = "", toDefaultValue = "") => {
+window.insertEdit = (
+  index,
+  parameterDefaultValue = "",
+  toDefaultValue = "",
+) => {
   let container = document.getElementById("edit_filtered_container");
   let template = document
     .getElementById("edit_filtered_<INDEX>")
@@ -37,8 +47,14 @@ window.insertEdit = (index, parameterDefaultValue = "", toDefaultValue = "") => 
   template.id = template.id.replace("<INDEX>", index);
   template.innerHTML = template.innerHTML.replaceAll("<INDEX>", index);
   template.innerHTML = template.innerHTML.replace("data-no-create", "");
-  template.innerHTML = template.innerHTML.replace("<PARAMETER_DEFAULTVALUE>", parameterDefaultValue);
-  template.innerHTML = template.innerHTML.replace("<TO_DEFAULTVALUE>", toDefaultValue);
+  template.innerHTML = template.innerHTML.replace(
+    "<PARAMETER_DEFAULTVALUE>",
+    parameterDefaultValue,
+  );
+  template.innerHTML = template.innerHTML.replace(
+    "<TO_DEFAULTVALUE>",
+    toDefaultValue,
+  );
 
   container.appendChild(template);
   document.getElementById(`btnDeleteEdit${index}`).onclick = () =>
@@ -104,47 +120,39 @@ window.generateEditJson = () => {
   }
 };
 
-let btnSave = new Button({
-  options: {
-    type: Button.TYPE_ICON_TEXT,
-    icon: "check",
-    text: "Opslaan",
-    title: "Opslaan",
-    bgColor: "primary",
-    onclick: () => {
-      window.generateNewJson();
-      window.generateEditJson();
-      Form.GetInstance(pageId).submit();
-    },
+let btnSave = new Button(null, {
+  type: Button.TYPE_ICON_TEXT,
+  icon: "check",
+  text: "Opslaan",
+  title: "Opslaan",
+  bgColor: "primary",
+  onclick: () => {
+    window.generateNewJson();
+    window.generateEditJson();
+    Form.GetInstance(pageId).submit();
   },
 });
 
-let btnAddNew = new Button({
-  element: document.getElementById("btnAddNew"),
-  options: {
-    type: Button.TYPE_ICON,
-    icon: "plus",
-    bgColor: "success",
-    title: "Nieuwe filter toevoegen",
-    onclick: () =>
-      window.insertNew(
-        document.getElementById("new_filtered_container").children.length - 1,
-      ),
-  },
+let btnAddNew = new Button(document.getElementById("btnAddNew"), {
+  type: Button.TYPE_ICON,
+  icon: "plus",
+  bgColor: "success",
+  title: "Nieuwe filter toevoegen",
+  onclick: () =>
+    window.insertNew(
+      document.getElementById("new_filtered_container").children.length - 1,
+    ),
 });
 
-let btnAddEdit = new Button({
-  element: document.getElementById("btnAddEdit"),
-  options: {
-    type: Button.TYPE_ICON,
-    icon: "plus",
-    bgColor: "success",
-    title: "Nieuwe filter toevoegen",
-    onclick: () =>
-      window.insertEdit(
-        document.getElementById("edit_filtered_container").children.length - 1,
-      ),
-  },
+let btnAddEdit = new Button(document.getElementById("btnAddEdit"), {
+  type: Button.TYPE_ICON,
+  icon: "plus",
+  bgColor: "success",
+  title: "Nieuwe filter toevoegen",
+  onclick: () =>
+    window.insertEdit(
+      document.getElementById("edit_filtered_container").children.length - 1,
+    ),
 });
 
 Component.addActionButton(btnSave);
@@ -152,11 +160,21 @@ Component.addActionButton(btnSave);
 $(document).ready(() => {
   Helpers.CheckAllLoaded(() => {
     setTimeout(() => {
-      let jsonNew = JSON.parse(document.getElementById("flow.new.filtered").value || "[]");
-      let jsonEdit = JSON.parse(document.getElementById("flow.edit.filtered").value || "[]");
+      let jsonNew = JSON.parse(
+        document.getElementById("flow.new.filtered").value || "[]",
+      );
+      let jsonEdit = JSON.parse(
+        document.getElementById("flow.edit.filtered").value || "[]",
+      );
 
-      if (jsonNew.length) jsonNew.forEach((item, index) => window.insertNew(index, item.roleId, item.to));
-      if (jsonEdit.length) jsonEdit.forEach((item, index) => window.insertEdit(index, item.parameterId, item.to));
+      if (jsonNew.length)
+        jsonNew.forEach((item, index) =>
+          window.insertNew(index, item.roleId, item.to),
+        );
+      if (jsonEdit.length)
+        jsonEdit.forEach((item, index) =>
+          window.insertEdit(index, item.parameterId, item.to),
+        );
     }, 500);
   }, [Form]);
 });

@@ -2,6 +2,7 @@
 
 namespace Database\Object\StrategicDashboard;
 
+use Ouzo\Utilities\Strings;
 use Security\CustomObject;
 
 class ItemType extends CustomObject

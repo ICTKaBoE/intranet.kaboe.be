@@ -12,7 +12,7 @@ const TEMPLATE = "
 
 <div class='card mb-3'>
     <div class='card-body'>
-        <div role='chart' id='crt{{page:id}}' data-height='300vh' data-source='{{chart:url:full}}/{{url:part.id}}' data-no-data-text='Geen geschiedenis beschikbaar' data-title='Geschiedenis' data-xaxis-type='datetime'></div>
+        <div role='chart' id='crt{{page:id}}' data-height='300vh' data-source='{{chart:url:full}}/{{url:part.id}}?vw=true' data-no-data-text='Geen geschiedenis beschikbaar' data-title='Geschiedenis' data-xaxis-type='datetime'></div>
     </div>
 </div>
 ";

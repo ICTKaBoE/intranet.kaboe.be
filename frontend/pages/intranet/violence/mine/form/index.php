@@ -152,9 +152,9 @@
         </div>
     </div>
 
-    <div class="card-footer btn-list">
-        <button type="button" class="btn btn-primary me-auto d-none" id="btnPrevStep"><i class="icon ti ti-chevron-left"></i>Vorige stap</button>
-        <button type="button" class="btn btn-primary ms-auto" id="btnNextStep">Volgende stap<i class="icon ti ti-chevron-right ms-2 me-n1"></i></button>
-        <button type="submit" class="btn btn-primary ms-auto d-none" id="btnSubmit">Opslaan</button>
+    <div class="card-footer btn-list" id="btnList">
+        <button id="btnPrevStep"></button>
+        <button id="btnNextStep"></button>
+        <button id="btnSubmit"></button>
     </div>
 </form>

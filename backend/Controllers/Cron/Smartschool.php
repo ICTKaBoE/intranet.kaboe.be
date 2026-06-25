@@ -3,32 +3,28 @@
 namespace Controllers\Cron;
 
 use Database\Object\School\Course as SchoolCourse;
-use Database\Object\School\CourseInformatEmployeeClassgroup as SchoolCourseInformatEmployeeClassgroup;
 use Database\Object\School\CourseInformatEmployeeStudentClassgroup as SchoolCourseInformatEmployeeStudentClassgroup;
 use Database\Object\School\CourseInformatStudent as SchoolCourseInformatStudent;
+use Database\Repository\General\Schoolyear;
 use Database\Repository\Informat\ClassGroup;
+use Database\Repository\Informat\ClassGroupTeacher;
 use Database\Repository\Informat\Employee;
 use Database\Repository\Informat\Student;
 use Database\Repository\School\Course;
-use Database\Repository\School\CourseInformatEmployeeClassgroup;
 use Database\Repository\School\CourseInformatEmployeeStudentClassgroup;
 use Database\Repository\School\CourseInformatStudent;
+use Database\Repository\School\School;
 use Database\Repository\Smartschool\Message;
 use Database\Repository\Smartschool\MessageReceiver;
 use Database\Repository\Source;
 use Database\Repository\User\User as RepositoryUser;
 use Helpers\CString;
-use Helpers\General;
 use Helpers\Log;
-use M365\Repository\Group;
 use M365\Repository\User;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
-use Security\FileSystem;
 use Security\GUID;
-use Security\Input;
-use Security\User as SecurityUser;
 use Smartschool\Repository\AllAccountsExtended;
 use Smartschool\Repository\AllGroupsAndClasses;
 use Smartschool\Repository\SkoreClassTeacherCourseRelation;
@@ -168,6 +164,7 @@ abstract class Smartschool
 
                     $smsUsers = (new AllAccountsExtended($source->id))->get($group["code"], "1");
                     $m365Users = (new User)->getGroupMembersByGroupId($group['code'], ["userPrincipalName", "surname", "givenName", "employeeId"]);
+                    $m365Users = Arrays::filter($m365Users, fn($u) => Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class));
                     $m365Users = Arrays::map($m365Users, fn($u) => [
                         "userPrincipalName" => $u->getUserPrincipalName(),
                         "surname" => $u->getSurname(),
@@ -209,6 +206,54 @@ abstract class Smartschool
             } catch (\Exception $e) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
             }
+        }
+
+        return true;
+    }
+
+    public static function SyncClassTeachers()
+    {
+        $sourceRepo = new Source;
+        $classgroupRepo = new ClassGroup;
+        $classgroupTeacherRepo = new ClassGroupTeacher;
+        $userRepo = new RepositoryUser;
+        $schoolyear = (new Schoolyear)->getCurrent();
+        $sources = Arrays::filter($sourceRepo->get(), fn($s) => Strings::startsWith($s->id, "smartschool"));
+
+        foreach ($sources as $source) {
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Source: {$source->id}");
+            $errorCodes = SmartschoolSmartschool::GetErrorCodes($source->id);
+            $classes = (new AllGroupsAndClasses($source->id))->get();
+            $classes = Arrays::uniqueBy(Arrays::filter($classes, fn($c) => Strings::equal('K', $c['type'])), 'name');
+
+            foreach ($classes as $class) {
+                $classgroups = $classgroupRepo->getAllBySchoolyearAndCode($schoolyear->name, $class['name']);
+
+                foreach ($classgroups as $classgroup) {
+                    Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+                    $sync = $classgroup->linked->schoolInstitute->linked->school->smsSyncClassTeachers ?: $classgroup->linked->schoolInstitute->linked->school->linked->parentSchool->smsSyncClassTeachers;
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$classgroup->linked->schoolInstitute->linked->school->name} - {$class['name']}" . ($sync ? "" : "... NO SYNC"));
+                    if (!$sync) continue;
+
+                    $classgroupTeachers = $classgroupTeacherRepo->getByInformatClassgroupId($classgroup->id);
+                    $usernames = [];
+
+                    foreach ($classgroupTeachers as $classgroupTeacher) {
+                        $username = ($userRepo->getByInformatEmployeeId($classgroupTeacher->linked->informatEmployee->informatId) ?: $userRepo->getByInformatEmployeeId("P{$classgroupTeacher->linked->informatEmployee->informatId}"))?->username;
+
+                        if ($username) {
+                            $usernames[] = $username;
+                        }
+                    }
+
+                    $usernames = implode(",", $usernames);
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Link " . implode(", ", explode(",", $usernames)) . " to class...");
+                    $result = SmartschoolSmartschool::ChangeGroupOwners($source->id, $class['code'], $usernames);
+                    if (is_int($result) && $result !== 0) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $errorCodes[$result] ?? "Unknown error code: {$result}");
+                }
+            }
+
+            Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
         }
 
         return true;

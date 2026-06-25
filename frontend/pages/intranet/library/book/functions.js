@@ -6,130 +6,116 @@ import Form from "../../../../shared/default/js/object/Form.js";
 import Component from "../../../../shared/default/js/object/Component.js";
 
 window.setLender = () => {
-	let selected = Select.GetInstance("lenderType").getValue();
-	Select.GetInstance("lenderInformatId").setDetails(selected);
+  let selected = Select.GetInstance("lenderType").getValue();
+  Select.GetInstance("lenderInformatId").setDetails(selected);
 };
 
 window.setReturner = () => {
-	let selected = Select.GetInstance("returnerType").getValue();
-	Select.GetInstance("returnerInformatId").setDetails(selected);
+  let selected = Select.GetInstance("returnerType").getValue();
+  Select.GetInstance("returnerInformatId").setDetails(selected);
 };
 
-let btnFilter = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "filter",
-		title: "Filteren",
-		bgColor: "blue",
-		modal: "filter",
-	},
+let btnFilter = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "filter",
+  title: "Filteren",
+  bgColor: "blue",
+  modal: "filter",
 });
 
-let btnAdd = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "plus",
-		title: "Toevoegen",
-		bgColor: "green",
-		onclick: () => {
-			Helpers.redirect("/add");
-		},
-	},
+let btnAdd = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "plus",
+  title: "Toevoegen",
+  bgColor: "green",
+  onclick: () => {
+    Helpers.redirect("/add");
+  },
 });
 
-let btnEdit = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "pencil",
-		title: "Bewerken",
-		bgColor: "orange",
-		onclick: "edit",
-	},
+let btnEdit = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "pencil",
+  title: "Bewerken",
+  bgColor: "orange",
+  onclick: "edit",
 });
 
-let btnDelete = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "trash",
-		title: "Verwijderen",
-		bgColor: "red",
-		modal: "delete",
-		onclick: "delete",
-	},
+let btnDelete = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "trash",
+  title: "Verwijderen",
+  bgColor: "red",
+  modal: "delete",
+  onclick: "delete",
 });
 
-let btnLend = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "arrow-forward",
-		title: "Uitlenen",
-		bgColor: "green",
-		modal: "lend",
-		onclick: () => {
-			Form.GetInstance(`${pageId}Lend`).reset();
-			Form.GetInstance(`${pageId}Lend`).setLastLoadedId(
-				Table.GetInstance(pageId)
-					.getSelectedRowData()
-					.map((r) => r.guid || r.id)
-					.join("_")
-			);
-		},
-	},
+let btnLend = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "arrow-forward",
+  title: "Uitlenen",
+  bgColor: "green",
+  modal: "lend",
+  onclick: () => {
+    Form.GetInstance(`${pageId}Lend`).reset();
+    Form.GetInstance(`${pageId}Lend`).setLastLoadedId(
+      Table.GetInstance(pageId)
+        .getSelectedRowData()
+        .map((r) => r.guid || r.id)
+        .join("_"),
+    );
+  },
 });
 
-let btnReturn = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "arrow-back-up",
-		title: "Terugbrengen",
-		bgColor: "orange",
-		modal: "return",
-		onclick: () => {
-			Form.GetInstance(`${pageId}Return`).reset();
-			Form.GetInstance(`${pageId}Return`).setLastLoadedId(
-				Table.GetInstance(pageId)
-					.getSelectedRowData()
-					.map((r) => r.guid || r.id)
-					.join("_")
-			);
-		},
-	},
+let btnReturn = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "arrow-back-up",
+  title: "Terugbrengen",
+  bgColor: "orange",
+  modal: "return",
+  onclick: () => {
+    Form.GetInstance(`${pageId}Return`).reset();
+    Form.GetInstance(`${pageId}Return`).setLastLoadedId(
+      Table.GetInstance(pageId)
+        .getSelectedRowData()
+        .map((r) => r.guid || r.id)
+        .join("_"),
+    );
+  },
 });
 
-let btnHistory = new Button({
-	options: {
-		type: Button.TYPE_ICON,
-		icon: "history",
-		title: "Geschiedenis",
-		bgColor: "primary",
-		modal: "history",
-		onclick: () => {
-			Table.GetInstance(`${pageId}History`).appendSource(
-				Table.GetInstance(pageId)
-					.getSelectedRowData()
-					.map((r) => r.guid || r.id)
-					.join("_")
-			);
+let btnHistory = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "history",
+  title: "Geschiedenis",
+  bgColor: "primary",
+  modal: "history",
+  onclick: () => {
+    Table.GetInstance(`${pageId}History`).appendSource(
+      Table.GetInstance(pageId)
+        .getSelectedRowData()
+        .map((r) => r.guid || r.id)
+        .join("_"),
+    );
 
-			Table.GetInstance(`${pageId}History`).reload();
-		},
-	},
+    Table.GetInstance(`${pageId}History`).reload();
+  },
 });
 
 Component.addActionButton(
-	btnFilter,
-	btnAdd,
-	btnEdit,
-	btnDelete,
-	btnLend,
-	btnReturn,
-	btnHistory
+  btnFilter,
+  btnAdd,
+  btnEdit,
+  btnDelete,
+  btnLend,
+  btnReturn,
+  btnHistory,
 );
 
 $(document).ready(() => {
-	Table.GetInstance(pageId).attachButton(btnEdit, "==1");
-	Table.GetInstance(pageId).attachButton(btnDelete, ">0");
-	Table.GetInstance(pageId).attachButton(btnLend, ">0");
-	Table.GetInstance(pageId).attachButton(btnReturn, ">0");
-	Table.GetInstance(pageId).attachButton(btnHistory, "==1");
+  Table.GetInstance(pageId).attachButton(btnEdit, "==1");
+  Table.GetInstance(pageId).attachButton(btnDelete, ">0");
+  Table.GetInstance(pageId).attachButton(btnLend, ">0");
+  Table.GetInstance(pageId).attachButton(btnReturn, ">0");
+  Table.GetInstance(pageId).attachButton(btnHistory, "==1");
 });
