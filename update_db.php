@@ -24,8 +24,6 @@ $lines = Arrays::map($lines, fn($l) => "{$l};");
 $db = Database::getInstance();
 $connection = $db->getConnection();
 
-$db->beginTransaction();
-
 try {
     foreach ($lines as $line) {
         echo $line;
@@ -35,7 +33,6 @@ try {
         sleep(2);
     }
 
-    $db->commit();
     echo "<br />";
     echo "Committed!<br />";
     echo "Removing directory...<br />";
@@ -44,6 +41,6 @@ try {
     echo "DONE!";
 } catch (\Exception $e) {
     echo "<span style='color: red; margin-left: 10px'>FAIL</span><br />";
-    $db->rollback();
+    sleep(2);
     echo "<br />Error Message:<br />{$e->getMessage()}";
 }

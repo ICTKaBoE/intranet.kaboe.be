@@ -51,12 +51,12 @@ ALTER TABLE tbl_school ADD eetjemeeEmployeeSmartschoolGroup varchar(254) NULL;
 ALTER TABLE tbl_school CHANGE eetjemeeEmployeeSmartschoolGroup eetjemeeEmployeeSmartschoolGroup varchar(254) NULL AFTER eetjemeeStudentSmartschoolGroup;
 
 ALTER TABLE tbl_school CHANGE eetjemeeStudentSmartschoolGroup smsGroupStudents varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL;
-ALTER TABLE tbl_school CHANGE smsGroupStudents smsGroupStudents varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER smsSyncClassTeachers;
 ALTER TABLE tbl_school CHANGE eetjemeeEmployeeSmartschoolGroup smsGroupEmployee varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL;
 ALTER TABLE tbl_school CHANGE smsGroupEmployee smsGroupEmployee varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER smsGroupStudents;
 
 ALTER TABLE tbl_school ADD smsSyncClassTeachers BOOL DEFAULT 0 NOT NULL;
-ALTER TABLE tbl_school CHANGE smsSyncClassTeachers smsSyncClassTeachers BOOL DEFAULT 0 NOT NULL AFTER eetjemeeKey;
+ALTER TABLE tbl_school CHANGE smsSyncClassTeachers smsSyncClassTeachers BOOL DEFAULT 0 NOT NULL AFTER eetjemeeKeyStudents;
+ALTER TABLE tbl_school CHANGE smsGroupStudents smsGroupStudents varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER smsSyncClassTeachers;
 ALTER TABLE tbl_school ADD eetjemeeKeyEmployee varchar(254) NULL;
 ALTER TABLE tbl_school CHANGE eetjemeeKeyEmployee eetjemeeKeyEmployee varchar(254) NULL AFTER eetjemeeKeyStudents;
 
