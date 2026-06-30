@@ -19,7 +19,9 @@ class Registration extends CustomObject
         "grade" => self::TYPE_INTEGER,
         "year" => self::TYPE_INTEGER,
         "start" => self::TYPE_DATE,
+        "virtualStart" => self::TYPE_DATE,
         "end" => self::TYPE_DATE,
+        "virtualEnd" => self::TYPE_DATE,
         "status" => self::TYPE_INTEGER,
         "current" => self::TYPE_BOOLEAN
     ];

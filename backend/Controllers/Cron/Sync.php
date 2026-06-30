@@ -36,11 +36,10 @@ abstract class Sync
     /* ---------------------------- PUBLIC ENTRY ----------------------------- */
     public static function Prepare()
     {
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting sync...");
-        // $ok1 = self::PrepareEmployee();
+        $status[] = self::PrepareEmployee();
         Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-        $ok2 = self::PrepareStudent();
-        return ($ok1 && $ok2);
+        $status[] = self::PrepareStudent();
+        return !Arrays::contains($status, false);
     }
 
     /* ========================== REUSABLE HELPERS ========================== */
@@ -130,10 +129,12 @@ abstract class Sync
             Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
         );
 
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($currentEmployees) . " employees");
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($currentEmployees) . " employees in M365");
 
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
         $informat = $employeeRepo->get();
+        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && !($i->linked->institute->linked->school->syncEmployee || $i->linked->institute->linked->school->linked->parentSchool->syncEmployee));
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* ----------------------------- PROCESS EMPLOYEES ------------------------------ */
         foreach ($informat as $emp) {
@@ -142,10 +143,10 @@ abstract class Sync
 
             $schoolObject = $emp->linked->institute->linked->school;
 
-            if ($emp->instituteId !== 0 && !($schoolObject->syncEmployee || $schoolObject->linked->parentSchool->syncEmployee)) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
-                continue;
-            }
+            // if ($emp->instituteId !== 0 && !($schoolObject->syncEmployee || $schoolObject->linked->parentSchool->syncEmployee)) {
+            //     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
+            //     continue;
+            // }
 
             /* ---------- Load or Init Sync Object ---------- */
             $sync = $syncRepo->getByEmployeeId($emp->informatId) ?? new ObjectSync;
@@ -158,7 +159,7 @@ abstract class Sync
 
             /* ---------- Check active / status ---------- */
             $ownFieldStatus = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, $statusKey)?->value;
-            $inService = is_null($ownFieldStatus) ? General::convert($emp->active, "boolean") : Strings::equal($ownFieldStatus, "IN DIENST");
+            $inService = Strings::equal($ownFieldStatus, "IN DIENST") ?: false;
 
             /* ---------- Determine GivenName ---------- */
             $firstNameSource = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, $firstNameKey)?->value ?: "Voornaam";
@@ -246,7 +247,7 @@ abstract class Sync
             if ($photoEnabled) $photo = self::resolvePhoto(LOCATION_IMAGE . "/informat/employee/{$emp->informatGuid}.jpg");
 
             /* ---------- Determine ACTION: Create / Enable / Update / Disable ---------- */
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365 ? "" : "NOT ") . "FOUND; M365 Enabled: " . ($m365 ? ($m365->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; In Service OR Informat Active: " . ($inService ? "YES" : "NO"));
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "M365: " . ($m365 ? "" : "NOT ") . "FOUND; M365 Enabled: " . ($m365 ? ($m365->getAccountEnabled() ? "YES" : "NO") : "N/A") . "; In Service: " . ($inService ? "YES" : "NO"));
 
             if (!$m365 && $inService) $sync->action = "C";
             else if ($m365 && !$m365->getAccountEnabled() && $inService) $sync->action = "E";
@@ -355,11 +356,11 @@ abstract class Sync
 
             /* ---------- Mails ---------- */
             if (Arrays::contains(["C", "E"], $sync->action)) {
-                // self::createNewEmployeeMail($sync);
-                // self::createNewEmployeeToCentralMail($sync, []);
+                self::createNewEmployeeMail($sync);
+                self::createNewEmployeeToCentralMail($sync, []);
             } else if ($sync->action === "D") {
-                // self::createDisableEmployeeMail($sync);
-                // self::createDisableEmployeeToCentralMail($sync);
+                self::createDisableEmployeeMail($sync);
+                self::createDisableEmployeeToCentralMail($sync);
             }
         }
 
@@ -384,6 +385,8 @@ abstract class Sync
         $navigation = (new Navigation)->getByLinkAndType('sync', "M");
         $photoEnabled = General::convert($settingRepo->getByNavigationIdAndKey($navigation->id, "photo.student")->value, 'bool');
         $schoolyear = (new Schoolyear)->getCurrent();
+
+        $mails = [];
 
         /* ------------------------------ Get all M365 ------------------------------ */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering M365 students...");
@@ -410,11 +413,13 @@ abstract class Sync
             fn($u) =>
             Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
         );
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($current) . " students");
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($current) . " students in M365");
 
         /* ---------------------------- Get Informat students ---------------------------- */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat students...");
         $informat = $studentRepo->get();
+        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && !($i->linked->institute->linked->school->syncStudent || $i->linked->institute->linked->school->linked->parentSchool->syncStudent));
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* -------------------------------- Process each student ------------------------------- */
         foreach ($informat as $st) {
@@ -422,10 +427,10 @@ abstract class Sync
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$st->informatId} - {$st->name} {$st->firstName}");
             $schoolObj = $st->linked->institute->linked->school;
 
-            if ($st->instituteId !== 0 && !($schoolObj->syncStudent || $schoolObj->linked->parentSchool->syncStudent)) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
-                continue;
-            }
+            // if ($st->instituteId !== 0 && !($schoolObj->syncStudent || $schoolObj->linked->parentSchool->syncStudent)) {
+            //     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
+            //     continue;
+            // }
 
             /* ---------- Load or Init Sync Object ---------- */
             $sync = $syncRepo->getByEmployeeId($st->informatId) ?? new ObjectSync;
@@ -437,14 +442,7 @@ abstract class Sync
             $m365 = Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equal($u->getEmployeeId(), $st->informatId) || Strings::equal($u->getEmployeeId(), "L{$st->informatId}")));
 
             /* ---------- Registration / class lookups ---------- */
-            $takeInAccountStartDate = General::convert(self::pick($schoolObj->takeInAccountStartDate, $schoolObj->linked->parentSchool->takeInAccountStartDate), "bool");
-            $regs = $regRepo->getByInformatStudentId($st->id);
-            die(var_dump($schoolyear));
-            if ($takeInAccountStartDate) $regs = Arrays::filter($regs, fn($r) => $r->current && $r->status == 0);
-            else $regs = Arrays::filter($regs, fn($r) => Clock::at($r->start)->isAfterOrEqualTo(Clock::at($schoolyear->start)) && (is_null($r->end) || Clock::at($r->end)->isBeforeOrEqualTo(Clock::at($schoolyear->end))) && $r->status == 0);
-            $regs = Arrays::orderBy($regs, "start");
-            $regs = array_reverse($regs);
-            $currentReg = Arrays::firstOrNull($regs);
+            $currentReg = $regRepo->getCurrentByInformatStudentId($st->id);
 
             $regClasses = $currentReg ? $regClassRepo->getByInformatRegistrationId($currentReg->id) : [];
             $regClasses = Arrays::filter($regClasses, fn($rc) => $rc->current);
@@ -455,9 +453,9 @@ abstract class Sync
 
             $currentRegClass = Arrays::firstOrNull($regClasses);
 
-            $institute = $currentReg ? Arrays::firstOrNull($instituteRepo->get($currentReg->schoolInstituteId)) : null;
-            $school = $institute ? Arrays::firstOrNull($schoolRepo->get($institute->schoolId)) : null;
-            $class = $currentRegClass ? Arrays::firstOrNull($classRepo->get($currentRegClass->informatClassGroupId)) : null;
+            $institute = $instituteRepo->getById($currentReg?->schoolInstituteId);
+            $school = $schoolRepo->getById($institute?->schoolId);
+            $class = $classRepo->getById($currentRegClass?->informatClassGroupId);
 
             /* ---------- DisplayName + email ---------- */
             $fmtDisplay = $settingRepo->getByNavigationIdAndKey($navigation->id, "format.displayName")->value;
@@ -494,7 +492,6 @@ abstract class Sync
 
             foreach ($defaultGroups as $g) {
                 if (!$g) continue;
-
                 if (!$school->adSecGroupPart) continue;
 
                 $_g = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $g);
@@ -596,7 +593,7 @@ abstract class Sync
                         $sync->password          = null;
                         $sync->ou                = null;
                         $sync->thumbnailPhoto    = null;
-                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "No changes - skip");
+                        // Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "No changes - skip");
                     }
                     break;
             }
@@ -614,12 +611,14 @@ abstract class Sync
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
             $id = $syncRepo->set($sync);
-            if (!$sync->id) $sync = Arrays::firstOrNull($syncRepo->get($id));
+            if (!$sync->id) $sync = $syncRepo->getById($id);
 
-            /* ---------- Prepare student summary mail ---------- */
-            // (original call disabled in your source code — left untouched)
-            // self::createStudentMail($create, $update, $enable, $disable);
+            if (!is_null($sync->action)) $mails[$sync->action][$schoolObj->id] = $sync;
+            // die(var_dump($mails));
         }
+
+        /* ---------- Prepare student summary mail ---------- */
+        self::createStudentMail($mails['C'], $mails['U'], $mails['E'], $mails['D']);
 
         return true;
     }
@@ -652,19 +651,21 @@ abstract class Sync
         $email = (new EmployeeEmail)->getByInformatEmployeeId($employee->id);
         $email = Arrays::filter($email, fn($e) => Strings::equal($e->type, $_mailType));
 
-        $mail = new MailMail;
-        $mail->subject = $subject;
-        $mail->body = $body;
+        if ($email) {
+            $mail = new MailMail;
+            $mail->subject = $subject;
+            $mail->body = $body;
 
-        $mId = $mailRepo->set($mail);
+            $mId = $mailRepo->set($mail);
 
-        foreach ($email as $_email) {
-            $receiver = new MailReceiver;
-            $receiver->mailId = $mId;
-            $receiver->name = $employee->formatted->fullName;
-            $receiver->email = $_email->email;
+            foreach ($email as $_email) {
+                $receiver = new MailReceiver;
+                $receiver->mailId = $mId;
+                $receiver->name = $employee->formatted->fullName;
+                $receiver->email = $_email->email;
 
-            $mailReceiverRepo->set($receiver);
+                $mailReceiverRepo->set($receiver);
+            }
         }
     }
 
@@ -689,19 +690,21 @@ abstract class Sync
         $email = (new EmployeeEmail)->getByInformatEmployeeId($employee->id);
         $email = Arrays::filter($email, fn($e) => Strings::equal($e->type, $_mailType));
 
-        $mail = new MailMail;
-        $mail->subject = $subject;
-        $mail->body = $body;
+        if ($email) {
+            $mail = new MailMail;
+            $mail->subject = $subject;
+            $mail->body = $body;
 
-        $mId = $mailRepo->set($mail);
+            $mId = $mailRepo->set($mail);
 
-        foreach ($email as $_email) {
-            $receiver = new MailReceiver;
-            $receiver->mailId = $mId;
-            $receiver->name = $employee->formatted->fullName;
-            $receiver->email = $_email->email;
+            foreach ($email as $_email) {
+                $receiver = new MailReceiver;
+                $receiver->mailId = $mId;
+                $receiver->name = $employee->formatted->fullName;
+                $receiver->email = $_email->email;
 
-            $mailReceiverRepo->set($receiver);
+                $mailReceiverRepo->set($receiver);
+            }
         }
     }
 

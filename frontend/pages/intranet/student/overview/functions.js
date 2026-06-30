@@ -12,6 +12,24 @@ let btnFilter = new Button(null, {
   modal: "filter",
 });
 
-Component.addActionButton(btnFilter);
+let btnChangePassword = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "key",
+  title: "Wachtwoord wijzigen",
+  bgColor: "red",
+  modal: "changePassword",
+  onclick: () => {
+    Form.GetInstance(`${pageId}ChangePassword`).setLastLoadedId(
+      Table.GetInstance(pageId)
+        .getSelectedRowData()
+        .map((r) => r.guid || r.id)
+        .join("_"),
+    );
+  },
+});
 
-$(document).ready(() => {});
+Component.addActionButton(btnFilter, btnChangePassword);
+
+$(document).ready(() => {
+  Table.GetInstance(pageId).attachButton(btnChangePassword, ">0");
+});

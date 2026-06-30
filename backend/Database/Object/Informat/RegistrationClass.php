@@ -14,7 +14,9 @@ class RegistrationClass extends CustomObject
         "informatClassGroupId" => self::TYPE_INTEGER,
         "rank" => self::TYPE_INTEGER,
         "start" => self::TYPE_DATE,
+        "virtualStart" => self::TYPE_DATE,
         "end" => self::TYPE_DATE,
+        "virtualEnd" => self::TYPE_DATE,
         "current" => self::TYPE_BOOLEAN
     ];
 

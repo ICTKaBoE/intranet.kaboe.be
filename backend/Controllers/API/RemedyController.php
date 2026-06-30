@@ -640,7 +640,7 @@ class RemedyController extends ApiController
                 $body = "
                 Beste {$moment->linked->informatEmployee->formatted->fullNameReversed}, <br />
                 <br />
-                <p>Onderstaande leerlingen werden door {$user->formatted->fullNameReversed} <a href=\"https://intranet.kaboe.be/remedy/presence.php\" target=\"_blank\">ingeschreven via intranet</a> om een {$type->name} bij u te volgen" . ($fields['remark'] ? " met volgende opmerking" : "") . ":</p>";
+                <p>Onderstaande leerlingen werden door {$user->formatted->fullNameReversed} <a href=\"https://intranet.kaboe.be/remedy/presence\" target=\"_blank\">ingeschreven via intranet</a> om een {$type->name} bij u te volgen" . ($fields['remark'] ? " met volgende opmerking" : "") . ":</p>";
                 if ($fields['remark']) $body .= "<p>{$fields['remark']}</p>";
 
                 $body .= "

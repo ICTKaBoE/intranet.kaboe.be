@@ -1,310 +1,323 @@
 import MasterObject from "../MasterObject.js";
 import Button from "./Button.js";
+import Helpers from "./Helpers.js";
 
 export default class Table extends MasterObject {
-	static OBJ_SELECTOR = "table[role='table']";
-	static OBJ_ID_PREFIX = "tbl";
+  static OBJ_SELECTOR = "table[role='table']";
+  static OBJ_ID_PREFIX = "tbl";
 
-	constructor(element) {
-		super();
+  constructor(element) {
+    super();
 
-		this.element = element;
-		this.id = this.element.id || false;
+    this.element = element;
+    this.id = this.element.id || false;
 
-		this.source = this.element.dataset.source || false;
-		this._source = false;
-		this.holdLoad = this.element.hasAttribute("data-hold-load");
-		this.autoRefresh = this.element.dataset.autoRefresh || false;
-		this.defaultExtraData = this.element.dataset.extra || false;
-		this.doubleClickAction =
-			this.element.dataset.doubleClickAction || false;
-		this.small = this.element.hasAttribute("data-small");
-		this.checkbox = this.element.hasAttribute("data-checkbox");
-		this.noSearch = this.element.hasAttribute("data-no-search");
-		this.noInfo = this.element.hasAttribute("data-no-info");
-		this.noPaging = this.element.hasAttribute("data-no-paging");
-		this.pagingButtons = this.element.dataset.pagingButtons || 5;
-		this.childRowFormatFunction =
-			this.element.dataset.childRowFormat || false;
+    this.source = this.element.dataset.source || false;
+    this._source = false;
+    this.holdLoad = this.element.hasAttribute("data-hold-load");
+    this.autoRefresh = this.element.dataset.autoRefresh || false;
+    this.defaultExtraData = this.element.dataset.extra || false;
+    this.doubleClickAction = this.element.dataset.doubleClickAction || false;
+    this.small = this.element.hasAttribute("data-small");
+    this.checkbox = this.element.hasAttribute("data-checkbox");
+    this.noSearch = this.element.hasAttribute("data-no-search");
+    this.noInfo = this.element.hasAttribute("data-no-info");
+    this.noPaging = this.element.hasAttribute("data-no-paging");
+    this.pagingButtons = this.element.dataset.pagingButtons || 5;
+    this.childRowFormatFunction = this.element.dataset.childRowFormat || false;
 
-		this.data = null;
-		this.extraData = {};
-		this.buttons = {};
+    this.data = null;
+    this.extraData = {};
+    this.buttons = {};
 
-		if (this.defaultExtraData) {
-			let extraData = this.defaultExtraData
-				.replace("[", "")
-				.replace("]", "")
-				.split("|");
+    if (this.defaultExtraData) {
+      let extraData = this.defaultExtraData
+        .replace("[", "")
+        .replace("]", "")
+        .split("|");
 
-			this.extraData = {};
-			extraData.forEach((v) => {
-				v = v.split("=");
-				this.extraData[v[0]] = v[1];
-			});
-		}
+      this.extraData = {};
+      extraData.forEach((v) => {
+        v = v.split("=");
+        this.extraData[v[0]] = v[1];
+      });
+    }
 
-		this.tableOptions = {
-			columnDefs: [],
-			serverSide: false,
-			responsive: {
-				details: {
-					type: "inline",
-				},
-			},
-			pageLength: 25,
-			language: {
-				select: {
-					cells: null,
-					columns: null,
-					rows: null,
-				},
-				paginate: {
-					first: '<i class="ti ti-chevrons-left"></i>',
-					last: '<i class="ti ti-chevrons-right"></i>',
-					previous: '<i class="ti ti-chevron-left"></i>',
-					next: '<i class="ti ti-chevron-right"></i>',
-				},
-			},
-			layout: {
-				topStart: [
-					{
-						className: "col-12 col-lg-6 ps-3",
-						features: {
-							info: true,
-						},
-					},
-				],
-				topEnd: [
-					{
-						className: "col-12 col-lg-6 pe-3",
-						features: {
-							paging: {
-								buttons: this.pagingButtons,
-							},
-						},
-					},
-				],
-				bottomStart: [
-					{
-						className: "col-12 col-lg-6 ps-3",
-						features: {
-							info: true,
-						},
-					},
-				],
-				bottomEnd: [
-					{
-						className: "col-12 col-lg-6 pe-3 mb-2",
-						features: {
-							paging: {
-								buttons: this.pagingButtons,
-							},
-						},
-					},
-				],
-			},
-		};
+    this.tableOptions = {
+      columnDefs: [],
+      serverSide: false,
+      responsive: {
+        details: {
+          type: "inline",
+        },
+      },
+      pageLength: 25,
+      language: {
+        select: {
+          cells: null,
+          columns: null,
+          rows: null,
+        },
+        paginate: {
+          first: '<i class="ti ti-chevrons-left"></i>',
+          last: '<i class="ti ti-chevrons-right"></i>',
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next: '<i class="ti ti-chevron-right"></i>',
+        },
+      },
+      layout: {
+        topStart: [
+          {
+            className: "col-12 col-lg-6 ps-3",
+            features: {
+              info: true,
+            },
+          },
+        ],
+        topEnd: [
+          {
+            className: "col-12 col-lg-6 pe-3",
+            features: {
+              paging: {
+                buttons: this.pagingButtons,
+              },
+            },
+          },
+        ],
+        bottomStart: [
+          {
+            className: "col-12 col-lg-6 ps-3",
+            features: {
+              info: true,
+            },
+          },
+        ],
+        bottomEnd: [
+          {
+            className: "col-12 col-lg-6 pe-3 mb-2",
+            features: {
+              paging: {
+                buttons: this.pagingButtons,
+              },
+            },
+          },
+        ],
+      },
+    };
 
-		if (this.noInfo) this.tableOptions.info = false;
-		if (this.noPaging) this.tableOptions.paging = false;
+    if (this.noInfo) this.tableOptions.info = false;
+    if (this.noPaging) this.tableOptions.paging = false;
 
-		this.loaded = false;
+    this.loaded = false;
 
-		this.init();
-	}
+    this.init();
+  }
 
-	init = async () => {
-		this.createStructure();
+  init = async () => {
+    this.createStructure();
+    this.filter();
+    await this.getData();
+    this.createDataTable();
+    this.checkButtonStates();
 
-		await this.getData();
-		this.createDataTable();
-		this.checkButtonStates();
+    this.loaded = true;
 
-		this.loaded = true;
+    if (this.autoRefresh) this.startAutoRefresh();
+  };
 
-		if (this.autoRefresh) this.startAutoRefresh();
-	};
+  reload = async () => {
+    Helpers.toggleWait();
+    this.loaded = false;
+    this.filter();
 
-	reload = async () => {
-		this.loaded = false;
+    await this.getData();
+    this.datatable
+      .clear()
+      .rows.add(this.data?.rows ?? [])
+      .draw();
+    this.datatable.columns.adjust().draw();
 
-		await this.getData();
-		this.datatable
-			.clear()
-			.rows.add(this.data?.rows ?? [])
-			.draw();
-		this.datatable.columns.adjust().draw();
+    this.loaded = true;
+    Helpers.toggleWait();
+  };
 
-		this.loaded = true;
-	};
+  createStructure = () => {
+    if (!this.element.classList.contains("table"))
+      this.element.classList.add("table");
+    if (this.small && !this.element.classList.contains("table-sm"))
+      this.element.classList.add("table-sm");
+  };
 
-	createStructure = () => {
-		if (!this.element.classList.contains("table"))
-			this.element.classList.add("table");
-		if (this.small && !this.element.classList.contains("table-sm"))
-			this.element.classList.add("table-sm");
-	};
+  getData = () => {
+    if (!this.source) return;
 
-	getData = () => {
-		if (!this.source) return;
+    return $.get(
+      this.source + (this._source ? "/" + this._source : ""),
+      this.extraData,
+    ).done((data) => {
+      this.data = data;
+    });
+  };
 
-		return $.get(
-			this.source + (this._source ? "/" + this._source : ""),
-			this.extraData
-		).done((data) => {
-			this.data = data;
-		});
-	};
+  createDataTable = () => {
+    this.data?.columns.forEach((c) => {
+      if (!Object.hasOwn(c, "defaultContent")) c.defaultContent = "";
+    });
 
-	createDataTable = () => {
-		this.data?.columns.forEach((c) => {
-			if (!Object.hasOwn(c, "defaultContent")) c.defaultContent = "";
-		});
+    if (this.checkbox) {
+      this.data?.columns.unshift({
+        type: "checkbox",
+        data: null,
+        orderable: false,
+        searchable: false,
+        width: "20px",
+      });
 
-		if (this.checkbox) {
-			this.data?.columns.unshift({
-				type: "checkbox",
-				data: null,
-				orderable: false,
-				searchable: false,
-				width: "20px",
-			});
+      this.tableOptions.columnDefs.push({
+        orderable: false,
+        render: DataTable.render.select(),
+        targets: 0,
+      });
+    }
 
-			this.tableOptions.columnDefs.push({
-				orderable: false,
-				render: DataTable.render.select(),
-				targets: 0,
-			});
-		}
+    this.tableOptions.order = this.data?.defaultOrder || [
+      [this.checkbox ? 1 : 0, "asc"],
+    ];
 
-		this.tableOptions.order = this.data?.defaultOrder || [
-			[this.checkbox ? 1 : 0, "asc"],
-		];
+    this.tableOptions.columns = this.data?.columns;
+    this.tableOptions.data = this.data?.rows;
+    this.tableOptions.select = this.checkbox;
+    this.datatable = $(this.element).DataTable(this.tableOptions);
 
-		this.tableOptions.columns = this.data?.columns;
-		this.tableOptions.data = this.data?.rows;
-		this.tableOptions.select = this.checkbox;
-		this.datatable = $(this.element).DataTable(this.tableOptions);
+    this.datatable.on("select deselect", () => this.checkButtonStates());
 
-		this.datatable.on("select deselect", () => this.checkButtonStates());
+    if (this.doubleClickAction) {
+      let dt = this.datatable;
+      let action = this.doubleClickAction;
+      this.datatable.on("dblclick", "tr", function (e) {
+        dt.rows(this).select();
+        window[action]();
+      });
+    }
 
-		if (this.doubleClickAction) {
-			let dt = this.datatable;
-			let action = this.doubleClickAction;
-			this.datatable.on("dblclick", "tr", function (e) {
-				dt.rows(this).select();
-				window[action]();
-			});
-		}
+    if (this.data?.childRows) {
+      let dt = this.datatable;
+      let fn = this.childRowFormatFunction;
+      this.datatable.on("requestChild", (e, row) => {
+        row.child(window[fn](row.data())).show();
+      });
 
-		if (this.data?.childRows) {
-			let dt = this.datatable;
-			let fn = this.childRowFormatFunction;
-			this.datatable.on("requestChild", (e, row) => {
-				row.child(window[fn](row.data())).show();
-			});
+      this.datatable.on("click", "tbody td.dt-control", function () {
+        var tr = $(this).closest("tr");
+        var row = dt.row(tr);
 
-			this.datatable.on("click", "tbody td.dt-control", function () {
-				var tr = $(this).closest("tr");
-				var row = dt.row(tr);
+        if (row.child.isShown()) {
+          // This row is already open - close it
+          row.child.hide();
+        } else {
+          // Open this row
+          row.child(window[fn](row.data())).show();
+        }
+      });
+    }
+  };
 
-				if (row.child.isShown()) {
-					// This row is already open - close it
-					row.child.hide();
-				} else {
-					// Open this row
-					row.child(window[fn](row.data())).show();
-				}
-			});
-		}
-	};
+  attachButton = (button, showIf = null) => {
+    if ((!button) instanceof Button) return;
 
-	attachButton = (button, showIf = null) => {
-		if (!button instanceof Button) return;
+    this.buttons[button.id] = {
+      button: button,
+      showIf: showIf,
+    };
+  };
 
-		this.buttons[button.id] = {
-			button: button,
-			showIf: showIf,
-		};
-	};
+  checkButtonStates = () => {
+    let count = this.datatable.rows({ selected: true }).count();
+    // if (count == 0) count = -1;
 
-	checkButtonStates = () => {
-		let count = this.datatable.rows({ selected: true }).count();
-		// if (count == 0) count = -1;
+    for (let btn in this.buttons) {
+      if (Object.hasOwnProperty.call(this.buttons, btn)) {
+        if (eval(`${count}${this.buttons[btn].showIf}`))
+          this.buttons[btn].button.enable();
+        else this.buttons[btn].button.disable();
+      }
+    }
+  };
 
-		for (let btn in this.buttons) {
-			if (Object.hasOwnProperty.call(this.buttons, btn)) {
-				if (eval(`${count}${this.buttons[btn].showIf}`))
-					this.buttons[btn].button.enable();
-				else this.buttons[btn].button.disable();
-			}
-		}
-	};
+  startAutoRefresh = () => {
+    setInterval(() => {
+      this.reload();
+    }, this.autoRefresh * 1000);
+  };
 
-	startAutoRefresh = () => {
-		setInterval(() => {
-			this.reload();
-		}, this.autoRefresh * 1000);
-	};
+  addRow = (data, allowDuplicate = true, checkDuplicateField = null) => {
+    if (allowDuplicate == false && checkDuplicateField) {
+      let found = false;
+      $(this.element)
+        .find("td.sorting_1")
+        .each((i, x) => {
+          if (!found) found = x.innerHTML == data[checkDuplicateField];
+        });
+      if (found) return;
+    }
 
-	addRow = (data, allowDuplicate = true, checkDuplicateField = null) => {
-		if (allowDuplicate == false && checkDuplicateField) {
-			let found = false;
-			$(this.element)
-				.find("td.sorting_1")
-				.each((i, x) => {
-					if (!found)
-						found = x.innerHTML == data[checkDuplicateField];
-				});
-			if (found) return;
-		}
+    this.datatable.row.add(data).draw();
+  };
 
-		this.datatable.row.add(data).draw();
-	};
+  deleteSelectedRows = () => {
+    this.datatable.row(".selected").remove().draw(false);
+  };
 
-	deleteSelectedRows = () => {
-		this.datatable.row(".selected").remove().draw(false);
-	};
+  search = (value) => {
+    if (this.noSearch) return;
+    this.datatable.search(value).draw();
+  };
 
-	search = (value) => {
-		if (this.noSearch) return;
-		this.datatable.search(value).draw();
-	};
+  addExtraData = (key, value) => {
+    this.extraData[key] = value;
+  };
 
-	addExtraData = (key, value) => {
-		this.extraData[key] = value;
-	};
+  removeExtraData = (key) => {
+    delete this.extraData[key];
+  };
 
-	removeExtraData = (key) => {
-		delete this.extraData[key];
-	};
+  clearExtraData = () => {
+    this.extraData = {};
+  };
 
-	clearExtraData = () => {
-		this.extraData = {};
-	};
+  selectAllRows = () => {
+    $(this.element).find("thead tr td input.form-check-input").click();
+  };
 
-	selectAllRows = () => {
-		$(this.element).find("thead tr td input.form-check-input").click();
-	};
+  deselectAllRows = () => {
+    $(this.element).find("thead tr td input.form-check-input").click();
+  };
 
-	deselectAllRows = () => {
-		$(this.element).find("thead tr td input.form-check-input").click();
-	};
+  appendSource = (value) => {
+    this._source = value;
+  };
 
-	appendSource = (value) => {
-		this._source = value;
-	};
+  getSelectedRowData = () => {
+    let returnData = [];
+    let count = this.datatable.rows({ selected: true }).count();
+    let data = this.datatable.rows({ selected: true }).data();
 
-	getSelectedRowData = () => {
-		let returnData = [];
-		let count = this.datatable.rows({ selected: true }).count();
-		let data = this.datatable.rows({ selected: true }).data();
+    for (let i = 0; i < count; i++) {
+      returnData.push(data[i]);
+    }
 
-		for (let i = 0; i < count; i++) {
-			returnData.push(data[i]);
-		}
+    return returnData;
+  };
 
-		return returnData;
-	};
+  filter = () => {
+    let modal = document.getElementById("modal-filter");
+    let filter = JSON.parse(
+      window.localStorage.getItem(
+        `filter_${modal.dataset.module}_${modal.dataset.page}`,
+      ),
+    );
+
+    if (filter)
+      for (const [k, v] of Object.entries(filter)) this.addExtraData(k, v);
+  };
 }

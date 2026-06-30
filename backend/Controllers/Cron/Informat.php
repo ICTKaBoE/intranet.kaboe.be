@@ -11,7 +11,6 @@ use Database\Object\Informat\EmployeeNumber;
 use Database\Object\Informat\EmployeeOwnfield;
 use Database\Object\Informat\Registration as InformatRegistration;
 use Database\Object\Informat\RegistrationClass;
-use Database\Object\Informat\RegistrationClassTeacher as InformatRegistrationClassTeacher;
 use Database\Object\Informat\Student as InformatStudent;
 use Database\Object\Informat\StudentAddress;
 use Database\Object\Informat\StudentBank;
@@ -29,7 +28,6 @@ use Database\Repository\Informat\EmployeeNumber as InformatEmployeeNumber;
 use Database\Repository\Informat\EmployeeOwnfield as InformatEmployeeOwnfield;
 use Database\Repository\Informat\Registration as RepositoryInformatRegistration;
 use Database\Repository\Informat\RegistrationClass as InformatRegistrationClass;
-use Database\Repository\Informat\RegistrationClassTeacher;
 use Database\Repository\Informat\Student as RepositoryInformatStudent;
 use Database\Repository\Informat\StudentAddress as InformatStudentAddress;
 use Database\Repository\Informat\StudentBank as InformatStudentBank;
@@ -49,7 +47,6 @@ use Informat\Repository\StudentPhoto;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
-use Router\Helpers;
 use Security\FileSystem;
 
 abstract class Informat
@@ -61,21 +58,20 @@ abstract class Informat
             foreach ((new Institute)->getBySchoolId($school->id) as $inst) $institutes[] = $inst;
         }
         define("_INSTITUTES_", $institutes);
+        $schoolyear = _CURRENT_SCHOOLYEAR_;
+        $nextSchoolyear = Arrays::keyExists($args, 'nextSchoolyear');
+
+        if ($nextSchoolyear) {
+            $schoolyear = General::getSchoolyear(Clock::now()->plusYears(1)->format("Y-m-d"));
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Switching to schoolyear {$schoolyear}");
+        }
 
         if (Arrays::keyExists($args, 'image')) {
-            $studentPhoto = self::StudentPhotos();
-            $employeePhoto = self::EmployeePhotos();
+            $studentPhoto = self::StudentPhotos($schoolyear);
+            $employeePhoto = self::EmployeePhotos($schoolyear);
 
             return ($studentPhoto && $employeePhoto);
         } else {
-            $schoolyear = _CURRENT_SCHOOLYEAR_;
-            $nextSchoolyear = Arrays::keyExists($args, 'nextSchoolyear');
-
-            if ($nextSchoolyear) {
-                $schoolyear = General::getSchoolyear(Clock::now()->plusYears(1)->format("Y-m-d"));
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Switching to schoolyear {$schoolyear}");
-            }
-
             $schoolyear = (new Schoolyear)->getByName($schoolyear);
             $student = self::Students($schoolyear);
             $registration = self::Registrations($schoolyear);
@@ -87,7 +83,7 @@ abstract class Informat
     }
 
     // Main Functions
-    static private function Students($schoolyear = null)
+    static private function Students($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import students...");
         $_error_ = false;
@@ -95,21 +91,17 @@ abstract class Informat
         $repo = new RepositoryInformatStudent;
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Removing institute ID from students...");
-        // foreach ($repo->get() as $student) {
-        //     $student->instituteId = 0;
-        //     $repo->set($student);
-        // }
 
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$iItem->pPersoon} ({$iItem->persoonId}) - {$iItem->naam} {$iItem->voornaam}");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->pPersoon} ({$iItem->persoonId}) - {$iItem->naam} {$iItem->voornaam}");
 
                 try {
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->persoonId) ?? new InformatStudent;
@@ -146,7 +138,7 @@ abstract class Informat
         return !$_error_;
     }
 
-    private static function StudentPhotos($schoolyear = null)
+    private static function StudentPhotos($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import students pictures...");
         $_error = false;
@@ -157,7 +149,7 @@ abstract class Informat
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
@@ -190,27 +182,29 @@ abstract class Informat
         return !$_error;
     }
 
-    private static function Registrations($schoolyear = null)
+    private static function Registrations($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import registrations...");
         $_error_ = false;
 
         $informatRepo = new Registration;
         $studentRepo = new RepositoryInformatStudent;
+        $repo = new RepositoryInformatRegistration;
 
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
-            $repo = new RepositoryInformatRegistration;
 
             foreach ($iItems as $iItem) {
                 try {
-                    if (Clock::at($iItem->begindatum)->format("m-d") === "09-01") $iItem->begindatum = Clock::at($iItem->begindatum)->format("Y-08-01");
-                    if (!is_null($iItem->einddatum) && Clock::at($iItem->einddatum)->format("m-d") === "06-30") $iItem->einddatum = Clock::at($iItem->einddatum)->format("Y-07-31");
+                    $virtualStart = Clock::at($iItem->begindatum)->format("m-d") === "09-01" ? Clock::at($iItem->begindatum)->format("Y-" . Clock::at($schoolyear->start)->format("m-d")) : $iItem->begindatum;
+                    $virtualEnd = (!is_null($iItem->einddatum) && Clock::at($iItem->einddatum)->format("m-d") === "06-30") ? Clock::at($iItem->einddatum)->format("Y-" . Clock::at($schoolyear->end)->format("m-d")) : $iItem->einddatum;
+
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Registration ({$iItem->inschrijvingsId}): {$iItem->begindatum}" . (is_null($iItem->einddatum) ? "" : " - {$iItem->einddatum}"));
 
                     $item = $repo->getByInformatId($iItem->pInschr) ?? $repo->getByInformatGuid($iItem->inschrijvingsId) ?? new InformatRegistration;
                     $item->informatId = Strings::trimToNull($iItem->pInschr);
@@ -222,9 +216,10 @@ abstract class Informat
                     $item->grade = Strings::trimToNull($iItem->graad);
                     $item->year = Strings::trimToNull($iItem->leerjaar);
                     $item->start = Strings::trimToNull($iItem->begindatum);
+                    $item->virtualStart = $virtualStart;
                     $item->end = Strings::trimToNull($iItem->einddatum);
+                    $item->virtualEnd = $virtualEnd;
                     $item->status = Strings::trimToNull($iItem->status);
-                    $item->current = ($iItem->status == 0 && Clock::now()->isAfterOrEqualTo(Clock::at($schoolyear->start)) && Clock::at($schoolyear->start)->isAfterOrEqualTo(Clock::at($iItem->begindatum)) && (is_null($iItem->einddatum) || Clock::at($schoolyear->end)->isBeforeOrEqualTo(Clock::at($iItem->einddatum))));
 
                     $nId = $repo->set($item);
                     if (!$item->id) $item->id = $nId;
@@ -235,6 +230,8 @@ abstract class Informat
 
                         foreach ($inschr->klassenleraars as $teacher) self::CreateClassGroupTeacher($classgroupId, $teacher['persoonId']);
                     }
+
+                    Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
                 } catch (\Exception $e) {
                     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
                     Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
@@ -244,10 +241,23 @@ abstract class Informat
             }
         }
 
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Calculating current registrations");
+        foreach ($repo->get() as $item) {
+            $item->current = ($item->status == 0 && Clock::at($item->virtualStart)->isBeforeOrEqualTo(Clock::now()) && (is_null($item->virtualEnd) || Clock::now()->isBeforeOrEqualTo(Clock::at($item->virtualEnd))));
+            $repo->set($item);
+        }
+
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Calculating current classregistrations");
+        $ircRepo = new InformatRegistrationClass;
+        foreach ($ircRepo->get() as $item) {
+            $item->current = (Clock::at($item->virtualStart)->isBeforeOrEqualTo(Clock::now()) && (is_null($item->virtualEnd) || Clock::now()->isBeforeOrEqualTo(Clock::at($item->virtualEnd))));
+            $ircRepo->set($item);
+        }
+
         return !$_error_;
     }
 
-    private static function Employees($schoolyear = null)
+    private static function Employees($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import employees...");
         $_error_ = false;
@@ -267,13 +277,13 @@ abstract class Informat
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->pPersoon} ({$iItem->personId}) - {$iItem->naam} {$iItem->voornaam}");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->pPersoon} ({$iItem->personId}) - {$iItem->naam} {$iItem->voornaam}");
 
                 try {
                     $item = $repo->getByInformatId($iItem->pPersoon) ?? $repo->getByInformatGuid($iItem->personId) ?? new InformatEmployee;
@@ -314,7 +324,7 @@ abstract class Informat
         return !$_error_;
     }
 
-    private static function EmployeeOwnfields($schoolyear = null)
+    private static function EmployeeOwnfields($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import employees own fields...");
         $_error_ = false;
@@ -327,13 +337,13 @@ abstract class Informat
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
 
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Institute: {$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$iItem->personId}; Item: {$iItem->naam} = {$iItem->waarde}");
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->personId}; Item: {$iItem->naam} = {$iItem->waarde}");
 
                 try {
                     $employeeId = $employeeRepo->getByInformatGuid($iItem->personId)->id;
@@ -360,7 +370,7 @@ abstract class Informat
         return !$_error_;
     }
 
-    private static function EmployeePhotos($schoolyear = null)
+    private static function EmployeePhotos($schoolyear)
     {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Starting to import employees pictures...");
         $_error_ = false;
@@ -498,9 +508,10 @@ abstract class Informat
 
     private static function CreateRegistrationClass($registrationId, $classgroupId, $inschr, $schoolyear)
     {
-        if (Clock::at($inschr->begindatum)->format("m-d") === "09-01") $inschr->begindatum = Clock::at($inschr->begindatum)->format("Y-08-01");
-        if (!is_null($inschr->einddatum) && Clock::at($inschr->einddatum)->format("m-d") === "06-30") $inschr->einddatum = Clock::at($inschr->einddatum)->format("Y-07-31");
+        $virtualStart = Clock::at($inschr->begindatum)->format("m-d") === "09-01" ? Clock::at($inschr->begindatum)->format("Y-" . Clock::at($schoolyear->start)->format("m-d")) : $inschr->begindatum;
+        $virtualEnd = (!is_null($inschr->einddatum) && Clock::at($inschr->einddatum)->format("m-d") === "06-30") ? Clock::at($inschr->einddatum)->format("Y-" . Clock::at($schoolyear->end)->format("m-d")) : $inschr->einddatum;
 
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Class Registration ({$inschr->inschrKlasId}): {$inschr->begindatum}" . (is_null($inschr->einddatum) ? "" : " - {$inschr->einddatum}"));
         $registrationClassRepo = new InformatRegistrationClass;
         $registrationClass = $registrationClassRepo->getByInformatGuid($inschr->inschrKlasId) ?? new RegistrationClass;
         $registrationClass->informatGuid = $inschr->inschrKlasId;
@@ -508,8 +519,9 @@ abstract class Informat
         $registrationClass->informatClassGroupId = $classgroupId;
         $registrationClass->rank = $inschr->klasnummer;
         $registrationClass->start = $inschr->begindatum;
+        $registrationClass->virtualStart = $virtualStart;
         $registrationClass->end = $inschr->einddatum;
-        $registrationClass->current = (Clock::now()->isAfterOrEqualTo(Clock::at($schoolyear->start)) && Clock::now()->isAfterOrEqualTo(Clock::at($inschr->begindatum)) && (is_null($inschr->einddatum) || Clock::now()->isBeforeOrEqualTo(Clock::at($inschr->einddatum))));
+        $registrationClass->virtualEnd = $virtualEnd;
         $registrationClassRepo->set($registrationClass);
     }
 

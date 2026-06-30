@@ -46,6 +46,7 @@ setTimeout(() => {
 }, 250);
 
 $(document).ready(() => {
+  Helpers.toggleWait();
   Helpers.CheckAllLoaded(() => {
     setTimeout(() => {
       window.fillFilter();
@@ -56,6 +57,8 @@ $(document).ready(() => {
       const popoverList = [...popoverTriggerList].map(
         (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl),
       );
+
+      Helpers.toggleWait();
     }, 500);
-  }, [Select, Table]);
+  }, [Select, Table, List, Form]);
 });

@@ -106,7 +106,7 @@ class SyncController extends ApiController
                 $this->setToast("Het wachtwoord van '{$item->linked->employee->formatted->fullNameReversed}' wordt gewijzigd naar '{$item->password}'.");
             }
 
-            $this->setCloseModal();
+            $this->setCloseModal('changePassword');
             $this->setReloadTable();
             $this->setResetForm();
         }
@@ -130,6 +130,7 @@ class SyncController extends ApiController
             $repo = new Sync;
 
             $item = $repo->getById($id);
+            if (!$fields['lastSync']) $item->clear(['id', 'type', 'employeeId', 'setPassword', 'setEmail', 'lastAction', 'lastError', 'lastSync']);
             $item->fillWithPostData($fields);
 
             $repo->set($item);

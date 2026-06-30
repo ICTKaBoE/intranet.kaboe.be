@@ -6,6 +6,16 @@ CREATE TABLE `tbl_informat_classgroup_teacher` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE tbl_informat_registration ADD virtualStart DATE NULL;
+ALTER TABLE tbl_informat_registration CHANGE virtualStart virtualStart DATE NULL AFTER `start`;
+ALTER TABLE tbl_informat_registration ADD virtualEnd DATE NULL;
+ALTER TABLE tbl_informat_registration CHANGE virtualEnd virtualEnd DATE NULL AFTER `end`;
+ALTER TABLE tbl_informat_registration_class ADD virtualStart DATE NULL;
+ALTER TABLE tbl_informat_registration_class CHANGE virtualStart virtualStart DATE NULL AFTER `start`;
+ALTER TABLE tbl_informat_registration_class ADD virtualEnd DATE NULL;
+ALTER TABLE tbl_informat_registration_class CHANGE virtualEnd virtualEnd DATE NULL AFTER `end`;
+
+
 -- STUDENT
 -- --NAVIGATION
 INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', 0, 'M', 0, 93, 'student', 'Leerlingenbeheer', 'users-group', 'blue', 0);
@@ -27,17 +37,15 @@ ALTER TABLE tbl_school ADD syncStudentDefaultMemberOf blob DEFAULT NULL NULL;
 ALTER TABLE tbl_school CHANGE syncStudentDefaultMemberOf syncStudentDefaultMemberOf blob DEFAULT NULL NULL AFTER hrEmail;
 ALTER TABLE tbl_school ADD syncEmployeeDefaultMemberOf BLOB NULL;
 ALTER TABLE tbl_school CHANGE syncEmployeeDefaultMemberOf syncEmployeeDefaultMemberOf BLOB NULL AFTER syncStudentDefaultMemberOf;
-ALTER TABLE tbl_school ADD takeInAccountStartDate BOOL DEFAULT 1 NOT NULL;
-ALTER TABLE tbl_school CHANGE takeInAccountStartDate takeInAccountStartDate BOOL DEFAULT 1 NOT NULL AFTER syncEmployeeDefaultMemberOf;
 ALTER TABLE tbl_school DROP COLUMN hrEmail;
 
 ALTER TABLE tbl_school CHANGE syncEmployeeCompanyName syncEmployeeCompanyName varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER syncEmployee;
 ALTER TABLE tbl_school CHANGE syncEmployeeOU syncEmployeeOU text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER syncEmployeeCompanyName;
 ALTER TABLE tbl_school CHANGE syncEmployeeDefaultMemberOf syncEmployeeDefaultMemberOf blob DEFAULT NULL NULL AFTER syncEmployeeOU;
 ALTER TABLE tbl_school CHANGE syncStudentDefaultMemberOf syncStudentDefaultMemberOf blob DEFAULT NULL NULL AFTER syncStudentOU;
-ALTER TABLE tbl_school CHANGE takeInAccountStartDate takeInAccountStartDate tinyint(1) DEFAULT 1 NOT NULL AFTER syncStudentDefaultMemberOf;
 ALTER TABLE tbl_school CHANGE syncUpdateMail syncUpdateMail text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL AFTER syncStudentDefaultMemberOf;
 
+ALTER TABLE tbl_school CHANGE eetjemeeKey eetjemeeKeyStudents varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL;
 ALTER TABLE tbl_school CHANGE eetjemeeSmartschoolGroup eetjemeeStudentSmartschoolGroup varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL;
 ALTER TABLE tbl_school ADD eetjemeeEmployeeSmartschoolGroup varchar(254) NULL;
 ALTER TABLE tbl_school CHANGE eetjemeeEmployeeSmartschoolGroup eetjemeeEmployeeSmartschoolGroup varchar(254) NULL AFTER eetjemeeStudentSmartschoolGroup;
@@ -49,6 +57,8 @@ ALTER TABLE tbl_school CHANGE smsGroupEmployee smsGroupEmployee varchar(254) CHA
 
 ALTER TABLE tbl_school ADD smsSyncClassTeachers BOOL DEFAULT 0 NOT NULL;
 ALTER TABLE tbl_school CHANGE smsSyncClassTeachers smsSyncClassTeachers BOOL DEFAULT 0 NOT NULL AFTER eetjemeeKey;
+ALTER TABLE tbl_school ADD eetjemeeKeyEmployee varchar(254) NULL;
+ALTER TABLE tbl_school CHANGE eetjemeeKeyEmployee eetjemeeKeyEmployee varchar(254) NULL AFTER eetjemeeKeyStudents;
 
 -- SYNC
 UPDATE tbl_navigation SET deleted = 1 WHERE link='sync' AND `type`='M';

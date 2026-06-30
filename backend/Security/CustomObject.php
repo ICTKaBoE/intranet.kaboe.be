@@ -106,6 +106,11 @@ class CustomObject extends stdClass
         foreach ($this->getKeys() as $key) $this->$key = $fields[$key] ?? \Router\Helpers::input()->post($key)?->getValue() ?? $this->$key;
     }
 
+    public function clear($exept = [])
+    {
+        foreach ($this->getKeys() as $key) if (!Arrays::contains($exept, $key)) $this->$key = null;
+    }
+
     public function toArray($flatten = false)
     {
         return $flatten ? Arrays::flattenKeysRecursively(General::object_to_array($this)) : General::object_to_array($this);

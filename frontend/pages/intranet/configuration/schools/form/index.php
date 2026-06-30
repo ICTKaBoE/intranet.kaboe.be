@@ -128,8 +128,6 @@
 
             <div class="tab-pane d-none" id="tab-ad-student">
                 <div class="row">
-                    <div class="col-12" id="chbTakeInAccountStartDate" role="checkbox" data-type="checkbox" data-name="takeInAccountStartDate" data-text="Rekening houden met start datum (nee = schooljaar)"></div>
-
                     <div class="col-12 mb-3">
                         <label for="syncStudentCompanyName" class="form-label">Bedrijf</label>
                         <input type="text" name="syncStudentCompanyName" id="syncStudentCompanyName" class="form-control" />
@@ -168,8 +166,13 @@
             <div class="tab-pane" id="tab-eetjemee">
                 <div class="row">
                     <div class="col-12 mb-3">
-                        <label class="form-label" for="eetjemeeKey">Platform KEY</label>
-                        <input type="text" name="eetjemeeKey" id="eetjemeeKey" class="form-control" required />
+                        <label class="form-label" for="eetjemeeKeyStudents">Platform KEY Student</label>
+                        <input type="text" name="eetjemeeKeyStudents" id="eetjemeeKeyStudents" class="form-control" required />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="eetjemeeKeyEmployee">Platform KEY Personeel</label>
+                        <input type="text" name="eetjemeeKeyEmployee" id="eetjemeeKeyEmployee" class="form-control" required />
                     </div>
                 </div>
             </div>

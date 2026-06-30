@@ -1,4 +1,5 @@
 import MasterObject from "../MasterObject.js";
+import Helpers from "./Helpers.js";
 
 export default class List extends MasterObject {
   static OBJ_SELECTOR = "[role='list']";
@@ -43,6 +44,7 @@ export default class List extends MasterObject {
   }
 
   init = async () => {
+    this.filter();
     await this.getData();
     this.fill();
     if (!this.stopCheckNext) await this.checkNext();
@@ -52,16 +54,18 @@ export default class List extends MasterObject {
   };
 
   reload = async () => {
+    Helpers.toggleWait();
     this.loaded = false;
     this.stopCheckNext = true;
     this.extraData.page = 0;
-
+    this.filter();
     await this.getData();
     this.fill();
     if (!this.stopCheckNext) await this.checkNext();
     this.loaded = true;
 
     if (this.afterLoadCallback) window[this.afterLoadCallback]();
+    Helpers.toggleWait();
   };
 
   getData = () => {
@@ -104,5 +108,17 @@ export default class List extends MasterObject {
         if (!this.stopCheckNext) this.checkNext();
       }, 1000);
     }
+  };
+
+  filter = () => {
+    let modal = document.getElementById("modal-filter");
+    let filter = JSON.parse(
+      window.localStorage.getItem(
+        `filter_${modal.dataset.module}_${modal.dataset.page}`,
+      ),
+    );
+
+    if (filter)
+      for (const [k, v] of Object.entries(filter)) this.setExtraLoadParam(k, v);
   };
 }

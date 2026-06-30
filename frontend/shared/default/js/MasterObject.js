@@ -49,4 +49,13 @@ export default class MasterObject {
         this.INSTANCES[this.name][i].search(value);
     }
   }
+
+  static Filter() {
+    for (const i in this.INSTANCES[this.name]) {
+      if (typeof this.INSTANCES[this.name][i].filter === "function") {
+        this.INSTANCES[this.name][i].filter();
+        this.INSTANCES[this.name][i].reload();
+      }
+    }
+  }
 }
