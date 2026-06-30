@@ -4,7 +4,7 @@ namespace Database\Object\Informat;
 
 use Security\CustomObject;
 
-class ClassgroupTeacher extends CustomObject
+class ClassGroupTeacher extends CustomObject
 {
     protected $objectAttributes = [
         "id" => self::TYPE_INTEGER,

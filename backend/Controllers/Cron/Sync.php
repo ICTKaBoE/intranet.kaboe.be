@@ -133,7 +133,7 @@ abstract class Sync
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
         $informat = $employeeRepo->get();
-        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && !($i->linked->institute->linked->school->syncEmployee || $i->linked->institute->linked->school->linked->parentSchool->syncEmployee));
+        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncEmployee || $i->linked->institute->linked->school->linked->parentSchool->syncEmployee));
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* ----------------------------- PROCESS EMPLOYEES ------------------------------ */
@@ -418,7 +418,7 @@ abstract class Sync
         /* ---------------------------- Get Informat students ---------------------------- */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat students...");
         $informat = $studentRepo->get();
-        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && !($i->linked->institute->linked->school->syncStudent || $i->linked->institute->linked->school->linked->parentSchool->syncStudent));
+        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncStudent || $i->linked->institute->linked->school->linked->parentSchool->syncStudent));
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* -------------------------------- Process each student ------------------------------- */

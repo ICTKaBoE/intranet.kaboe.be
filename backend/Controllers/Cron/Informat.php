@@ -3,7 +3,7 @@
 namespace Controllers\Cron;
 
 use Database\Object\Informat\ClassGroup;
-use Database\Object\Informat\ClassgroupTeacher as InformatClassgroupTeacher;
+use Database\Object\Informat\ClassGroupTeacher as InformatClassgroupTeacher;
 use Database\Object\Informat\Employee as InformatEmployee;
 use Database\Object\Informat\EmployeeAddress;
 use Database\Object\Informat\EmployeeEmail;
