@@ -130,7 +130,7 @@ class SyncController extends ApiController
             $repo = new Sync;
 
             $item = $repo->getById($id);
-            if (!$fields['lastError']) $item->clear(['id', 'type', 'employeeId', 'setPassword', 'setEmail', 'lastAction', 'lastError', 'lastSync']);
+            if (is_null($fields['lastError'])) $item->clear(['id', 'type', 'employeeId', 'setPassword', 'setEmail', 'lastAction', 'lastError', 'lastSync']);
             $item->fillWithPostData($fields);
 
             $repo->set($item);
