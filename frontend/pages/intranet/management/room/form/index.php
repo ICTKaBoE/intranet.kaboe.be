@@ -5,13 +5,11 @@
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="schoolId">School</label>
                     <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school" required></select>
-
                 </div>
 
                 <div class="col-lg-6 col-12 mb-3">
                     <label class="form-label" for="buildingId">Gebouw</label>
                     <select name="buildingId" id="buildingId" data-load-source="{{select:url:short}}/{{url:part.module}}/building/" required data-parent-select="schoolId"></select>
-
                 </div>
             </div>
 
@@ -19,13 +17,18 @@
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="floor">Verdiep</label>
                     <input type="number" name="floor" id="floor" class="form-control" step="1" min="-1" max="10" required />
-
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
                     <label class="form-label" for="number">Nummer</label>
                     <input type="number" name="number" id="number" class="form-control" step="1" min="0" max="100" required />
+                </div>
+            </div>
 
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label class="form-label" for="alias">Alias</label>
+                    <input type="text" name="alias" id="alias" class="form-control" />
                 </div>
             </div>
         </div>

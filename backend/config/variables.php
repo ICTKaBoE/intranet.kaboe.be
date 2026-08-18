@@ -1,6 +1,6 @@
 <?php
 
-define("VERSION_DB", "5.2.1");
+define("VERSION_DB", "5.3.0");
 define("URL_MAIN", "kaboe.be");
 define("DEV_MODE", (PHP_SAPI !== "cli" ? str_starts_with($_SERVER["HTTP_HOST"], "dev") : array_search("mode=dev", $argv)));
 define("DEV_CONTACT", "jano.lampaert@coltd.be");

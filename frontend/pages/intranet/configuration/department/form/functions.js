@@ -1,20 +1,15 @@
 import Select from "../../../../../shared/default/js/object/Select.js";
 import Checkbox from "../../../../../shared/default/js/object/Checkbox.js";
 
-window.virtualView = (info) => {
-	let val = Checkbox.GetInstance("chbVirtual").getValue();
+window.schoolIdView = (info) => {
+  let val = Select.GetInstance("schoolId").getValue();
+  Select.GetInstance("informatClassId").setExtraLoadParam("schoolId", val);
+  Select.GetInstance("managementRoomId").setExtraLoadParam("schoolId", val);
 
-	if (val) {
-		Select.GetInstance("parentSchoolId").disable();
-		document.getElementById("parentSchool-warning").classList.add("d-none");
-	} else {
-		Select.GetInstance("parentSchoolId").enable();
-		document
-			.getElementById("parentSchool-warning")
-			.classList.remove("d-none");
-	}
+  Select.GetInstance("informatClassId").reload();
+  Select.GetInstance("managementRoomId").reload();
 };
 
 $(document).ready(() => {
-	window.virtualView();
+  window.schoolIdView();
 });

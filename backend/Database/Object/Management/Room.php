@@ -14,6 +14,7 @@ class Room extends CustomObject
         "buildingId" => self::TYPE_INTEGER,
         "floor" => self::TYPE_INTEGER,
         "number" => self::TYPE_INTEGER,
+        "alias" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
@@ -27,6 +28,6 @@ class Room extends CustomObject
         $this->formatted->number = CString::leadingZeros($this->number, 2);
         $this->formatted->name = "{$this->floor}.{$this->formatted->number}";
         $this->formatted->buildingRoom = "{$this->linked->building->name} {$this->formatted->name}";
-        $this->formatted->full = "{$this->linked->building->formatted->full} - {$this->formatted->name}";
+        $this->formatted->full = "{$this->linked->building->formatted->full} - {$this->formatted->name}" . ($this->alias ? " ({$this->alias})" : "");
     }
 }
