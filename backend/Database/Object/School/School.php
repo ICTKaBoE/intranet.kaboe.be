@@ -31,7 +31,7 @@ class School extends CustomObject
         "syncStudentCompanyName" => self::TYPE_STRING,
         "syncStudentOU" => self::TYPE_STRING,
         "syncStudentDefaultMemberOf" => self::TYPE_STRING,
-        "syncUpdateMail" => self::TYPE_LIST,
+        "syncUpdateMail" => self::TYPE_STRING,
         "intuneOrderIdPrefix" => self::TYPE_STRING,
         "jamfIpadPrefix" => self::TYPE_STRING,
         "adJobTitlePrefix" => self::TYPE_STRING,

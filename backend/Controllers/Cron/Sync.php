@@ -36,7 +36,7 @@ abstract class Sync
     /* ---------------------------- PUBLIC ENTRY ----------------------------- */
     public static function Prepare()
     {
-        $status[] = self::PrepareEmployee();
+        // $status[] = self::PrepareEmployee();
         Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
         $status[] = self::PrepareStudent();
         return !Arrays::contains($status, false);
@@ -613,12 +613,12 @@ abstract class Sync
             $id = $syncRepo->set($sync);
             if (!$sync->id) $sync = $syncRepo->getById($id);
 
-            if (!is_null($sync->action)) $mails[$sync->action][$schoolObj->id] = $sync;
+            if (!is_null($sync->action)) $mails[$sync->action][$schoolObj->id][] = $sync;
             // die(var_dump($mails));
         }
 
         /* ---------- Prepare student summary mail ---------- */
-        self::createStudentMail($mails['C'], $mails['U'], $mails['E'], $mails['D']);
+        self::createStudentMail($mails['C'] ?: [], $mails['U'] ?: [], $mails['E'] ?: [], $mails['D'] ?: []);
 
         return true;
     }
@@ -811,9 +811,6 @@ abstract class Sync
         $navRepo = new Navigation;
         $schoolRepo = new School;
         $informatStudentRepo = new Student;
-        $informatRegistrationRepo = new Registration;
-        $informatRegistrationClassRepo = new RegistrationClass;
-        $informatClassgroupRepo = new ClassGroup;
         $settingRepo = new Setting;
 
         $navigation = (new Navigation)->getByLinkAndType('sync', "M");
@@ -856,27 +853,10 @@ abstract class Sync
 
                 foreach ($create[$school->id] as $sync) {
                     $informatStudent = $informatStudentRepo->getByInformatId($sync->employeeId);
-                    $lastRegistration = $informatRegistrationRepo->getByInformatStudentId($informatStudent->id);
-                    $lastRegistration = Arrays::orderBy($lastRegistration, "start");
-                    $lastRegistration = Arrays::filter($lastRegistration, fn($lr) => $lr->status == 0);
-
-                    if (count($lastRegistration) == 1) $lastRegistration = Arrays::last($lastRegistration);
-
-                    $currentRegistrationClass = $informatRegistrationClassRepo->getByInformatRegistrationId($lastRegistration->id);
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => is_null($crc->end));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, function ($crc) use ($informatClassgroupRepo) {
-                        $class = Arrays::firstOrNull($informatClassgroupRepo->get($crc->informatClassGroupId));
-                        if (!$class) return false;
-                        if ($class->type == "C") return true;
-                        return false;
-                    });
-                    $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
-                    $class = Arrays::firstOrNull($informatClassgroupRepo->get($currentRegistrationClass->informatClassGroupId));
 
                     $tblCreate .= "
                         <tr>
-                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$class->code}</td>
+                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->department}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->name}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->firstName}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->setEmail}</td>
@@ -907,27 +887,10 @@ abstract class Sync
 
                 foreach ($update[$school->id] as $sync) {
                     $informatStudent = $informatStudentRepo->getByInformatId($sync->employeeId);
-                    $lastRegistration = $informatRegistrationRepo->getByInformatStudentId($informatStudent->id);
-                    $lastRegistration = Arrays::orderBy($lastRegistration, "start");
-                    $lastRegistration = Arrays::filter($lastRegistration, fn($lr) => $lr->status == 0);
-
-                    if (count($lastRegistration) == 1) $lastRegistration = Arrays::last($lastRegistration);
-
-                    $currentRegistrationClass = $informatRegistrationClassRepo->getByInformatRegistrationId($lastRegistration->id);
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => is_null($crc->end));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, function ($crc) use ($informatClassgroupRepo) {
-                        $class = Arrays::firstOrNull($informatClassgroupRepo->get($crc->informatClassGroupId));
-                        if (!$class) return false;
-                        if ($class->type == "C") return true;
-                        return false;
-                    });
-                    $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
-                    $class = Arrays::firstOrNull($informatClassgroupRepo->get($currentRegistrationClass->informatClassGroupId));
 
                     $tblUpdate .= "
                         <tr>
-                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$class->code}</td>
+                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->department}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->name}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->firstName}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->setEmail}</td>
@@ -958,27 +921,10 @@ abstract class Sync
 
                 foreach ($enable[$school->id] as $sync) {
                     $informatStudent = $informatStudentRepo->getByInformatId($sync->employeeId);
-                    $lastRegistration = $informatRegistrationRepo->getByInformatStudentId($informatStudent->id);
-                    $lastRegistration = Arrays::orderBy($lastRegistration, "start");
-                    $lastRegistration = Arrays::filter($lastRegistration, fn($lr) => $lr->status == 0);
-
-                    if (count($lastRegistration) == 1) $lastRegistration = Arrays::last($lastRegistration);
-
-                    $currentRegistrationClass = $informatRegistrationClassRepo->getByInformatRegistrationId($lastRegistration->id);
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => Clock::now()->isAfterOrEqualTo(Clock::at($crc->start)));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, fn($crc) => is_null($crc->end));
-                    $currentRegistrationClass = Arrays::filter($currentRegistrationClass, function ($crc) use ($informatClassgroupRepo) {
-                        $class = Arrays::firstOrNull($informatClassgroupRepo->get($crc->informatClassGroupId));
-                        if (!$class) return false;
-                        if ($class->type == "C") return true;
-                        return false;
-                    });
-                    $currentRegistrationClass = Arrays::firstOrNull($currentRegistrationClass);
-                    $class = Arrays::firstOrNull($informatClassgroupRepo->get($currentRegistrationClass->informatClassGroupId));
 
                     $tblEnable .= "
                         <tr>
-                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$class->code}</td>
+                            <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->department}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->name}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$informatStudent->firstName}</td>
                             <td style='border: 1px solid #dddddd; text-align: left; padding: 8px'>{$sync->setEmail}</td>
@@ -1035,7 +981,7 @@ abstract class Sync
 
             $mId = $mailRepo->set($mail);
 
-            foreach ($school->syncUpdateMail as $r) {
+            foreach (explode(",", $school->syncUpdateMail) as $r) {
                 $receiver = new MailReceiver;
                 $receiver->mailId = $mId;
                 $receiver->email = $r;
