@@ -82,6 +82,7 @@ class RemedyController extends ApiController
     {
         $repo = new Moment;
         $remedyRepo = new Remedy;
+        $schoolyear = (new Schoolyear)->getCurrent();
         $filters = Filter::Find(['schoolId', 'departmentId', 'typeId', 'courseId']);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
@@ -95,6 +96,7 @@ class RemedyController extends ApiController
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
+            $items = Arrays::filter($items, fn($i) => $i->schoolyearId == $schoolyear->id);
             $items = Arrays::filter($items, fn($i) => !$i->full);
             $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::at($i->date . " " . $i->linked->hour->start)->isAfterOrEqualTo(Clock::at(date("Y-m-d H:i:s", strtotime("next " . WEEK_DAYS['en'][$i->linked->type->closeRegistrationAt] . " 8:59:00")))));
             $items = Arrays::filter($items, fn($i) => !$i->isPast);
@@ -128,7 +130,7 @@ class RemedyController extends ApiController
             $items = $repo->get(filters: $filters);
             $items = Arrays::map($items, fn($i) => $i->linked->course);
             if (!Arrays::find($items, fn($i) => !is_null($i))) $items = [];
-            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i?->toArray(true)));
         }
     }
 

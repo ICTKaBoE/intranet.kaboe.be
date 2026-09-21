@@ -350,14 +350,16 @@ export default class Form extends MasterObject {
       .then((json) => {
         this.prefillFields(json.fields);
 
-        setTimeout(() => {
-          if (this.lockedValue) {
-            this.locked = json.fields[this.lockedValue];
-            if (json.fields[this.lockedValue] === true) this.disable();
-            else this.enable();
-          }
-          Helpers.toggleWait();
-        }, 500);
+        Helpers.CheckAllLoaded(() => {
+          setTimeout(() => {
+            if (this.lockedValue) {
+              this.locked = json.fields[this.lockedValue];
+              if (json.fields[this.lockedValue] === true) this.disable();
+              else this.enable();
+            }
+            Helpers.toggleWait();
+          }, 500);
+        }, [Select, Form]);
       });
   };
 

@@ -259,7 +259,7 @@ class HRController extends ApiController
     {
         $settings = Helpers::input()->all();
         foreach ($settings as $k => $v) if (Strings::startsWith($k, "flow_new_roleId_") || Strings::startsWith($k, "flow_new_to_")) unset($settings[$k]);
-        $this->postSettings($settings);
+        $this->postSettings($view, $id, $settings);
     }
 
     // Delete functions 

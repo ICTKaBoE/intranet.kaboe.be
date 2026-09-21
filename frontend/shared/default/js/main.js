@@ -23,6 +23,20 @@ $.ajaxSetup({
   },
 });
 
+
+window.createProgressBar = () => {
+  let progress = document.createElement("div");
+  progress.classList.add("progress");
+  progress.classList.add("d-none");
+  let progressBar = document.createElement("div");
+  progressBar.classList.add("progress-bar");
+  progressBar.classList.add("progress-bar-indeterminate");
+  progressBar.classList.add("bg-green");
+  progress.appendChild(progressBar);
+
+  return progress;
+};
+
 const components = [
   Toast,
   List,
@@ -46,7 +60,6 @@ setTimeout(() => {
 }, 250);
 
 $(document).ready(() => {
-  Helpers.toggleWait();
   Helpers.CheckAllLoaded(() => {
     setTimeout(() => {
       window.fillFilter();
@@ -57,8 +70,6 @@ $(document).ready(() => {
       const popoverList = [...popoverTriggerList].map(
         (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl),
       );
-
-      Helpers.toggleWait();
     }, 500);
   }, [Select, Table, List, Form]);
 });

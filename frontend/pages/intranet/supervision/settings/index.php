@@ -117,19 +117,16 @@
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.duration">Registratie per (minuten)</label>
                     <input role="text" class="form-control" id="slot.duration" name="slot.duration" required>
-
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.min">Registratie vanaf</label>
                     <input role="text" class="form-control" id="slot.min" name="slot.min" required>
-
                 </div>
 
                 <div class="col-lg-4 col-12 mb-3">
                     <label class="form-label" for="slot.max">Registratie tot en met</label>
                     <input role="text" class="form-control" id="slot.max" name="slot.max" required>
-
                 </div>
             </div>
         </div>

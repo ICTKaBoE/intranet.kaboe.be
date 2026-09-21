@@ -8,6 +8,7 @@ export default class Select extends MasterObject {
     super();
 
     this.element = element;
+    this.elementContainer = element.parentElement;
     this.id = this.element.id || false;
 
     this.noCreate = this.element.hasAttribute("data-no-create");
@@ -98,6 +99,8 @@ export default class Select extends MasterObject {
 
   init = async () => {
     if (this.noCreate) return;
+    this.createProgress();
+
     this.element.setAttribute("role", "select");
     this.element.setAttribute("type", "text");
     this.element.removeAttribute("disabled");
@@ -105,6 +108,7 @@ export default class Select extends MasterObject {
       this.element.classList.add("form-select");
 
     if (!this.defaultNoLoad && this.source) {
+      this.enableProgress();
       this.loadParams.page = 0;
       await this.getData();
       if (!this.stopCheckNext) await this.checkNext();
@@ -118,11 +122,13 @@ export default class Select extends MasterObject {
     if (!this.defaultDisabled) this.enable();
     if (this.hideIfNoOptions) this.checkHide();
     if (this.disableIfNoOptions) this.checkDisable();
+    this.disableProgress();
     this.loaded = true;
   };
 
   reload = async () => {
     this.loaded = false;
+    this.enableProgress();
     this.disable();
     this.clear();
     this.destroy();
@@ -140,6 +146,7 @@ export default class Select extends MasterObject {
     if (!this.defaultDisabled) this.enable();
     if (this.hideIfNoOptions) this.checkHide();
     if (this.disableIfNoOptions) this.checkDisable();
+    this.disableProgress();
     this.loaded = true;
   };
 
@@ -288,6 +295,18 @@ export default class Select extends MasterObject {
   addOption = (v, t) => {
     this.tomSelect.addOption({ value: v, text: t });
   };
+
+  createProgress = () => {
+    this.elementContainer.appendChild(window.createProgressBar());
+  }
+
+  enableProgress = () => {
+    this.elementContainer.querySelector(".progress").classList.remove("d-none");
+  }
+
+  disableProgress = () => {
+    this.elementContainer.querySelector(".progress").classList.add("d-none");
+  }
 
   setEventListeners = () => {
     Object.keys(this.eventListeners).forEach((key) => {

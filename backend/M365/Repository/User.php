@@ -31,7 +31,7 @@ class User extends Repository
         $config->queryParameters = UsersRequestBuilderGetRequestConfiguration::createQueryParameters();
         $config->queryParameters->top = 999;
         $config->queryParameters->count = true;
-        $config->queryParameters->filter = "endswith(mail,'@coltd.be')";
+        $config->queryParameters->filter = "endswith(userPrincipalName,'@coltd.be')";
         if ($select) $config->queryParameters->select = $select;
 
         return $this->iterate(GraphHelper::$appClient->users()->get($config)->wait());
@@ -45,7 +45,7 @@ class User extends Repository
         $config->queryParameters = UsersRequestBuilderGetRequestConfiguration::createQueryParameters();
         $config->queryParameters->top = 999;
         $config->queryParameters->count = true;
-        $config->queryParameters->filter = "endswith(mail,'@student.coltd.be')";
+        $config->queryParameters->filter = "endswith(userPrincipalName,'@student.coltd.be')";
         if ($select) $config->queryParameters->select = $select;
 
         return $this->iterate(GraphHelper::$appClient->users()->get($config)->wait());

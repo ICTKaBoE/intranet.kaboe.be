@@ -14,10 +14,23 @@ INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, ti
 UPDATE tbl_navigation_tabledef SET `order`=6 WHERE id=(select id from tbl_navigation where parentId = @managementId and link="room") AND `data`='formatted.full';
 
 --EXAMSCHEDULE
+INSERT INTO tbl_route (routeGroupId, `method`, route, controller, callback, apiNoAuth, `order`, deleted) VALUES(2, 'ANY', '{view}/examschedule/{what?}/{id?}', '\\Controllers\\API\\ExamScheduleController', 'any', 0, 1, 0);
+
 INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', 0, 'M', 0, 82, 'examschedule', 'Examenrooster', 'calendar-week', 'teal', 0);
 SET @examscheduleId = (SELECT id FROM tbl_navigation WHERE link="examschedule");
+INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', @examscheduleId, 'P', 0, 1, 'build', 'Rooster bouwen', 'calendar-week', 'blue', 0);
 INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', @examscheduleId, 'P', 1, 1, 'assign', 'Uren toewijzen', 'clock', 'blue', 0);
-INSERT INTO tbl_navigation_setting (navigationId, `key`, value) VALUES(@examscheduleId, '_', 0x63616C656E646172);
+INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', @examscheduleId, 'P', 1, 2, 'period', 'Periode', 'calendar-time', 'blue', 0);
+INSERT INTO tbl_navigation (routeGroupId, parentId, `type`, management, `order`, link, name, icon, color, deleted) VALUES('1', @examscheduleId, 'P', 1, 100, 'settings', 'Instellingen', 'settings', 'blue', 0);
+INSERT INTO tbl_navigation_setting (navigationId, `key`, value) VALUES(@examscheduleId, '_', 0x6275696C64);
+
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 1, NULL, NULL, 'Leerkracht', 'formatted.fullNameReversed', 1, 1, 0, 0, 1, 1, 'asc', 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 2, NULL, NULL, 'Gepresteerde uren', 'hours.workedHours', 0, 0, 100, 0, 0, NULL, NULL, 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 3, NULL, NULL, 'Uren examen', 'hours.examHours', 0, 0, 100, 0, 0, NULL, NULL, 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 4, NULL, NULL, 'Geen examen', 'hours.noExamHours', 0, 0, 100, 0, 0, NULL, NULL, 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 5, NULL, NULL, 'Uren toezicht', 'hours.formatted.supervisionHoursToDo', 0, 0, 100, 0, 0, NULL, NULL, 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 6, NULL, NULL, 'Uren toezicht effectief', 'hours.supervisionHours', 0, 0, 100, 0, 0, NULL, NULL, 0);
+INSERT INTO tbl_navigation_tabledef (navigationId, `order`, priority, `type`, title, `data`, orderable, searchable, width, render, defaultOrder, defaultOrderOrder, defaultOrderDirection, deleted) VALUES((select id from tbl_navigation where parentId = @examscheduleId and link="assign"), 7, NULL, NULL, 'Balans', 'hours.formatted.balans', 0, 0, 100, 0, 0, NULL, NULL, 0);
 
 --LAST STEP
 UPDATE tbl_setting SET settingTabId=1, name='DB Versie', `type`='input', `options`=NULL, value=0x352E332E30, readonly=1, `order`=99, deleted=0 WHERE id='db.version';

@@ -260,10 +260,7 @@ class InformatController extends ApiController
         $items = [];
 
         $department = (new Department)->getById($filters['departmentId'][0]);
-        foreach (explode(";", $department->informatClassId) as $classId) {
-            $class = $classRepo->getById($classId);
-            $optgroups[] = $class;
-        }
+        foreach (explode(";", $department->informatClassId) as $classId) $optgroups[] = $classRepo->getById($classId);
         $optgroups = Arrays::orderBy($optgroups, "code");
 
         foreach ($optgroups as $class) {

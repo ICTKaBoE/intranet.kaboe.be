@@ -98,7 +98,7 @@ abstract class Informat
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
-            $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat, changedSince: true);
 
             foreach ($iItems as $iItem) {
                 Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->pPersoon} ({$iItem->persoonId}) - {$iItem->naam} {$iItem->voornaam}");
@@ -197,7 +197,7 @@ abstract class Informat
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
-            $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
+            $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat, changedSince: true);
 
             foreach ($iItems as $iItem) {
                 try {

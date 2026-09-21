@@ -59,13 +59,11 @@ const ATTACHMENT_TEMPLATE = "   <div class='row mb-1'>
                 <div class="mb-2">
                     <label class="form-label mb-1" for="schoolId">School</label>
                     <select name="schoolId" id="schoolId" data-load-source="{{select:url:short}}/school"></select>
-
                 </div>
 
                 <div class="mb-2">
                     <label class="form-label mb-1" for="priority">Prioriteit</label>
                     <select name="priority" id="priority" data-load-source="{{select:url:short}}/{{url:part.module}}/priority"></select>
-
                 </div>
 
                 <div class="mb-2">

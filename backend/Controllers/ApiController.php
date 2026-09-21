@@ -214,7 +214,7 @@ class ApiController extends stdClass
 		else $this->appendToJson('fields', Arrays::flattenKeysRecursively($settings));
 	}
 
-	protected function postSettings($settings = [])
+	protected function postSettings($view, $id = null, $settings = null)
 	{
 		$_settings = $settings ?? Helpers::input()->all();
 		$_settings = Arrays::mapKeys($_settings, fn($s) => str_replace("_", ".", $s));

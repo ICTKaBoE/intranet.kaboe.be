@@ -8,6 +8,7 @@ use Helpers\General;
 use stdClass;
 use Informat\Connection;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Path;
 
 class Repository extends stdClass
@@ -31,7 +32,7 @@ class Repository extends stdClass
         $this->structure = $structure;
     }
 
-    public function get($schoolyear, $instituteNumber, $id = null, $raw = false)
+    public function get($schoolyear, $instituteNumber, $id = null, $raw = false, $changedSince = false)
     {
         $endpoint = Path::normalize(str_replace("<version>", $this->apiVersion ?: "", $this->endpoint));
         $endpoint = Path::normalize(str_replace("<extend>", $this->extend ?: "", $endpoint));
@@ -42,6 +43,7 @@ class Repository extends stdClass
         ];
 
         $requestQuery['schoolYear'] = $schoolyear;
+        if ($changedSince) $requestQuery['changedSince'] = Clock::now()->minusDays(1)->format("Y-m-d");
         if ($this->structure) $requestQuery['structure'] = Arrays::first((new Setting)->get("informat.structure"))->value;
 
         $result = $this->execute($endpoint, $requestHeaders, $requestQuery);

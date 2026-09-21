@@ -10,6 +10,7 @@ export default class Table extends MasterObject {
     super();
 
     this.element = element;
+    this.elementContainer = element.parentElement;
     this.id = this.element.id || false;
 
     this.source = this.element.dataset.source || false;
@@ -114,6 +115,9 @@ export default class Table extends MasterObject {
   }
 
   init = async () => {
+    // Helpers.toggleWait();
+    this.createProgress();
+    this.enableProgress();
     this.createStructure();
     this.filter();
     await this.getData();
@@ -121,12 +125,15 @@ export default class Table extends MasterObject {
     this.checkButtonStates();
 
     this.loaded = true;
+    // Helpers.toggleWait();
+    this.disableProgress();
 
     if (this.autoRefresh) this.startAutoRefresh();
   };
 
   reload = async () => {
-    Helpers.toggleWait();
+    // Helpers.toggleWait();
+    this.enableProgress();
     this.loaded = false;
     this.filter();
 
@@ -138,8 +145,21 @@ export default class Table extends MasterObject {
     this.datatable.columns.adjust().draw();
 
     this.loaded = true;
-    Helpers.toggleWait();
+    // Helpers.toggleWait();
+    this.disableProgress();
   };
+
+  createProgress = () => {
+    this.elementContainer.insertBefore(window.createProgressBar(), this.element);
+  }
+
+  enableProgress = () => {
+    this.elementContainer.querySelector(".progress").classList.remove("d-none");
+  }
+  
+  disableProgress = () => {
+    this.elementContainer.querySelector(".progress").classList.add("d-none");
+  }
 
   createStructure = () => {
     if (!this.element.classList.contains("table"))

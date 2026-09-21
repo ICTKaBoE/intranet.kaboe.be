@@ -36,21 +36,18 @@ abstract class Sync
     /* ---------------------------- PUBLIC ENTRY ----------------------------- */
     public static function Prepare()
     {
-        // $status[] = self::PrepareEmployee();
-        Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
         $status[] = self::PrepareStudent();
+        Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+        $status[] = self::PrepareEmployee();
         return !Arrays::contains($status, false);
     }
 
     /* ========================== REUSABLE HELPERS ========================== */
 
     // Generic null-coalescing helper with fallback pipeline
-    private static function pick(...$values)
+    private static function pick($v1, $v2)
     {
-        foreach ($values as $v) {
-            if (!is_null($v) && $v !== "") return $v;
-        }
-        return null;
+        return Strings::trimToNull($v2) ?: Strings::trimToNull($v1) ?: null;
     }
 
     // Reusable function to build displayName/email
@@ -114,6 +111,7 @@ abstract class Sync
             'givenName',
             'surname',
             'displayName',
+            'userPrincipalName',
             'onPremisesSamAccountName',
             'onPremisesUserPrincipalName',
             'companyName',
@@ -128,18 +126,19 @@ abstract class Sync
             fn($u) =>
             Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
         );
+        $currentUserPrincipalNames = Arrays::map($currentEmployees, fn($u) => $u->getUserPrincipalName());
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($currentEmployees) . " employees in M365");
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat employees...");
         $informat = $employeeRepo->get();
-        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncEmployee || $i->linked->institute->linked->school->linked->parentSchool->syncEmployee));
+        $informat = array_values(Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncEmployee || $i->linked->institute->linked->school->linked->parentSchool->syncEmployee)));
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* ----------------------------- PROCESS EMPLOYEES ------------------------------ */
-        foreach ($informat as $emp) {
+        foreach ($informat as $empIndex => $emp) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee: {$emp->informatId} - {$emp->name} {$emp->firstName}");
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Employee " . ($empIndex + 1) . "/" . count($informat) . ": {$emp->informatId} - {$emp->name} {$emp->firstName}");
 
             $schoolObject = $emp->linked->institute->linked->school;
 
@@ -155,7 +154,7 @@ abstract class Sync
             $sync->employeeId = $emp->informatId;
 
             /* ---------- Identify matching M365 user ---------- */
-            $m365 = Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($u) => Strings::equal($u->getEmployeeId(), $emp->informatId) || Strings::equal($u->getEmployeeId(), "P{$emp->informatId}")));
+            $m365 = Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($u) => Strings::equal($u->getEmployeeId(), $emp->informatId)));
 
             /* ---------- Check active / status ---------- */
             $ownFieldStatus = $ownRepo->getByInformatEmployeeIdSectionAndName($emp->id, 2, $statusKey)?->value;
@@ -172,12 +171,15 @@ abstract class Sync
             [$displayName, $emailAddress] =
                 self::buildNameAndMail($fmtDisplay, $fmtEmail, $givenName, $emp->name, EMAIL_SUFFIX);
 
-            /* ---------- Avoid duplicate emails ---------- */
-            $postfix = 2;
-            $parts = explode("@", $emailAddress);
-            while (Arrays::firstOrNull(Arrays::filter($currentEmployees, fn($u) => Strings::equalsIgnoreCase($u->getMail(), $emailAddress)))) {
-                $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
-                $postfix++;
+            /* Avoid duplicate emails */
+            if (!$m365) {
+                $postfix = 2;
+                $parts = explode("@", $emailAddress);
+                while (Arrays::contains($currentUserPrincipalNames, $emailAddress)) {
+                    $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
+                    $postfix++;
+                }
+                $currentUserPrincipalNames[] = $emailAddress;
             }
 
             $samAccountName = substr(explode("@", $emailAddress)[0], 0, 20);
@@ -204,10 +206,8 @@ abstract class Sync
 
                 foreach ($schoolNames as $sn) {
                     $s = $schoolRepo->getByName($sn);
-                    if (!$s->adSecGroupPart) continue;
-
-                    $_g = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$s->adSecGroupPart, strtoupper($s->adOuPart)], $g);
-                    if (!$m365 || !Arrays::contains($existing, $_g)) $memberOf[] = $_g;
+                    $_g = $s->adSecGroupPart ? str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$s->adSecGroupPart, strtoupper($s->adOuPart)], $g) : null;
+                    if ($_g && (!$m365 || !Arrays::contains($existing, $_g))) $memberOf[] = $_g;
                 }
             }
 
@@ -348,7 +348,7 @@ abstract class Sync
             }
 
             /* ---------- Persist ---------- */
-            $sync->setEmail    = $sync->emailAddress ?: $m365?->getMail();
+            $sync->setEmail    = $sync->emailAddress ?: $m365?->getUserPrincipalName();
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
             $id = $syncRepo->set($sync);
@@ -399,6 +399,7 @@ abstract class Sync
             'givenName',
             'surname',
             'displayName',
+            'userPrincipalName',
             'onPremisesSamAccountName',
             'onPremisesUserPrincipalName',
             'companyName',
@@ -413,19 +414,19 @@ abstract class Sync
             fn($u) =>
             Strings::equal($u::class, \Microsoft\Graph\Generated\Models\User::class)
         );
+        $currentUserPrincipalNames = Arrays::map($current, fn($u) => $u->getUserPrincipalName());
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Found " . count($current) . " students in M365");
 
         /* ---------------------------- Get Informat students ---------------------------- */
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Gathering Informat students...");
         $informat = $studentRepo->get();
-        $informat = Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncStudent || $i->linked->institute->linked->school->linked->parentSchool->syncStudent));
+        $informat = array_values(Arrays::filter($informat, fn($i) => $i->instituteId !== 0 && ($i->linked->institute->linked->school->syncStudent || $i->linked->institute->linked->school->linked->parentSchool->syncStudent)));
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Count: " . count($informat));
 
         /* -------------------------------- Process each student ------------------------------- */
-        foreach ($informat as $st) {
+        foreach ($informat as $stIndex => $st) {
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student: {$st->informatId} - {$st->name} {$st->firstName}");
-            $schoolObj = $st->linked->institute->linked->school;
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Student " . ($stIndex + 1) . "/" . count($informat) . ": {$st->informatId} - {$st->name} {$st->firstName}");
 
             // if ($st->instituteId !== 0 && !($schoolObj->syncStudent || $schoolObj->linked->parentSchool->syncStudent)) {
             //     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Sync not allowed, skipping");
@@ -439,7 +440,7 @@ abstract class Sync
             $sync->employeeId = $st->informatId;
 
             /* ---------- Determine if student exists in M365 ---------- */
-            $m365 = Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equal($u->getEmployeeId(), $st->informatId) || Strings::equal($u->getEmployeeId(), "L{$st->informatId}")));
+            $m365 = Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equal($u->getEmployeeId(), $st->informatId)));
 
             /* ---------- Registration / class lookups ---------- */
             $currentReg = $regRepo->getCurrentByInformatStudentId($st->id);
@@ -454,7 +455,7 @@ abstract class Sync
             $currentRegClass = Arrays::firstOrNull($regClasses);
 
             $institute = $instituteRepo->getById($currentReg?->schoolInstituteId);
-            $school = $schoolRepo->getById($institute?->schoolId);
+            $schoolObj = $institute->linked->school ?: $st->linked->institute->linked->school;
             $class = $classRepo->getById($currentRegClass?->informatClassGroupId);
 
             /* ---------- DisplayName + email ---------- */
@@ -465,11 +466,14 @@ abstract class Sync
                 self::buildNameAndMail($fmtDisplay, $fmtEmail, $st->firstName, $st->name, EMAIL_SUFFIX_STUDENT);
 
             /* Avoid duplicate emails */
-            $postfix = 2;
-            $parts = explode("@", $emailAddress);
-            while (Arrays::firstOrNull(Arrays::filter($current, fn($u) => Strings::equalsIgnoreCase($u->getMail(), $emailAddress)))) {
-                $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
-                $postfix++;
+            if (!$m365) {
+                $postfix = 2;
+                $parts = explode("@", $emailAddress);
+                while (Arrays::contains($currentUserPrincipalNames, $emailAddress)) {
+                    $emailAddress = "{$parts[0]}{$postfix}@{$parts[1]}";
+                    $postfix++;
+                }
+                $currentUserPrincipalNames[] = $emailAddress;
             }
 
             $samAccount = substr(explode("@", $emailAddress)[0], 0, 20);
@@ -478,7 +482,7 @@ abstract class Sync
             $companyName = self::pick($schoolObj->syncStudentCompanyName, $schoolObj->linked->parentSchool->syncStudentCompanyName);
             $ou = self::pick($schoolObj->syncStudentOU, $schoolObj->linked->parentSchool->syncStudentOU);
 
-            if ($school) $ou = self::replaceOu($ou, $school);
+            if ($schoolObj) $ou = self::replaceOu($ou, $schoolObj);
 
             /* ---------- MemberOf ---------- */
             $memberOf = [];
@@ -491,12 +495,11 @@ abstract class Sync
             }
 
             foreach ($defaultGroups as $g) {
+                $g = Strings::trimToNull($g);
                 if (!$g) continue;
-                if (!$school->adSecGroupPart) continue;
 
-                $_g = str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$school->adSecGroupPart, strtoupper($school->adOuPart)], $g);
-
-                if (!$m365 || !Arrays::contains($existing, $_g)) $memberOf[] = $_g;
+                $_g = $schoolObj->adSecGroupPart ? str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$schoolObj->adSecGroupPart, strtoupper($schoolObj->adOuPart)], $g) :null;
+                if ($_g && (!$m365 || !Arrays::contains($existing, $_g))) $memberOf[] = $_g;
             }
 
             $memberOf = $memberOf ?: null;
@@ -528,6 +531,7 @@ abstract class Sync
                         $sync->userPrincipalName = $emailAddress;
                         $sync->companyName       = $companyName;
                         $sync->department        = $class?->code;
+                        $sync->jobTitle          = "Student";
                         $sync->memberOf          = $memberOf;
                         $sync->password          = User::generatePassword();
                         $sync->ou                = trim($ou);
@@ -545,6 +549,7 @@ abstract class Sync
                         $sync->displayName  = self::applyField($displayName,   $m365->getDisplayName());
                         $sync->companyName  = self::applyField($companyName,   $m365->getCompanyName());
                         $sync->department   = self::applyField($class?->code,  $m365->getDepartment());
+                        $sync->jobTitle     = self::applyField("Student",      $m365->getJobTitle());
                         $sync->ou           = self::applyField($ou,            $m365OU ?? null);
 
                         $sync->memberOf       = $memberOf;
@@ -563,6 +568,7 @@ abstract class Sync
                         $sync->displayName  = self::applyField($displayName,   $m365->getDisplayName());
                         $sync->companyName  = self::applyField($companyName,   $m365->getCompanyName());
                         $sync->department   = self::applyField($class?->code,  $m365->getDepartment());
+                        $sync->jobTitle     = self::applyField("Student",      $m365->getJobTitle());
                         $sync->ou           = self::applyField($ou,            $m365OU ?? null);
 
                         $sync->memberOf       = $memberOf;
@@ -576,6 +582,7 @@ abstract class Sync
                         $sync->displayName    = null;
                         $sync->companyName    = null;
                         $sync->department     = null;
+                        $sync->jobTitle       = null;
                         $sync->memberOf       = null;
                         $sync->thumbnailPhoto = null;
                     }
@@ -607,13 +614,16 @@ abstract class Sync
             }
 
             /* ---------- Persist ---------- */
-            $sync->setEmail    = $sync->emailAddress ?: $m365?->getMail();
+            $sync->setEmail    = $sync->emailAddress ?: $m365?->getUserPrincipalName();
             $sync->setPassword = $sync->password ?: $sync->setPassword;
 
             $id = $syncRepo->set($sync);
             if (!$sync->id) $sync = $syncRepo->getById($id);
 
-            if (!is_null($sync->action)) $mails[$sync->action][$schoolObj->id][] = $sync;
+            if (!is_null($sync->action)) {
+                if (!$sync->department) $sync->department = $class?->code;
+                $mails[$sync->action][$schoolObj->id][] = $sync;
+            }
             // die(var_dump($mails));
         }
 
