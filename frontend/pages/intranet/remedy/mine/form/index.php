@@ -11,7 +11,7 @@
 
                     <div class="col-lg-6 col-12 mb-3">
                         <label class="form-label" for="departmentId">Afdeling</label>
-                        <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-parent-select="schoolId" data-on-change="departmentView" data-default-no-load required></select>
+                        <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-parent-select="schoolId" data-on-change="departmentView" required></select>
                     </div>
                 </div>
 
