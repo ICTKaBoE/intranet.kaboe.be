@@ -163,15 +163,15 @@ abstract class Input
 			'/[Ç]/u'        =>   'C',
 			'/[ñ]/u'        =>   'n',
 			'/[Ñ]/u'        =>   'N',
-			'/–/'           =>   '', // UTF-8 hyphen
-			'/-/'           =>   '', // UTF-8 hyphen
-			'/&/'           =>   '', // UTF-8 &
-			'/\//'          =>   '', // UTF-8 /
-			'/\(/'          =>   '', // UTF-8 (
-			'/\)/'          =>   '', // UTF-8 )
-			'/[’‘\'‹›‚]/'  =>   '', // Literally a single quote
-			'/[“”«»„]/'    =>   '', // Double quote
-			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)
+			'/–/u'           =>   '', // UTF-8 hyphen
+			'/-/u'           =>   '', // UTF-8 hyphen
+			'/&/u'           =>   '', // UTF-8 &
+			'/\//u'          =>   '', // UTF-8 /
+			'/\(/u'          =>   '', // UTF-8 (
+			'/\)/u'          =>   '', // UTF-8 )
+			'/[’‘\'‹›‚]/u'  =>   '', // Literally a single quote
+			'/[“”«»„]/u'    =>   '', // Double quote
+			'/ /u'           =>   '', // nonbreaking space (equiv. to 0x160)
 		);
 
 		$output = preg_replace(array_keys($utf8), array_values($utf8), $input);

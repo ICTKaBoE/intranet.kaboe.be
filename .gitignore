@@ -1,6 +1,7 @@
 /downloads
 /uploads
-**/logs
+/powershell
+/logs
 /files
 **/*.old
 **/*.bak

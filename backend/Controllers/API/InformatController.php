@@ -16,7 +16,6 @@ use Database\Repository\Informat\RegistrationClass;
 use Database\Repository\Informat\Student;
 use Database\Repository\Informat\StudentAddress;
 use Database\Repository\Informat\StudentBank;
-use Database\Repository\Informat\StudentConfig;
 use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
@@ -199,10 +198,10 @@ class InformatController extends ApiController
         foreach ($registrationClasses as $rc) {
             if (!$rc->current) continue;
 
-            $registration = $registrationRepo->getById($rc->informatRegistrationId);
+            $registration = Arrays::firstOrNull($registrationRepo->get($rc->informatRegistrationId));
             if (!$registration) continue;
 
-            $students[] = $repo->getById($registration->informatStudentId);
+            $students[] = Arrays::firstOrNull($repo->get($registration->informatStudentId));
         }
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
@@ -256,8 +255,6 @@ class InformatController extends ApiController
         $filters = Filter::Find(['schoolId', 'departmentId']);
 
         $classRepo = new ClassGroup;
-        $registrationRepo = new Registration;
-        $registrationClassRepo = new RegistrationClass;
 
         $optgroups = [];
         $items = [];
@@ -268,8 +265,9 @@ class InformatController extends ApiController
 
         foreach ($optgroups as $class) {
             $students = [];
-            $registrationClasses = $registrationClassRepo->getByInformatClassgroupId($class->id);
+            $registrationClasses = (new RegistrationClass)->getByInformatClassgroupId($class->id);
 
+            $registrationRepo = new Registration;
             foreach ($registrationClasses as $rc) {
                 if (!$rc->current) continue;
 
@@ -285,37 +283,6 @@ class InformatController extends ApiController
 
             $students = Arrays::orderBy($students, "name");
             $items = array_merge($items, $students);
-        }
-
-        $this->appendToJson('optgroups', $optgroups);
-        $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
-    }
-
-    protected function getStudentPerClassByDepartmentFast($view, $id = null)
-    {
-        $filters = Filter::Find(['schoolId', 'departmentId']);
-        $configRepo = new StudentConfig;
-        $departmentRepo = new Department;
-        $classRepo = new ClassGroup;
-        $schoolyear = (new Schoolyear)->getCurrent()->id;
-
-        $optgroups = [];
-        $items = [];
-
-        $department = $departmentRepo->getById($filters['departmentId'][0]);
-        foreach (explode(";", $department->informatClassId) as $classId) $optgroups[] = $classRepo->getById($classId);
-        $optgroups = Arrays::orderBy($optgroups, "code");
-
-        foreach ($optgroups as $class) {
-            $config = $configRepo->getActiveBySchoolyearIdAndClassgroupId($schoolyear, $class->id);
-
-            foreach ($config as $c) {
-                $student = $c->linked->informatStudent;
-                $student->optgroup = $class->id;
-                $student->linked->class = $class;
-                $student->formatted->name = "{$class->code} - {$student->formatted->fullNameReversed}";
-                $items[] = $student;
-            }
         }
 
         $this->appendToJson('optgroups', $optgroups);

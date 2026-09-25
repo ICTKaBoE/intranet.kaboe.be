@@ -21,9 +21,6 @@ class Type extends CustomObject
         "manualAssignDate" => self::TYPE_BOOLEAN,
         "onComputer" => self::TYPE_BOOLEAN,
         "closeRegistrationAt" => self::TYPE_INTEGER,
-        "allowMultipleRegistrationsForThisTypeOnSameDay" => self::TYPE_BOOLEAN,
-        "allowMultipleRegistrationsForSameCourseOnSameDay" => self::TYPE_BOOLEAN,
-        "allowWithoutDate" => self::TYPE_BOOLEAN,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
