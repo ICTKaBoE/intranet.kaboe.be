@@ -3,7 +3,7 @@
 namespace Database\Object\StrategicDashboard;
 
 use Helpers\CString;
-use Helpers\General;
+use Ouzo\Utilities\Strings;
 use Security\CustomObject;
 use Security\Input;
 
@@ -16,6 +16,10 @@ class ItemValue extends CustomObject
         "datetime" => self::TYPE_DATETIME,
         "editedByUserId" => self::TYPE_INTEGER,
         "deleted" => self::TYPE_BOOLEAN
+    ];
+
+    protected $linkedAttributes = [
+        "item" => ["itemId" => \Database\Repository\StrategicDashboard\Item::class]
     ];
 
     public function init()
@@ -32,6 +36,8 @@ class ItemValue extends CustomObject
             }
         }
 
-        $this->formatted->value = is_int($this->value) ? CString::formatNumber($this->value, 2) : $this->value;
+        $this->formatted->value = (Strings::equal($this->linked->item->linked->type->short, "number") && is_numeric($this->value)) ? CString::formatNumber($this->value, $this->linked->item->valueRound) : $this->value;
+        if ($this->linked->item->valuePrefix) $this->formatted->value = "{$this->linked->item->valuePrefix} {$this->formatted->value}";
+        if ($this->linked->item->valueSuffix) $this->formatted->value = "{$this->formatted->value} {$this->linked->item->valueSuffix}";
     }
 }

@@ -27,22 +27,18 @@
 
             <div class="row">
                 <div class="col-12 mb-3">
-                    <label for="closeRegistrationAt" class="form-label">Sluit registratie op (voor de komende week)</label>
-                    <select name="closeRegistrationAt" id="closeRegistrationAt">
-                        <option value="0">Niet</option>
-                        <option value="1">Maandag</option>
-                        <option value="2">Dinsdag</option>
-                        <option value="3">Woensdag</option>
-                        <option value="4">Donderdag</option>
-                        <option value="5">Vrijdag</option>
-                    </select>
+                    <label for="closeRegistrationAt" class="form-label">Sluit registratie x uren voor begin</label>
+                    <input type="number" name="closeRegistrationAt" id="closeRegistrationAt" class="form-control" min="0" />
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12" id="chbCourseDependsOnSkore" role="checkbox" data-default-value="false" data-type="checkbox" data-name="courseDependsOnSkore" data-text="Getoonde vakken hangen af van Skore?"></div>
-                <div class="col-12" id="chbManualAssignDate" role="checkbox" data-default-value="false" data-type="checkbox" data-name="manualAssignDate" data-text="Leerling manueel toewijzen aan datum?"></div>
-                <div class="col-12" id="chbOnComputer" role="checkbox" data-default-value="false" data-type="checkbox" data-name="onComputer" data-text="Mogelijkheid tot op computer?"></div>
+                <div class="col-12" id="chbAllowWithoutDate" role="checkbox" data-default-value="false" data-type="checkbox" data-name="allowWithoutDate" data-text="Toestaan dat er registraties kunnen worden gemaakt zonder datum?" data-on-change="checkAllowWithoutDate"></div>
+                <div class="col-12" id="chbManualAssignDate" role="checkbox" data-default-value="false" data-type="checkbox" data-name="manualAssignDate" data-text="Leerling manueel toewijzen aan datum?" data-on-change="checkManualAssignDate"></div>
+                <div class="col-12" id="chbAllowMultipleRegistrationsForThisTypeOnSameDay" role="checkbox" data-default-value="false" data-type="checkbox" data-name="allowMultipleRegistrationsForThisTypeOnSameDay" data-text="Toestaan dat er meerdere registraties van dit type voor dezelfde student op dezelfde datum toegestaan zijn?" data-on-change="checkAllowMultipleRegistrationsForThisTypeOnSameDay"></div>
+                <div class="col-12" id="chbAllowMultipleRegistrationsForSameCourseOnSameDay" role="checkbox" data-default-value="false" data-type="checkbox" data-name="allowMultipleRegistrationsForSameCourseOnSameDay" data-text="Toestaan dat er meerdere registraties van hetzelfde vak op dezelfde datum toegestaan zijn?" data-on-change="checkAllowMultipleRegistrationsForSameCourseOnSameDay"></div>
+                <div class="col-12" id="chbOnComputer" role="checkbox" data-default-value="false" data-type="checkbox" data-name="onComputer" data-text="Mogelijkheid tot het maken op computer?"></div>
             </div>
         </div>
 

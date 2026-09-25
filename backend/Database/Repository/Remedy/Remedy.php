@@ -48,4 +48,27 @@ class Remedy extends Repository
 
         return $this->executeSelect($statement);
     }
+
+    public function getMultipleByInformatStudentIdTypeIdAndMomentId($informatStudentId, $typeId, $momentId)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'informatStudentId' => $informatStudentId,
+            'typeId' => $typeId,
+            'momentId' => $momentId
+        ]);
+
+        return $this->executeSelect($statement);
+    }
+
+    public function getMultipleByInformatStudentIdTypeIdMomentIdAndCourseId($informatStudentId, $typeId, $momentId, $courseId)
+    {
+        $statement = $this->prepareSelect(filters: [
+            'informatStudentId' => $informatStudentId,
+            'typeId' => $typeId,
+            'momentId' => $momentId,
+            'courseId' => $courseId
+        ]);
+
+        return $this->executeSelect($statement);
+    }
 }

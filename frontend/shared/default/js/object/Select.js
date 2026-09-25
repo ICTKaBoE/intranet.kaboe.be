@@ -282,8 +282,7 @@ export default class Select extends MasterObject {
 
   getItemDetails = () => {
     let details = [];
-    this.tomSelect
-      .getValue()
+    this.getValue()
       .split(";")
       .forEach((value) => {
         details.push(this.tomSelect.options[value]);
@@ -298,15 +297,15 @@ export default class Select extends MasterObject {
 
   createProgress = () => {
     this.elementContainer.appendChild(window.createProgressBar());
-  }
+  };
 
   enableProgress = () => {
     this.elementContainer.querySelector(".progress").classList.remove("d-none");
-  }
+  };
 
   disableProgress = () => {
     this.elementContainer.querySelector(".progress").classList.add("d-none");
-  }
+  };
 
   setEventListeners = () => {
     Object.keys(this.eventListeners).forEach((key) => {

@@ -97,9 +97,9 @@ class RemedyController extends ApiController
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $items = Arrays::filter($items, fn($i) => $i->schoolyearId == $schoolyear->id);
-            $items = Arrays::filter($items, fn($i) => !$i->full);
-            $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::at($i->date . " " . $i->linked->hour->start)->isAfterOrEqualTo(Clock::at(date("Y-m-d H:i:s", strtotime("next " . WEEK_DAYS['en'][$i->linked->type->closeRegistrationAt] . " 8:59:00")))));
             $items = Arrays::filter($items, fn($i) => !$i->isPast);
+            $items = Arrays::filter($items, fn($i) => !$i->full);
+            $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::now()->isBeforeOrEqualTo(Clock::at($i->date . " " . $i->linked->hour->start)->minusHours($i->linked->type->closeRegistrationAt)));
 
             $items = array_values($items);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
@@ -141,7 +141,7 @@ class RemedyController extends ApiController
         $filters = Filter::Find(['informatStudentId', 'informatClassgroupId']);
 
         if (Strings::equal($view, self::VIEW_SELECT)) {
-            if (empty(Arrays::getNestedValue($filters, ['informatStudentId', 0]))) {
+            if (empty(Arrays::getNestedValue($filters, ['informatStudentId']))) {
                 $this->appendToJson('items', []);
                 return;
             }
@@ -662,9 +662,29 @@ class RemedyController extends ApiController
                 $item = new RemedyRemedy;
                 $item->fillWithPostData($fields);
                 $item->creatorUserId = User::getLoggedInUser()->id;
-                $item->informatStudentId = $_informatStudentId;;
+                $item->informatStudentId = $_informatStudentId;
                 if (!$type->manualAssignDate) $item->courseId = $schoolCourseId;
                 $item->classgroupId = !$type->manualAssignDate ? $informatClassgroupId : (explode(";", $fields['informatClassgroupId'])[$index] ?? null);
+
+                if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForThisTypeOnSameDay) {
+                    $multiple = $repo->getMultipleByInformatStudentIdTypeIdAndMomentId($item->informatStudentId, $item->typeId, $item->momentId);
+
+                    if ($multiple) {
+                        $item->reinit();
+                        $this->setToast("{$item->linked->informatStudent->formatted->fullNameReversed} heeft al een {$item->linked->type->name} voor deze datum.", self::VALIDATION_STATE_INVALID);
+                        continue;
+                    }
+                }
+
+                if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForSameCourseOnSameDay) {
+                    $multiple = $repo->getMultipleByInformatStudentIdTypeIdMomentIdAndCourseId($item->informatStudentId, $item->typeId, $item->momentId, $item->courseId);
+
+                    if ($multiple) {
+                        $item->reinit();
+                        $this->setToast("{$item->linked->informatStudent->formatted->fullNameReversed} heeft al een {$item->linked->type->name} voor {$item->linked->course->name} op deze datum.", self::VALIDATION_STATE_INVALID);
+                        continue;
+                    }
+                }
 
                 $item = $repo->getById($repo->set($item));
 
@@ -719,8 +739,13 @@ class RemedyController extends ApiController
             }
         }
 
-        if ($this->validationIsAllGood()) $this->setReturn();
-        else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+        if ($this->validationIsAllGood()) {
+            $this->setToast("De inschrijvingen zijn voltooid! U kan verder gaan.");
+            $this->setEnableForm();
+        } else {
+            $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+            $this->setEnableForm();
+        }
     }
 
     protected function postAssign($view, $id = null)
@@ -1005,7 +1030,7 @@ class RemedyController extends ApiController
                 $smsMessageReceiverRepo->set($receiver);
             }
 
-            $this->setToast("De registratie '{$item->formatted->shortDescription}' is verwijderd en iedereen is op de hoogte gebracht!");
+            $this->setToast("De registratie is verwijderd en iedereen is op de hoogte gebracht!");
         }
 
         $this->setReloadTable();
@@ -1075,14 +1100,14 @@ class RemedyController extends ApiController
             $table["header"][] = "Datum";
             $table["header"][] = "Lesuur";
             $table["header"][] = "Lokaal";
-            if (!$type->courseDependsOnSkore) $table["header"][] = "Vak";
+            if (!$type->courseDependsOnSkore && !$type->allowWithoutDate) $table["header"][] = "Vak";
             if ($type->manualAssignDate) $table["header"][] = "Status";
             $table["header"][] = "School";
             $table["header"][] = "Afdeling";
             $table["header"][] = "Klas";
             $table["header"][] = "Naam";
 
-            if ($type->courseDependsOnSkore) {
+            if ($type->courseDependsOnSkore || $type->allowWithoutDate) {
                 $table["header"][] = "Vak";
                 $table["header"][] = "Leerkracht";
             }
@@ -1094,14 +1119,14 @@ class RemedyController extends ApiController
                 $table["data"][$i][] = Clock::at($type->manualAssignDate ? $item->assignedDate : $item->linked->moment->date)->format("d/m/Y");
                 $table["data"][$i][] = $item->linked->moment->linked->hour->formatted->startEnd;
                 $table["data"][$i][] = $item->linked->moment->linked->room->formatted->buildingRoom;
-                if (!$type->courseDependsOnSkore) $table["data"][$i][] = $item->linked->course->name;
+                if (!$type->courseDependsOnSkore && !$type->allowWithoutDate) $table["data"][$i][] = $item->linked->course->name;
                 if ($type->manualAssignDate) $table["data"][$i][] = $item->formatted->status;
                 $table["data"][$i][] = $item->linked->school->name;
                 $table["data"][$i][] = $item->linked->department->name;
                 $table["data"][$i][] = $item->linked->classgroup->name;
                 $table["data"][$i][] = $item->linked->informatStudent->formatted->fullNameReversed;
 
-                if ($type->courseDependsOnSkore) {
+                if ($type->courseDependsOnSkore || $type->allowWithoutDate) {
                     $table["data"][$i][] = $item->linked->course->name;
                     $table["data"][$i][] = $item->linked->informatEmployee->formatted->fullNameReversed;
                 }
