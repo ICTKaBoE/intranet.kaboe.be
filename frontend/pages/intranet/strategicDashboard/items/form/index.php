@@ -26,19 +26,48 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-4 col-12 mb-3">
+                <div class="col-lg-6 col-12 mb-3">
                     <label for="minimum" class="form-label">Minimum</label>
                     <input type="number" name="minimum" id="minimum" class="form-control" />
                 </div>
 
-                <div class="col-lg-4 col-12 mb-3">
+                <div class="col-lg-6 col-12 mb-3">
                     <label for="target" class="form-label">Streefdoel</label>
                     <input type="number" name="target" id="target" class="form-control" />
                 </div>
+            </div>
 
-                <div class="col-lg-4 col-12 mb-3">
+            <div class="row">
+                <div class="col-lg-6 col-12 mb-3">
+                    <label for="minimumRemark" class="form-label">Verklaring Minimum</label>
+                    <input type="text" name="minimumRemark" id="minimumRemark" class="form-control" />
+                </div>
+
+                <div class="col-lg-6 col-12 mb-3">
+                    <label for="targetRemark" class="form-label">Verklaring Streefdoel</label>
+                    <input type="text" name="targetRemark" id="targetRemark" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-12 mb-3">
                     <label for="width" class="form-label">Breedte</label>
                     <input type="number" name="width" id="width" min="2" max="12" step="2" class="form-control" />
+                </div>
+
+                <div class="col-lg-3 col-12 mb-3">
+                    <label for="valueRound" class="form-label">Afronding (0 is geen)</label>
+                    <input type="number" name="valueRound" id="valueRound" min="0" class="form-control" />
+                </div>
+
+                <div class="col-lg-3 col-12 mb-3">
+                    <label for="valuePrefix" class="form-label">Voorvoegsel</label>
+                    <input type="text" name="valuePrefix" id="valuePrefix" class="form-control" />
+                </div>
+
+                <div class="col-lg-3 col-12 mb-3">
+                    <label for="valueSuffix" class="form-label">Achtervoegsel</label>
+                    <input type="text" name="valueSuffix" id="valueSuffix" class="form-control" />
                 </div>
             </div>
 

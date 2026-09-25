@@ -18,12 +18,17 @@ class Item extends CustomObject
         "categoryId" => self::TYPE_INTEGER,
         "name" => self::TYPE_STRING,
         "minimum" => self::TYPE_DOUBLE,
+        "minimumRemark" => self::TYPE_STRING,
         "target" => self::TYPE_DOUBLE,
+        "targetRemark" => self::TYPE_STRING,
         "canEditUserId" => self::TYPE_STRING,
         "width" => self::TYPE_INTEGER,
         "order" => self::TYPE_INTEGER,
         "info" => self::TYPE_STRING,
         "valueTemplate" => self::TYPE_ALL,
+        "valueRound" => self::TYPE_INTEGER,
+        "valuePrefix" => self::TYPE_STRING,
+        "valueSuffix" => self::TYPE_STRING,
         "deleted" => self::TYPE_BOOLEAN
     ];
 
@@ -36,8 +41,17 @@ class Item extends CustomObject
     public function init()
     {
         $this->info = $this->info ?? "Geen extra informatie";
-        $this->formatted->minimum = CString::formatNumber($this->minimum, 2);
-        $this->formatted->target = CString::formatNumber($this->target, 2);
+        $this->formatted->minimum = CString::formatNumber($this->minimum, $this->valueRound);
+        $this->formatted->target = CString::formatNumber($this->target, $this->valueRound);
+
+        if ($this->valuePrefix) {
+            $this->formatted->minimum = "{$this->valuePrefix} {$this->formatted->minimum}";
+            $this->formatted->target = "{$this->valuePrefix} {$this->formatted->target}";
+        }
+        if ($this->valueSuffix) {
+            $this->formatted->minimum = "{$this->formatted->minimum} {$this->valueSuffix}";
+            $this->formatted->target = "{$this->formatted->target} {$this->valueSuffix}";
+        }
         $this->formatted->valueHtml = "";
 
         if (Strings::equal($this->linked->type->short, "number")) $this->formatted->html = "<span class='fs-1'>@formatted.value@</span>";

@@ -37,7 +37,7 @@ class StrategicDashboardController extends ApiController
             
             <div class='card-body text-center text-white bg-@bordercolor@'>@formatted.html@</div>
             
-            <div class='card-footer p-1'><span class='me-3'><i class='icon ti ti-math-min me-2'></i>@formatted.minimum@</span> <span><i class='icon ti ti-math-max me-2'></i>@formatted.target@</span></div>
+            <div class='card-footer p-1'><span class='me-3' data-bs-position='bottom' data-bs-trigger='hover' data-bs-toggle='popover' data-bs-container='body' title='Verklaring' data-bs-content='@minimumRemark@'><i class='icon ti ti-math-min me-2'></i>@formatted.minimum@</span> <span data-bs-position='bottom' data-bs-trigger='hover' data-bs-toggle='popover' data-bs-container='body' title='Verklaring' data-bs-content='@targetRemark@'><i class='icon ti ti-math-max me-2'></i>@formatted.target@</span></div>
         </a>
     </div>";
 
@@ -240,7 +240,9 @@ class StrategicDashboardController extends ApiController
             "typeId" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
             "name" => ["mandatory" => true],
             "minimum" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "minimumRemark" => ["type" => Input::INPUT_TYPE_STRING],
             "target" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT],
+            "targetRemark" => ["type" => Input::INPUT_TYPE_STRING],
             "width" => ["mandatory" => true, "type" => Input::INPUT_TYPE_INT]
         ];
 
