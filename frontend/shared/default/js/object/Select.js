@@ -282,7 +282,7 @@ export default class Select extends MasterObject {
 
   getItemDetails = () => {
     let details = [];
-    this.tomSelect
+    this
       .getValue()
       .split(";")
       .forEach((value) => {

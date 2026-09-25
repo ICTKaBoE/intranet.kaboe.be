@@ -14,6 +14,7 @@ use Database\Object\Informat\RegistrationClass;
 use Database\Object\Informat\Student as InformatStudent;
 use Database\Object\Informat\StudentAddress;
 use Database\Object\Informat\StudentBank;
+use Database\Object\Informat\StudentConfig as InformatStudentConfig;
 use Database\Object\Informat\StudentEmail;
 use Database\Object\Informat\StudentNumber;
 use Database\Object\Informat\StudentRelation;
@@ -31,6 +32,7 @@ use Database\Repository\Informat\RegistrationClass as InformatRegistrationClass;
 use Database\Repository\Informat\Student as RepositoryInformatStudent;
 use Database\Repository\Informat\StudentAddress as InformatStudentAddress;
 use Database\Repository\Informat\StudentBank as InformatStudentBank;
+use Database\Repository\Informat\StudentConfig;
 use Database\Repository\Informat\StudentEmail as InformatStudentEmail;
 use Database\Repository\Informat\StudentNumber as InformatStudentNumber;
 use Database\Repository\Informat\StudentRelation as InformatStudentRelation;
@@ -53,7 +55,7 @@ abstract class Informat
 {
     static public function Import(...$args)
     {
-        $institutes = [];
+        $institutes = $result = [];
         foreach ((new School)->getImport() as $school) {
             foreach ((new Institute)->getBySchoolId($school->id) as $inst) $institutes[] = $inst;
         }
@@ -66,20 +68,20 @@ abstract class Informat
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Switching to schoolyear {$schoolyear}");
         }
 
-        if (Arrays::keyExists($args, 'image')) {
-            $studentPhoto = self::StudentPhotos($schoolyear);
-            $employeePhoto = self::EmployeePhotos($schoolyear);
-
-            return ($studentPhoto && $employeePhoto);
-        } else {
             $schoolyear = (new Schoolyear)->getByName($schoolyear);
-            $student = self::Students($schoolyear);
-            $registration = self::Registrations($schoolyear);
-            $employee = $nextSchoolyear ? true : self::Employees($schoolyear);
-            $employeeOwnfield = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
 
-            return ($student && $registration && $employee && $employeeOwnfield);
+        if (Arrays::keyExists($args, 'image')) {
+            $result[] = self::StudentPhotos($schoolyear);
+            $result[] = self::EmployeePhotos($schoolyear);
+        } else {
+            // $result[] = self::Students($schoolyear);
+            // $result[] = self::Registrations($schoolyear);
+            $result[] = self::Config($schoolyear);
+            // $result[] = $nextSchoolyear ? true : self::Employees($schoolyear);
+            // $result[] = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
         }
+
+        return !Arrays::contains($result, false);
     }
 
     // Main Functions
@@ -252,6 +254,43 @@ abstract class Informat
         foreach ($ircRepo->get() as $item) {
             $item->current = (Clock::at($item->virtualStart)->isBeforeOrEqualTo(Clock::now()) && (is_null($item->virtualEnd) || Clock::now()->isBeforeOrEqualTo(Clock::at($item->virtualEnd))));
             $ircRepo->set($item);
+        }
+
+        return !$_error_;
+    }
+
+    private static function Config($schoolyear) {
+        $_error_ = false;
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filling student config table...");
+
+        $informatStudentRepo = new RepositoryInformatStudent;
+        $informatStudentRegistrationRepo = new RepositoryInformatRegistration;
+        $informatStudentRegistrationClassgroupRepo = new InformatRegistrationClass;
+        $informatStudentConfigRepo = new StudentConfig;
+
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Setting all lines active to 0...");
+        foreach ($informatStudentConfigRepo->getBySchoolyearId($schoolyear->id) as $config) {
+            $config->active = 0;
+            $informatStudentConfigRepo->set($config);
+        }
+
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filling student config table...");
+        foreach ($informatStudentRepo->get() as $student) {
+            $config = $informatStudentConfigRepo->getBySchoolyearIdAndInformatStudentId($schoolyear->id, $student->id) ?? new InformatStudentConfig;
+            $config->schoolyearId = $schoolyear->id;
+            $config->informatStudentId = $student->id;
+            $config->registrationId = $informatStudentRegistrationRepo->getCurrentByInformatStudentId($student->id)->id;
+            $config->classgroupId = $config->registrationId ? $informatStudentRegistrationClassgroupRepo->getCurrentByInformatRegistrationId($config->registrationId)->informatClassGroupId : null;
+            $config->active = ($config->registrationId && $config->classgroupId);
+
+            try {
+                $informatStudentConfigRepo->set($config);
+            } catch (\Exception $e) {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
+                Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+                $_error_ = true;
+                continue;
+            }
         }
 
         return !$_error_;

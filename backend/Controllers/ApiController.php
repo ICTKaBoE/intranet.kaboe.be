@@ -87,7 +87,7 @@ class ApiController extends stdClass
 		if ($this->activeButton) Arrays::setNestedValue($this->json, ['activeButton'], $this->activeButton);
 		if ($this->notActiveButton) Arrays::setNestedValue($this->json, ['notActiveButton'], $this->notActiveButton);
 
-		Helpers::response()->json($this->json);
+		Helpers::response()->json($this->json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES |JSON_INVALID_UTF8_IGNORE);
 	}
 
 	protected function setHttpCode($code)
