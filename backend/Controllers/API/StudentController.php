@@ -10,6 +10,7 @@ use Database\Repository\Informat\RegistrationClass;
 use Database\Repository\Informat\Student;
 use Database\Repository\Informat\StudentAddress;
 use Database\Repository\Informat\StudentBank;
+use Database\Repository\Informat\StudentConfig;
 use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
@@ -19,10 +20,13 @@ use Database\Repository\Sync\Sync;
 use Helpers\Filter;
 use Helpers\Form;
 use Helpers\General;
+use Helpers\PDF;
 use Helpers\Table;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
+use Security\FileSystem;
+use Security\Input;
 use Security\User;
 
 class StudentController extends ApiController
@@ -33,6 +37,7 @@ class StudentController extends ApiController
     protected function getOverview($view, $id = null)
     {
         $repo = new Student;
+        $configRepo = new StudentConfig;
         $regRepo = new Registration;
         $regClassRepo = new RegistrationClass;
         $classRepo = new ClassGroup;
@@ -45,58 +50,62 @@ class StudentController extends ApiController
         $emailRepo = new StudentEmail;
         $bankRepo = new StudentBank;
 
-        $filters = Filter::Find();
-        if (Helpers::url()->hasParam('schoolId')) $filters["instituteId"] = Arrays::map($instituteRepo->getBySchoolId(Helpers::url()->getParam("schoolId")), fn($i) => $i->id);
+        $filters = Filter::Find(['schoolyearId', 'schoolId']);
+        if (empty($filters['schoolyearId'])) $filters['schoolyearId'] = [(new Schoolyear)->getCurrent()->id];
+        // if (Helpers::url()->hasParam('schoolId')) $filters["instituteId"] = Arrays::map($instituteRepo->getBySchoolId(Helpers::url()->getParam("schoolId")), fn($i) => $i->id);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
             $this->appendToJson('defaultOrder', $defaultOrder);
             $this->appendToJson('columns', $columns);
 
-            $schoolyear = Helpers::url()->hasParam('schoolyearId') ? (new Schoolyear)->getById(Helpers::url()->getParam('schoolyearId')) : (new Schoolyear)->getCurrent();
-            $items = $repo->get(filters: $filters);
+            $items = $configRepo->get(filters: $filters);
 
-            foreach ($items as $index => $i) {
-                $currentRegistration = $regRepo->getCurrentByInformatStudentId($i->id);
+            // $schoolyear = Helpers::url()->hasParam('schoolyearId') ? (new Schoolyear)->getById(Helpers::url()->getParam('schoolyearId')) : (new Schoolyear)->getCurrent();
+            // $items = $repo->get(filters: $filters);
 
-                if (!$currentRegistration) {
-                    unset($items[$index]);
-                    continue;
-                }
+            // foreach ($items as $index => $i) {
+            //     $currentRegistration = $regRepo->getCurrentByInformatStudentId($i->id);
 
-                $currentRegistrationClass = $regClassRepo->getCurrentByInformatRegistrationId($currentRegistration->id);
-                if (!$currentRegistrationClass) continue;
+            //     if (!$currentRegistration) {
+            //         unset($items[$index]);
+            //         continue;
+            //     }
 
-                $i->linked->registration = $currentRegistrationClass;
-                $i->linked->class = $classRepo->getById($currentRegistrationClass->informatClassGroupId);
-            }
+            //     $currentRegistrationClass = $regClassRepo->getCurrentByInformatRegistrationId($currentRegistration->id);
+            //     if (!$currentRegistrationClass) continue;
+
+            //     $i->linked->registration = $currentRegistrationClass;
+            //     $i->linked->class = $classRepo->getById($currentRegistrationClass->informatClassGroupId);
+            // }
 
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_LIST) && $id) {
-            $item = Arrays::firstOrNull($repo->get($id));
+            $config = $configRepo->getById($id);
+            $item = $repo->getById($config->informatStudentId);
             if (!$item) return;
 
-            $addresses = $addressRepo->getByInformatStudentId($item->id);
+            $addresses = $addressRepo->getByInformatStudentId($config->informatStudentId);
             $addresses = Arrays::map($addresses, fn($a) => $a->formatted->full);
             $addresses = implode("<br />", $addresses);
 
-            $relations = $relationRepo->getByInformatStudentId($item->id);
+            $relations = $relationRepo->getByInformatStudentId($config->informatStudentId);
             $relations = Arrays::map($relations, fn($r) => $r->formatted->typeWithFullNameReversed);
             $relations = implode("<br />", $relations);
 
-            $numbers = $numberRepo->getByInformatStudentId($item->id);
+            $numbers = $numberRepo->getByInformatStudentId($config->informatStudentId);
             $numbers = Arrays::map($numbers, fn($n) => $n->formatted->typeWithLink);
             $numbers = implode("<br />", $numbers);
 
-            $emails = $emailRepo->getByInformatStudentId($item->id);
+            $emails = $emailRepo->getByInformatStudentId($config->informatStudentId);
             $emails = Arrays::map($emails, fn($e) => $e->formatted->typeWithLink);
             $emails = implode("<br />", $emails);
 
-            $banks = $bankRepo->getByInformatStudentId($item->id);
+            $banks = $bankRepo->getByInformatStudentId($config->informatStudentId);
             $banks = Arrays::map($banks, fn($b) => $b->formatted->details);
             $banks = implode("<br />", $banks);
 
-            $registrations = $regRepo->getByInformatStudentId($item->id);
+            $registrations = $regRepo->getByInformatStudentId($config->informatStudentId);
             $registrations = Arrays::filter($registrations, fn($cr) => $cr->status == 0);
             $registrations = array_reverse(Arrays::orderBy($registrations, "start"));
 
@@ -106,12 +115,12 @@ class StudentController extends ApiController
                 $classRegistrations = $regClassRepo->getByInformatRegistrationId($registration->id);
                 $classRegistrations = array_reverse(Arrays::orderBy($classRegistrations, "start"));
 
-                $history .= "{$school->name} ({$registration->formatted->dates}) - Stamnummer: {$registration->basenumber}";
+                $history .= "{$school->name} (Stamnummer {$registration->basenumber}) - {$registration->formatted->dates}";
                 $history .= "<ul>";
 
                 foreach ($classRegistrations as $cr) {
                     $classgroup = $classRepo->getById($cr->informatClassGroupId);
-                    $history .= "<li>{$classgroup->code} - {$classgroup->name} ({$cr->formatted->dates})</li>";
+                    $history .= "<li>{$classgroup->code} (n°{$cr->rank}) - {$cr->formatted->dates}</li>";
                 }
 
                 $history .= "</ul>";
@@ -120,15 +129,23 @@ class StudentController extends ApiController
             $items = [
                 [
                     "title" => "Naam",
-                    "content" => $item->name
+                    "content" => $config->linked->informatStudent->name
                 ],
                 [
                     "title" => "Voornaam",
-                    "content" => $item->firstName
+                    "content" => $config->linked->informatStudent->firstName
+                ],
+                [
+                    "title" => "Intern nummer",
+                    "content" => $config->linked->informatStudent->informatId
                 ],
                 [
                     "title" => "Geboortedatum",
-                    "content" => $item->formatted->birthDate
+                    "content" => $config->linked->informatStudent->formatted->birthDate
+                ],
+                [
+                    "title" => "Geboorteplaats",
+                    "content" => $config->linked->informatStudent->birthPlace
                 ],
                 [
                     "address" => $addresses,
@@ -137,8 +154,8 @@ class StudentController extends ApiController
                     "email" => $emails,
                     "bank" => $banks,
                     "history" => $history,
-                    "informatGuid" => $item->informatGuid,
-                    "fullNameReversed" => $item->formatted->fullNameReversed
+                    "informatGuid" => $config->linked->informatStudent->informatGuid,
+                    "fullNameReversed" => $config->linked->informatStudent->formatted->fullNameReversed
                 ]
             ];
 
@@ -147,8 +164,6 @@ class StudentController extends ApiController
     }
 
     // POST
-
-
     protected function postOverviewChangePassword($view, $id = null)
     {
         $informatStudentRepo = new Student;
@@ -184,6 +199,32 @@ class StudentController extends ApiController
 
             $this->setCloseModal('changePassword');
             $this->setResetForm();
+        }
+    }
+
+    protected function postOverviewPrint($view, $id = null)
+    {
+        $configRepo = new StudentConfig;
+        $repo = new Student;
+        $folder = LOCATION_FILES . "/student/";
+
+        $id = explode("_", $id);
+        $_fields = [
+            "random" => ["what" => Input::INPUT_TYPE_STRING],
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            FileSystem::CreateFolder($folder);
+            $pdf = new PDF("prints", $folder . date("YmdHis") . ".pdf", "L");
+
+            foreach ($id as $_id) {
+                $config = $configRepo->getById($_id);
+            }
+
+            $pdf->save();
         }
     }
 }

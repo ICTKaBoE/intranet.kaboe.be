@@ -193,7 +193,8 @@ abstract class Sync
             /* ---------- MemberOf groups ---------- */
             $memberOf = [];
 
-            $defaultGroups = explode(",", self::pick($schoolObject->syncEmployeeDefaultMemberOf, $schoolObject->linked->parentSchool->syncEmployeeDefaultMemberOf));
+            $defaultGroups = self::pick($schoolObject->syncEmployeeDefaultMemberOf, $schoolObject->linked->parentSchool->syncEmployeeDefaultMemberOf);
+            $defaultGroups = Strings::contains($defaultGroups, ",") ? explode(",", $defaultGroups) : [$defaultGroups];
 
             if ($m365) {
                 $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);
@@ -232,7 +233,6 @@ abstract class Sync
 
             if ($badgeId && (!$m365 || $badgeId !== $m365?->getOnPremisesExtensionAttributes()?->getExtensionAttribute15())) {
                 $otherAttributes["extensionAttribute15"] = $badgeId;
-                $otherAttributes["pager"] = $badgeId;
             }
 
             $otherAttributes = $otherAttributes ?: null;
@@ -487,7 +487,8 @@ abstract class Sync
             /* ---------- MemberOf ---------- */
             $memberOf = [];
 
-            $defaultGroups = explode(",", self::pick($schoolObj->syncStudentDefaultMemberOf, $schoolObj->linked->parentSchool->syncStudentDefaultMemberOf));
+            $defaultGroups = self::pick($schoolObj->syncStudentDefaultMemberOf, $schoolObj->linked->parentSchool->syncStudentDefaultMemberOf);
+            $defaultGroups = Strings::contains($defaultGroups, ",") ? explode(",", $defaultGroups) : [$defaultGroups];
 
             if ($m365) {
                 $existing = $m365Repo->getMemberOf($m365->getId(), ['displayName']);
@@ -498,7 +499,7 @@ abstract class Sync
                 $g = Strings::trimToNull($g);
                 if (!$g) continue;
 
-                $_g = $schoolObj->adSecGroupPart ? str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$schoolObj->adSecGroupPart, strtoupper($schoolObj->adOuPart)], $g) :null;
+                $_g = $schoolObj->adSecGroupPart ? str_replace(["{{school:adSecGroupPart}}", "{{school:adOuPartUpper}}"], [$schoolObj->adSecGroupPart, strtoupper($schoolObj->adOuPart)], $g) : null;
                 if ($_g && (!$m365 || !Arrays::contains($existing, $_g))) $memberOf[] = $_g;
             }
 

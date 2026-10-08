@@ -12,24 +12,16 @@ let btnFilter = new Button(null, {
   modal: "filter",
 });
 
-let btnChangePassword = new Button(null, {
+let btnEdit = new Button(null, {
   type: Button.TYPE_ICON,
-  icon: "key",
-  title: "Wachtwoord wijzigen",
-  bgColor: "red",
-  modal: "changePassword",
-  onclick: () => {
-    Form.GetInstance(`${pageId}ChangePassword`).setLastLoadedId(
-      Table.GetInstance(pageId)
-        .getSelectedRowData()
-        .map((r) => r.guid || r.id)
-        .join("_"),
-    );
-  },
+  icon: "eye",
+  title: "Bewerken",
+  bgColor: "orange",
+  onclick: "edit",
 });
 
-Component.addActionButton(btnFilter, btnChangePassword);
+Component.addActionButton(btnFilter, btnEdit);
 
 $(document).ready(() => {
-  Table.GetInstance(pageId).attachButton(btnChangePassword, ">0");
+  Table.GetInstance(pageId).attachButton(btnEdit, "==1");
 });

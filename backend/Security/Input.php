@@ -149,7 +149,7 @@ abstract class Input
 	static public function clean($input)
 	{
 		$utf8 = array(
-			'/[áàâãªä]/u'   =>   'a',
+			'/[áàâãªäă]/u'   =>   'a',
 			'/[ÁÀÂÃÄ]/u'    =>   'A',
 			'/[ÍÌÎÏ]/u'     =>   'I',
 			'/[íìîï]/u'     =>   'i',

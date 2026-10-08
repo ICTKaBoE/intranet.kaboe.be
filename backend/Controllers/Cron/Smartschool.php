@@ -219,18 +219,16 @@ abstract class Smartschool
         $classgroupTeacherRepo = new ClassGroupTeacher;
         $userRepo = new RepositoryUser;
         $schoolyear = (new Schoolyear)->getCurrent();
-        $instituteRepo = new Institute;
         $sources = Arrays::filter($sourceRepo->get(), fn($s) => Strings::startsWith($s->id, "smartschool"));
 
         foreach ($sources as $source) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Source: {$source->id}");
             $errorCodes = SmartschoolSmartschool::GetErrorCodes($source->id);
             $classes = (new AllGroupsAndClasses($source->id))->get();
-            $classes = array_values(Arrays::filter($classes, fn($c) => Strings::equal('K', $c['type']) && Strings::equal($c['isOfficial'], 1)));
+            $classes = array_values(Arrays::filter($classes, fn($c) => Strings::equal('K', $c['type'])));
 
             foreach ($classes as $class) {
-                $instituteId = $instituteRepo->getByInstituteNumber(CString::getDigitsOnly($class['instituteNumber']))->id;
-                $classgroup = $classgroupRepo->getBySchoolInstituteIdAdministrativeGroupCodeSchoolyearAndCode($instituteId, CString::leadingZeros($class['adminNumber'], 6), $schoolyear->name, $class['name']);
+                $classgroup = $classgroupRepo->getBySchoolyearAndCode($schoolyear->name, str_replace("*", "", $class['name']));
 
                 Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
                 $sync = $classgroup->linked->schoolInstitute->linked->school->smsSyncClassTeachers ?: $classgroup->linked->schoolInstitute->linked->school->linked->parentSchool->smsSyncClassTeachers;
@@ -241,7 +239,7 @@ abstract class Smartschool
                 $usernames = [];
 
                 foreach ($classgroupTeachers as $classgroupTeacher) {
-                    $username = ($userRepo->getByInformatEmployeeId($classgroupTeacher->linked->informatEmployee->informatId) ?: $userRepo->getByInformatEmployeeId("P{$classgroupTeacher->linked->informatEmployee->informatId}"))?->username;
+                    $username = $userRepo->getByInformatEmployeeId($classgroupTeacher->linked->informatEmployee->informatId)?->username;
 
                     if ($username) {
                         $usernames[] = $username;
@@ -251,8 +249,11 @@ abstract class Smartschool
                 if (count($usernames)) {
                     $usernames = implode(",", $usernames);
                     Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "Link " . implode(", ", explode(",", $usernames)) . " to class...");
-                    $result = SmartschoolSmartschool::ChangeGroupOwners($source->id, $class['code'], $usernames);
-                    if (is_int($result) && $result !== 0) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $errorCodes[$result] ?? "Unknown error code: {$result}");
+
+                    if (!DEV_MODE) {
+                        $result = SmartschoolSmartschool::ChangeGroupOwners($source->id, $class['code'], $usernames);
+                        if (is_int($result) && $result !== 0) Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $errorCodes[$result] ?? "Unknown error code: {$result}");
+                    }
                 }
             }
 

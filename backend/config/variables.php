@@ -17,8 +17,8 @@ define("LOCATION_PUBLIC", LOCATION_FRONTEND . "/public");
 define("LOCATION_ICON", LOCATION_SHARED . "/ui/icons/");
 define("LOCATION_IMAGE", LOCATION_SHARED . "/default/images/");
 define("LOCATION_FILES", LOCATION_ROOT . "/files");
-define("LOCATION_DOWNLOAD", LOCATION_ROOT . "/files/downloads");
-define("LOCATION_UPLOAD", LOCATION_ROOT . "/files/uploads");
+define("LOCATION_DOWNLOAD", LOCATION_FILES . "/downloads");
+define("LOCATION_UPLOAD", LOCATION_FILES . "/uploads");
 
 define("SECURITY_SESSION_ISSIGNEDIN", sha1("isSignedIn"));
 

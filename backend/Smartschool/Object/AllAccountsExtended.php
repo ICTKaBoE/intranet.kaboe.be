@@ -17,6 +17,7 @@ class AllAccountsExtended extends CustomObject
         "BadgeID" => self::TYPE_STRING,
         "Cateringtarief" => self::TYPE_STRING,
         "schoolverlater" => self::TYPE_BOOLEAN,
-        "groups" => self::TYPE_ARRAY_OR_OBJECT
+        "groups" => self::TYPE_ARRAY_OR_OBJECT,
+        "scannableCode" => self::TYPE_STRING
     ];
 }

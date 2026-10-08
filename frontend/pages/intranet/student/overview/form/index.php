@@ -27,7 +27,7 @@ const LIST_IMAGE = "<img class='img-fluid rounded' src='https://kaboe.be/fronten
 
         <div class="card mb-3">
             <div class="card-header">
-                <h2 class="card-title">Geschiedenis (Nieuw - Oud)</h2>
+                <h2 class="card-title">Geschiedenis binnen COLTD vzw (Nieuw - Oud)</h2>
             </div>
 
             <div class="card-body" role="list" id="lst{{page:id}}History" data-source="{{list:url:full}}/{{url:part.id}}" data-template="<?= LIST_TEMPLATE_HISTORY ?>"></div>

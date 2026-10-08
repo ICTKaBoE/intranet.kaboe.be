@@ -54,6 +54,7 @@ abstract class Eetjemee
                     "child_email" => $u->gebruikersnaam,
                     'child_dateofbirth' => $u->geboortedatum,
                     'child_regnr' => CString::getDigitsOnly($u->rijksregisternummer),
+                    'external_qr_code' => $u->scannableCode,
                     'fk_external_ref' => $u->internnummer,
                     'external_barcode' => $u->BadgeID ?: null,
                     'class_name' => $u->officialClass,

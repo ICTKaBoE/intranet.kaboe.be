@@ -14,7 +14,7 @@ class ClassGroupTeacher extends Repository
 
     public function getByInformatClassgroupId($informatClassgroupId)
     {
-        $statement = $this->prepareSelect(filters: ['informatClassGroupId' => $informatClassgroupId]);
+        $statement = $this->prepareSelect(filters: ['informatClassgroupId' => $informatClassgroupId]);
         return $this->executeSelect($statement);
     }
 
@@ -28,5 +28,10 @@ class ClassGroupTeacher extends Repository
     {
         $statement = $this->prepareSelect(filters: ['informatClassgroupId' => $informatClassgroupId, 'informatEmployeeId' => $informatEmployeeId]);
         return Arrays::firstOrNull($this->executeSelect($statement));
+    }
+
+    public function deleteByClassgroupId($informatClassgroupId)
+    {
+        $this->delete(["informatClassgroupId" => $informatClassgroupId]);
     }
 }

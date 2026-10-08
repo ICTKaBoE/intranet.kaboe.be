@@ -26,6 +26,10 @@ class Registration extends CustomObject
         "current" => self::TYPE_BOOLEAN
     ];
 
+    protected $linkedAttributes = [
+        "schoolInstitute" => ["schoolInstituteId" => \Database\Repository\School\Institute::class]
+    ];
+
     public function init()
     {
         $this->actualYear = ($this->grade - 1) * 2 + $this->year;

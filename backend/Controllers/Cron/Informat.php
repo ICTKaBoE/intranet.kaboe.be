@@ -74,11 +74,11 @@ abstract class Informat
             $result[] = self::StudentPhotos($schoolyear);
             $result[] = self::EmployeePhotos($schoolyear);
         } else {
-            $result[] = self::Students($schoolyear);
-            $result[] = self::Registrations($schoolyear);
+            // $result[] = self::Students($schoolyear);
+            // $result[] = self::Registrations($schoolyear);
             $result[] = self::Config($schoolyear);
-            $result[] = $nextSchoolyear ? true : self::Employees($schoolyear);
-            $result[] = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
+            // $result[] = $nextSchoolyear ? true : self::Employees($schoolyear);
+            // $result[] = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
         }
 
         return !Arrays::contains($result, false);
@@ -192,6 +192,7 @@ abstract class Informat
         $informatRepo = new Registration;
         $studentRepo = new RepositoryInformatStudent;
         $repo = new RepositoryInformatRegistration;
+        $classgroupTeacherRepo = new ClassGroupTeacher;
 
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
@@ -230,6 +231,7 @@ abstract class Informat
                         $classgroupId = self::CreateClassGroup($institute->id, $inschr, $iItem->nrAdmgrp, $item->departmentCode, $item->grade, $item->year);
                         self::CreateRegistrationClass($item->id, $classgroupId, $inschr, $schoolyear);
 
+                        $classgroupTeacherRepo->deleteByClassgroupId($classgroupId);
                         foreach ($inschr->klassenleraars as $teacher) self::CreateClassGroupTeacher($classgroupId, $teacher['persoonId']);
                     }
 
@@ -262,7 +264,7 @@ abstract class Informat
     private static function Config($schoolyear)
     {
         $_error_ = false;
-        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filling student config table...");
+        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Start student config...");
 
         $informatStudentRepo = new RepositoryInformatStudent;
         $informatStudentRegistrationRepo = new RepositoryInformatRegistration;
@@ -277,11 +279,15 @@ abstract class Informat
 
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "Filling student config table...");
         foreach ($informatStudentRepo->get() as $student) {
+            $currentRegistration = $informatStudentRegistrationRepo->getCurrentByInformatStudentId($student->id);
+            $currentClassgroup = $currentRegistration ? $informatStudentRegistrationClassgroupRepo->getCurrentByInformatRegistrationId($currentRegistration->id) : 0;
+
             $config = $informatStudentConfigRepo->getBySchoolyearIdAndInformatStudentId($schoolyear->id, $student->id) ?? new InformatStudentConfig;
             $config->schoolyearId = $schoolyear->id;
             $config->informatStudentId = $student->id;
-            $config->registrationId = $informatStudentRegistrationRepo->getCurrentByInformatStudentId($student->id)->id;
-            $config->classgroupId = $config->registrationId ? $informatStudentRegistrationClassgroupRepo->getCurrentByInformatRegistrationId($config->registrationId)->informatClassGroupId : null;
+            $config->registrationId = $currentRegistration->id;
+            $config->schoolId = $currentRegistration ? $currentRegistration->linked->schoolInstitute->schoolId : null;
+            $config->classgroupId = $currentRegistration ? $currentClassgroup->informatClassGroupId : null;
             $config->active = ($config->registrationId && $config->classgroupId);
 
             try {
@@ -573,7 +579,7 @@ abstract class Informat
         if (!$informatEmployee) return;
 
         $classgroupTeacher = $classgroupTeacherRepo->getByInformatClassgroupIdAndInformatEmployeeId($classgroupId, $informatEmployee->id) ?? new InformatClassgroupTeacher;
-        $classgroupTeacher->informatClassGroupId = $classgroupId;
+        $classgroupTeacher->informatClassgroupId = $classgroupId;
         $classgroupTeacher->informatEmployeeId = $informatEmployee->id;
         $classgroupTeacherRepo->set($classgroupTeacher);
     }

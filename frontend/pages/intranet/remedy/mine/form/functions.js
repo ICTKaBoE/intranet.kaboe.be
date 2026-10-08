@@ -39,11 +39,11 @@ window.typeView = () => {
   }
 
   if (details.allowWithoutDate) {
-    Select.GetInstance("courseId").hide();
+    if (!details.courseDependsOnSkore) Select.GetInstance("courseId").hide();
     Select.GetInstance("coursePerStudent").show();
     Select.GetInstance("momentId").hide();
   } else {
-    Select.GetInstance("courseId").show();
+    if (!details.courseDependsOnSkore) Select.GetInstance("courseId").show();
     Select.GetInstance("coursePerStudent").hide();
     Select.GetInstance("momentId").show();
   }
