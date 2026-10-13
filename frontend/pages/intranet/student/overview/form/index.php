@@ -1,6 +1,6 @@
 <?php
 const LIST_TEMPLATE = " <div class='datagrid-item'>
-                            <div class='datagrid-item'>#title#</div>
+                            <div class='datagrid-item'><strong>#title#</strong></div>
                             <div class='datagrid-content'>#content#</div>
                         </div>";
 

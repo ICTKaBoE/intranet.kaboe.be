@@ -148,33 +148,40 @@ abstract class Input
 
 	static public function clean($input)
 	{
-		$utf8 = array(
-			'/[áàâãªäă]/u'   =>   'a',
-			'/[ÁÀÂÃÄ]/u'    =>   'A',
-			'/[ÍÌÎÏ]/u'     =>   'I',
-			'/[íìîï]/u'     =>   'i',
-			'/[éèêë]/u'     =>   'e',
-			'/[ÉÈÊË]/u'     =>   'E',
-			'/[óòôõºö]/u'   =>   'o',
-			'/[ÓÒÔÕÖ]/u'    =>   'O',
-			'/[úùûü]/u'     =>   'u',
-			'/[ÚÙÛÜ]/u'     =>   'U',
-			'/[ç]/u'      	=>   'c',
-			'/[Ç]/u'        =>   'C',
-			'/[ñ]/u'        =>   'n',
-			'/[Ñ]/u'        =>   'N',
-			'/–/'           =>   '', // UTF-8 hyphen
-			'/-/'           =>   '', // UTF-8 hyphen
-			'/&/'           =>   '', // UTF-8 &
-			'/\//'          =>   '', // UTF-8 /
-			'/\(/'          =>   '', // UTF-8 (
-			'/\)/'          =>   '', // UTF-8 )
-			'/[’‘\'‹›‚]/'  =>   '', // Literally a single quote
-			'/[“”«»„]/'    =>   '', // Double quote
-			'/ /'           =>   '', // nonbreaking space (equiv. to 0x160)
-		);
+		$output = preg_replace([
+			'/[áàâãäå]/u',
+			'/[ÁÀÂÃÄÅ]/u',
+			'/[éèêë]/u',
+			'/[ÉÈÊË]/u',
+			'/[íìîï]/u',
+			'/[ÍÌÎÏ]/u',
+			'/[óòôõö]/u',
+			'/[ÓÒÔÕÖ]/u',
+			'/[úùûü]/u',
+			'/[ÚÙÛÜ]/u',
+			'/[ç]/u',
+			'/[Ç]/u',
+			'/[ñ]/u',
+			'/[Ñ]/u',
+		], [
+			'a',
+			'A',
+			'e',
+			'E',
+			'i',
+			'I',
+			'o',
+			'O',
+			'u',
+			'U',
+			'c',
+			'C',
+			'n',
+			'N'
+		], $input);
 
-		$output = preg_replace(array_keys($utf8), array_values($utf8), $input);
+		$output = preg_replace('/[-–&\/()\'"[:space:]]/u', '', $output);
+
 		return $output ?: $input;
 	}
 

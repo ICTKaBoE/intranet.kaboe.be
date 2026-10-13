@@ -13,7 +13,6 @@ use Database\Repository\Informat\Student;
 use Database\Repository\School\Course;
 use Database\Repository\School\CourseInformatEmployeeStudentClassgroup;
 use Database\Repository\School\CourseInformatStudent;
-use Database\Repository\School\Institute;
 use Database\Repository\School\School;
 use Database\Repository\Smartschool\Message;
 use Database\Repository\Smartschool\MessageReceiver;
@@ -261,5 +260,19 @@ abstract class Smartschool
         }
 
         return true;
+    }
+
+    public static function SyncUserData()
+    {
+        $schoolRepo = new School;
+        $sourceRepo = new Source;
+
+        $schools = Arrays::filter($schoolRepo->get(), fn($i) => !is_null(Strings::trimToNull($i->smsGroupStudents)));
+
+        foreach ($schools as $school) {
+            $sourceId = $school->linked->parentSchool->smartschoolSourceId ?: $school->smartschoolSourceId;
+            $errorCodes = SmartschoolSmartschool::GetErrorCodes($sourceId);
+            $users = (new AllAccountsExtended($sourceId))->get();
+        }
     }
 }

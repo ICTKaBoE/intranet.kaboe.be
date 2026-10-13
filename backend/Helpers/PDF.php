@@ -7,13 +7,13 @@ use TCPDF;
 
 class PDF extends TCPDF
 {
-	public function __construct($title, $location, $orientation = "P", $headerText = "")
+	public function __construct($title, $location, $orientation = "P", $format = "A4", $headerText = "")
 	{
 		$this->title = $title;
 		$this->location = $location;
 		$this->headerText = $headerText;
 
-		parent::__construct($orientation);
+		parent::__construct($orientation, format: $format);
 		$this->setCreator("Appliction");
 		$this->setTitle($this->title);
 		$this->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);

@@ -37,7 +37,7 @@ if ((int)Clock::now()->format("H") >= 22 && (int)Clock::now()->format("H") <= 4)
     $settingRepo = new Setting;
     $mode = $args['mode'];
 
-    $class = "\\Controllers\\Cron\\{$class}";
+    $class = "\\Controllers\\CRON\\{$class}";
 
     if (class_exists($class) && method_exists($class, $function)) {
         if (!$cron->active) {

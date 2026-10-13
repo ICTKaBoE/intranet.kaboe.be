@@ -16,6 +16,7 @@ use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
 use Database\Repository\School\Institute;
 use Database\Repository\School\School;
+use Database\Repository\Source;
 use Database\Repository\Sync\Sync;
 use Helpers\Filter;
 use Helpers\Form;
@@ -23,6 +24,7 @@ use Helpers\General;
 use Helpers\PDF;
 use Helpers\Table;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
 use Security\FileSystem;
@@ -43,6 +45,7 @@ class StudentController extends ApiController
         $classRepo = new ClassGroup;
         $schoolRepo = new School;
         $instituteRepo = new Institute;
+        $sourceRepo = new Source;
 
         $addressRepo = new StudentAddress;
         $relationRepo = new StudentRelation;
@@ -52,7 +55,6 @@ class StudentController extends ApiController
 
         $filters = Filter::Find(['schoolyearId', 'schoolId']);
         if (empty($filters['schoolyearId'])) $filters['schoolyearId'] = [(new Schoolyear)->getCurrent()->id];
-        // if (Helpers::url()->hasParam('schoolId')) $filters["instituteId"] = Arrays::map($instituteRepo->getBySchoolId(Helpers::url()->getParam("schoolId")), fn($i) => $i->id);
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -60,24 +62,6 @@ class StudentController extends ApiController
             $this->appendToJson('columns', $columns);
 
             $items = $configRepo->get(filters: $filters);
-
-            // $schoolyear = Helpers::url()->hasParam('schoolyearId') ? (new Schoolyear)->getById(Helpers::url()->getParam('schoolyearId')) : (new Schoolyear)->getCurrent();
-            // $items = $repo->get(filters: $filters);
-
-            // foreach ($items as $index => $i) {
-            //     $currentRegistration = $regRepo->getCurrentByInformatStudentId($i->id);
-
-            //     if (!$currentRegistration) {
-            //         unset($items[$index]);
-            //         continue;
-            //     }
-
-            //     $currentRegistrationClass = $regClassRepo->getCurrentByInformatRegistrationId($currentRegistration->id);
-            //     if (!$currentRegistrationClass) continue;
-
-            //     $i->linked->registration = $currentRegistrationClass;
-            //     $i->linked->class = $classRepo->getById($currentRegistrationClass->informatClassGroupId);
-            // }
 
             $this->appendToJson("rows", array_values($items));
         } else if (Strings::equal($view, self::VIEW_LIST) && $id) {
@@ -126,38 +110,40 @@ class StudentController extends ApiController
                 $history .= "</ul>";
             }
 
-            $items = [
-                [
-                    "title" => "Naam",
-                    "content" => $config->linked->informatStudent->name
-                ],
-                [
-                    "title" => "Voornaam",
-                    "content" => $config->linked->informatStudent->firstName
-                ],
-                [
-                    "title" => "Intern nummer",
-                    "content" => $config->linked->informatStudent->informatId
-                ],
-                [
-                    "title" => "Geboortedatum",
-                    "content" => $config->linked->informatStudent->formatted->birthDate
-                ],
-                [
-                    "title" => "Geboorteplaats",
-                    "content" => $config->linked->informatStudent->birthPlace
-                ],
-                [
-                    "address" => $addresses,
-                    "relation" => $relations,
-                    "number" => $numbers,
-                    "email" => $emails,
-                    "bank" => $banks,
-                    "history" => $history,
-                    "informatGuid" => $config->linked->informatStudent->informatGuid,
-                    "fullNameReversed" => $config->linked->informatStudent->formatted->fullNameReversed
-                ]
-            ];
+            $smartschool =
+
+                $items = [
+                    [
+                        "title" => "Naam",
+                        "content" => $config->linked->informatStudent->name
+                    ],
+                    [
+                        "title" => "Voornaam",
+                        "content" => $config->linked->informatStudent->firstName
+                    ],
+                    [
+                        "title" => "Intern nummer",
+                        "content" => $config->linked->informatStudent->informatId
+                    ],
+                    [
+                        "title" => "Geboortedatum",
+                        "content" => $config->linked->informatStudent->formatted->birthDate
+                    ],
+                    [
+                        "title" => "Geboorteplaats",
+                        "content" => $config->linked->informatStudent->birthPlace
+                    ],
+                    [
+                        "address" => $addresses,
+                        "relation" => $relations,
+                        "number" => $numbers,
+                        "email" => $emails,
+                        "bank" => $banks,
+                        "history" => $history,
+                        "informatGuid" => $config->linked->informatStudent->informatGuid,
+                        "fullNameReversed" => $config->linked->informatStudent->formatted->fullNameReversed
+                    ]
+                ];
 
             $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "#"));
         }
@@ -210,7 +196,7 @@ class StudentController extends ApiController
 
         $id = explode("_", $id);
         $_fields = [
-            "random" => ["what" => Input::INPUT_TYPE_STRING],
+            "what" => ["mandatory" => true],
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -218,13 +204,38 @@ class StudentController extends ApiController
 
         if ($this->validationIsAllGood()) {
             FileSystem::CreateFolder($folder);
-            $pdf = new PDF("prints", $folder . date("YmdHis") . ".pdf", "L");
 
-            foreach ($id as $_id) {
-                $config = $configRepo->getById($_id);
+            if (Strings::equal($fields['what'], "card")) {
+                $pdf = new PDF($fields['what'], $folder . date("YmdHis") . ".pdf", "L", [55, 87]);
+                $pdf->SetMargins(0, 0, 0);
+                $pdf->setPrintHeader(false);
+                $pdf->setPrintFooter(false);
+                $pdf->SetAutoPageBreak(TRUE, 0);
+
+                foreach ($id as $_id) {
+                    $config = $configRepo->getById($_id);
+
+                    $pdf->AddPage();
+
+                    // QR
+                    $pdf->Image("", 47, 1.5, 35, 35);
+
+                    // BirthDate
+                    $pdf->setFontSize(7);
+                    $pdf->Text(5, 34, Clock::at($config->linked->informatStudent->birthDate)->format("d/m/Y"));
+                    $pdf->Line(6, 37.5, 11, 37.5);
+
+                    // FirstName
+                    $pdf->setFontSize(17);
+                    $pdf->Text(5, 38, $config->linked->informatStudent->firstName);
+
+                    // Name
+                    $pdf->setFontSize(17);
+                    $pdf->Text(5, 44, $config->linked->informatStudent->name);
+                }
+
+                $pdf->save();
             }
-
-            $pdf->save();
         }
     }
 }
