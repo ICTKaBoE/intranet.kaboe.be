@@ -15,15 +15,13 @@
 
             <div class="row">
                 <div class="col-12 mb-3">
-                    <label for="managementRoomId" class="form-label">Lokalen</label>
-                    <select name="managementRoomId" id="managementRoomId" data-load-source="{{select:url:short}}/management/room" data-label="formatted.buildingRoom" data-search multiple></select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12 mb-3">
                     <label for="informatClassId" class="form-label">Klassen</label>
-                    <select name="informatClassId" id="informatClassId" data-load-source="{{select:url:short}}/informat/classgroup" data-search multiple></select>
+                    <select name="informatClassId" id="informatClassId" data-load-source="{{select:url:short}}/informat/classgroup" data-search data-no-default-load multiple></select>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="managementRoomId" class="form-label">Lokalen</label>
+                    <select name="managementRoomId" id="managementRoomId" data-load-source="{{select:url:short}}/management/room" data-label="formatted.buildingRoom" data-search data-no-default-load multiple></select>
                 </div>
             </div>
         </div>

@@ -9,8 +9,8 @@
             </div>
 
             <div class="col-lg-4 col-12 mb-3">
-                <label class="form-label" for="departmentId">Afdeling</label>
-                <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-optgroup="schoolId" required data-on-change="departmentView"></select>
+                <label class="form-label" for="departmentId">Afdeling(en)</label>
+                <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-optgroup="schoolId" multiple required data-on-change="departmentView"></select>
             </div>
 
             <div class="col-lg-4 col-12 mb-3">
@@ -103,22 +103,18 @@
                 </div>
 
                 <div class="col-12 col-lg-6 mb-3">
-                    <label for="dayOfWeek" class="form-label">Op</label>
-                    <select name="dayOfWeek" id="dayOfWeek">
-                        <option value="1">Maandag</option>
-                        <option value="2">Dinsdag</option>
-                        <option value="3">Woensdag</option>
-                        <option value="4">Donderdag</option>
-                        <option value="5">Vrijdag</option>
-                    </select>
-                </div>
-
-                <div class="col-12 col-lg-6 mb-3">
                     <label for="hourId" class="form-label">Lesuur</label>
                     <select name="hourId" id="hourId" data-load-source="{{select:url:short}}/school/hours" data-label="formatted.startEnd" data-default-no-load required></select>
                 </div>
             </div>
         <?php endif; ?>
+
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label for="closeRegistrationAt" class="form-label">Sluit registratie x uren voor begin</label>
+                <input type="number" name="closeRegistrationAt" id="closeRegistrationAt" class="form-control" min="0" />
+            </div>
+        </div>
     </div>
 
     <div class="card-footer d-flex py-3">

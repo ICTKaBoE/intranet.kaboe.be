@@ -15,7 +15,7 @@
 
                     <div class="col-12 mb-3">
                         <label class="form-label" for="informatSubgroupId">Klas</label>
-                        <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-parent-select="fast_schoolId" data-extra="[fast_schoolId={{user:mainSchoolId}}]" data-search data-default-no-load required></select>
+                        <select name="informatSubgroupId" id="informatSubgroupId" data-load-source="{{select:url:short}}/informat/classgroup" data-label="code" data-parent-select="fast_schoolId" data-extra="[fast_schoolId={{user:mainSchoolId}}]" data-search data-default-no-load required></select>
                     </div>
 
                     <div class="col-12 mb-3">

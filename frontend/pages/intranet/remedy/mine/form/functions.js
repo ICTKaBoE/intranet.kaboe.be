@@ -26,15 +26,15 @@ window.typeView = () => {
 
   Select.GetInstance("momentId").setExtraLoadParam("typeId", details.id);
 
+  Select.GetInstance("courseId").show();
+  Select.GetInstance("coursePerStudent").hide();
+  Select.GetInstance("momentId").setExtraLoadParam("courseId", 0);
+  Select.GetInstance("momentId").reload();
+
   if (details.courseDependsOnSkore) {
     Select.GetInstance("courseId").hide();
     Select.GetInstance("coursePerStudent").show();
     Select.GetInstance("momentId").removeExtraLoadParam("courseId");
-    Select.GetInstance("momentId").reload();
-  } else {
-    Select.GetInstance("courseId").show();
-    Select.GetInstance("coursePerStudent").hide();
-    Select.GetInstance("momentId").setExtraLoadParam("courseId", 0);
     Select.GetInstance("momentId").reload();
   }
 
@@ -42,10 +42,6 @@ window.typeView = () => {
     Select.GetInstance("courseId").hide();
     Select.GetInstance("coursePerStudent").show();
     Select.GetInstance("momentId").hide();
-  } else {
-    Select.GetInstance("courseId").show();
-    Select.GetInstance("coursePerStudent").hide();
-    Select.GetInstance("momentId").show();
   }
 
   if (details.onComputer)

@@ -10,12 +10,12 @@
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="departmentId">Afdeling</label>
-                    <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-parent-select="schoolId" data-disable-if-no-options data-default-no-load></select>
+                    <select name="departmentId" id="departmentId" data-load-source="{{select:url:short}}/school/department" data-parent-select="schoolId" multiple data-disable-if-no-options data-default-no-load></select>
                 </div>
 
                 <div class="col-12 col-lg-4 mb-3">
                     <label class="form-label" for="typeId">Type</label>
-                    <select name="typeId" id="typeId" data-load-source="{{select:url:short}}/{{url:part.module}}/type" data-parent-select="departmentId" data-disable-if-no-options data-default-no-load multiple></select>
+                    <select name="typeId" id="typeId" data-load-source="{{select:url:short}}/{{url:part.module}}/typeAdvanced" data-parent-select="departmentId" data-disable-if-no-options data-default-no-load multiple></select>
                 </div>
             </div>
 

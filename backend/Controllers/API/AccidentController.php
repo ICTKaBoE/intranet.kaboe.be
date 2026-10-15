@@ -238,6 +238,31 @@ class AccidentController extends ApiController
         $this->getDetailsAttachments($view, $id);
     }
 
+    protected function getMineAttachments($view, $id = null)
+    {
+        $repo = new Accident;
+        $item = $repo->getById($id);
+
+        $files = FileSystem::getFiles(LOCATION_FILES . "/accident/{$item->guid}/*") ?: [];
+        $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- B.pdf")))[0];
+        $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- C.pdf")))[0];
+
+        if (Strings::equal($view, self::VIEW_LIST)) {
+            $items = [
+                [
+                    "title" => "Geneeskundig getuigschrift",
+                    "content" => $b ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($b), "Geneeskundig getuigschrift.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
+                ],
+                [
+                    "title" => "Informatieblad",
+                    "content" => $c ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($c), "Informatieblad.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
+                ],
+            ];
+
+            $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "#"));
+        }
+    }
+
     // Post functions
     protected function postMine($view, $id = null)
     {
@@ -601,7 +626,7 @@ class AccidentController extends ApiController
         }
 
         $message = new SmartschoolMessage;
-        $message->sourceId = $accident->linked->school->smartschoolSourceId ?? $accident->linked->school->linked->parentSchool->smartschoolSourceId;
+        $message->sourceId = Strings::trimToNull($accident->linked->school->smartschoolSourceId) ?? Strings::trimToNull($accident->linked->school->linked->parentSchool->smartschoolSourceId);
         $message->subject = Strings::trimToNull($subject);
         $message->body = Strings::trimToNull($body);
 

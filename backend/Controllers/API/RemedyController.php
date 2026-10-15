@@ -16,7 +16,6 @@ use Database\Repository\Remedy\ComputerType;
 use Database\Repository\Remedy\Moment;
 use Database\Repository\Remedy\Remedy;
 use Database\Repository\Remedy\Type;
-use Database\Repository\School\CourseInformatEmployeeClassgroup;
 use Database\Repository\School\CourseInformatEmployeeStudentClassgroup;
 use Database\Repository\School\Department;
 use Database\Repository\Smartschool\Message;
@@ -55,6 +54,7 @@ class RemedyController extends ApiController
             $items = $repo->get(filters: $filters);
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
+            if (is_array($filters['departmentId'])) $filters['departmentId'] = [join(";", $filters['departmentId'])];
             $items = $repo->get(filters: $filters);
 
             if (Helpers::url()->hasParam("show") && Strings::equal(Helpers::url()->getParam("show"), "limit")) {
@@ -65,6 +65,27 @@ class RemedyController extends ApiController
 
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
         } else if (Strings::equal($view, self::VIEW_FORM)) $this->appendToJson('fields', $repo->getById($id));
+    }
+
+    protected function getTypeAdvanced($view, $id = null)
+    {
+        $repo = new Type;
+        $filters = Filter::Find(['schoolId']);
+
+        if (Strings::equal($view, self::VIEW_SELECT)) {
+            $items = $repo->get(filters: $filters);
+            $filters = Filter::Find(['schoolId', 'departmentId']);
+
+            $items = Arrays::filter($items, fn($i) => Strings::equal($i->departmentId, $filters['departmentId'][0]) || Strings::contains($i->departmentId, ";{$filters['departmentId'][0]}") || Strings::contains($i->departmentId, "{$filters['departmentId'][0]};"));
+
+            if (Helpers::url()->hasParam("show") && Strings::equal(Helpers::url()->getParam("show"), "limit")) {
+                $items = Arrays::filter($items, fn($i) => is_null($i->from) || Clock::now()->isAfterOrEqualTo(Clock::at($i->from)));
+                $items = Arrays::filter($items, fn($i) => is_null($i->until) || Clock::now()->isBeforeOrEqualTo(Clock::at($i->until)));
+            }
+
+            $items = array_values($items);
+            $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
+        }
     }
 
     protected function getComputerType($view, $id = null)
@@ -99,7 +120,7 @@ class RemedyController extends ApiController
             $items = Arrays::filter($items, fn($i) => $i->schoolyearId == $schoolyear->id);
             $items = Arrays::filter($items, fn($i) => !$i->isPast);
             $items = Arrays::filter($items, fn($i) => !$i->full);
-            $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::now()->isBeforeOrEqualTo(Clock::at($i->date . " " . $i->linked->hour->start)->minusHours($i->linked->type->closeRegistrationAt)));
+            $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::now()->isBeforeOrEqualTo(Clock::at($i->date . " " . $i->linked->hour->start)->minusHours($i->closeRegistrationAt)));
 
             $items = array_values($items);
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i->toArray(true)));
@@ -478,7 +499,7 @@ class RemedyController extends ApiController
         if ($id == "add") $id = null;
 
         $_fields = [
-            "departmentId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "departmentId" => ["mandatory" => true],
             "name" => ["mandatory" => true],
             "courseDependsOnSkore"
         ];
@@ -509,7 +530,7 @@ class RemedyController extends ApiController
         $_fields = [
             "schoolId" => ["type" => Input::INPUT_TYPE_INT],
             "schoolyearId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
-            "departmentId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
+            "departmentId" => ["mandatory" => true],
             "typeId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
             "courseId" => ['type' => Input::INPUT_TYPE_INT],
             "buildingId" => ["mandatory" => true, 'type' => Input::INPUT_TYPE_INT],
@@ -632,7 +653,7 @@ class RemedyController extends ApiController
             $user = User::getLoggedInUser();
             [$schoolCourseId, $informatEmployeeId, $informatStudentId, $informatClassgroupId] = explode("-", $fields['coursePerStudent']);
 
-            $smartschoolSourceId = $department->linked->school->smartschoolSourceId ?? $department->linked->school->linked->parentSchool->smartschoolSourceId;
+            $smartschoolSourceId = Strings::trimToNull($department->linked->school->smartschoolSourceId) ?? Strings::trimToNull($department->linked->school->linked->parentSchool->smartschoolSourceId);
 
             $title = "";
             $body = "";
@@ -668,8 +689,8 @@ class RemedyController extends ApiController
 
                 if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForThisTypeOnSameDay) {
                     $multiple = $repo->getMultipleByInformatStudentIdTypeIdAndMomentId($item->informatStudentId, $item->typeId, $item->momentId);
-                    
-                    if ($multiple) {
+
+                    if (count($multiple) > $type->allowMultipleRegistrationsForThisTypeOnSameDayAmount) {
                         $item->reinit();
                         $this->setToast("{$item->linked->informatStudent->formatted->fullNameReversed} heeft al een {$item->linked->type->name} voor deze datum.", self::VALIDATION_STATE_INVALID);
                         continue;
@@ -679,7 +700,7 @@ class RemedyController extends ApiController
                 if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForSameCourseOnSameDay) {
                     $multiple = $repo->getMultipleByInformatStudentIdTypeIdMomentIdAndCourseId($item->informatStudentId, $item->typeId, $item->momentId, $item->courseId);
 
-                    if ($multiple) {
+                    if (count($multiple) > $type->allowMultipleRegistrationsForSameCourseOnSameDayAmount) {
                         $item->reinit();
                         $this->setToast("{$item->linked->informatStudent->formatted->fullNameReversed} heeft al een {$item->linked->type->name} voor {$item->linked->course->name} op deze datum.", self::VALIDATION_STATE_INVALID);
                         continue;
@@ -782,7 +803,7 @@ class RemedyController extends ApiController
                 if ($this->validationIsAllGood()) {
                     $repo->set($item);
 
-                    $smartschoolSourceId = $item->linked->department->linked->school->smartschoolSourceId ?? $item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId;
+                    $smartschoolSourceId = Strings::trimToNull($item->linked->department->linked->school->smartschoolSourceId) ?? Strings::trimToNull($item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId);
 
                     $subject = "";
                     $body = "";
@@ -875,7 +896,7 @@ class RemedyController extends ApiController
             $repo->set($item);
 
             if (!$present) {
-                $smartschoolSourceId = $item->linked->department->linked->school->smartschoolSourceId ?? $item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId;
+                $smartschoolSourceId = Strings::trimToNull($item->linked->department->linked->school->smartschoolSourceId) ?? Strings::trimToNull($item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId);
 
                 $subject = "Afwezig bij {$item->linked->type->name} voor {$item->linked->course->name}";
                 $body = "
@@ -1012,7 +1033,7 @@ class RemedyController extends ApiController
                 Je mag dit item dus schrappen uit je agenda.
             ";
 
-            $smartschoolSourceId = $item->linked->department->linked->school->smartschoolSourceId ?? $item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId;
+            $smartschoolSourceId = Strings::trimToNull($item->linked->department->linked->school->smartschoolSourceId) ?? Strings::trimToNull($item->linked->department->linked->school->linked->parentSchool->smartschoolSourceId);
 
             $message = new SmartschoolMessage;
             $message->sourceId = $smartschoolSourceId;
@@ -1050,6 +1071,16 @@ class RemedyController extends ApiController
         [$invalid, $fields] = Form::Validate($_fields);
         Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
+        if (is_array($fields['departmentId']) && !Strings::contains($fields['departmentId'], ";")) {
+            $s = [];
+            foreach ($fields['departmentId'] as $sch)
+                $s[] = $sch->getValue();
+
+            $fields['departmentId'] = $s;
+        } else if (Strings::contains($fields['departmentId'], ";")) {
+            $fields['departmentId'] = explode(";", $fields['departmentId']);
+        } else $fields['departmentId'] = [$fields['departmentId']];
+
         if (is_array($fields['typeId']) && !Strings::contains($fields['typeId'], ";")) {
             $s = [];
             foreach ($fields['typeId'] as $sch)
@@ -1065,6 +1096,7 @@ class RemedyController extends ApiController
             if ($fields['end']) $fields['end'] .= " 23:59:59";
 
             $this->export($fields['schoolId'], $fields['departmentId'], $fields['typeId'], $fields['start'], $fields['end']);
+            $this->setEnableForm();
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
@@ -1111,6 +1143,12 @@ class RemedyController extends ApiController
                 $table["header"][] = "Vak";
                 $table["header"][] = "Leerkracht";
             }
+
+            if ($type->onComputer) {
+                $table["header"][] = "Opdracht te vinden op (indien op computer)";
+                $table["header"][] = "Wachtwoord";
+            }
+
             $table["header"][] = "Opmerking";
 
             foreach ($items[$typeId] as $i => $item) {
@@ -1131,6 +1169,11 @@ class RemedyController extends ApiController
                     $table["data"][$i][] = $item->linked->informatEmployee->formatted->fullNameReversed;
                 }
 
+                if ($type->onComputer) {
+                    $table["data"][$i][] = Strings::equal($item->computerType, "O") ? $item->computerTypeOther : $item->linked->computerType->name;
+                    $table["data"][$i][] = $item->computerPassword;
+                }
+
                 $table["data"][$i][] = $item->remark;
             }
 
@@ -1141,7 +1184,7 @@ class RemedyController extends ApiController
         if ($this->validationIsAllGood()) $this->appendToJson("download", FileSystem::GetDownloadLink("{$folder}/{$filename}"));
     }
 
-    protected function getAllGrouped($schoolId, $departmentId, $typeIds, $start, $end)
+    protected function getAllGrouped($schoolId, $departmentIds, $typeIds, $start, $end)
     {
         $return = [];
         $repo = new Remedy;
@@ -1149,7 +1192,7 @@ class RemedyController extends ApiController
 
         $items = $repo->get();
         $items = Arrays::filter($items, fn($i) => Strings::equal($i->schoolId, $schoolId));
-        $items = Arrays::filter($items, fn($i) => Strings::equal($i->departmentId, $departmentId));
+        $items = Arrays::filter($items, fn($i) => Arrays::contains($departmentIds, $i->departmentId));
         Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->schoolId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
 
         if ($start) $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate ?: $i->linked->moment->date)->isAfterOrEqualTo(Clock::at($start)));

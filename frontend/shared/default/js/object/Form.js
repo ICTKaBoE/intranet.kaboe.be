@@ -179,6 +179,12 @@ export default class Form extends MasterObject {
     $(this.element)
       .find(":input")
       .each((idx, el) => {
+        console.log(
+          el.id,
+          this.defaultStates[el.id]?.disabled,
+          el.tagName,
+          el.role,
+        );
         if (!el.id) return;
         if (this.defaultStates[el.id]?.disabled === true) return;
 
