@@ -3,9 +3,10 @@
 namespace Database\Object\Remedy;
 
 use Helpers\Date;
-use stdClass;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Security\CustomObject;
+use stdClass;
 
 class Moment extends CustomObject
 {
@@ -14,7 +15,7 @@ class Moment extends CustomObject
         "guid" => self::TYPE_GUID,
         "schoolyearId" => self::TYPE_INTEGER,
         "schoolId" => self::TYPE_INTEGER,
-        "departmentId" => self::TYPE_INTEGER,
+        "departmentId" => self::TYPE_STRING,
         "buildingId" => self::TYPE_INTEGER,
         "roomId" => self::TYPE_INTEGER,
         "typeId" => self::TYPE_INTEGER,
@@ -24,6 +25,7 @@ class Moment extends CustomObject
         "dayOfWeek" => self::TYPE_INTEGER,
         "date" => self::TYPE_DATE,
         "hourId" => self::TYPE_INTEGER,
+        "closeRegistrationAt" => self::TYPE_INTEGER,
         "courseId" => self::TYPE_INTEGER,
         "informatEmployeeId" => self::TYPE_INTEGER,
         "userId" => self::TYPE_INTEGER,
@@ -56,5 +58,6 @@ class Moment extends CustomObject
         $this->formatted->shortDescriptionWithType = "{$this->linked->type->name}: {$this->formatted->shortDescription}";
 
         $this->formatted->seats = $this->seats == 0 ? "Onbeperkt" : (($this->linked->type->manualAssignDate) ? $this->seats : $this->seats . ($this->full ? " (vol)" : ""));
+        $this->formatted->department = $this->linked->department ? (is_array($this->linked->department) ? implode(", ", Arrays::map($this->linked->department, fn($c) => $c->name)) : $this->linked->department->name) : null;
     }
 }

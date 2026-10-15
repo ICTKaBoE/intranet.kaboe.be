@@ -2,6 +2,7 @@
 
 namespace Database\Object\Remedy;
 
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Security\CustomObject;
 use stdClass;
@@ -12,7 +13,7 @@ class Type extends CustomObject
         "id" => self::TYPE_INTEGER,
         "guid" => self::TYPE_GUID,
         "schoolId" => self::TYPE_INTEGER,
-        "departmentId" => self::TYPE_INTEGER,
+        "departmentId" => self::TYPE_STRING,
         "name" => self::TYPE_STRING,
         "color" => self::TYPE_STRING,
         "from" => self::TYPE_DATE,
@@ -22,7 +23,9 @@ class Type extends CustomObject
         "onComputer" => self::TYPE_BOOLEAN,
         "closeRegistrationAt" => self::TYPE_INTEGER,
         "allowMultipleRegistrationsForThisTypeOnSameDay" => self::TYPE_BOOLEAN,
+        "allowMultipleRegistrationsForThisTypeOnSameDayAmount" => self::TYPE_INTEGER,
         "allowMultipleRegistrationsForSameCourseOnSameDay" => self::TYPE_BOOLEAN,
+        "allowMultipleRegistrationsForSameCourseOnSameDayAmount" => self::TYPE_INTEGER,
         "allowWithoutDate" => self::TYPE_BOOLEAN,
         "deleted" => self::TYPE_BOOLEAN
     ];
@@ -49,5 +52,7 @@ class Type extends CustomObject
             $this->formatted->until->display = Clock::at($this->until)->format("d/m/Y");
             $this->formatted->until->sort = Clock::at($this->until)->format("U");
         }
+
+        $this->formatted->department = $this->linked->department ? (is_array($this->linked->department) ? implode(", ", Arrays::map($this->linked->department, fn($c) => $c->name)) : $this->linked->department->name) : null;
     }
 }

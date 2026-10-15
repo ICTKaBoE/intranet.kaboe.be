@@ -9,7 +9,3 @@ window.schoolIdView = (info) => {
   Select.GetInstance("informatClassId").reload();
   Select.GetInstance("managementRoomId").reload();
 };
-
-$(document).ready(() => {
-  window.schoolIdView();
-});

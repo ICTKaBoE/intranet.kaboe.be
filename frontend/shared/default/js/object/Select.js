@@ -362,7 +362,8 @@ export default class Select extends MasterObject {
         this.data.items = [];
         this.setExtraLoadParam(
           this.parent,
-          value ?? this.defaultExtraData[this.parent],
+          (Array.isArray(value) ? value.join(";") : value) ??
+            this.defaultExtraData[this.parent],
         );
         this.reload();
       });
