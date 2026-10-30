@@ -31,10 +31,13 @@ abstract class Mail
             $attachments = $attRepo->getByMailId($mail->id);
             $m = new SecurityMail;
 
-            if ($mail->fromEmail) $m->setSender($mail->fromEmail, $mail->fromName);
             $m->setSubject($mail->subject);
             $m->setBody($mail->body);
             $m->setReplyTo($mail->replyTo['email'], $mail->replyTo['name']);
+            if ($mail->fromEmail) {
+                $m->setSender($mail->fromEmail, $mail->fromName);
+                $m->setReplyTo($mail->fromEmail, $mail->fromName);
+            }
 
             foreach ($receivers as $r) $m->setReceiver($r->email, $r->name);
             foreach ($attachments as $a) $m->setAttachment($a->path, $a->name);

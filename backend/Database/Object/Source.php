@@ -8,6 +8,7 @@ class Source extends CustomObject
 {
     protected $objectAttributes = [
         "id" => self::TYPE_STRING,
+        "url" => self::TYPE_STRING,
         "host" => self::TYPE_STRING,
         "tokenType" => self::TYPE_STRING,
         "tokenUntil" => self::TYPE_DATETIME,

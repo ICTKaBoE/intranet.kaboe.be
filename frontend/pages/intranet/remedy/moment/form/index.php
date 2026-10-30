@@ -34,7 +34,7 @@
 
             <div class="col-lg-4 col-12 mb-3">
                 <label for="roomId" class="form-label">Lokaal</label>
-                <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room" data-label="formatted.name" data-parent-select="buildingId" data-default-no-load required></select>
+                <select name="roomId" id="roomId" data-load-source="{{select:url:short}}/management/room" data-label="formatted.nameWithAlias" data-parent-select="buildingId" data-default-no-load required></select>
             </div>
 
             <div class="col-12 col-lg-4 mb-3">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}">
+<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}" data-bs-layout="fluid" data-bs-theme="{{layout:theme}}">
 
 <head>
     {{load:head}}
@@ -7,18 +7,18 @@
     {{content:page:css}}
 </head>
 
-<body data-bs-theme="{{layout:theme}}">
+<body>
     <div class="page">
         {{component:navigation?mode=extranet}}
 
         <div class="page-wrapper">
             {{component:pagetitle?mode=extranet}}
 
-            <div class="page-body">
+            <main class="page-body">
                 <div class="container-fluid">
                     {{content:page}}
                 </div>
-            </div>
+            </main>
             {{component:footer}}
 
         </div>

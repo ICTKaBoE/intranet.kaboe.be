@@ -7,8 +7,6 @@ use SoapClient;
 
 abstract class Connection
 {
-    const SOURCE_ID = "smartschool";
-
     static public function init($sourceId, $timeout = 300)
     {
         ini_set('default_socket_timeout', $timeout);

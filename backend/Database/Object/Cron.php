@@ -13,6 +13,7 @@ class Cron extends CustomObject
         "class" => self::TYPE_STRING,
         "function" => self::TYPE_STRING,
         "active" => self::TYPE_BOOLEAN,
-        "lastRun" => self::TYPE_DATETIME
+        "lastRun" => self::TYPE_DATETIME,
+        "enabled" => self::TYPE_BOOLEAN
     ];
 }

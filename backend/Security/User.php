@@ -60,7 +60,7 @@ abstract class User
         return Arrays::contains($navigationIds, $navigationId);
     }
 
-    static public function generatePassword()
+    static public function generatePassword($minLength = 8, $addSpecialCharacters = false, $amountSpecialCharacters = 4)
     {
         $settingRepo = new Setting;
         $dictionary = $settingRepo->get("dictionary")[0]->value;
@@ -69,6 +69,15 @@ abstract class User
         $password = trim(Arrays::randElement($words));
         $password .= str_pad(rand(0, pow(10, 2) - 1), 2, '0', STR_PAD_LEFT);
         $password = str_replace(" ", "", $password);
+
+        if (strlen($password) < $minLength) {
+            $password = str_pad($password, ($minLength - strlen($password)), "0");
+        }
+
+        if ($addSpecialCharacters) {
+            $specialCharacters = "$*@#%";
+            for ($i = 0; $i < $amountSpecialCharacters; $i++) $password .= $specialCharacters[rand(0, strlen($specialCharacters))];
+        }
 
         return $password;
     }

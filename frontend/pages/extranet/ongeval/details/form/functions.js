@@ -18,36 +18,44 @@ let btnDeny = new Button(document.getElementById("btnClose"), {
   },
 });
 
-setTimeout(() => {
-  setTimeout(() => {
-    Select.GetInstance("informatStudentRelationId").setExtraLoadParam(
-      "informatStudentId",
-      document.getElementById("informatStudentId").value,
-    );
-    Select.GetInstance("informatStudentRelationId").reload();
+$(document).ready(() => {
+  if (add == "") {
+    Component.addActionButton(btnCancel, btnSave);
 
-    Select.GetInstance("informatStudentEmailId").setExtraLoadParam(
-      "informatStudentId",
-      document.getElementById("informatStudentId").value,
-    );
-    Select.GetInstance("informatStudentEmailId").reload();
+    Helpers.CheckAllLoaded(async () => {
+      await Helpers.sleep(750);
+      let informatStudentId =
+        document.getElementById("informatStudentId").value;
+      Select.GetInstance("informatStudentRelationId").setExtraLoadParam(
+        "informatStudentId",
+        informatStudentId,
+      );
 
-    Select.GetInstance("informatStudentNumberId").setExtraLoadParam(
-      "informatStudentId",
-      document.getElementById("informatStudentId").value,
-    );
-    Select.GetInstance("informatStudentNumberId").reload();
+      Select.GetInstance("informatStudentEmailId").setExtraLoadParam(
+        "informatStudentId",
+        informatStudentId,
+      );
 
-    Select.GetInstance("informatStudentBankId").setExtraLoadParam(
-      "informatStudentId",
-      document.getElementById("informatStudentId").value,
-    );
-    Select.GetInstance("informatStudentBankId").reload();
+      Select.GetInstance("informatStudentNumberId").setExtraLoadParam(
+        "informatStudentId",
+        informatStudentId,
+      );
 
-    Select.GetInstance("informatStudentAddressId").setExtraLoadParam(
-      "informatStudentId",
-      document.getElementById("informatStudentId").value,
-    );
-    Select.GetInstance("informatStudentAddressId").reload();
-  }, 750);
-}, 750);
+      Select.GetInstance("informatStudentBankId").setExtraLoadParam(
+        "informatStudentId",
+        informatStudentId,
+      );
+
+      Select.GetInstance("informatStudentAddressId").setExtraLoadParam(
+        "informatStudentId",
+        informatStudentId,
+      );
+
+      Select.GetInstance("informatStudentRelationId").reload();
+      Select.GetInstance("informatStudentEmailId").reload();
+      Select.GetInstance("informatStudentNumberId").reload();
+      Select.GetInstance("informatStudentBankId").reload();
+      Select.GetInstance("informatStudentAddressId").reload();
+    }, [Form, Select]);
+  }
+});

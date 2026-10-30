@@ -7,10 +7,14 @@ use Security\FileSystem;
 
 abstract class Log
 {
+    static public function Create($location)
+    {
+        FileSystem::CreateFolder(LOCATION_LOGS . "/{$location}");
+    }
+
     static public function Open($location, $timestamp)
     {
-        $now = Clock::nowAsString("Y-m-d H:i:s");
-        FileSystem::CreateFolder(LOCATION_LOGS . "/{$location}");
+        self::Create($location);
         self::Write($location, $timestamp, "INFO", "BEGIN OF LOG...");
     }
 
@@ -32,10 +36,10 @@ abstract class Log
         }
     }
 
-    static public function Write($location, $timestamp, $type, $text)
+    static public function Write($location, $timestamp, $type, $text, $id = null)
     {
         $now = Clock::nowAsString("Y-m-d H:i:s");
-        FileSystem::WriteFile(LOCATION_LOGS . "/{$location}/{$timestamp}.log", "{$now}\t[{$type}]\t{$text}\n", true);
+        FileSystem::WriteFile(LOCATION_LOGS . "/{$location}/{$timestamp}.log", "{$now}\t" . ($id ? "[{$id}]\t" : "") . "[{$type}]\t{$text}\n", true);
     }
 
     static public function EmptyLine($location, $timestamp)

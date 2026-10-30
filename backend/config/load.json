@@ -31,8 +31,10 @@
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.css",
-        "rel": "stylesheet"
+        "href": "https://cdn.datatables.net/v/bs5/dt-3.1.4/cr-3.1.2/fc-6.1.1/fh-5.1.2/r-4.1.1/rr-2.1.1/sc-3.1.1/sb-2.1.1/sl-4.1.1/datatables.min.css",
+        "rel": "stylesheet",
+        "integrity": "sha384-FP1PbY7eNhxkvXMQaTqH10z6iY32LFwpnSg3h1K9VSK6Gqj5zvWHBDNJYfcNJ2la",
+        "crossorigin": "anonymous"
       }
     },
     {
@@ -59,28 +61,28 @@
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css",
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/css/tabler.min.css",
         "rel": "stylesheet"
       }
     },
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-socials.min.css",
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/css/tabler-socials.min.css",
         "rel": "stylesheet"
       }
     },
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-vendors.min.css",
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/css/tabler-vendors.min.css",
         "rel": "stylesheet"
       }
     },
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-themes.min.css",
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/css/tabler-themes.min.css",
         "rel": "stylesheet"
       }
     },
@@ -101,9 +103,7 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "https://code.jquery.com/jquery-3.6.0.min.js",
-        "integrity": "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=",
-        "crossorigin": "anonymous"
+        "src": "https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
       }
     }
   ],
@@ -111,7 +111,9 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "https://cdn.datatables.net/v/bs5/dt-2.1.6/cr-2.0.4/fc-5.0.1/fh-4.0.1/r-3.0.3/sc-2.4.3/sr-1.4.1/sl-2.0.5/datatables.min.js"
+        "src": "https://cdn.datatables.net/v/bs5/dt-3.1.4/cr-3.1.2/fc-6.1.1/fh-5.1.2/r-4.1.1/rr-2.1.1/sc-3.1.1/sb-2.1.1/sl-4.1.1/datatables.min.js",
+        "integrity": "sha384-0K9ztF4f36O/PV4hZZBvCDb2s6OL08HZWHAEny94z87Cr4lTZNeqK5tbqADqrmhx",
+        "crossorigin": "anonymous"
       }
     },
     {
@@ -173,7 +175,7 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"
+        "src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/js/tabler.min.js"
       }
     },
     {

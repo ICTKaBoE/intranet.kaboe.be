@@ -28,6 +28,7 @@ use Helpers\Filter;
 use Helpers\Form;
 use Helpers\General;
 use Helpers\Table;
+use M365\Repository\User as RepositoryUser;
 use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
@@ -116,10 +117,12 @@ class RemedyController extends ApiController
             Arrays::each($items, fn($i) => $i->formatted->seats = $i->seats == 0 ? $i->formatted->seats : ($i->linked->type->manualAssignDate ? $i->formatted->seats : count($remedyRepo->getByMomentId($i->id)) . "/{$i->formatted->seats}"));
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_SELECT)) {
+            $filters["schoolyearId"] = [$schoolyear->id];
+            $filters["full"] = [0];
             $items = $repo->get(filters: $filters);
-            $items = Arrays::filter($items, fn($i) => $i->schoolyearId == $schoolyear->id);
+            // $items = Arrays::filter($items, fn($i) => $i->schoolyearId == $schoolyear->id);
             $items = Arrays::filter($items, fn($i) => !$i->isPast);
-            $items = Arrays::filter($items, fn($i) => !$i->full);
+            // $items = Arrays::filter($items, fn($i) => !$i->full);
             $items = Arrays::filter($items, fn($i) => $i->linked->type->manualAssignDate || Clock::now()->isBeforeOrEqualTo(Clock::at($i->date . " " . $i->linked->hour->start)->minusHours($i->closeRegistrationAt)));
 
             $items = array_values($items);
@@ -371,7 +374,7 @@ class RemedyController extends ApiController
             $items = Arrays::uniqueBy($items, fn($i) => $i->assignedDate ?: $i->linked->moment->date);
 
             $items = array_values($items);
-            Arrays::each($items, fn($i) => $i->formatted->seats = count($i->linked->type->manualAssignDate ? $remedyRepo->getByMomentIdAndAssignedDate($i->momentId, $i->assignedDate) : $remedyRepo->getByMomentId($i->momentId)) . "/{$i->linked->moment->formatted->seats}");
+            // Arrays::each($items, fn($i) => $i->formatted->seats = count($i->linked->type->manualAssignDate ? $remedyRepo->getByMomentIdAndAssignedDate($i->momentId, $i->assignedDate) : $remedyRepo->getByMomentId($i->momentId)) . "/{$i->linked->moment->formatted->seats}");
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_LIST)) {
             $item = $remedyRepo->getById($id);
@@ -396,7 +399,7 @@ class RemedyController extends ApiController
                 ],
                 [
                     "title" => "Vak",
-                    "content" => $item->linked->course->name,
+                    "content" => $item->linked->type->courseDependsOnSkore ? "Zie lijst" : $item->linked->course->name,
                 ],
                 [
                     "title" => "Lokaal",
@@ -488,7 +491,7 @@ class RemedyController extends ApiController
 
             $courseTeacherRepo = new CourseInformatEmployeeStudentClassgroup;
             $items = $item->linked->type->manualAssignDate ? $repo->getByMomentIdAndAssignedDate($item->momentId, $item->assignedDate) : $repo->getByMomentId($item->momentId);
-            Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->schoolId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
+            Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->courseId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
             $this->appendToJson("rows", $items);
         }
     }
@@ -551,14 +554,14 @@ class RemedyController extends ApiController
         Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
 
         if ($this->validationIsAllGood()) {
-            $manualAssignDate = (new Type)->getById($fields['typeId'])->manualAssignDate;
+            $type = (new Type)->getById($fields['typeId']);
             $repo = new Moment;
             $userRepo = new UserUser;
             $informatEmployeeRepo = new Employee;
 
             if ($this->validationIsAllGood()) {
                 $informatEmployee = $informatEmployeeRepo->getById($fields['informatEmployeeId']);
-                $user = $userRepo->getByInformatEmployeeId($informatEmployee->informatId) ?? $userRepo->getByInformatEmployeeId("P{$informatEmployee->informatId}");
+                $user = $userRepo->getByInformatEmployeeId($informatEmployee->informatId);
 
                 if (is_null($fields['repeat']) || Strings::equal($fields['repeat'], "N")) {
                     $item = $repo->getById($id) ?? new RemedyMoment;
@@ -566,9 +569,14 @@ class RemedyController extends ApiController
                     $item->userId = $user->id;
                     if (!$fields['date']) $item->date = $fields['startDate'];
 
-                    if ($manualAssignDate) {
+                    if ($type->manualAssignDate) {
                         $item->dayOfWeek = $id ? $fields['dayOfWeek'] : Date::stringToDayOfWeek($fields['repeatAt'], "en");
                         $item->date = null;
+                    }
+
+                    if ($type->courseDependsOnSkore) {
+                        $item->informatEmployeeId = 0;
+                        $item->userId = 0;
                     }
 
                     $repo->set($item);
@@ -591,7 +599,7 @@ class RemedyController extends ApiController
                             $item->date = $date->format("Y-m-d");
                             $item->userId = $user->id;
 
-                            if ($manualAssignDate) {
+                            if ($type->manualAssignDate) {
                                 $item->dayOfWeek = $id ? $fields['dayOfWeek'] : Date::stringToDayOfWeek($fields['repeatAt'], "en");
                                 $item->date = null;
                             }
@@ -735,7 +743,7 @@ class RemedyController extends ApiController
                     for ($i = 0; $i <= 2; $i++) {
                         $receiver = new SmartschoolMessageReceiver;
                         $receiver->messageId = $messageId;
-                        $receiver->username = DEV_MODE ? DEV_CONTACT : $syncRepo->getByEmployeeId($item->informatStudentId)->setEmail;
+                        $receiver->username = DEV_MODE ? DEV_CONTACT : ($syncRepo->getByEmployeeId($item->linked->informatStudent->informatId)?->setEmail ?: (new RepositoryUser)->getByEmployeeId($item->linked->informatStudent->informatId, ['userPrincipalName'])?->getUserPrincipalName());
                         $receiver->account = $i;
 
                         $smsMessageReceiverRepo->set($receiver);
@@ -859,7 +867,7 @@ class RemedyController extends ApiController
                     for ($i = 0; $i <= 2; $i++) {
                         $receiver = new SmartschoolMessageReceiver;
                         $receiver->messageId = $messageId;
-                        $receiver->username = DEV_MODE ? DEV_CONTACT : $syncRepo->getByEmployeeId($item->informatStudentId)->setEmail;
+                        $receiver->username = DEV_MODE ? DEV_CONTACT : ($syncRepo->getByEmployeeId($item->informatStudentId)?->setEmail ?: (new RepositoryUser)->getByEmployeeId($item->linked->informatStudent->informatId, ['userPrincipalName'])?->getUserPrincipalName());
                         $receiver->account = $i;
 
                         $smsMessageReceiverRepo->set($receiver);
@@ -1045,7 +1053,7 @@ class RemedyController extends ApiController
             for ($i = 0; $i <= 2; $i++) {
                 $receiver = new SmartschoolMessageReceiver;
                 $receiver->messageId = $messageId;
-                $receiver->username = DEV_MODE ? DEV_CONTACT : $syncRepo->getByEmployeeId($item->informatStudentId)->setEmail;
+                $receiver->username = DEV_MODE ? DEV_CONTACT : ($syncRepo->getByEmployeeId($item->linked->informatStudent->informatId)?->setEmail ?: (new RepositoryUser)->getByEmployeeId($item->linked->informatStudent->informatId, ['userPrincipalName'])?->getUserPrincipalName());
                 $receiver->account = $i;
 
                 $smsMessageReceiverRepo->set($receiver);
@@ -1105,7 +1113,7 @@ class RemedyController extends ApiController
     {
         $typeRepo = new Type();
         $folder = FileSystem::CreateFolder(LOCATION_FILES . "/remedy/" . date("YmdHis"));
-        $filename = "Remediëring.xlsx";
+        $filename = "Remediering.xlsx";
 
         $items = $this->getAllGrouped($schoolId, $departmentId, $typeIds, $start, $end);
 
@@ -1129,7 +1137,7 @@ class RemedyController extends ApiController
             $table = [];
             $table["header"] = [];
 
-            $table["header"][] = "Datum";
+            $table["header"][] = ($type->manualAssignDate ? "Ingeplande " : "") . "Datum";
             $table["header"][] = "Lesuur";
             $table["header"][] = "Lokaal";
             if (!$type->courseDependsOnSkore && !$type->allowWithoutDate) $table["header"][] = "Vak";
@@ -1154,7 +1162,7 @@ class RemedyController extends ApiController
             foreach ($items[$typeId] as $i => $item) {
                 $table["data"][$i] = [];
 
-                $table["data"][$i][] = Clock::at($type->manualAssignDate ? $item->assignedDate : $item->linked->moment->date)->format("d/m/Y");
+                $table["data"][$i][] = $type->manualAssignDate ? (!is_null($item->assignedDate) ? Clock::at($item->assignedDate)->format("d/m/Y") : "N.T.B.") : Clock::at($item->linked->moment->date)->format("d/m/Y");
                 $table["data"][$i][] = $item->linked->moment->linked->hour->formatted->startEnd;
                 $table["data"][$i][] = $item->linked->moment->linked->room->formatted->buildingRoom;
                 if (!$type->courseDependsOnSkore && !$type->allowWithoutDate) $table["data"][$i][] = $item->linked->course->name;
@@ -1193,7 +1201,7 @@ class RemedyController extends ApiController
         $items = $repo->get();
         $items = Arrays::filter($items, fn($i) => Strings::equal($i->schoolId, $schoolId));
         $items = Arrays::filter($items, fn($i) => Arrays::contains($departmentIds, $i->departmentId));
-        Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->schoolId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
+        Arrays::each($items, fn($i) => $i->linked->informatEmployee = $courseTeacherRepo->getBySchoolCourseIdInformatStudentIdAndInformatClassgroupId($i->courseId, $i->informatStudentId, $i->classgroupId)->linked->informatEmployee);
 
         if ($start) $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate ?: $i->linked->moment->date)->isAfterOrEqualTo(Clock::at($start)));
         if ($end) $items = Arrays::filter($items, fn($i) => Clock::at($i->assignedDate ?: $i->linked->moment->date)->isBeforeOrEqualTo(Clock::at($end)));

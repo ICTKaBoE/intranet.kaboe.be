@@ -6,6 +6,8 @@ use M365\GraphHelper;
 use M365\Interface\Repository;
 use Microsoft\Graph\Generated\Groups\Item\TransitiveMembers\TransitiveMembersRequestBuilderGetQueryParameters;
 use Microsoft\Graph\Generated\Groups\Item\TransitiveMembers\TransitiveMembersRequestBuilderGetRequestConfiguration;
+use Microsoft\Graph\Generated\Models\PasswordProfile;
+use Microsoft\Graph\Generated\Models\User as ModelsUser;
 use Microsoft\Graph\Generated\Users\UsersRequestBuilderGetRequestConfiguration;
 use Ouzo\Utilities\Arrays;
 
@@ -87,5 +89,16 @@ class User extends Repository
         if ($select) $config->queryParameters->select = $select;
 
         return Arrays::firstOrNull($this->iterate(GraphHelper::$appClient->users()->get($config)->wait()));
+    }
+
+    public function resetPassword($userId, $password, $forceChangePasswordNextLogin = true)
+    {
+        $requestBody = new ModelsUser;
+        $passwordProfile = new PasswordProfile;
+        $passwordProfile->setForceChangePasswordNextSignIn($forceChangePasswordNextLogin);
+        $passwordProfile->setPassword($password);
+        $requestBody->setPasswordProfile($passwordProfile);
+
+        return GraphHelper::$appClient->users()->byUserId($userId)->patch($requestBody)->wait();
     }
 }

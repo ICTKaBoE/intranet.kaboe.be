@@ -62,6 +62,14 @@ abstract class Smartschool
         return $connection->saveUserToClass($connectionPassword, $username, $groupCode, null);
     }
 
+    static public function SavePassword($sourceId, $username, $password, $accountType, $changePasswordAtNextLogin = true)
+    {
+        $connection = Connection::init($sourceId);
+        $connectionPassword = Connection::GetPassword($sourceId);
+
+        return $connection->savePassword($connectionPassword, $username, $password, $accountType, $changePasswordAtNextLogin);
+    }
+
     static public function RemoveUserFromGroup($sourceId, $username, $groupCode)
     {
         $connection = Connection::init($sourceId);

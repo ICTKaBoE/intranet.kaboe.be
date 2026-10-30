@@ -21,6 +21,7 @@ use Database\Repository\Informat\StudentEmail;
 use Database\Repository\Informat\StudentNumber;
 use Database\Repository\Informat\StudentRelation;
 use Database\Repository\School\Department;
+use Database\Repository\School\DepartmentClass;
 use Database\Repository\School\Institute;
 use Database\Repository\School\School;
 use Helpers\Filter;
@@ -257,13 +258,10 @@ class InformatController extends ApiController
         $repo = new Student;
         $filters = Filter::Find(['schoolId', 'departmentId']);
 
-        $classRepo = new ClassGroup;
-
         $optgroups = [];
         $items = [];
 
-        $department = (new Department)->getById($filters['departmentId'][0]);
-        foreach (explode(";", $department->informatClassId) as $classId) $optgroups[] = $classRepo->getById($classId);
+        $optgroups = Arrays::orderBy(Arrays::map((new DepartmentClass)->getByDepartmentId($filters['departmentId'][0]), fn($dc) => $dc->linked->classgroup), "code");
         $optgroups = Arrays::orderBy($optgroups, "code");
 
         foreach ($optgroups as $class) {
@@ -296,15 +294,12 @@ class InformatController extends ApiController
     {
         $filters = Filter::Find(['schoolId', 'departmentId']);
         $configRepo = new StudentConfig;
-        $departmentRepo = new Department;
-        $classRepo = new ClassGroup;
         $schoolyear = (new Schoolyear)->getCurrent()->id;
 
         $optgroups = [];
         $items = [];
 
-        $department = $departmentRepo->getById($filters['departmentId'][0]);
-        foreach (explode(";", $department->informatClassId) as $classId) $optgroups[] = $classRepo->getById($classId);
+        $optgroups = Arrays::orderBy(Arrays::map((new DepartmentClass)->getByDepartmentId($filters['departmentId'][0]), fn($dc) => $dc->linked->classgroup), "code");
         $optgroups = Arrays::orderBy($optgroups, "code");
 
         foreach ($optgroups as $class) {

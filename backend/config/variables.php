@@ -19,6 +19,7 @@ define("LOCATION_IMAGE", LOCATION_SHARED . "/default/images/");
 define("LOCATION_FILES", LOCATION_ROOT . "/files");
 define("LOCATION_DOWNLOAD", LOCATION_FILES . "/downloads");
 define("LOCATION_UPLOAD", LOCATION_FILES . "/uploads");
+define("LOCATION_FONT", LOCATION_BACKEND . "/Fonts");
 
 define("SECURITY_SESSION_ISSIGNEDIN", sha1("isSignedIn"));
 

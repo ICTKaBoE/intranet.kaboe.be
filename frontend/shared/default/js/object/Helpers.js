@@ -183,10 +183,6 @@ export default class Helpers {
     if (data.redirect) Helpers.redirect(data.redirect);
     if (data.return) window.history.back();
     if (data.toast) Toast.GetInstance("toast").show(data.toast);
-    if (data.closeModal)
-      typeof data.closeModal == "boolean"
-        ? Helpers.closeAllModals()
-        : Helpers.toggleModal(data.closeModal);
     if (data.reload) location.reload();
     if (data.reloadTable) Table.ReloadAll();
     if (data.reloadCalendar) Calendar.ReloadAll();
@@ -203,6 +199,10 @@ export default class Helpers {
         Button.GetInstance(btn).hide();
       });
     }
+    if (data.closeModal)
+      typeof data.closeModal == "boolean"
+        ? Helpers.closeAllModals()
+        : Helpers.toggleModal(data.closeModal);
   };
 
   static cleanRowIndexes = (rows) => {

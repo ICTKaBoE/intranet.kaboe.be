@@ -74,11 +74,11 @@ abstract class Informat
             $result[] = self::StudentPhotos($schoolyear);
             $result[] = self::EmployeePhotos($schoolyear);
         } else {
-            // $result[] = self::Students($schoolyear);
-            // $result[] = self::Registrations($schoolyear);
+            $result[] = self::Students($schoolyear);
+            $result[] = self::Registrations($schoolyear);
             $result[] = self::Config($schoolyear);
-            // $result[] = $nextSchoolyear ? true : self::Employees($schoolyear);
-            // $result[] = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
+            $result[] = $nextSchoolyear ? true : self::Employees($schoolyear);
+            $result[] = $nextSchoolyear ? true : self::EmployeeOwnfields($schoolyear);
         }
 
         return !Arrays::contains($result, false);
@@ -157,27 +157,16 @@ abstract class Informat
             $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
 
             foreach ($iItems as $iItem) {
-                $photo = $informatPhotoRepo->get($institute->numberNewFormat, $iItem->persoonId, true);
-                if (Strings::isBlank($photo['foto'])) continue;
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->naam} {$iItem->voornaam} ($iItem->persoonId)");
+                $photo = $informatPhotoRepo->get($schoolyear->name, $institute->numberNewFormat, $iItem->persoonId, true);
 
-                try {
-                    $b64Photo = base64_decode($photo['foto']);
-
-                    if (FileSystem::PathExists(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg")) {
-                        $currentPhoto = file_get_contents(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg");
-
-                        if (!Strings::equal($b64Photo, $currentPhoto)) {
-                            FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg", $b64Photo);
-                        }
-                    } else FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg", $b64Photo);
-
-                    $photo = null;
-                } catch (\Exception $e) {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
+                if (Strings::isBlank($photo['foto'])) {
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "WARN", "No picture found...");
                     Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-                    $_error_ = true;
                     continue;
                 }
+
+                FileSystem::WriteFile(LOCATION_IMAGE . "/informat/student/{$iItem->persoonId}.jpg", base64_decode($photo['foto']));
             }
         }
 
@@ -288,6 +277,7 @@ abstract class Informat
             $config->registrationId = $currentRegistration->id;
             $config->schoolId = $currentRegistration ? $currentRegistration->linked->schoolInstitute->schoolId : null;
             $config->classgroupId = $currentRegistration ? $currentClassgroup->informatClassGroupId : null;
+            $config->rank = $currentRegistration ? $currentClassgroup->rank : null;
             $config->active = ($config->registrationId && $config->classgroupId);
 
             try {

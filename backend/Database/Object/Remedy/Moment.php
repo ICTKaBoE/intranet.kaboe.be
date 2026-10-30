@@ -54,10 +54,10 @@ class Moment extends CustomObject
 
         $this->formatted->buildingRoom = "{$this->linked->building->name} - {$this->linked->room->formatted->name}";
 
+        $this->formatted->seats = $this->seats == 0 ? "Onbeperkt" : (($this->linked->type->manualAssignDate) ? $this->seats : $this->seats . ($this->full ? " (volzet)" : ""));
+        $this->formatted->department = $this->linked->department ? (is_array($this->linked->department) ? implode(", ", Arrays::map($this->linked->department, fn($c) => $c->name)) : $this->linked->department->name) : null;
+
         $this->formatted->shortDescription = ucfirst(Date::dayOfWeekToString(is_null($this->date) ? $this->dayOfWeek : Clock::at($this->date)->format("w"))) . " " . (is_null($this->date) ? "" : $this->formatted->date->display) . " ({$this->linked->hour->formatted->startEnd})" . ($this->linked->informatEmployee ? " - Door {$this->linked->informatEmployee->formatted->fullNameReversed}" : "") . ($this->description ? " - {$this->description}" : "") . ($this->full ? " (volzet)" : "");
         $this->formatted->shortDescriptionWithType = "{$this->linked->type->name}: {$this->formatted->shortDescription}";
-
-        $this->formatted->seats = $this->seats == 0 ? "Onbeperkt" : (($this->linked->type->manualAssignDate) ? $this->seats : $this->seats . ($this->full ? " (vol)" : ""));
-        $this->formatted->department = $this->linked->department ? (is_array($this->linked->department) ? implode(", ", Arrays::map($this->linked->department, fn($c) => $c->name)) : $this->linked->department->name) : null;
     }
 }

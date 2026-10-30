@@ -65,13 +65,18 @@ window.witnessAfterView = () => {
   }
 };
 
-Helpers.CheckAllLoaded(() => {
-  setTimeout(() => {
-    window.locationView();
-    window.partyView();
-    window.policeView();
-    window.supervisionView();
-    window.witnessView();
-    window.witnessAfterView();
-  }, 250);
-}, [Form, Select]);
+$(document).ready(() => {
+  if (add == "") {
+    Component.addActionButton(btnCancel, btnSave);
+
+    Helpers.CheckAllLoaded(async () => {
+      await Helpers.sleep(250);
+      window.locationView();
+      window.partyView();
+      window.policeView();
+      window.supervisionView();
+      window.witnessView();
+      window.witnessAfterView();
+    }, [Form, Select]);
+  }
+});

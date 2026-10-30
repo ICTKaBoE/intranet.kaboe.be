@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}">
+<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}" data-bs-navbar-position="vertical" data-bs-layout="fluid" data-bs-theme="{{layout:theme}}">
 
 <head>
 	{{load:head}}
@@ -7,22 +7,21 @@
 	{{content:page:css}}
 </head>
 
-<body data-bs-theme="{{layout:theme}}">
+<body>
 	<div class="page">
 		{{component:navigation}}
 
 		<div class="page-wrapper">
 			{{component:generalMessage}}
-
 			{{component:pagetitle}}
 
-			<div class="page-body">
+			<main class="page-body">
 				<div class="container-fluid">
 					{{content:page}}
 				</div>
-			</div>
-			{{component:footer}}
+			</main>
 
+			{{component:footer}}
 		</div>
 	</div>
 

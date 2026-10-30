@@ -148,6 +148,7 @@ abstract class Input
 
 	static public function clean($input)
 	{
+		return iconv('UTF-8', 'ASCII//TRANSLIT', $input);
 		$output = preg_replace([
 			'/[áàâãäå]/u',
 			'/[ÁÀÂÃÄÅ]/u',
@@ -163,6 +164,8 @@ abstract class Input
 			'/[Ç]/u',
 			'/[ñ]/u',
 			'/[Ñ]/u',
+			'/[ž]/u',
+			' '
 		], [
 			'a',
 			'A',
@@ -177,7 +180,9 @@ abstract class Input
 			'c',
 			'C',
 			'n',
-			'N'
+			'N',
+			'z',
+			''
 		], $input);
 
 		$output = preg_replace('/[-–&\/()\'"[:space:]]/u', '', $output);

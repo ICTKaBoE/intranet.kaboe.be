@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  composer:
+    restart: 'no'
+    image: composer:latest
+    volumes:
+      - .:/app
+  phpunit:
+    image: php:8-cli
+    restart: never
+    volumes:
+      - .:/app
+    working_dir: /app
+    entrypoint: vendor/bin/phpunit

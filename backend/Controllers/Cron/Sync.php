@@ -55,6 +55,7 @@ abstract class Sync
     {
         $display = Input::createDisplayName($formatDisplay, $firstName, $lastName);
         $email = Input::createEmail($formatEmail, $firstName, $lastName, $suffix);
+        $email = str_replace(" ", "", $email);
         return [$display, $email];
     }
 

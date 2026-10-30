@@ -5,6 +5,8 @@ namespace Controllers\Cron;
 use Database\Object\School\Course as SchoolCourse;
 use Database\Object\School\CourseInformatEmployeeStudentClassgroup as SchoolCourseInformatEmployeeStudentClassgroup;
 use Database\Object\School\CourseInformatStudent as SchoolCourseInformatStudent;
+use Database\Object\Smartschool\User as ObjectSmartschoolUser;
+use Database\Object\Smartschool\UserCoAccount as SmartschoolUserCoAccount;
 use Database\Repository\General\Schoolyear;
 use Database\Repository\Informat\ClassGroup;
 use Database\Repository\Informat\ClassGroupTeacher;
@@ -16,6 +18,8 @@ use Database\Repository\School\CourseInformatStudent;
 use Database\Repository\School\School;
 use Database\Repository\Smartschool\Message;
 use Database\Repository\Smartschool\MessageReceiver;
+use Database\Repository\Smartschool\User as SmartschoolUser;
+use Database\Repository\Smartschool\UserCoAccount;
 use Database\Repository\Source;
 use Database\Repository\User\User as RepositoryUser;
 use Helpers\CString;
@@ -265,14 +269,57 @@ abstract class Smartschool
     public static function SyncUserData()
     {
         $schoolRepo = new School;
-        $sourceRepo = new Source;
+        $smsUserRepo = new SmartschoolUser;
+        $smsUserCoAccountRepo = new UserCoAccount;
 
         $schools = Arrays::filter($schoolRepo->get(), fn($i) => !is_null(Strings::trimToNull($i->smsGroupStudents)));
 
         foreach ($schools as $school) {
+            Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "School: {$school->name}");
             $sourceId = $school->linked->parentSchool->smartschoolSourceId ?: $school->smartschoolSourceId;
-            $errorCodes = SmartschoolSmartschool::GetErrorCodes($sourceId);
-            $users = (new AllAccountsExtended($sourceId))->get();
+
+            $users = (new AllAccountsExtended($sourceId))->get($school->smsGroupStudents);
+
+            foreach ($users as $user) {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "User {$user->naam} {$user->voornaam} ($user->internnummer)");
+                $smsUser = $smsUserRepo->getByInternalId($user->internnummer) ?: (new ObjectSmartschoolUser);
+                $smsUser->internalId = $user->internnummer;
+                $smsUser->name = $user->naam;
+                $smsUser->firstName = $user->voornaam;
+                $smsUser->username = $user->gebruikersnaam;
+                $smsUser->rank = $user->klasnummer;
+                $smsUser->scannableCode = $user->scannableCode;
+                $smsUser->lastLogin = $user->last_successful_login;
+
+                $nId = $smsUserRepo->set($smsUser);
+
+                for ($i = 1; $i <= 6; $i++) {
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "User Co Account " . $user->{"naam_coaccount$i"} . " " . $user->{"voornaam_coaccount$i"} . " (" . $user->{"type_coaccount$i"} . ")");
+                    $smsUserCoAccount = $smsUserCoAccountRepo->getByUserIdAndIndex($smsUser->id ? $smsUser->id : $nId, $i) ?: (new SmartschoolUserCoAccount);
+                    $smsUserCoAccount->userId = $smsUser->id ? $smsUser->id : $nId;
+                    $smsUserCoAccount->index = $i;
+                    $smsUserCoAccount->name = $user->{"naam_coaccount$i"};
+                    $smsUserCoAccount->firstName = $user->{"voornaam_coaccount$i"};
+                    $smsUserCoAccount->email = $user->{"email_coaccount$i"};
+                    $smsUserCoAccount->emailVerified = $user->{"email_coaccount" . $i . "_isVerified"};
+                    $smsUserCoAccount->phone = $user->{"telefoonnummer_coaccount$i"};
+                    $smsUserCoAccount->mobile = $user->{"mobielnummer_coaccount$i"};
+                    $smsUserCoAccount->type = Arrays::findKeyByValue(SmartschoolUserCoAccount::TYPE, $user->{"type_coaccount$i"});
+                    $smsUserCoAccount->authenticatorApp = $user->{"authenticator_app_enabled$i"};
+                    $smsUserCoAccount->yubikey = $user->{"yubikey_enabled$i"};
+                    $smsUserCoAccount->status = Arrays::findKeyByValue(SmartschoolUserCoAccount::STATUS, ucfirst($user->{"status$i"}));
+                    $smsUserCoAccount->responsible = $user->{"wettelijkverantwoordelijke_coaccount$i"};
+                    $smsUserCoAccount->lastLogin = $user->{"last_successful_login_coaccount$i"};
+
+                    $smsUserCoAccountRepo->set($smsUserCoAccount);
+                }
+
+                Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+            }
+
+            Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
         }
+
+        return true;
     }
 }

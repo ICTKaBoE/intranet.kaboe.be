@@ -52,12 +52,12 @@ class Repository extends stdClass
         return $statement;
     }
 
-    protected function executeSelect($statement)
+    protected function executeSelect($statement, $link = true)
     {
         $objects = [];
         $rows = $statement->get();
 
-        foreach ($rows as $row) $objects[] = new $this->object($row);
+        foreach ($rows as $row) $objects[] = new $this->object($row, $link);
 
         return $objects;
     }
@@ -68,10 +68,10 @@ class Repository extends stdClass
         return Arrays::firstOrNull($this->get($id));
     }
 
-    public function get($id = null, $order = true, $deleted = false, $filters = [])
+    public function get($id = null, $order = true, $deleted = false, $filters = [], $link = true)
     {
         $statement = $this->prepareSelect($id, $order, $deleted, $filters);
-        return $this->executeSelect($statement);
+        return $this->executeSelect($statement, $link);
     }
 
     public function set(CustomObject $object, $only = [])

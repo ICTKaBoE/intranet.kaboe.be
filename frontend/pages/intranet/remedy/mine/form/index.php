@@ -22,7 +22,7 @@
 
                     <div class="col-lg-6 col-12 mb-3">
                         <label for="courseId" class="form-label">Vak</label>
-                        <select name="courseId" id="courseId" data-load-source="{{select:url:short}}/{{url:part.module}}/course" data-parent-select="typeId" data-on-change="courseView" data-search data-default-no-load required></select>
+                        <select name="courseId" id="courseId" data-load-source="{{select:url:short}}/{{url:part.module}}/course" data-on-change="courseView" data-search data-default-no-load required></select>
                     </div>
                 </div>
 
@@ -67,8 +67,9 @@
 
                 <div class="row">
                     <div class="col-12 mb-3">
-                        <label for="remark" class="form-label">Opmerking</label>
-                        <textarea name="remark" id="remark" class="form-control" rows="5" required></textarea>
+                        <label for="remark" class="form-label mb-0">Opmerking</label>
+                        <div class="form-text mt-0 mb-1">Enkel bestemd voor de begeleidende leerkracht</div>
+                        <textarea name="remark" id="remark" class="form-control" rows="5"></textarea>
                     </div>
                 </div>
             </div>

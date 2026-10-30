@@ -13,6 +13,7 @@ class StudentConfig extends CustomObject
         "schoolId" => self::TYPE_INTEGER,
         "registrationId" => self::TYPE_INTEGER,
         "classgroupId" => self::TYPE_INTEGER,
+        "rank" => self::TYPE_INTEGER,
         "active" => self::TYPE_BOOLEAN,
     ];
 

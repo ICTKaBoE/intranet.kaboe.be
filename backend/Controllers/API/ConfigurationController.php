@@ -31,10 +31,14 @@ use Database\Repository\Security\GroupNavigation;
 use Database\Object\School\Course as SchoolCourse;
 use Database\Object\General\Message as GeneralMessage;
 use Database\Object\School\Department as SchoolDepartment;
+use Database\Object\School\DepartmentClass as SchoolDepartmentClass;
+use Database\Object\School\DepartmentRoom as SchoolDepartmentRoom;
 use Database\Object\School\Direction as SchoolDirection;
 use Database\Object\Security\Group as ObjectSecurityGroup;
 use Database\Object\Security\GroupUser as ObjectSecurityGroupUser;
 use Database\Object\Security\GroupNavigation as SecurityGroupNavigation;
+use Database\Repository\School\DepartmentClass;
+use Database\Repository\School\DepartmentRoom;
 use Database\Repository\School\Direction;
 
 class ConfigurationController extends ApiController
@@ -105,6 +109,8 @@ class ConfigurationController extends ApiController
     protected function getDepartment($view, $id = null)
     {
         $repo = new Department;
+        $classRepo = new DepartmentClass;
+        $roomRepo = new DepartmentRoom;
 
         if (Strings::equal($view, self::VIEW_TABLE)) {
             [$defaultOrder, $columns] = Table::Format();
@@ -112,9 +118,25 @@ class ConfigurationController extends ApiController
             $this->appendToJson('columns', $columns);
 
             $items = $repo->get();
+
+            foreach ($items as $i) {
+                $classes = Arrays::map($classRepo->getByDepartmentId($i->id) ?: [], fn($c) => $c->linked->classgroup->name);
+                $rooms = Arrays::map($roomRepo->getByDepartmentId($i->id) ?: [], fn($c) => $c->linked->room->name);
+                $i->formatted->classes = join(", ", $classes);
+                $i->formatted->managementRooms = join(", ", $rooms);
+            }
+
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_FORM)) {
             $group = $repo->getById($id);
+
+            if ($group) {
+                $classes = $classRepo->getByDepartmentId($group->id) ?: [];
+                $rooms = $roomRepo->getByDepartmentId($group->id) ?: [];
+                $group->informatClassId = join(";", Arrays::map($classes, fn($m) => $m->classgroupId));
+                $group->managementRoomId = join(";", Arrays::map($rooms, fn($m) => $m->roomId));
+            }
+
             $this->appendToJson('fields', $group);
         }
     }
@@ -319,7 +341,9 @@ class ConfigurationController extends ApiController
 
         $_fields = [
             "name" => ["mandatory" => true],
-            "schoolId" => ["mandatory" => true]
+            "schoolId" => ["mandatory" => true],
+            "informatClassId",
+            "managementRoomId"
         ];
 
         [$invalid, $fields] = Form::Validate($_fields);
@@ -327,12 +351,32 @@ class ConfigurationController extends ApiController
 
         if ($this->validationIsAllGood()) {
             $repo = new Department;
+            $roomRepo = new DepartmentRoom;
+            $classRepo = new DepartmentClass;
 
             if ($this->validationIsAllGood()) {
                 $item = $repo->getById($id) ?? new SchoolDepartment;
                 $item->fillWithPostData();
 
-                $repo->set($item);
+                $nId = $repo->set($item);
+                if (!$item->id) $item->id = $nId;
+
+                $roomRepo->delete(["departmentId" => $item->id]);
+                $classRepo->delete(["departmentId" => $item->id]);
+
+                foreach (explode(";", $fields["informatClassId"]) as $class) {
+                    $classRepo->set(new SchoolDepartmentClass([
+                        "departmentId" => $item->id,
+                        "classgroupId" => $class
+                    ]));
+                }
+
+                foreach (explode(";", $fields["managementRoomId"]) as $room) {
+                    $roomRepo->set(new SchoolDepartmentRoom([
+                        "departmentId" => $item->id,
+                        "roomId" => $room
+                    ]));
+                }
             }
         }
 

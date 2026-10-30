@@ -357,7 +357,8 @@ export default class Select extends MasterObject {
   };
 
   detectParentAndSetFunctions = () => {
-    setTimeout(() => {
+    Helpers.CheckAllLoaded(async () => {
+      await Helpers.sleep(500);
       Select.GetInstance(this.parent).setEventListener("change", (value) => {
         this.data.items = [];
         this.setExtraLoadParam(
@@ -367,6 +368,6 @@ export default class Select extends MasterObject {
         );
         this.reload();
       });
-    }, 500);
+    }, [Select]);
   };
 }

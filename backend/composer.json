@@ -13,7 +13,9 @@
 		"cloudmersive/cloudmersive_document_convert_api_client": "^3.2",
 		"james-heinrich/getid3": "^1.9",
 		"jumbojett/openid-connect-php": "^1.0",
-		"karriere/pdf-merge": "^3.3"
+		"karriere/pdf-merge": "^3.3",
+		"amirezaeb/heroqr": "^2.1",
+		"mrdreek/docx-merge": "^1.2"
 	},
 	"config": {
 		"allow-plugins": {

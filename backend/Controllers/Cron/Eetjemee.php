@@ -26,7 +26,7 @@ abstract class Eetjemee
         $schoolRepo = new School;
 
         $schools = Arrays::filter($schoolRepo->get(), fn($i) => !is_null(Strings::trimToNull($i->eetjemeeKeyStudents)) && !is_null(Strings::trimToNull($i->smsGroupStudents)));
-        $client = new Client(['base_uri' => "https://api.eetjemee.be"]);
+        $client = new Client(['base_uri' => "https://api.laveer.be"]);
 
         foreach ($schools as $school) {
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "School: {$school->name}");

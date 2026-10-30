@@ -54,7 +54,7 @@ class Navigation extends CustomObject
         $this->formatted->active = Strings::contains(Helpers::getReletiveUrl(), $this->formatted->link);
         $this->formatted->target = $this->type == "L" ? "_blank" : "_self";
 
-        $this->formatted->icon->dashboard = HTML::Icon($this->icon, style: ["font-size" => "4rem"]);
+        $this->formatted->icon->dashboard = HTML::Icon($this->icon, style: ["font-size" => "3rem"]);
         $this->formatted->badge = Arrays::contains(["F", "L"], $this->type) ? "<span class='badge badge-icononly badge-lg bg-{$this->color} text-white badge-notification'>" . HTML::Icon($this->type == "F" ? "folder" : ($this->type == "L" ? "link" : "")) . "</span>" : "";
 
         $this->formatted->isActive = $this->formatted->active ? 'active' : '';

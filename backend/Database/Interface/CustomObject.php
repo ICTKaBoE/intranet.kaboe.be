@@ -34,8 +34,9 @@ class CustomObject extends stdClass
     public $linked = null;
     public $formatted = null;
 
-    public function __construct($attributes = [])
+    public function __construct($attributes = [], $link = true)
     {
+        $this->_link = $link;
         $this->mapped = new stdClass;
         $this->linked = new stdClass;
         $this->formatted = new stdClass;
@@ -46,14 +47,14 @@ class CustomObject extends stdClass
         $this->createAttributes($attributes);
         $this->encode();
         $this->decode();
-        $this->link();
+        if ($this->_link) $this->link();
         $this->init();
     }
 
     public function reinit()
     {
         $this->encode();
-        $this->link();
+        if ($this->_link) $this->link();
         $this->init();
     }
 

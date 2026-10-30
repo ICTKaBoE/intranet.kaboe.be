@@ -101,6 +101,7 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         array (
             'Http\\Promise\\' => 13,
             'Http\\Discovery\\' => 15,
+            'HeroQR\\' => 7,
         ),
         'G' =>
         array (
@@ -112,10 +113,16 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         array (
             'Firebase\\JWT\\' => 13,
         ),
+        'E' =>
+        array (
+            'Endroid\\QrCode\\' => 15,
+        ),
         'D' =>
         array (
+            'DocxMerge\\' => 10,
             'Doctrine\\Common\\Lexer\\' => 22,
             'Doctrine\\Common\\Annotations\\' => 28,
+            'DASPRiD\\Enum\\' => 13,
         ),
         'C' =>
         array (
@@ -127,6 +134,7 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         'B' =>
         array (
             'Brick\\Math\\' => 11,
+            'BaconQrCode\\' => 12,
         ),
     );
 
@@ -300,6 +308,10 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         array (
             0 => __DIR__ . '/..' . '/php-http/discovery/src',
         ),
+        'HeroQR\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/amirezaeb/heroqr/src',
+        ),
         'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
@@ -316,6 +328,14 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
+        'Endroid\\QrCode\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
+        'DocxMerge\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mrdreek/docx-merge/src',
+        ),
         'Doctrine\\Common\\Lexer\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/lexer/src',
@@ -323,6 +343,10 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         'Doctrine\\Common\\Annotations\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
+        ),
+        'DASPRiD\\Enum\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
         ),
         'Composer\\Semver\\' =>
         array (
@@ -344,6 +368,10 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
+        'BaconQrCode\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
+        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -363,6 +391,10 @@ class ComposerStaticInitb7e60972198c258e77094ac549cfc390
         'AllowDynamicProperties' => __DIR__ . '/..' . '/symfony/polyfill-php82/Resources/stubs/AllowDynamicProperties.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
+        'DocxMerge\\DocxMerge' => __DIR__ . '/..' . '/mrdreek/docx-merge/src/DocxMerge.php',
+        'DocxMerge\\DocxMerge\\Docx' => __DIR__ . '/..' . '/mrdreek/docx-merge/src/DocxMerge/Docx.php',
+        'DocxMerge\\DocxMerge\\Prettify' => __DIR__ . '/..' . '/mrdreek/docx-merge/src/DocxMerge/Prettify.php',
+        'DocxMerge\\libraries\\TbsZip' => __DIR__ . '/..' . '/mrdreek/docx-merge/src/libraries/TbsZip.php',
         'FPDF' => __DIR__ . '/..' . '/karriere/pdf-merge/tcpi/tcpdi.php',
         'FPDF_TPL' => __DIR__ . '/..' . '/karriere/pdf-merge/tcpi/fpdf_tpl.php',
         'Image_XMP' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.tag.xmp.php',

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}">
+<html lang="{{setting:site.language}}" dir="{{setting:site.direction}}" data-bs-layout="fluid" data-bs-theme="{{layout:theme}}">
 
 <head>
 	{{load:head}}

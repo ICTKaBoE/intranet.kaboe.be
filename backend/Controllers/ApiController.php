@@ -6,10 +6,13 @@ use Database\Object\Navigation\Setting as NavigationSetting;
 use Database\Repository\General\Schoolyear;
 use Database\Repository\Navigation\Navigation;
 use Database\Repository\Navigation\Setting;
+use Helpers\Log;
 use Ouzo\Utilities\Arrays;
+use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 use Router\Helpers;
 use Security\Code;
+use Security\GUID;
 use stdClass;
 
 class ApiController extends stdClass
@@ -44,6 +47,10 @@ class ApiController extends stdClass
 			define("CURRENT_NAVIGATION_MODULE_ID", (new Navigation)->getByLinkAndType(static::CURRENT_NAVIGATION_MODULE_NAME, "M")->id ?: false);
 		}
 
+		define("_LOGTIMESTAMP_", Clock::nowAsString("Y-m-d"));
+		define("_LOGLOCATION_", "api/" . static::CURRENT_NAVIGATION_MODULE_NAME . "/");
+		define("_LOGID_", GUID::create());
+		Log::Create(_LOGLOCATION_);
 		define("_CURRENT_SCHOOLYEAR_", (new Schoolyear)->getCurrent()->name);
 	}
 

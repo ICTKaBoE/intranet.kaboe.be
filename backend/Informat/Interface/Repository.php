@@ -39,13 +39,13 @@ class Repository extends stdClass
         $endpoint = Path::normalize(str_replace("<id>", $id ?: "", $endpoint));
 
         $requestHeaders = [
-            "InstituteNo" => $instituteNumber
+            "InstituteNo" => $instituteNumber,
+            "Timestamp" => Clock::nowAsString("Y-m-d\TH:i:s")
         ];
 
         $requestQuery['schoolYear'] = $schoolyear;
         if ($changedSince) $requestQuery['changedSince'] = Clock::now()->minusDays(1)->format("Y-m-d");
         if ($this->structure) $requestQuery['structure'] = Arrays::first((new Setting)->get("informat.structure"))->value;
-
         $result = $this->execute($endpoint, $requestHeaders, $requestQuery);
         if ($this->shift) $result = $result[$this->shift];
 

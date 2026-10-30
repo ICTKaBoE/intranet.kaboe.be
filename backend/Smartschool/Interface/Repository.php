@@ -33,14 +33,14 @@ class Repository extends stdClass
     public function get(...$params)
     {
         try {
+            $errorCodes = $this->client->returnJsonErrorCodes();
+            $errorCodes = json_decode($errorCodes);
             $function = $this->function;
             $output = $this->client->$function($this->clientPassword, ...$params);
             $result = null;
 
             if (is_int($output)) {
                 if ($output !== 0) {
-                    $errorCodes = $this->client->returnJsonErrorCodes();
-                    $errorCodes = json_decode($errorCodes);
                     $errorMessage = $errorCodes->{$output};
 
                     throw new Exception($errorMessage);

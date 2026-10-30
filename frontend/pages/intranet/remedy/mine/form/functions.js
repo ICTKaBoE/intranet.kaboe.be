@@ -29,19 +29,22 @@ window.typeView = () => {
   Select.GetInstance("courseId").show();
   Select.GetInstance("coursePerStudent").hide();
   Select.GetInstance("momentId").setExtraLoadParam("courseId", 0);
-  Select.GetInstance("momentId").reload();
+  // Select.GetInstance("momentId").reload();
 
   if (details.courseDependsOnSkore) {
     Select.GetInstance("courseId").hide();
     Select.GetInstance("coursePerStudent").show();
     Select.GetInstance("momentId").removeExtraLoadParam("courseId");
-    Select.GetInstance("momentId").reload();
+  } else {
+    Select.GetInstance("courseId").reload();
   }
 
   if (details.allowWithoutDate) {
     if (!details.courseDependsOnSkore) Select.GetInstance("courseId").hide();
     Select.GetInstance("coursePerStudent").show();
     Select.GetInstance("momentId").hide();
+  } else {
+    Select.GetInstance("momentId").reload();
   }
 
   if (details.onComputer)

@@ -12,16 +12,34 @@ let btnFilter = new Button(null, {
   modal: "filter",
 });
 
-let btnEdit = new Button(null, {
+let btnView = new Button(null, {
   type: Button.TYPE_ICON,
   icon: "eye",
   title: "Bewerken",
-  bgColor: "orange",
+  bgColor: "green",
   onclick: "edit",
 });
 
-Component.addActionButton(btnFilter, btnEdit);
+let btnPrint = new Button(null, {
+  type: Button.TYPE_ICON,
+  icon: "printer",
+  title: "Printen",
+  bgColor: "blue",
+  modal: "printSelect",
+  onclick: () => {
+    Form.GetInstance(`${pageId}PrintSelect`).reset();
+    Form.GetInstance(`${pageId}PrintSelect`).setLastLoadedId(
+      Table.GetInstance(pageId)
+        .getSelectedRowData()
+        .map((r) => r.guid || r.id)
+        .join("_"),
+    );
+  },
+});
+
+Component.addActionButton(btnFilter, btnView, btnPrint);
 
 $(document).ready(() => {
-  Table.GetInstance(pageId).attachButton(btnEdit, "==1");
+  Table.GetInstance(pageId).attachButton(btnView, "==1");
+  Table.GetInstance(pageId).attachButton(btnPrint, ">0");
 });
