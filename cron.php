@@ -36,7 +36,7 @@ if (!$cron) {
     $cron->lastRun = $start->format("Y-m-d H:i:s");
     $cronRepo->set($cron);
 
-    if ((int)Clock::now()->format("H") >= 22 && (int)Clock::now()->format("H") <= 4) {
+    if (!((int)Clock::nowAsString("H") >= 4 && (int)Clock::nowAsString("H") <= 22)) {
         Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", "Instance not allowed to run!");
     } else {
         $settingRepo = new Setting;
