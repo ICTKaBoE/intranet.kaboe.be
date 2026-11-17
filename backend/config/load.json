@@ -47,8 +47,10 @@
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css",
-        "rel": "stylesheet"
+        "href": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css",
+        "rel": "stylesheet",
+        "integrity": "sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX",
+        "crossorigin": "anonymous"
       }
     },
     {
@@ -82,7 +84,7 @@
     {
       "tag": "link",
       "attributes": {
-        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.1/dist/css/tabler-themes.min.css",
+        "href": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.4/dist/libs/tom-select/dist/css/tom-select.bootstrap5.min.css",
         "rel": "stylesheet"
       }
     },
@@ -119,7 +121,13 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"
+        "src": "https://cdn.jsdelivr.net/npm/@tabler/core@1.7.4/dist/libs/tom-select/dist/js/tom-select.base.min.js"
+      }
+    },
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "https://cdn.jsdelivr.net/npm/tom-select@2.7.0/dist/js/tom-select.complete.min.js"
       }
     },
     {
@@ -167,8 +175,8 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js",
-        "integrity": "sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI",
+        "src": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js",
+        "integrity": "sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu",
         "crossorigin": "anonymous"
       }
     },

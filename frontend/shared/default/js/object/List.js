@@ -54,7 +54,7 @@ export default class List extends MasterObject {
   };
 
   reload = async () => {
-    Helpers.toggleWait();
+    // Helpers.toggleWait();
     this.loaded = false;
     this.stopCheckNext = true;
     this.extraData.page = 0;
@@ -65,7 +65,7 @@ export default class List extends MasterObject {
     this.loaded = true;
 
     if (this.afterLoadCallback) window[this.afterLoadCallback]();
-    Helpers.toggleWait();
+    // Helpers.toggleWait();
   };
 
   getData = () => {

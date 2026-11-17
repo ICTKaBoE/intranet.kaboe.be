@@ -153,6 +153,7 @@ class RemedyController extends ApiController
         if (Strings::equal($view, self::VIEW_SELECT)) {
             $items = $repo->get(filters: $filters);
             $items = Arrays::map($items, fn($i) => $i->linked->course);
+            $items = Arrays::filterNotBlank($items);
             if (!Arrays::find($items, fn($i) => !is_null($i))) $items = [];
             $this->appendToJson('items', Arrays::map($items, fn($i) => $i?->toArray(true)));
         }
@@ -171,7 +172,7 @@ class RemedyController extends ApiController
             }
 
             $items = $repo->get(filters: $filters);
-            Arrays::each($items, fn($i) => $i->id = "{$i->schoolCourseId}-{$i->informatEmployeeId}-{$i->informatStudentId}-{$i->informatClassgroupId}");
+            Arrays::each($items, fn($i) => $i->id = $i->schoolCourseId);
             Arrays::each($items, fn($i) => $i->name = "{$i->linked->schoolCourse->name} - {$i->linked->informatEmployee->formatted->fullNameReversed}");
             $items = Arrays::orderBy($items, "name");
             $items = Arrays::uniqueBy($items, fn($i) => $i->name);
@@ -374,7 +375,7 @@ class RemedyController extends ApiController
             $items = Arrays::uniqueBy($items, fn($i) => $i->assignedDate ?: $i->linked->moment->date);
 
             $items = array_values($items);
-            // Arrays::each($items, fn($i) => $i->formatted->seats = count($i->linked->type->manualAssignDate ? $remedyRepo->getByMomentIdAndAssignedDate($i->momentId, $i->assignedDate) : $remedyRepo->getByMomentId($i->momentId)) . "/{$i->linked->moment->formatted->seats}");
+            Arrays::each($items, fn($i) => $i->formatted->seats = count($i->linked->type->manualAssignDate ? $remedyRepo->getByMomentIdAndAssignedDate($i->momentId, $i->assignedDate) : $remedyRepo->getByMomentId($i->momentId)) . "/{$i->linked->moment->formatted->seats}");
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_LIST)) {
             $item = $remedyRepo->getById($id);
@@ -659,8 +660,6 @@ class RemedyController extends ApiController
 
         if ($this->validationIsAllGood()) {
             $user = User::getLoggedInUser();
-            [$schoolCourseId, $informatEmployeeId, $informatStudentId, $informatClassgroupId] = explode("-", $fields['coursePerStudent']);
-
             $smartschoolSourceId = Strings::trimToNull($department->linked->school->smartschoolSourceId) ?? Strings::trimToNull($department->linked->school->linked->parentSchool->smartschoolSourceId);
 
             $title = "";
@@ -692,8 +691,8 @@ class RemedyController extends ApiController
                 $item->fillWithPostData($fields);
                 $item->creatorUserId = User::getLoggedInUser()->id;
                 $item->informatStudentId = $_informatStudentId;
-                if (!$type->manualAssignDate) $item->courseId = $schoolCourseId;
-                $item->classgroupId = !$type->manualAssignDate ? $informatClassgroupId : (explode(";", $fields['informatClassgroupId'])[$index] ?? null);
+                if (!$type->manualAssignDate) $item->courseId = $fields['coursePerStudent'];
+                $item->classgroupId = explode(";", $fields['informatClassgroupId'])[$index] ?? null;
 
                 if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForThisTypeOnSameDay) {
                     $multiple = $repo->getMultipleByInformatStudentIdTypeIdAndMomentId($item->informatStudentId, $item->typeId, $item->momentId);

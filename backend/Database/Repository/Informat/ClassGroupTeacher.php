@@ -9,7 +9,7 @@ class ClassGroupTeacher extends Repository
 {
     public function __construct()
     {
-        parent::__construct("tbl_informat_classgroup_teacher", \Database\Object\Informat\ClassgroupTeacher::class, orderField: 'informatClassgroupId', deletedField: false, guidField: false);
+        parent::__construct("tbl_informat_classgroup_teacher", \Database\Object\Informat\ClassGroupTeacher::class, orderField: 'informatClassgroupId', deletedField: false, guidField: false);
     }
 
     public function getByInformatClassgroupId($informatClassgroupId)
