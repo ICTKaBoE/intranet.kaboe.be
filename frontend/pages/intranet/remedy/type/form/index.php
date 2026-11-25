@@ -40,6 +40,7 @@
                     <input type="number" name="allowMultipleRegistrationsForSameCourseOnSameDayAmount" id="allowMultipleRegistrationsForSameCourseOnSameDayAmount" class="form-control" />
                 </div>
                 <div class="col-12" id="chbOnComputer" role="checkbox" data-default-value="false" data-type="checkbox" data-name="onComputer" data-text="Mogelijkheid tot het maken op computer?"></div>
+                <div class="col-12" id="chbSendMessage" role="checkbox" data-default-value="true" data-type="checkbox" data-name="sendMessage" data-text="Verzend bericht?"></div>
             </div>
         </div>
 

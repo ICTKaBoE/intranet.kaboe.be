@@ -21,12 +21,12 @@ class Type extends CustomObject
         "courseDependsOnSkore" => self::TYPE_BOOLEAN,
         "manualAssignDate" => self::TYPE_BOOLEAN,
         "onComputer" => self::TYPE_BOOLEAN,
-        "closeRegistrationAt" => self::TYPE_INTEGER,
         "allowMultipleRegistrationsForThisTypeOnSameDay" => self::TYPE_BOOLEAN,
         "allowMultipleRegistrationsForThisTypeOnSameDayAmount" => self::TYPE_INTEGER,
         "allowMultipleRegistrationsForSameCourseOnSameDay" => self::TYPE_BOOLEAN,
         "allowMultipleRegistrationsForSameCourseOnSameDayAmount" => self::TYPE_INTEGER,
         "allowWithoutDate" => self::TYPE_BOOLEAN,
+        "sendMessage" => self::TYPE_BOOLEAN,
         "deleted" => self::TYPE_BOOLEAN
     ];
 

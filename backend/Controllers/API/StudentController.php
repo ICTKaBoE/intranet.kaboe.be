@@ -424,7 +424,8 @@ class StudentController extends ApiController
 
                 foreach ($id as $_id) {
                     $config = $configRepo->getById($_id);
-                    (new QRCodeGenerator)->setData($smsUserRepo->getByInternalId($config->linked->informatStudent->informatId)->scannableCode)->setSize(600)->generate()->saveTo("{$qrFolder}{$config->linked->informatStudent->informatId}");
+                    $smsUser = $smsUserRepo->getByInternalId($config->linked->informatStudent->informatId);
+                    if ($smsUser) (new QRCodeGenerator)->setData($smsUser->scannableCode)->setSize(600)->generate()->saveTo("{$qrFolder}{$config->linked->informatStudent->informatId}");
 
                     $smartschoolSourceId = $config->linked->school->linked->parentSchool->smartschoolSourceId ?: $config->linked->school->smartschoolSourceId;
                     $saveFilename = $folder . "/{$filename}_{$_id}.{$document->ext}";
@@ -432,7 +433,7 @@ class StudentController extends ApiController
                     $template = new TemplateProcessor(LOCATION_FILES . "/student/_default_/{$document->guid}.{$document->ext}");
 
                     foreach ($config->linked->informatStudent->toArray(true) as $key => $value) $template->setValue("student:{$key}", $value);
-                    $template->setImageValue("smartschool:qr", "{$qrFolder}{$config->linked->informatStudent->informatId}.png");
+                    if ($smsUser) $template->setImageValue("smartschool:qr", "{$qrFolder}{$config->linked->informatStudent->informatId}.png");
 
                     foreach ($template->getVariables() as $var) $template->setValue($var, '');
                     $template->saveAs($saveFilename);

@@ -368,7 +368,9 @@ abstract class Informat
         $informatRepo = new RepositoryEmployeeOwnfield;
         $employeeRepo = new RepositoryInformatEmployee;
         $repo = new InformatEmployeeOwnfield;
-        $repo->delete();
+
+        $origCount = count($repo->get());
+        $tempList = [];
 
         foreach (_INSTITUTES_ as $institute) {
             $import = $institute->linked->school->import || $institute->linked->school->linked->parentSchool->import;
@@ -376,31 +378,43 @@ abstract class Informat
             Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$institute->numberNewFormat} - {$institute->linked->school->name} (import: " .  (!$import ? "NO" : "YES") . ")");
             if (!$import) continue;
 
-            $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
+            try {
+                $iItems = $informatRepo->get($schoolyear->name, $institute->numberNewFormat);
 
-            foreach ($iItems as $iItem) {
-                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->personId}; Item: {$iItem->naam} = {$iItem->waarde}");
+                foreach ($iItems as $iItem) {
+                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "INFO", "{$iItem->personId}; Item: {$iItem->naam} = {$iItem->waarde}");
 
-                try {
-                    $employeeId = $employeeRepo->getByInformatGuid($iItem->personId)->id;
-                    $item = $repo->getByInformatGuidAndEmployeeId($iItem->vvId, $employeeId) ?? new EmployeeOwnfield;
-                    $item->informatEmployeeId = $employeeId;
-                    $item->informatGuid = $iItem->vvId;
-                    $item->name = Strings::trimToNull($iItem->naam);
-                    $item->value = Strings::trimToNull($iItem->waarde);
-                    $item->type = Strings::trimToNull($iItem->dataType);
-                    $item->section = $iItem->rubriek;
+                    try {
+                        $employeeId = $employeeRepo->getByInformatGuid($iItem->personId)->id;
+                        $item = new EmployeeOwnfield;
+                        $item->informatEmployeeId = $employeeId;
+                        $item->informatGuid = $iItem->vvId;
+                        $item->name = Strings::trimToNull($iItem->naam);
+                        $item->value = Strings::trimToNull($iItem->waarde);
+                        $item->type = Strings::trimToNull($iItem->dataType);
+                        $item->section = $iItem->rubriek;
 
-                    $repo->set($item);
-                } catch (\Exception $e) {
-                    Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
-                    Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
-                    $_error_ = true;
-                    continue;
+                        $tempList[] = $item;
+                    } catch (\Exception $e) {
+                        Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", $e->getMessage());
+                        Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+                        $_error_ = true;
+                        continue;
+                    }
                 }
+            } catch (\Exception $e) {
+                Log::Write(_LOGLOCATION_, _LOGTIMESTAMP_, "ERROR", "Error getting items...");
+                Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+                $_error_ = true;
+                continue;
             }
 
             Log::EmptyLine(_LOGLOCATION_, _LOGTIMESTAMP_);
+        }
+
+        if (count($tempList) > ($origCount * 0.95)) {
+            $repo->delete();
+            foreach ($tempList as $temp) $repo->set($temp);
         }
 
         return !$_error_;

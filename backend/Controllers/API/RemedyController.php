@@ -171,9 +171,17 @@ class RemedyController extends ApiController
                 return;
             }
 
-            $items = $repo->get(filters: $filters);
-            Arrays::each($items, fn($i) => $i->id = $i->schoolCourseId);
+            $items = [];
+
+            foreach ($filters['informatStudentId'] as $_index => $informatStudentId) {
+                $_items = $repo->get(filters: ['informatStudentId' => $informatStudentId, 'informatClassgroupId' => $filters['informatClassgroupId'][$_index]]);
+                $items = Arrays::concat([$items, $_items]);
+            }
+
+            Arrays::each($items, fn($i) => $i->id = "{$i->schoolCourseId}-{$i->informatEmployeeId}");
             Arrays::each($items, fn($i) => $i->name = "{$i->linked->schoolCourse->name} - {$i->linked->informatEmployee->formatted->fullNameReversed}");
+            $items = Arrays::uniqueBy($items, "name");
+
             $items = Arrays::orderBy($items, "name");
             $items = Arrays::uniqueBy($items, fn($i) => $i->name);
             $items = array_values($items);
@@ -375,6 +383,7 @@ class RemedyController extends ApiController
             $items = Arrays::uniqueBy($items, fn($i) => $i->assignedDate ?: $i->linked->moment->date);
 
             $items = array_values($items);
+            Arrays::each($items, fn($i) => $i->formatted->courseName = $i->linked->type->courseDependsOnSkore ? "Zie details" : $i->linked->course->name);
             Arrays::each($items, fn($i) => $i->formatted->seats = count($i->linked->type->manualAssignDate ? $remedyRepo->getByMomentIdAndAssignedDate($i->momentId, $i->assignedDate) : $remedyRepo->getByMomentId($i->momentId)) . "/{$i->linked->moment->formatted->seats}");
             $this->appendToJson("rows", $items);
         } else if (Strings::equal($view, self::VIEW_LIST)) {
@@ -655,7 +664,7 @@ class RemedyController extends ApiController
             $newSeats = count(explode(";", $fields['informatStudentId']));
             $seats = $newSeats + $currentSeats;
             $availableSeats = $moment->seats - $currentSeats;
-            if ($seats >= $moment->seats) $this->setToast("Helaas zijn er nog {$availableSeats} plaatsen vrij, u probeert er {$newSeats} in te schrijven...", self::VALIDATION_STATE_INVALID);
+            if ($seats > $moment->seats) $this->setToast("Helaas zijn er nog {$availableSeats} plaatsen vrij, u probeert er {$newSeats} in te schrijven...", self::VALIDATION_STATE_INVALID);
         }
 
         if ($this->validationIsAllGood()) {
@@ -691,7 +700,7 @@ class RemedyController extends ApiController
                 $item->fillWithPostData($fields);
                 $item->creatorUserId = User::getLoggedInUser()->id;
                 $item->informatStudentId = $_informatStudentId;
-                if (!$type->manualAssignDate) $item->courseId = $fields['coursePerStudent'];
+                if ($type->courseDependsOnSkore) $item->courseId = explode("-", $fields['coursePerStudent'])[0];
                 $item->classgroupId = explode(";", $fields['informatClassgroupId'])[$index] ?? null;
 
                 if (!$type->manualAssignDate && !$type->allowMultipleRegistrationsForThisTypeOnSameDay) {
@@ -732,6 +741,30 @@ class RemedyController extends ApiController
                     Gelieve dit te noteren in je agenda en hiervoor aanwezig te zijn a.u.b.
                     ";
 
+                    if ($type->sendMessage) {
+                        $message = new SmartschoolMessage;
+                        $message->sourceId = $smartschoolSourceId;
+                        $message->subject = Strings::trimToNull($title);
+                        $message->body = Strings::trimToNull($body);
+
+                        $messageId = $smsMessageRepo->set($message);
+
+                        for ($i = 0; $i <= 2; $i++) {
+                            $receiver = new SmartschoolMessageReceiver;
+                            $receiver->messageId = $messageId;
+                            $receiver->username = DEV_MODE ? DEV_CONTACT : ($syncRepo->getByEmployeeId($item->linked->informatStudent->informatId)?->setEmail ?: (new RepositoryUser)->getByEmployeeId($item->linked->informatStudent->informatId, ['userPrincipalName'])?->getUserPrincipalName());
+                            $receiver->account = $i;
+
+                            $smsMessageReceiverRepo->set($receiver);
+                        }
+                    }
+                }
+            }
+
+            if ($type->manualAssignDate) {
+                $body .= "</tbody></table><br /><p>Gelieve de leerlingen zo snel mogelijk een plaatsje te geven.</p>";
+
+                if ($type->sendMessage) {
                     $message = new SmartschoolMessage;
                     $message->sourceId = $smartschoolSourceId;
                     $message->subject = Strings::trimToNull($title);
@@ -739,31 +772,12 @@ class RemedyController extends ApiController
 
                     $messageId = $smsMessageRepo->set($message);
 
-                    for ($i = 0; $i <= 2; $i++) {
-                        $receiver = new SmartschoolMessageReceiver;
-                        $receiver->messageId = $messageId;
-                        $receiver->username = DEV_MODE ? DEV_CONTACT : ($syncRepo->getByEmployeeId($item->linked->informatStudent->informatId)?->setEmail ?: (new RepositoryUser)->getByEmployeeId($item->linked->informatStudent->informatId, ['userPrincipalName'])?->getUserPrincipalName());
-                        $receiver->account = $i;
+                    $receiver = new SmartschoolMessageReceiver;
+                    $receiver->messageId = $messageId;
+                    $receiver->username = DEV_MODE ? DEV_CONTACT : $userRepo->getByInformatEmployeeId($moment->linked->informatEmployee->informatId)->username;
 
-                        $smsMessageReceiverRepo->set($receiver);
-                    }
+                    $smsMessageReceiverRepo->set($receiver);
                 }
-            }
-
-            if ($type->manualAssignDate) {
-                $body .= "</tbody></table><br /><p>Gelieve de leerlingen zo snel mogelijk een plaatsje te geven.</p>";
-                $message = new SmartschoolMessage;
-                $message->sourceId = $smartschoolSourceId;
-                $message->subject = Strings::trimToNull($title);
-                $message->body = Strings::trimToNull($body);
-
-                $messageId = $smsMessageRepo->set($message);
-
-                $receiver = new SmartschoolMessageReceiver;
-                $receiver->messageId = $messageId;
-                $receiver->username = DEV_MODE ? DEV_CONTACT : $userRepo->getByInformatEmployeeId($moment->linked->informatEmployee->informatId)->username;
-
-                $smsMessageReceiverRepo->set($receiver);
             }
         }
 

@@ -244,23 +244,28 @@ class AccidentController extends ApiController
         $item = $repo->getById($id);
 
         $files = FileSystem::getFiles(LOCATION_FILES . "/accident/{$item->guid}/*") ?: [];
-        $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- B.pdf")))[0];
-        $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- C.pdf")))[0];
+        $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- B.docx")))[0];
+        $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "- C.docx")))[0];
 
         if (Strings::equal($view, self::VIEW_LIST)) {
             $items = [
                 [
                     "title" => "Geneeskundig getuigschrift",
-                    "content" => $b ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($b), "Geneeskundig getuigschrift.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
+                    "content" => $b ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($b), "Geneeskundig getuigschrift.docx", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
                 ],
                 [
                     "title" => "Informatieblad",
-                    "content" => $c ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($c), "Informatieblad.pdf", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
+                    "content" => $c ? HTML::Link(HTML::LINK_TYPE_URL, FileSystem::GetDownloadLink($c), "Informatieblad.docx", HTML::LINK_TARGET_BLANK) : "Niet beschikbaar"
                 ],
             ];
 
             $this->appendToJson('raw', General::processTemplate($items, searchPrePost: "#"));
         }
+    }
+
+    protected function getDeclarationsAttachmentsOriginal($view, $id = null)
+    {
+        $this->getMineAttachments($view, $id);
     }
 
     // Post functions
@@ -425,6 +430,40 @@ class AccidentController extends ApiController
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }
 
+    protected function postDeclarationsUpload($view, $id = null)
+    {
+        $_fields = [
+            "documentB" => ["type" => "file"],
+            "documentC" => ["type" => "file"],
+        ];
+
+        [$invalid, $fields] = Form::Validate($_fields);
+        Arrays::each($invalid, fn($k) => $this->setValidation($k, Arrays::getNestedValue($_fields, [$k, "fieldError"]), self::VALIDATION_STATE_INVALID));
+
+        if ($this->validationIsAllGood()) {
+            $repo = new Accident;
+            $item = $repo->getById($id);
+
+            $documentB = $fields["documentB"];
+            if ($documentB && $documentB[0]->getSize() > 0) {
+                $ext = $documentB[0]->getExtension();
+                FileSystem::CreateFolder(LOCATION_FILES . "/accident/{$item->guid}");
+                $documentB[0]->move(LOCATION_FILES . "/accident/{$item->guid}/B.{$ext}");
+            }
+
+            $documentC = $fields["documentC"];
+            if ($documentC && $documentC[0]->getSize() > 0) {
+                $ext = $documentC[0]->getExtension();
+                FileSystem::CreateFolder(LOCATION_FILES . "/accident/{$item->guid}");
+                $documentC[0]->move(LOCATION_FILES . "/accident/{$item->guid}/C.{$ext}");
+            }
+
+            $this->setToast("Uploaden voltooid!");
+            $this->setCloseModal();
+            $this->setReloadList("lstIntranetAccidentDeclarationsFormAttachments");
+        } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
+    }
+
     protected function postDocuments($view, $id = null)
     {
         if ($id == "add") $id = null;
@@ -482,7 +521,8 @@ class AccidentController extends ApiController
             $id = CString::removeLeadingZeros(explode("-", $fields["filenumber"])[1]);
 
             $item = $repo->getById($id);
-            if ($item && Strings::equal(CString::getDigitsOnly($item?->linked->informatStudent->insz), CString::getDigitsOnly($fields['insz']))) $this->setRedirect("/details/{$item->guid}");
+            if ($item && $item?->linked->status->closed) $this->setToast("Uw dossier heeft de status gekregen van '{$item?->linked->status->name}' en kan niet meer worden bewerkt.", self::VALIDATION_STATE_INVALID);
+            else if ($item && Strings::equal(CString::getDigitsOnly($item?->linked->informatStudent->insz), CString::getDigitsOnly($fields['insz']))) $this->setRedirect("/details/{$item->guid}");
             else $this->setToast("Dossier niet gevonden!<br />Gelieve de juiste waarden in te vullen!", self::VALIDATION_STATE_INVALID);
         } else $this->setToast("Gelieve de vereiste velden in vullen!", self::VALIDATION_STATE_INVALID);
     }

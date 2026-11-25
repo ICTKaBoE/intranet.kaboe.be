@@ -2,12 +2,15 @@
 
 namespace Database\Object\Accident;
 
-use stdClass;
+use Database\Repository\Navigation\Navigation;
+use Database\Repository\Navigation\Setting;
+use Helpers\HTML;
+use Ouzo\Utilities\Arrays;
 use Ouzo\Utilities\Clock;
 use Ouzo\Utilities\Strings;
 use Security\CustomObject;
-use Database\Repository\Navigation\Setting;
-use Database\Repository\Navigation\Navigation;
+use Security\FileSystem;
+use stdClass;
 
 class Accident extends CustomObject
 {
@@ -125,6 +128,13 @@ class Accident extends CustomObject
         $this->formatted->location = $this->linked->location->formatted->name;
         $this->formatted->link = "https://intranet.kaboe.be/accident/mine/{$this->guid}";
         $this->formatted->publicLink = "https://extranet.kaboe.be/ongeval/details/{$this->guid}";
+
+        $files = FileSystem::getFiles(LOCATION_FILES . "/accident/{$this->guid}/*") ?: [];
+        $b = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/B.pdf")))[0];
+        $c = array_values(Arrays::filter($files, fn($f) => Strings::contains($f, "/C.pdf")))[0];
+
+        $this->formatted->files = HTML::Icon($b ? "check" : "x", "Geneeskundig getuigschrift", $b ? "green" : "red", ["icon"]) . HTML::Icon($c ? "check" : "x", "Informatieblad", $c ? "green" : "red", ["icon"]);
+
         $this->_lockedForm = $this->linked->status->closed;
 
         $this->createNumber();

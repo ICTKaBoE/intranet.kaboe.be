@@ -67,10 +67,19 @@ window.witnessAfterView = () => {
 
 $(document).ready(() => {
   if (add == "") {
-    Component.addActionButton(btnCancel, btnSave);
-
     Helpers.CheckAllLoaded(async () => {
       await Helpers.sleep(250);
+      Select.GetInstance("informatSubgroupId").setExtraLoadParam(
+        "schoolId",
+        Select.GetInstance("schoolId").getValue(),
+      );
+      Select.GetInstance("informatStudentId").setExtraLoadParam(
+        "informatSubgroupId",
+        Select.GetInstance("informatSubgroupId").getValue(),
+      );
+      Select.GetInstance("informatSubgroupId").reload();
+      await Helpers.sleep(250);
+      Select.GetInstance("informatStudentId").reload();
       window.locationView();
       window.partyView();
       window.policeView();

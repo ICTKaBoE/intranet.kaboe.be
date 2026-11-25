@@ -193,7 +193,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                 </div>
 
                 <div class="row">
-                    <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht" data-on-change="supervisionView" data-required></div>
+                    <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht (niet aangevinkt = Er was geen toezicht)" data-on-change="supervisionView" data-required></div>
                 </div>
 
                 <div class="row d-none" id="supervision-Y">
@@ -251,7 +251,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
     <div class="col-12 col-lg-3">
         <div class="card mb-3">
             <div class="card-header">
-                <h2 class="card-title">Documenten</h2>
+                <h2 class="card-title">Originele Documenten</h2>
             </div>
 
             <div class="card-body">

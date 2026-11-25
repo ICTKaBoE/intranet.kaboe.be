@@ -194,7 +194,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     </div>
 
                     <div class="row">
-                        <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht" data-on-change="supervisionView"></div>
+                        <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht (niet aangevinkt = Er was geen toezicht)" data-on-change="supervisionView"></div>
                     </div>
 
                     <div class="row d-none" id="supervision-Y">
@@ -450,7 +450,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     </div>
 
                     <div class="row">
-                        <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht" data-on-change="supervisionView"></div>
+                        <div class="col" id="chbSupervision" role="checkbox" data-type="checkbox" data-name="supervision" data-text="Er was toezicht (niet aangevinkt = Er was geen toezicht)" data-on-change="supervisionView"></div>
                     </div>
 
                     <div class="row d-none" id="supervision-Y">
@@ -573,7 +573,7 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
                     <div class="mb-2">
                         <label class="form-label" for="informatSubgroupId">Klas</label>
                         <input type="hidden" name="informatSubgroupId" id="informatSubgroupId" />
-                        <input type="text" name="linked.informatClass.name" id="linked.informatClass.name" class="form-control" readonly>
+                        <input type="text" name="linked.informatClass.code" id="linked.informatClass.code" class="form-control" readonly>
                     </div>
 
                     <div class="mb-2">
@@ -586,7 +586,23 @@ const LIST_TEMPLATE = " <div class='datagrid-item'>
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h2 class="card-title">Documenten</h2>
+                    <h2 class="card-title">Originele Documenten</h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="datagrid" role="list" id="lst{{page:id}}AttachmentsOriginal" data-source="{{list:url:full}}AttachmentsOriginal/{{url:part.id}}" data-template="<?= LIST_TEMPLATE; ?>"></div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Documenten (geüpload)</h2>
+                    </div>
+
+                    <div class="card-actions btn-actions">
+                        <button id="btnUpload" class="btn btn-action"></button>
+                    </div>
                 </div>
 
                 <div class="card-body">

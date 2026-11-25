@@ -89,6 +89,13 @@ let btnSave = new Button(null, {
   },
 });
 
+let btnUpload = new Button(document.getElementById("btnUpload"), {
+  type: Button.TYPE_ICON,
+  icon: "upload",
+  title: "Uploaden",
+  modal: "upload",
+});
+
 $(document).ready(() => {
   if (add == "") {
     Component.addActionButton(btnCancel, btnSave);
